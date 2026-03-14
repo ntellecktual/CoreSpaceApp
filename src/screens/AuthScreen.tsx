@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { Image, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { BrandLogo } from '../components/BrandLogo';
 import { NebulaBackground } from '../components/NebulaBackground';

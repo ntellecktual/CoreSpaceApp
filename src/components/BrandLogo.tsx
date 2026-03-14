@@ -1,0 +1,33 @@
+import React from 'react';
+import { Image, ImageStyle, StyleProp } from 'react-native';
+import { useUiTheme } from '../context/UiThemeContext';
+
+type BrandLogoProps = {
+  width?: number;
+  height?: number;
+  logoUri?: string;
+  style?: StyleProp<ImageStyle>;
+  accessibilityLabel?: string;
+};
+
+const nightLogoSource = require('../../assets/icon.png');
+const dayLogoSource = require('../../assets/icon2.png');
+
+export function BrandLogo({
+  width = 148,
+  height = 40,
+  logoUri,
+  style,
+  accessibilityLabel = 'CoreSpace logo',
+}: BrandLogoProps) {
+  const theme = useUiTheme();
+  const resolvedMode = (theme as any).mode?.mode ?? theme.mode;
+
+  return React.createElement(Image, {
+    source: logoUri?.trim() ? { uri: logoUri.trim() } : resolvedMode === 'day' ? dayLogoSource : nightLogoSource,
+    resizeMode: logoUri?.trim() ? 'contain' : 'cover',
+    style: [{ width, height }, style],
+    accessibilityRole: 'image',
+    accessibilityLabel,
+  });
+}

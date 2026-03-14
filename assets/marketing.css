@@ -1,0 +1,95 @@
+/* CoreSpace Marketing Page Styles */
+
+.cs-hero-badge {
+  margin-top: 4px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(139,92,246,0.35);
+  background: rgba(139,92,246,0.12);
+  display: inline-block;
+}
+
+.cs-hero-title {
+  /* font-size and line-height set via CSS variable if needed */
+  max-width: 860px;
+}
+
+.cs-hero-subtitle {
+  /* font-size and line-height set via CSS variable if needed */
+  max-width: 780px;
+}
+
+.cs-hero-actions {
+  display: flex;
+  gap: var(--cs-gap, 16px);
+  width: 100%;
+  max-width: 420px;
+}
+
+.cs-hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--cs-gap, 32px);
+  margin-top: 28px;
+  width: 100%;
+  max-width: 720px;
+}
+
+.cs-hero-demo {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cs-hero-demo-iframe {
+  width: 100%;
+  max-width: 800px;
+  align-self: center;
+  margin-top: 12px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(140,91,245,0.28);
+  aspect-ratio: 800 / 679;
+  min-height: 480px;
+  display: block;
+}
+
+.cs-problem-panel {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.cs-problem-card {
+  flex: 1;
+  min-width: 220px;
+  padding: 18px;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+}
+
+.cs-how-panel {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.cs-how-card {
+  flex: 1;
+  min-width: 190px;
+  padding: 18px;
+  gap: 10px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+/* Add more classes as needed for other sections */

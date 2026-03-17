@@ -11,23 +11,9 @@ const colors = {
 };
 
 const nightStyleObject = {
-  landingWrap: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  landingContent: {
-    flexGrow: 1,
-    paddingBottom: 36,
-  },
-  landingTopMenu: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  landingTopMenuText: {
-    color: '#F7F1FF',
-    fontSize: 13,
-    fontWeight: '700',
-  },
+  // Removed duplicate landingWrap and landingContent
+  // Removed duplicate landingTopMenu
+  // Removed duplicate landingTopMenuText
   root: {
     flex: 1,
     backgroundColor: '#07080C',
@@ -56,12 +42,9 @@ const nightStyleObject = {
   dashboardSidebar: {
     width: 288,
     borderRadius: 12,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))',
     backgroundColor: 'rgba(10,14,24,0.82)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
-    backdropFilter: 'blur(14px)',
     paddingHorizontal: 14,
     paddingTop: 14,
     paddingBottom: 14,
@@ -285,12 +268,9 @@ const nightStyleObject = {
   dashboardMainPane: {
     flex: 1,
     borderRadius: 12,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))',
     backgroundColor: 'rgba(11,14,22,0.82)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
-    backdropFilter: 'blur(14px)',
     overflow: 'hidden',
   },
   dashboardMainHeader: {
@@ -360,9 +340,7 @@ const nightStyleObject = {
   dashboardBottomActionBar: {
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))',
     backgroundColor: 'rgba(255,255,255,0.04)',
-    backdropFilter: 'blur(14px)',
     paddingHorizontal: 18,
     paddingVertical: 12,
     position: 'relative' as any,
@@ -484,10 +462,7 @@ const nightStyleObject = {
     borderRadius: 14,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
     backgroundColor: 'transparent',
-    backdropFilter: 'blur(14px)',
-    boxShadow: 'none',
     overflow: 'hidden',
   },
   moduleWidgetBlur: {
@@ -498,10 +473,7 @@ const nightStyleObject = {
     borderRadius: 14,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
     backgroundColor: 'transparent',
-    backdropFilter: 'blur(18px)',
-    boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
     overflow: 'hidden',
   },
   card: {
@@ -509,10 +481,7 @@ const nightStyleObject = {
     borderColor: 'rgba(255,255,255,0.10)',
     borderRadius: 14,
     padding: 14,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
     backgroundColor: 'transparent',
-    backdropFilter: 'blur(20px)',
-    boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
     overflow: 'hidden',
   },
   cardBlurWrap: {

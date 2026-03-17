@@ -11,6 +11,14 @@ import { useUiTheme } from '../context/UiThemeContext';
 const MKT_STYLE_ID = 'cs-mktg-css';
 function ensureMarketingCSS() {
   if (typeof document === 'undefined') return;
+  // Inject Tailwind CDN once — provides utility classes (tw- prefix)
+  const TW_ID = 'cs-tailwind-cdn';
+  if (!document.getElementById(TW_ID)) {
+    const tw = document.createElement('script');
+    tw.id = TW_ID;
+    tw.src = 'https://cdn.tailwindcss.com';
+    document.head.appendChild(tw);
+  }
   if (document.getElementById(MKT_STYLE_ID)) return;
   const s = document.createElement('style');
   s.id = MKT_STYLE_ID;
@@ -147,7 +155,7 @@ const orbitalLogo = require('../../assets/cs_orbitallightlogo.png');
 const cosmoLogo = require('../../assets/cs_orbitallightlogo.png'); // placeholder until cs_cosmolightlogo.png ships
 
 /* ─── Section-nav keys ──────────────────────────────────────────── */
-type NavKey = 'home' | 'problem' | 'how' | 'industries' | 'investors' | 'pricing';
+type NavKey = 'home' | 'problem' | 'how' | 'industries' | 'investors' | 'pricing' | 'about' | 'blog' | 'careers';
 const NAV_ITEMS: { key: NavKey; label: string }[] = [
   { key: 'home', label: 'Home' },
   { key: 'problem', label: 'Problem' },
@@ -155,6 +163,9 @@ const NAV_ITEMS: { key: NavKey; label: string }[] = [
   { key: 'industries', label: 'Industries' },
   { key: 'investors', label: 'Investors' },
   { key: 'pricing', label: 'Pricing' },
+  { key: 'about', label: 'About' },
+  { key: 'blog', label: 'Blog' },
+  { key: 'careers', label: 'Careers' },
 ];
 
 /* ─── Static data arrays ────────────────────────────────────────── */
@@ -321,6 +332,143 @@ const TIERS: {
   },
 ];
 
+/* ─── Investor profiles ─────────────────────────────────────────── */
+const INVESTORS = [
+  {
+    name: 'Marcus Delacroix',
+    title: 'Managing Partner',
+    fund: 'Veridian Ventures',
+    focus: 'B2B SaaS · HealthTech · Ops Automation',
+    amount: '$500K',
+    round: 'Seed',
+    bio: 'Marcus has led over 30 early-stage investments across B2B SaaS and healthcare technology. He backed one of the first enterprise no-code platforms, which exited at $220M in 2021. His thesis centers on replacing operational fragmentation with unified, AI-augmented tooling.',
+    thesis: '"The next wave is operational intelligence. CoreSpace is the infrastructure play I\'ve been looking for since 2019."',
+    portfolio: ['MedLane (acquired)', 'Fieldstack', 'VerifyNow'],
+    emoji: '💎',
+    accent: '#8C5BF5',
+  },
+  {
+    name: 'Priya Nairn',
+    title: 'Partner',
+    fund: 'BlueBridge Capital',
+    focus: 'No-Code Platforms · Workflow Automation · SMB',
+    amount: '$350K',
+    round: 'Seed',
+    bio: 'Priya leads BlueBridge\'s no-code and low-code portfolio spanning 14 active companies. She was previously CPO at WorkflowIQ (acquired by Salesforce). Her expertise is evaluating go-to-market readiness for platforms that democratize software development for non-technical teams.',
+    thesis: '"CoreSpace solves the last-mile problem — the gap between what Notion gives you and what a mid-market company actually needs."',
+    portfolio: ['DeskFlow', 'Cloverfield CRM', 'FormBase'],
+    emoji: '🚀',
+    accent: '#3B82F6',
+  },
+  {
+    name: 'Jordan Thatcher',
+    title: 'Angel Investor · ex-CTO',
+    fund: 'Personal Investment',
+    focus: 'Infrastructure · Developer Tools · Multi-Tenant SaaS',
+    amount: '$150K',
+    round: 'Seed',
+    bio: 'Jordan was CTO at Meridian Software for 9 years, scaling multi-tenant SaaS from Series A to $80M ARR. He invests personally in technical founders with deep architectural moats and a clear view on persistence strategy and data portability.',
+    thesis: '"The portable persistence layer alone is a defensible moat. Add AI-assisted workspace generation and you have a compounding product flywheel."',
+    portfolio: ['Databrace', 'LogicCore', 'PipelineIQ'],
+    emoji: '🏗️',
+    accent: '#22C55E',
+  },
+];
+
+/* ─── About / module deep-dives ─────────────────────────────────── */
+const ABOUT_MODULES = [
+  {
+    name: 'CoreSpace Platform',
+    icon: '🌌',
+    tagline: 'The Operational Platform for Every Business',
+    color: '#8C5BF5',
+    description: 'CoreSpace is a no-code operational platform that lets any business build, automate, and scale its workflows without writing a single line of code. Enterprise-grade infrastructure accessible to teams of any size.',
+    details: [
+      { label: '🌍 Multi-Tenant Architecture', text: 'Full tenant isolation — dedicated branding, data, and configuration per client.' },
+      { label: '🛡️ Role & Permission Engine', text: 'Field-level and workspace-level access control per persona.' },
+      { label: '📊 Board & Record Runtime', text: 'Dynamic boards, intake forms, and lifecycle tracking — auto-generated from your config.' },
+      { label: '🔗 Portable Persistence', text: 'Export to Cosmos DB, PostgreSQL, or MongoDB at any time — your data, your way.' },
+    ],
+  },
+  {
+    name: 'Signal Studio',
+    icon: '⚡',
+    tagline: 'Automate Anything. No Code. No Scripts.',
+    color: '#3B82F6',
+    description: 'Signal Studio is the automation engine. Build visual flows that respond to record events, webhooks, or schedules. Runs locally on-device with AI flow suggestions from Bebo and full audit trails.',
+    details: [
+      { label: '🎨 Visual Flow Builder', text: 'Drag signals to actions — any non-technical admin can build automations in minutes.' },
+      { label: '🔔 Event + Webhook + Schedule', text: 'Fires on record change, inbound webhook payload, or a cron-style timer.' },
+      { label: '🔀 Conditional Logic', text: 'Branch with AND/OR conditions evaluating field values, tags, or lifecycle stage.' },
+      { label: '📈 Run Metrics + Audit', text: 'Total runs, failure rate, avg execution time, and a full event log per flow.' },
+    ],
+  },
+  {
+    name: 'Orbital',
+    icon: '🛸',
+    tagline: 'Integrate Your Tools. One Marketplace.',
+    color: '#F59E0B',
+    description: 'Orbital is the integration marketplace. Pick an integration, configure credentials and field mappings, and your workspace is live. Every integration auto-registers pre-wired triggers in Signal Studio.',
+    details: [
+      { label: '🛒 Integration Marketplace', text: 'DocuSign, QuickBooks, and growing. Every integration ships with a pre-built template.' },
+      { label: '🔐 Multi-Auth Support', text: 'OAuth 2.0, API key, Basic Auth — whichever the integration requires, Orbital handles it.' },
+      { label: '✅ Pre-Flight Validation', text: 'Validates credentials and mappings before activating — zero broken integrations.' },
+      { label: '📡 Auto-Registered Signals', text: 'Integration triggers auto-appear in Signal Studio — connect events without any extra config.' },
+    ],
+  },
+  {
+    name: 'Cosmograph',
+    icon: '🧬',
+    tagline: 'Import Any Data. Auto-Mapped. Privacy-Safe.',
+    color: '#22C55E',
+    description: 'Cosmograph is the schema intelligence engine. Upload a CSV, Excel, or JSON file and Cosmograph scans structure, classifies PII/PHI, detects keys, and maps columns to workspace fields automatically.',
+    details: [
+      { label: '🧠 Schema Intelligence', text: 'Detects column types, nullability, cardinality, and business meaning automatically.' },
+      { label: '🔏 PII / PHI Classification', text: 'Flags emails, SSNs, DOBs, medical record fields before import — privacy by default.' },
+      { label: '🎯 Semantic Column Matching', text: 'Maps source columns to workspace fields by semantic similarity, not just name matching.' },
+      { label: '🔒 Network-Isolated Scan', text: 'All scanning happens locally — your data never leaves the vault during analysis.' },
+    ],
+  },
+  {
+    name: 'Bebo — AI Builder',
+    icon: '🤖',
+    tagline: 'Describe Your Business. Bebo Builds It.',
+    color: '#EC4899',
+    description: 'Bebo is the embedded AI assistant. Describe your business in plain English and Bebo configures workspaces, intake forms, personas, lifecycle stages, and Signal Studio flows for you.',
+    details: [
+      { label: '🏗️ AI Workspace Builder', text: 'One prompt → complete workspace with fields, lifecycle stages, personas, and automations.' },
+      { label: '📝 Auto-Fill & Validation', text: 'Reads context and prefills intake fields — catches errors before submission.' },
+      { label: '🏷️ Tag Suggestions', text: 'Recommends tags based on record content and historical patterns.' },
+      { label: '🔍 Query Engine', text: 'Ask plain-English questions about your data — Bebo returns counts, charts, insights.' },
+    ],
+  },
+];
+
+/* ─── Blog posts (static company news + live Dev.to SaaS feed) ──── */
+type BlogPost = { id: string; title: string; summary: string; author: string; date: string; tag: string; readTime: number; url: string | null; emoji: string };
+const BLOG_POSTS_STATIC: BlogPost[] = [
+  { id: 'cs-1', title: 'CoreSpace Closes $1M Seed Round to Build the Operational Platform for Every Business', summary: 'We are thrilled to announce our $1M seed round, backed by Veridian Ventures and BlueBridge Capital. This capital will accelerate engineering, Cosmograph, and our go-to-market motion.', author: 'CoreSpace Team', date: 'March 12, 2026', tag: 'Company News', readTime: 3, url: null, emoji: '🎉' },
+  { id: 'cs-2', title: 'Introducing Cosmograph: Smart Data Import Is Finally Here', summary: 'Today we are shipping Cosmograph to Pro and Enterprise users. Scan, classify, and import any CSV or Excel file in under 3 minutes — PII detection and schema mapping included.', author: 'CoreSpace Engineering', date: 'March 8, 2026', tag: 'Product Update', readTime: 4, url: null, emoji: '🧬' },
+  { id: 'cs-3', title: 'Why DSCSA Compliance Teams Choose CoreSpace Over Custom Software', summary: 'Healthcare supply chain teams need serialized batch tracking, lifecycle governance, and Orbital integrations — in one place. Here is how CoreSpace wins the compliance conversation.', author: 'CoreSpace Product', date: 'February 28, 2026', tag: 'Industry Insight', readTime: 6, url: null, emoji: '💊' },
+  { id: 'cs-4', title: 'Signal Studio Update: Webhook Triggers, Retry Policies, and Run Metrics v2', summary: 'Signal Studio got a major update: inbound webhooks now support payload parsing, failed runs auto-retry up to 3 times, and the run stats dashboard shows per-flow failure patterns.', author: 'CoreSpace Engineering', date: 'February 14, 2026', tag: 'Product Update', readTime: 5, url: null, emoji: '⚡' },
+];
+
+/* ─── Job listings ───────────────────────────────────────────────── */
+const JOBS = [
+  { title: 'Senior Full-Stack Engineer', team: 'Engineering', type: 'Full-time · Remote', level: 'Senior', description: 'Build and scale the CoreSpace platform — React Native, TypeScript, Node.js, and Cosmos DB. Own major features from spec to production.', skills: ['React Native / Expo', 'TypeScript 5+', 'Node.js APIs', 'Cosmos DB or PostgreSQL'] },
+  { title: 'Product Designer (UX/UI)', team: 'Design', type: 'Full-time · Remote', level: 'Mid–Senior', description: 'Lead the visual identity and UX of CoreSpace — workspace creator to end-user dashboard. Own the Figma system, user flows, and marketing design.', skills: ['Figma', 'Design systems', 'Mobile + web product design', 'SaaS background'] },
+  { title: 'Customer Success Manager', team: 'Customer Success', type: 'Full-time · Remote', level: 'Mid-level', description: 'Own onboarding, retention, and expansion for Pro and Enterprise clients. Build playbooks, reduce churn, and drive NPS.', skills: ['SaaS customer success', 'CRM tools', 'Onboarding playbooks', 'Strong communication'] },
+  { title: 'Growth Marketing Lead', team: 'Marketing', type: 'Full-time · Remote', level: 'Mid–Senior', description: 'Drive inbound pipeline through content, SEO, partnerships, and product-led growth. Own our digital presence end-to-end.', skills: ['B2B SaaS marketing', 'SEO + paid channels', 'Content strategy', 'Analytics'] },
+];
+
+/* ─── Team ───────────────────────────────────────────────────────── */
+const TEAM = [
+  { name: 'D. Eck', title: 'Founder & CEO', emoji: '🧠', bio: 'Built CoreSpace to close the gap between scattered spreadsheets and expensive custom software. 10+ years in operations and product.' },
+  { name: 'Alex Morin', title: 'Head of Engineering', emoji: '⚙️', bio: 'Led platform engineering at two SaaS exits. Owns CoreSpace architecture, multi-tenant infra, and Bebo AI.' },
+  { name: 'Tanya Walsh', title: 'Head of Customer Success', emoji: '🚀', bio: 'Onboarded 200+ SMB teams across healthcare, logistics, and finance. Runs rapid deployment and retention playbooks.' },
+  { name: 'Sam Okafor', title: 'Lead Designer', emoji: '🎨', bio: 'Designed the CoreSpace visual system from scratch — Nebula background, branded shell, and the Workspace Creator UX.' },
+];
+
 type MarketingScreenProps = {
   onContinue: () => void;
 };
@@ -334,10 +482,45 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
   const scrollRef = useRef<ScrollView>(null);
   const lastScrollYRef = useRef(0);
   const [navVisible, setNavVisible] = useState(true);
-  const [anchors, setAnchors] = useState<Record<NavKey, number>>({ home: 0, problem: 0, how: 0, industries: 0, investors: 0, pricing: 0 });
+  const [anchors, setAnchors] = useState<Record<NavKey, number>>({ home: 0, problem: 0, how: 0, industries: 0, investors: 0, pricing: 0, about: 0, blog: 0, careers: 0 });
   const revealRef = useScrollReveal();
 
+  // Blog: starts with static posts, enriched with Dev.to live feed
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(BLOG_POSTS_STATIC);
+  const [blogLoading, setBlogLoading] = useState(false);
+
+  // Careers form state
+  const [careerName, setCareerName] = useState('');
+  const [careerEmail, setCareerEmail] = useState('');
+  const [careerRole, setCareerRole] = useState('');
+  const [careerMessage, setCareerMessage] = useState('');
+  const [careerSubmitted, setCareerSubmitted] = useState(false);
+  const [expandedJob, setExpandedJob] = useState<string | null>(null);
+
   useEffect(() => { ensureMarketingCSS(); }, []);
+
+  // Fetch live SaaS articles from Dev.to public API (no auth required)
+  useEffect(() => {
+    setBlogLoading(true);
+    fetch('https://dev.to/api/articles?tag=saas&per_page=3&sort=latest')
+      .then((r) => r.json())
+      .then((data: any[]) => {
+        const live: BlogPost[] = data.slice(0, 3).map((a) => ({
+          id: `devto-${a.id}`,
+          title: a.title,
+          summary: a.description ?? a.title,
+          author: a.user?.name ?? 'DEV Community',
+          date: new Date(a.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          tag: ((a.tag_list?.[0] ?? 'SaaS') as string).charAt(0).toUpperCase() + ((a.tag_list?.[0] ?? 'SaaS') as string).slice(1),
+          readTime: a.reading_time_minutes ?? 3,
+          url: a.url,
+          emoji: '📰',
+        }));
+        setBlogPosts([...BLOG_POSTS_STATIC.slice(0, 2), ...live]);
+      })
+      .catch(() => { /* silently fall back to static posts */ })
+      .finally(() => setBlogLoading(false));
+  }, []);
 
   const sectionInset = Math.max(18, Math.min(120, Math.floor((width - 980) / 2)));
   const clamp = (min: number, preferred: number, max: number) => Math.max(min, Math.min(max, preferred));
@@ -814,6 +997,43 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
               </View>
             </View>
 
+            {/* ── Our Investors ─────────────────────────────────────── */}
+            <View style={{ gap: 16 }}>
+              <Text style={{ color: '#FD9CFD', fontSize: 16, fontWeight: '900', letterSpacing: 1, textAlign: 'center' }}>🤝 OUR INVESTORS</Text>
+              <Text style={{ color: '#EBDFFF', fontSize: 13, lineHeight: 21, textAlign: 'center', maxWidth: 580, alignSelf: 'center' as const }}>CoreSpace is backed by experienced operators who have seen what real enterprise automation looks like — and know exactly the gap we fill.</Text>
+              <div className="cs-investor-grid">
+                {INVESTORS.map((inv, i) => (
+                  <div key={`inv-${i}`} className="cs-investor-card" style={{ borderColor: `${inv.accent}33` } as any}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                      <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: `${inv.accent}1A`, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 24 }}>{inv.emoji}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '800' }}>{inv.name}</Text>
+                        <Text style={{ color: inv.accent, fontSize: 11, fontWeight: '700' }}>{inv.title} — {inv.fund}</Text>
+                        <Text style={{ color: '#9B8ABE', fontSize: 10, marginTop: 1 }}>{inv.focus}</Text>
+                      </View>
+                      <View style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, backgroundColor: `${inv.accent}18`, borderWidth: 1, borderColor: `${inv.accent}30` }}>
+                        <Text style={{ color: inv.accent, fontSize: 12, fontWeight: '900' }}>{inv.amount}</Text>
+                      </View>
+                    </View>
+                    <Text style={{ color: '#C9B8EA', fontSize: 12, lineHeight: 19 }}>{inv.bio}</Text>
+                    <View style={{ padding: 12, borderRadius: 10, backgroundColor: `${inv.accent}0D`, borderWidth: 1, borderColor: `${inv.accent}22` }}>
+                      <Text style={{ color: '#EBDFFF', fontSize: 12, lineHeight: 19, fontStyle: 'italic' }}>{inv.thesis}</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                      <Text style={{ color: '#9B8ABE', fontSize: 10, fontWeight: '700', letterSpacing: 0.4 }}>PORTFOLIO:</Text>
+                      {inv.portfolio.map((p, pi) => (
+                        <View key={pi} style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)' }}>
+                          <Text style={{ color: '#C9B8EA', fontSize: 10, fontWeight: '600' }}>{p}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </div>
+                ))}
+              </div>
+            </View>
+
             <View style={{ ...(glassCard as any), padding: 20, gap: 12 }}>
               <Text style={{ color: '#FD9CFD', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>Interested in the CoreSpace opportunity?</Text>
               <Text style={{ color: '#C9B8EA', fontSize: 13, lineHeight: 20, textAlign: 'center', maxWidth: 500 }}>
@@ -929,6 +1149,276 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   <Text style={{ color: '#C9B8EA', fontSize: 11, textAlign: 'center' }}>{item.desc}</Text>
                 </View>
               ))}
+            </View>
+          </SectionGlass>
+        </div>
+      </View>
+
+      <div className="cs-section-divider" />
+
+      {/* ═══ ABOUT ════════════════════════════════════════════════════════ */}
+      <View onLayout={setAnchor('about')}>
+        <div ref={revealRef}>
+          <SectionGlass>
+            <Text style={[styles.landingSectionEyebrow, { fontSize: sectionTitleSize * 1.25, fontWeight: '900', textAlign: 'center', width: '100%' }]}>🏢 ABOUT CORESPACE</Text>
+            <Text style={[styles.landingSectionTitle, { fontSize: sectionTitleSize, lineHeight: sectionTitleLineHeight, textAlign: 'center', width: '100%' }]}>Built for operators. Engineered for scale.</Text>
+            <Text style={[styles.landingSectionText, { fontSize: sectionBodySize, lineHeight: sectionBodyLineHeight, textAlign: 'center', maxWidth: 700, alignSelf: 'center' as const }]}>
+              CoreSpace is a U.S.-based technology company founded in 2024. Our mission is to make enterprise-grade operational software accessible to every business on earth — regardless of size, technical resources, or industry.
+            </Text>
+
+            {/* Team */}
+            <View style={{ gap: 12 }}>
+              <Text style={{ color: '#FD9CFD', fontSize: 15, fontWeight: '900', textAlign: 'center', letterSpacing: 0.6 }}>👥 THE TEAM</Text>
+              <div className="cs-team-grid">
+                {TEAM.map((member, i) => (
+                  <div key={`team-${i}`} className="cs-team-card">
+                    <Text style={{ fontSize: 30 }}>{member.emoji}</Text>
+                    <Text style={{ color: '#FFFFFF', fontSize: 13, fontWeight: '800' }}>{member.name}</Text>
+                    <Text style={{ color: '#8C5BF5', fontSize: 11, fontWeight: '700', letterSpacing: 0.3 }}>{member.title}</Text>
+                    <Text style={{ color: '#C9B8EA', fontSize: 11, lineHeight: 17 }}>{member.bio}</Text>
+                  </div>
+                ))}
+              </div>
+            </View>
+
+            {/* Products */}
+            <View style={{ gap: 12, marginTop: spaceSm }}>
+              <Text style={{ color: '#FD9CFD', fontSize: 15, fontWeight: '900', textAlign: 'center', letterSpacing: 0.6 }}>🧩 OUR PRODUCTS</Text>
+              <div className="cs-about-grid">
+                {ABOUT_MODULES.map((mod, i) => (
+                  <div key={`mod-${i}`} className="cs-about-card" style={{ borderColor: `${mod.color}28` } as any}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                      <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: `${mod.color}1A`, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 20 }}>{mod.icon}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '800' }}>{mod.name}</Text>
+                        <Text style={{ color: mod.color, fontSize: 11, fontWeight: '700', marginTop: 1 }}>{mod.tagline}</Text>
+                      </View>
+                    </View>
+                    <Text style={{ color: '#C9B8EA', fontSize: 12, lineHeight: 19 }}>{mod.description}</Text>
+                    <div className="cs-about-detail-row">
+                      {mod.details.map((d, di) => (
+                        <div key={di} className="cs-about-detail-item">
+                          <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>{d.label}</Text>
+                          <Text style={{ color: '#9B8ABE', fontSize: 11, lineHeight: 17 }}>{d.text}</Text>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </View>
+
+            {/* Mission */}
+            <View style={{ ...(glassCard as any), padding: 26, gap: 12, alignItems: 'center', marginTop: spaceSm }}>
+              <Text style={{ fontSize: 30 }}>🌌</Text>
+              <Text style={{ color: '#FFFFFF', fontSize: 17, fontWeight: '800', textAlign: 'center' }}>Our Mission</Text>
+              <Text style={{ color: '#EBDFFF', fontSize: 13, lineHeight: 22, textAlign: 'center', maxWidth: 580 }}>
+                Every small business, healthcare provider, logistics company, and service firm deserves the same operational power that Fortune 500 companies have — without a $2M software budget. That is what CoreSpace is building.
+              </Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 4 }}>
+                {['🇺🇸 U.S. Company', '📍 Remote-First', '🔒 Privacy-First', '♾️ No Vendor Lock-In', '🤝 Community-Backed'].map((v, i) => (
+                  <View key={i} style={{ paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, backgroundColor: 'rgba(139,92,246,0.12)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.26)' }}>
+                    <Text style={{ color: '#D8BBFF', fontSize: 11, fontWeight: '700' }}>{v}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </SectionGlass>
+        </div>
+      </View>
+
+      <div className="cs-section-divider" />
+
+      {/* ═══ BLOG ══════════════════════════════════════════════════════════ */}
+      <View onLayout={setAnchor('blog')}>
+        <div ref={revealRef}>
+          <SectionGlass>
+            <Text style={[styles.landingSectionEyebrow, { fontSize: sectionTitleSize * 1.25, fontWeight: '900', textAlign: 'center', width: '100%' }]}>📰 BLOG &amp; NEWS</Text>
+            <Text style={[styles.landingSectionTitle, { fontSize: sectionTitleSize, lineHeight: sectionTitleLineHeight, textAlign: 'center', width: '100%' }]}>Latest from CoreSpace &amp; the SaaS world</Text>
+            {blogLoading && (
+              <Text style={{ color: '#9B8ABE', fontSize: 12, textAlign: 'center' }}>Loading latest articles…</Text>
+            )}
+            <div className="cs-blog-grid">
+              {blogPosts.map((post) => (
+                <a
+                  key={post.id}
+                  className="cs-blog-card"
+                  href={post.url ?? '#'}
+                  target={post.url ? '_blank' : undefined}
+                  rel="noreferrer"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <Text style={{ fontSize: 26 }}>{post.emoji}</Text>
+                  <span className="cs-blog-tag">{post.tag}</span>
+                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700', lineHeight: 21 }}>{post.title}</Text>
+                  <Text style={{ color: '#C9B8EA', fontSize: 12, lineHeight: 19, flex: 1 }}>{post.summary}</Text>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
+                    <Text style={{ color: '#9B8ABE', fontSize: 11 }}>{post.author}</Text>
+                    <Text style={{ color: '#9B8ABE', fontSize: 11 }}>{post.date} · {post.readTime} min</Text>
+                  </View>
+                </a>
+              ))}
+            </div>
+            <View style={{ ...(glassCard as any), padding: 22, gap: 10, alignItems: 'center', marginTop: spaceSm }}>
+              <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '800', textAlign: 'center' }}>📬 Stay in the loop</Text>
+              <Text style={{ color: '#C9B8EA', fontSize: 12, lineHeight: 19, textAlign: 'center', maxWidth: 480 }}>Product updates and SaaS insights — no spam, ever.</Text>
+              <Pressable
+                style={[styles.landingPrimaryCta, { alignSelf: 'center', marginTop: 4 }]}
+                onPress={() => {
+                  if (typeof window !== 'undefined') {
+                    window.open('mailto:dwaineeck@outlook.com?subject=Subscribe%20to%20CoreSpace%20Newsletter&body=Hi%20CoreSpace%20team%2C%20please%20add%20me%20to%20your%20newsletter.%0A%0AName%3A%20%0AEmail%3A%20', '_blank');
+                  }
+                }}
+              >
+                <Text style={styles.landingPrimaryCtaText}>Subscribe to updates</Text>
+              </Pressable>
+            </View>
+          </SectionGlass>
+        </div>
+      </View>
+
+      <div className="cs-section-divider" />
+
+      {/* ═══ CAREERS ═══════════════════════════════════════════════════════ */}
+      <View onLayout={setAnchor('careers')}>
+        <div ref={revealRef}>
+          <SectionGlass>
+            <Text style={[styles.landingSectionEyebrow, { fontSize: sectionTitleSize * 1.25, fontWeight: '900', textAlign: 'center', width: '100%' }]}>💼 CAREERS</Text>
+            <Text style={[styles.landingSectionTitle, { fontSize: sectionTitleSize, lineHeight: sectionTitleLineHeight, textAlign: 'center', width: '100%' }]}>Help us build the platform for every business</Text>
+            <Text style={[styles.landingSectionText, { fontSize: sectionBodySize, lineHeight: sectionBodyLineHeight, textAlign: 'center', maxWidth: 620, alignSelf: 'center' as const }]}>
+              We are remote-first. We move fast, ship real features, and care deeply about the people who use what we build.
+            </Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
+              {['🌍 Remote-First', '🔥 Seed Stage', '⚡ Move Fast', '🛡️ Privacy-First', '📈 Equity for Early Hires'].map((v, i) => (
+                <View key={i} style={{ paddingHorizontal: 13, paddingVertical: 5, borderRadius: 999, backgroundColor: 'rgba(139,92,246,0.10)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.24)' }}>
+                  <Text style={{ color: '#D8BBFF', fontSize: 11, fontWeight: '700' }}>{v}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Open roles */}
+            <View style={{ gap: 10 }}>
+              <Text style={{ color: '#FD9CFD', fontSize: 14, fontWeight: '800', letterSpacing: 0.4 }}>Open Positions</Text>
+              <div className="cs-jobs-list">
+                {JOBS.map((job, i) => (
+                  <div
+                    key={`job-${i}`}
+                    className="cs-job-card"
+                    onClick={() => setExpandedJob(expandedJob === job.title ? null : job.title)}
+                    style={{ cursor: 'pointer', flexDirection: 'column', alignItems: 'flex-start', gap: 10 } as any}
+                  >
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', gap: 12, flexWrap: 'wrap' as any }}>
+                      <View style={{ flex: 1, gap: 3 }}>
+                        <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '800' }}>{job.title}</Text>
+                        <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' as any }}>
+                          <Text style={{ color: '#8C5BF5', fontSize: 11, fontWeight: '700' }}>{job.team}</Text>
+                          <Text style={{ color: '#9B8ABE', fontSize: 11 }}>·</Text>
+                          <Text style={{ color: '#9B8ABE', fontSize: 11 }}>{job.type}</Text>
+                          <Text style={{ color: '#9B8ABE', fontSize: 11 }}>·</Text>
+                          <Text style={{ color: '#22C55E', fontSize: 11, fontWeight: '600' }}>{job.level}</Text>
+                        </View>
+                      </View>
+                      <View style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: 'rgba(139,92,246,0.12)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.26)' }}>
+                        <Text style={{ color: '#D8BBFF', fontSize: 10, fontWeight: '700' }}>{expandedJob === job.title ? 'Close ▲' : 'View ▼'}</Text>
+                      </View>
+                    </View>
+                    {expandedJob === job.title && (
+                      <View style={{ gap: 8, paddingTop: 6, width: '100%' }}>
+                        <Text style={{ color: '#EBDFFF', fontSize: 12, lineHeight: 19 }}>{job.description}</Text>
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                          {job.skills.map((sk, si) => (
+                            <View key={si} style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)' }}>
+                              <Text style={{ color: '#C9B8EA', fontSize: 11, fontWeight: '600' }}>{sk}</Text>
+                            </View>
+                          ))}
+                        </View>
+                        <Pressable
+                          style={{ alignSelf: 'flex-start', marginTop: 4, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, backgroundColor: '#8C5BF5' }}
+                          onPress={() => {
+                            if (typeof window !== 'undefined') {
+                              const sub = encodeURIComponent(`Application: ${job.title}`);
+                              const body = encodeURIComponent(`Hi CoreSpace Team,\n\nI am applying for the ${job.title} position.\n\nName: \nLinkedIn/Portfolio: \nWhy CoreSpace: \n\nThank you!`);
+                              window.open(`mailto:dwaineeck@outlook.com?subject=${sub}&body=${body}`, '_blank');
+                            }
+                          }}
+                        >
+                          <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>Apply for this role →</Text>
+                        </Pressable>
+                      </View>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </View>
+
+            {/* General application form */}
+            <View style={{ gap: 14, marginTop: spaceSm }}>
+              <Text style={{ color: '#FD9CFD', fontSize: 14, fontWeight: '800', letterSpacing: 0.4 }}>📨 Send a General Application</Text>
+              <Text style={{ color: '#C9B8EA', fontSize: 12, lineHeight: 19 }}>Don't see your role? We're always looking for exceptional people — send a note and we'll keep you in mind.</Text>
+              {careerSubmitted ? (
+                <View style={{ padding: 22, borderRadius: 14, backgroundColor: 'rgba(34,197,94,0.10)', borderWidth: 1, borderColor: 'rgba(34,197,94,0.28)', alignItems: 'center', gap: 8 }}>
+                  <Text style={{ fontSize: 26 }}>🎉</Text>
+                  <Text style={{ color: '#22C55E', fontSize: 14, fontWeight: '800', textAlign: 'center' }}>Application sent!</Text>
+                  <Text style={{ color: '#EBDFFF', fontSize: 12, lineHeight: 19, textAlign: 'center' }}>Thanks for reaching out. We'll be in touch within 5 business days.</Text>
+                  <Pressable
+                    style={{ marginTop: 6, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.06)' }}
+                    onPress={() => { setCareerSubmitted(false); setCareerName(''); setCareerEmail(''); setCareerRole(''); setCareerMessage(''); }}
+                  >
+                    <Text style={{ color: '#C9B8EA', fontSize: 11, fontWeight: '600' }}>Submit another</Text>
+                  </Pressable>
+                </View>
+              ) : (
+                <div className="cs-career-form">
+                  <div className="cs-form-row">
+                    <input
+                      className="cs-form-input"
+                      placeholder="Your full name"
+                      value={careerName}
+                      onChange={(e: any) => setCareerName(e.target.value)}
+                    />
+                    <input
+                      className="cs-form-input"
+                      type="email"
+                      placeholder="Your email address"
+                      value={careerEmail}
+                      onChange={(e: any) => setCareerEmail(e.target.value)}
+                    />
+                  </div>
+                  <select
+                    className="cs-form-input cs-form-select"
+                    title="Role of interest"
+                    value={careerRole}
+                    onChange={(e: any) => setCareerRole(e.target.value)}
+                  >
+                    <option value="" disabled>Which role interests you most?</option>
+                    {JOBS.map((j) => <option key={j.title} value={j.title}>{j.title}</option>)}
+                    <option value="Other">Other / General Inquiry</option>
+                  </select>
+                  <textarea
+                    className="cs-form-input cs-form-textarea"
+                    placeholder="Tell us about yourself, your background, and why CoreSpace…"
+                    value={careerMessage}
+                    onChange={(e: any) => setCareerMessage(e.target.value)}
+                  />
+                  <Pressable
+                    style={[styles.landingPrimaryCta, { alignSelf: 'flex-start', opacity: (!careerName.trim() || !careerEmail.trim() || !careerMessage.trim()) ? 0.5 : 1 }]}
+                    onPress={() => {
+                      if (!careerName.trim() || !careerEmail.trim() || !careerMessage.trim()) return;
+                      if (typeof window !== 'undefined') {
+                        const sub = encodeURIComponent(`Career Application — ${careerRole || 'General'} — ${careerName}`);
+                        const body = encodeURIComponent(`Name: ${careerName}\nEmail: ${careerEmail}\nRole of Interest: ${careerRole || 'General Inquiry'}\n\n${careerMessage}`);
+                        window.open(`mailto:dwaineeck@outlook.com?subject=${sub}&body=${body}`, '_blank');
+                        setCareerSubmitted(true);
+                      }
+                    }}
+                  >
+                    <Text style={styles.landingPrimaryCtaText}>Send Application →</Text>
+                  </Pressable>
+                  <Text style={{ color: '#9B8ABE', fontSize: 10, marginTop: -4 }}>Sends to dwaineeck@outlook.com</Text>
+                </div>
+              )}
             </View>
           </SectionGlass>
         </div>

@@ -1,0 +1,12 @@
+[build]
+  command   = "npx expo export --platform web"
+  publish   = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA routing — all paths fall back to index.html
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200

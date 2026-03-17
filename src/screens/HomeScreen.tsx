@@ -627,11 +627,10 @@ export function HomeScreen() {
               </Pressable>
 
               <View style={styles.dashboardNavSection}>
-                <Text style={styles.dashboardSectionLabel}>Mission Control</Text>
                 {pages.map((item) => (
                   item.id === 'bebo' ? (
                     <React.Fragment key={item.id}>
-                      <Text style={[styles.dashboardSectionLabel, { marginTop: 12 }]}>Ai</Text>
+                      <Text style={styles.dashboardSectionLabel}>AI</Text>
                       <Pressable
                         onPress={() => {
                           setTenantAccessOpen(false);
@@ -663,7 +662,7 @@ export function HomeScreen() {
                     </React.Fragment>
                   ) : item.id === 'enduser' && isSuperAdmin ? (
                     <React.Fragment key={item.id}>
-                      <Text style={[styles.dashboardSectionLabel, { marginTop: 12 }]}>Tenant</Text>
+                      <Text style={[styles.dashboardSectionLabel, { marginTop: 12 }]}>Operate</Text>
                       <View style={styles.dashboardTenantNavGroup}>
                       <Pressable
                         onPress={() => {
@@ -742,7 +741,7 @@ export function HomeScreen() {
                     </React.Fragment>
                   ) : item.id === 'enduser' ? (
                     <React.Fragment key={item.id}>
-                      <Text style={[styles.dashboardSectionLabel, { marginTop: 12 }]}>Tenant</Text>
+                      <Text style={[styles.dashboardSectionLabel, { marginTop: 12 }]}>Operate</Text>
                       <Pressable
                       onPress={() => {
                         setTenantAccessOpen(false);
@@ -773,38 +772,40 @@ export function HomeScreen() {
                     </Pressable>
                     </React.Fragment>
                   ) : (
-                    <Pressable
-                      key={item.id}
-                      onPress={() => {
-                        setTenantAccessOpen(false);
-                        setPage(item.id);
-                      }}
-                      style={[
-                        styles.dashboardNavItem,
-                        page === item.id && styles.dashboardNavItemActive,
-                      ]}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected: page === item.id }}
-                      accessibilityLabel={`${item.label} page`}
-                    >
-                      <View style={styles.dashboardNavItemRow}>
-                        {item.id === 'admin' && <Image source={workspaceNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Workspace icon" />}
-                        {item.id === 'signal' && <Image source={signalNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Signal Studio icon" />}
-                        {item.id === 'orbital' && <Image source={orbitalNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Orbital icon" />}
-                        {item.id === 'cosmograph' && <Image source={cosmoNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Cosmograph icon" />}
-                        <View>
-                          <Text
-                            style={[
-                              styles.dashboardNavItemText,
-                              page === item.id && styles.dashboardNavItemTextActive,
-                            ]}
-                          >
-                            {item.id === 'admin' ? 'Workspace' : item.label}
-                          </Text>
-                          <Text style={styles.dashboardNavItemDesc}>{item.desc}</Text>
+                    <React.Fragment key={item.id}>
+                      <Text style={[styles.dashboardSectionLabel, { marginTop: 12 }]}>{item.desc}</Text>
+                      <Pressable
+                        onPress={() => {
+                          setTenantAccessOpen(false);
+                          setPage(item.id);
+                        }}
+                        style={[
+                          styles.dashboardNavItem,
+                          page === item.id && styles.dashboardNavItemActive,
+                        ]}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected: page === item.id }}
+                        accessibilityLabel={`${item.label} page`}
+                      >
+                        <View style={styles.dashboardNavItemRow}>
+                          {item.id === 'admin' && <Image source={workspaceNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Workspace icon" />}
+                          {item.id === 'signal' && <Image source={signalNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Signal Studio icon" />}
+                          {item.id === 'orbital' && <Image source={orbitalNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Orbital icon" />}
+                          {item.id === 'cosmograph' && <Image source={cosmoNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Cosmograph icon" />}
+                          <View>
+                            <Text
+                              style={[
+                                styles.dashboardNavItemText,
+                                page === item.id && styles.dashboardNavItemTextActive,
+                              ]}
+                            >
+                              {item.id === 'admin' ? 'Workspace' : item.label}
+                            </Text>
+                            <Text style={styles.dashboardNavItemDesc}>{item.desc}</Text>
+                          </View>
                         </View>
-                      </View>
-                    </Pressable>
+                      </Pressable>
+                    </React.Fragment>
                   )
                 ))}
               </View>

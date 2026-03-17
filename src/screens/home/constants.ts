@@ -16,10 +16,10 @@ export type SpotlightGuideStep = {
 };
 
 export const pages: { id: Page; label: string; desc: string }[] = [
+  { id: 'bebo', label: 'Bebo Ai', desc: 'Assist' },
   { id: 'admin', label: 'Workspace Creator', desc: 'Design' },
   { id: 'signal', label: 'Signal Studio', desc: 'Automate' },
   { id: 'orbital', label: 'Orbital', desc: 'Integrate' },
-  { id: 'bebo', label: 'Bebo Ai', desc: 'Assist' },
   { id: 'cosmograph', label: 'Cosmograph', desc: 'Analyze' },
   { id: 'enduser', label: 'End User', desc: 'Operate' },
 ];

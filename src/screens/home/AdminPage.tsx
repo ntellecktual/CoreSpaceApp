@@ -132,7 +132,7 @@ const adminWalkthroughSteps: AdminWalkthroughStep[] = [
 export function AdminPage({ guidedMode, registerActions, auditLog, addNotification }: GuidedPageProps) {
   const { styles } = useUiTheme();
   const { width: windowWidth } = useWindowDimensions();
-  const [adminTab, setAdminTab] = useState<'workspace' | 'shell' | 'role' | 'governance' | 'forms'>('workspace');
+  const [adminTab, setAdminTab] = useState<'workspace' | 'shell' | 'role' | 'governance' | 'forms' | 'architecture'>('workspace');
   const [workspacePane, setWorkspacePane] = useState<'workspace' | 'subspaces'>('workspace');
   const [workspaceBuilderPanelOpen, setWorkspaceBuilderPanelOpen] = useState(true);
   const [draggedFieldType, setDraggedFieldType] = useState<SubSpaceBuilderFieldType | null>(null);
@@ -145,6 +145,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const [showCreateModeBanner, setShowCreateModeBanner] = useState(true);
   const [signalHintFieldId, setSignalHintFieldId] = useState<string | null>(null);
   const [expandedAdminSections, setExpandedAdminSections] = useState<Record<string, boolean>>({
+    architecture: false,
     workspace: true,
     shell: false,
     forms: false,
@@ -201,7 +202,18 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     updateSelectedSubSpace,
   } = useAdminWorkspace();
   const insights = useAdminEnterpriseInsights(workspace);
-  const { activeTenantId, data, getFormForSubSpace } = useAppState();
+  const { activeTenantId, data, getFormForSubSpace, upsertBusinessFunction, deleteBusinessFunction, upsertBusinessObject, deleteBusinessObject } = useAppState();
+  const [editingFunctionId, setEditingFunctionId] = useState<string | null>(null);
+  const [editingObjectKey, setEditingObjectKey] = useState<string | null>(null);
+  const [newFnName, setNewFnName] = useState('');
+  const [newFnIcon, setNewFnIcon] = useState('');
+  const [newFnColor, setNewFnColor] = useState('#8C5BF5');
+  const [newFnDesc, setNewFnDesc] = useState('');
+  const [newObjName, setNewObjName] = useState('');
+  const [newObjNamePlural, setNewObjNamePlural] = useState('');
+  const [newObjIcon, setNewObjIcon] = useState('');
+  const [newObjDesc, setNewObjDesc] = useState('');
+  const [expandedFnIds, setExpandedFnIds] = useState<Set<string>>(new Set());
   const aiWs = useAiWorkspaceBuilder();
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const canManageWorkspace = can('workspace.manage');
@@ -281,6 +293,15 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
 
   const adminNavSections = [
     {
+      key: 'architecture',
+      label: 'Business Architecture',
+      description: 'Define business functions and objects — the layer above workspaces that organises your whole operation.',
+      items: [
+        { label: 'Functions & Objects', detail: 'Build and manage your business hierarchy', onPress: () => setAdminTab('architecture') },
+        { label: 'Architecture Terminology', detail: 'Rename functions, objects, and collections', onPress: () => { setAdminTab('shell'); setShellPane('labels'); } },
+      ],
+    },
+    {
       key: 'workspace',
       label: 'Workspace Design',
       description: 'Build your operational core, SubSpaces, and data fields.',
@@ -340,6 +361,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   ];
 
   const getActiveNavItemKey = (): string => {
+    if (adminTab === 'architecture') return 'Functions & Objects';
     if (adminTab === 'workspace') return workspacePane === 'workspace' ? 'Configure Workspace' : 'SubSpace Lanes & Fields';
     if (adminTab === 'shell') {
       if (shellPane === 'labels') return 'App Terminology';
@@ -361,6 +383,10 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const activeNavItemKey = getActiveNavItemKey();
 
   const adminContentHeaders: Record<string, { title: string; description: string }> = {
+    architecture: {
+      title: 'Business Architecture',
+      description: `Define ${data.shellConfig.functionLabelPlural ?? 'Functions'} and ${data.shellConfig.objectLabelPlural ?? 'Objects'} — the layer above workspaces that maps your entire operation before any records are created.`,
+    },
     workspace: {
       title: 'Workspace Design',
       description: 'Build from the core out: define your workspace identity, branch into SubSpaces, and configure the data fields each lane captures. The live preview mirrors what end users will see.',
@@ -505,6 +531,18 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     setWorkspaceLabel,
     subSpaceLabel,
     setSubSpaceLabel,
+    functionLabel,
+    setFunctionLabel,
+    functionLabelPlural,
+    setFunctionLabelPlural,
+    objectLabel: shellObjectLabel,
+    setObjectLabel: setShellObjectLabel,
+    objectLabelPlural,
+    setObjectLabelPlural,
+    collectionLabel,
+    setCollectionLabel,
+    collectionLabelPlural,
+    setCollectionLabelPlural,
     newFieldLabel,
     setNewFieldLabel,
     newFieldType,
@@ -1566,6 +1604,208 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
         )}
       </Card>}
 
+      {adminTab === 'architecture' && <Card title="" blurred>
+        <Text style={styles.bodyText}>
+          {`Define ${data.shellConfig.functionLabelPlural ?? 'Functions'} and ${data.shellConfig.objectLabelPlural ?? 'Objects'} \u2014 the layer above workspaces that maps your full operation. Each ${data.shellConfig.objectLabel ?? 'Object'} links to the workspaces that process its ${data.shellConfig.collectionLabelPlural ?? 'collections'}.`}
+        </Text>
+        <Text style={styles.metaText}>{`Hierarchy: ${data.shellConfig.functionLabel ?? 'Function'} \u2192 ${data.shellConfig.objectLabel ?? 'Object'} \u2192 ${data.shellConfig.collectionLabel ?? 'Batch'} \u2192 Workspace \u2192 SubSpace \u2192 Record`}</Text>
+
+        {(data.businessFunctions ?? []).length === 0 && (
+          <Text style={[styles.metaText, { marginTop: 8 }]}>No functions defined yet. Add one below to start mapping your business architecture.</Text>
+        )}
+
+        {(data.businessFunctions ?? []).sort((a, b) => a.order - b.order).map((fn) => {
+          const isFnExpanded = expandedFnIds.has(fn.id);
+          const isEditingFn = editingFunctionId === fn.id;
+          return (
+            <View key={fn.id} style={[styles.listCard, { borderLeftWidth: 3, borderLeftColor: fn.color ?? '#8C5BF5' }]}>
+              <View style={styles.inlineRow}>
+                <Pressable onPress={() => setExpandedFnIds((prev) => { const next = new Set(prev); isFnExpanded ? next.delete(fn.id) : next.add(fn.id); return next; })} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  {!!fn.icon && <Text style={{ fontSize: 18 }}>{fn.icon}</Text>}
+                  <Text style={styles.listTitle}>{fn.name}</Text>
+                  <Text style={styles.metaText}>{fn.objects.length} {fn.objects.length === 1 ? (data.shellConfig.objectLabel ?? 'Object') : (data.shellConfig.objectLabelPlural ?? 'Objects')}</Text>
+                  <Text style={styles.metaText}>{isFnExpanded ? '▾' : '▸'}</Text>
+                </Pressable>
+                <Pressable onPress={() => {
+                  setEditingFunctionId(isEditingFn ? null : fn.id);
+                  if (!isEditingFn) { setNewFnName(fn.name); setNewFnIcon(fn.icon ?? ''); setNewFnColor(fn.color ?? '#8C5BF5'); setNewFnDesc(fn.description ?? ''); }
+                }} style={styles.secondaryButton}>
+                  <Text style={styles.secondaryButtonText}>{isEditingFn ? 'Cancel' : 'Edit'}</Text>
+                </Pressable>
+                <Pressable onPress={() => deleteBusinessFunction(fn.id)} style={[styles.secondaryButton, { marginLeft: 4 }]}>
+                  <Text style={[styles.secondaryButtonText, { color: '#EF4444' }]}>Delete</Text>
+                </Pressable>
+              </View>
+              {fn.description ? <Text style={styles.metaText}>{fn.description}</Text> : null}
+
+              {isEditingFn && (
+                <View style={{ marginTop: 8, gap: 6 }}>
+                  <LabeledInput label="Name" value={newFnName} onChangeText={setNewFnName} placeholder="e.g. Supply Chain & Regulatory" />
+                  <LabeledInput label="Icon (emoji)" value={newFnIcon} onChangeText={setNewFnIcon} placeholder="🔗" />
+                  <LabeledInput label="Accent Color (hex)" value={newFnColor} onChangeText={setNewFnColor} placeholder="#8C5BF5" />
+                  <LabeledInput label="Description (optional)" value={newFnDesc} onChangeText={setNewFnDesc} placeholder="What this function covers" />
+                  <Pressable style={styles.secondaryButton} onPress={() => {
+                    if (!newFnName.trim()) return;
+                    upsertBusinessFunction({ ...fn, name: newFnName.trim(), icon: newFnIcon.trim() || undefined, color: newFnColor.trim() || fn.color, description: newFnDesc.trim() || undefined });
+                    setEditingFunctionId(null);
+                  }}>
+                    <Text style={styles.secondaryButtonText}>Save Function</Text>
+                  </Pressable>
+                </View>
+              )}
+
+              {isFnExpanded && (
+                <View style={{ marginTop: 8, paddingLeft: 12, borderLeftWidth: 2, borderLeftColor: '#8C5BF540' }}>
+                  {fn.objects.length === 0 && (
+                    <Text style={styles.metaText}>No {(data.shellConfig.objectLabelPlural ?? 'Objects').toLowerCase()} yet. Add one below.</Text>
+                  )}
+                  {fn.objects.map((obj) => {
+                    const objKey = `${fn.id}::${obj.id}`;
+                    const isEditingObj = editingObjectKey === objKey;
+                    return (
+                      <View key={obj.id} style={[styles.listCard, { marginBottom: 8 }]}>
+                        <View style={styles.inlineRow}>
+                          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            {!!obj.icon && <Text>{obj.icon}</Text>}
+                            <Text style={styles.listTitle}>{obj.name}</Text>
+                            {obj.namePlural !== obj.name && <Text style={styles.metaText}>/ {obj.namePlural}</Text>}
+                          </View>
+                          <Pressable onPress={() => {
+                            setEditingObjectKey(isEditingObj ? null : objKey);
+                            if (!isEditingObj) { setNewObjName(obj.name); setNewObjNamePlural(obj.namePlural); setNewObjIcon(obj.icon ?? ''); setNewObjDesc(obj.description ?? ''); }
+                          }} style={styles.secondaryButton}>
+                            <Text style={styles.secondaryButtonText}>{isEditingObj ? 'Cancel' : 'Edit'}</Text>
+                          </Pressable>
+                          <Pressable onPress={() => deleteBusinessObject(fn.id, obj.id)} style={[styles.secondaryButton, { marginLeft: 4 }]}>
+                            <Text style={[styles.secondaryButtonText, { color: '#EF4444' }]}>Delete</Text>
+                          </Pressable>
+                        </View>
+                        {obj.description ? <Text style={styles.metaText}>{obj.description}</Text> : null}
+
+                        {isEditingObj && (
+                          <View style={{ marginTop: 8, gap: 6 }}>
+                            <LabeledInput label="Name (singular)" value={newObjName} onChangeText={setNewObjName} placeholder="e.g. Drug Inventory" />
+                            <LabeledInput label="Name (plural)" value={newObjNamePlural} onChangeText={setNewObjNamePlural} placeholder="e.g. Drug Inventories" />
+                            <LabeledInput label="Icon (emoji)" value={newObjIcon} onChangeText={setNewObjIcon} placeholder="💊" />
+                            <LabeledInput label="Description (optional)" value={newObjDesc} onChangeText={setNewObjDesc} placeholder="What this object tracks" />
+                            <Text style={[styles.metaText, { marginTop: 6 }]}>Linked Workspaces — tap to toggle:</Text>
+                            <View style={styles.inlineRow}>
+                              {data.workspaces.map((ws) => {
+                                const isLinked = obj.workspaceIds.includes(ws.id);
+                                return (
+                                  <Pressable
+                                    key={ws.id}
+                                    style={[styles.pill, isLinked && styles.pillActive]}
+                                    onPress={() => {
+                                      const next = isLinked
+                                        ? obj.workspaceIds.filter((id) => id !== ws.id)
+                                        : [...obj.workspaceIds, ws.id];
+                                      upsertBusinessObject(fn.id, { ...obj, workspaceIds: next });
+                                    }}
+                                  >
+                                    <Text style={[styles.pillText, isLinked && styles.pillTextActive]}>{ws.name}</Text>
+                                  </Pressable>
+                                );
+                              })}
+                              {data.workspaces.length === 0 && <Text style={styles.metaText}>No workspaces available yet.</Text>}
+                            </View>
+                            <Pressable style={styles.secondaryButton} onPress={() => {
+                              if (!newObjName.trim()) return;
+                              upsertBusinessObject(fn.id, { ...obj, name: newObjName.trim(), namePlural: newObjNamePlural.trim() || newObjName.trim(), icon: newObjIcon.trim() || undefined, description: newObjDesc.trim() || undefined });
+                              setEditingObjectKey(null);
+                            }}>
+                              <Text style={styles.secondaryButtonText}>Save {data.shellConfig.objectLabel ?? 'Object'}</Text>
+                            </Pressable>
+                          </View>
+                        )}
+
+                        {!isEditingObj && obj.workspaceIds.length > 0 && (
+                          <View style={[styles.inlineRow, { marginTop: 4 }]}>
+                            {obj.workspaceIds.map((wsId) => {
+                              const ws = data.workspaces.find((w) => w.id === wsId);
+                              return ws ? (
+                                <View key={wsId} style={[styles.pill, { opacity: 0.7 }]}>
+                                  <Text style={styles.pillText}>{ws.name}</Text>
+                                </View>
+                              ) : null;
+                            })}
+                          </View>
+                        )}
+                      </View>
+                    );
+                  })}
+
+                  {/* Add new object form */}
+                  {editingObjectKey === `${fn.id}::__new__` ? (
+                    <View style={[styles.listCard, { marginTop: 4 }]}>
+                      <Text style={styles.listTitle}>New {data.shellConfig.objectLabel ?? 'Object'}</Text>
+                      <LabeledInput label="Name (singular)" value={newObjName} onChangeText={setNewObjName} placeholder="e.g. Order Book" />
+                      <LabeledInput label="Name (plural)" value={newObjNamePlural} onChangeText={setNewObjNamePlural} placeholder="e.g. Order Books" />
+                      <LabeledInput label="Icon (emoji)" value={newObjIcon} onChangeText={setNewObjIcon} placeholder="📦" />
+                      <LabeledInput label="Description (optional)" value={newObjDesc} onChangeText={setNewObjDesc} placeholder="What this object tracks" />
+                      <View style={styles.inlineRow}>
+                        <Pressable style={styles.secondaryButton} onPress={() => {
+                          if (!newObjName.trim()) return;
+                          const id = `bobj-${newObjName.trim().toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
+                          upsertBusinessObject(fn.id, { id, functionId: fn.id, name: newObjName.trim(), namePlural: newObjNamePlural.trim() || newObjName.trim(), icon: newObjIcon.trim() || undefined, description: newObjDesc.trim() || undefined, workspaceIds: [] });
+                          setNewObjName(''); setNewObjNamePlural(''); setNewObjIcon(''); setNewObjDesc('');
+                          setEditingObjectKey(null);
+                        }}>
+                          <Text style={styles.secondaryButtonText}>Add {data.shellConfig.objectLabel ?? 'Object'}</Text>
+                        </Pressable>
+                        <Pressable style={[styles.secondaryButton, { marginLeft: 8 }]} onPress={() => setEditingObjectKey(null)}>
+                          <Text style={styles.secondaryButtonText}>Cancel</Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  ) : (
+                    <Pressable style={[styles.secondaryButton, { marginTop: 8, alignSelf: 'flex-start' }]} onPress={() => {
+                      setNewObjName(''); setNewObjNamePlural(''); setNewObjIcon(''); setNewObjDesc('');
+                      setEditingObjectKey(`${fn.id}::__new__`);
+                    }}>
+                      <Text style={styles.secondaryButtonText}>+ Add {data.shellConfig.objectLabel ?? 'Object'}</Text>
+                    </Pressable>
+                  )}
+                </View>
+              )}
+            </View>
+          );
+        })}
+
+        {/* Add new function form */}
+        {editingFunctionId === '__new__' ? (
+          <View style={[styles.listCard, { marginTop: 8 }]}>
+            <Text style={styles.listTitle}>New {data.shellConfig.functionLabel ?? 'Function'}</Text>
+            <LabeledInput label="Name" value={newFnName} onChangeText={setNewFnName} placeholder="e.g. Finance" />
+            <LabeledInput label="Icon (emoji)" value={newFnIcon} onChangeText={setNewFnIcon} placeholder="💰" />
+            <LabeledInput label="Accent Color (hex)" value={newFnColor} onChangeText={setNewFnColor} placeholder="#8C5BF5" />
+            <LabeledInput label="Description (optional)" value={newFnDesc} onChangeText={setNewFnDesc} placeholder="What this function covers" />
+            <View style={styles.inlineRow}>
+              <Pressable style={styles.secondaryButton} onPress={() => {
+                if (!newFnName.trim()) return;
+                const id = `bfn-${newFnName.trim().toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
+                const order = (data.businessFunctions ?? []).length;
+                upsertBusinessFunction({ id, name: newFnName.trim(), icon: newFnIcon.trim() || undefined, color: newFnColor.trim() || '#8C5BF5', description: newFnDesc.trim() || undefined, order, objects: [] });
+                setNewFnName(''); setNewFnIcon(''); setNewFnColor('#8C5BF5'); setNewFnDesc('');
+                setEditingFunctionId(null);
+              }}>
+                <Text style={styles.secondaryButtonText}>Add {data.shellConfig.functionLabel ?? 'Function'}</Text>
+              </Pressable>
+              <Pressable style={[styles.secondaryButton, { marginLeft: 8 }]} onPress={() => setEditingFunctionId(null)}>
+                <Text style={styles.secondaryButtonText}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        ) : (
+          <Pressable style={[styles.secondaryButton, { marginTop: 12, alignSelf: 'flex-start' }]} onPress={() => {
+            setNewFnName(''); setNewFnIcon(''); setNewFnColor('#8C5BF5'); setNewFnDesc('');
+            setEditingFunctionId('__new__');
+          }}>
+            <Text style={styles.secondaryButtonText}>+ Add {data.shellConfig.functionLabel ?? 'Function'}</Text>
+          </Pressable>
+        )}
+      </Card>}
+
       {adminTab === 'shell' && <Card title="" blurred>
         <Text style={styles.bodyText}>Customize the words your team sees across the app, build the intake form that starts every new record, define user personas, and set up lifecycle stages. No coding needed.</Text>
         {!canManageWorkspace && <Text style={styles.notice}>{deniedMessage('workspace.manage')}</Text>}
@@ -1593,6 +1833,12 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             <LabeledInput label="Main item (many)" helperText="What do you call multiple records?" value={subjectPlural} onChangeText={setSubjectPlural} placeholder="Example: Batches" />
             <LabeledInput label="Workspace name word" helperText="What should this area be called in the app?" value={workspaceLabel} onChangeText={setWorkspaceLabel} placeholder="Example: Team Workspace" />
             <LabeledInput label="SubSpace name word" helperText="What should each smaller work area be called?" value={subSpaceLabel} onChangeText={setSubSpaceLabel} placeholder="Example: Work Lane" />
+            <LabeledInput label={`${data.shellConfig.functionLabel ?? 'Function'} (one)`} helperText="How do you call one top-level business division?" value={functionLabel} onChangeText={setFunctionLabel} placeholder="Function" />
+            <LabeledInput label={`${data.shellConfig.functionLabel ?? 'Function'} (many)`} helperText="Plural version" value={functionLabelPlural} onChangeText={setFunctionLabelPlural} placeholder="Functions" />
+            <LabeledInput label={`${data.shellConfig.objectLabel ?? 'Object'} (one)`} helperText="The type of inventory or asset portfolio being tracked" value={shellObjectLabel} onChangeText={setShellObjectLabel} placeholder="Inventory" />
+            <LabeledInput label={`${data.shellConfig.objectLabel ?? 'Object'} (many)`} helperText="Plural version" value={objectLabelPlural} onChangeText={setObjectLabelPlural} placeholder="Inventories" />
+            <LabeledInput label={`${data.shellConfig.collectionLabel ?? 'Batch'} (one)`} helperText="An individual tracked collection or client portfolio" value={collectionLabel} onChangeText={setCollectionLabel} placeholder="Batch" />
+            <LabeledInput label={`${data.shellConfig.collectionLabel ?? 'Batch'} (many)`} helperText="Plural version" value={collectionLabelPlural} onChangeText={setCollectionLabelPlural} placeholder="Batches" />
             <Pressable nativeID="wt-save-app-words" disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={() => { saveLabels(); auditLog?.logEntry({ action: 'update', entityType: 'shell-config', entityId: 'shell-config', entityName: 'Shell Configuration', after: { subjectSingular, subjectPlural, workspaceLabel, subSpaceLabel } }); addNotification?.({ type: 'system', title: 'Config Updated', body: 'Shell configuration (app terminology) has been saved.', severity: 'info' }); }}>
               <Text style={styles.secondaryButtonText}>Save App Words</Text>
             </Pressable>

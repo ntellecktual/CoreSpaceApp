@@ -9,7 +9,7 @@ import {
 const SCHEMA_VERSION = 1;
 const ISO_NOW = () => new Date().toISOString();
 
-type IgnoredAppDataKeys = 'appName' | 'organizations' | 'activeOrg' | 'activeRoleId' | 'users' | 'session';
+type IgnoredAppDataKeys = 'appName' | 'organizations' | 'activeOrg' | 'activeRoleId' | 'users' | 'session' | 'integrations' | 'businessFunctions';
 
 type TenantCollectionMappers = {
   shellConfig: (tenant: TenantSnapshot) => CosmosDocument[];

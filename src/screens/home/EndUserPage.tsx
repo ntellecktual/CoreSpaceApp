@@ -391,7 +391,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const canCreateRecord = can('record.create');
 
   /* ── Direct addRecord for batch operations ── */
-  const { addRecord: addRecordDirect } = useAppState();
+  const { addRecord: addRecordDirect, data: appData } = useAppState();
 
   /* ── Local UI state ── */
   const [recordDrawerVisible, setRecordDrawerVisible] = useLocalState(false);
@@ -458,11 +458,36 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   /* ── NEW: Left rail collapse ── */
   const [leftRailCollapsed, setLeftRailCollapsed] = useLocalState(false);
 
+  /* ── Business Function / Object navigation ── */
+  const [selectedFunctionId, setSelectedFunctionId] = useLocalState('');
+  const [selectedObjectId, setSelectedObjectId] = useLocalState('');
+  const businessFunctions = appData.businessFunctions ?? [];
+  const selectedFunction = businessFunctions.find((f) => f.id === selectedFunctionId) ?? null;
+  const selectedObject = selectedFunction?.objects.find((o) => o.id === selectedObjectId) ?? null;
+  const displayedWorkspaces = selectedObject && selectedObject.workspaceIds.length > 0
+    ? workspaces.filter((ws) => selectedObject.workspaceIds.includes(ws.id))
+    : workspaces;
+
   /* ── NEW: Search, sort, filter state ── */
   const [searchQuery, setSearchQuery] = useLocalState('');
   const [sortField, setSortField] = useLocalState<'title' | 'status' | 'date' | 'amount'>('date');
   const [sortAsc, setSortAsc] = useLocalState(false);
   const [filterStatus, setFilterStatus] = useLocalState<string>('');
+
+  /* ── Batch record selection ── */
+  const [selectedRecordIds, setSelectedRecordIds] = useLocalState<Set<string>>(new Set());
+  const [batchMovedStage, setBatchMovedStage] = useLocalState<string | null>(null);
+  const toggleRecordSelection = useCallback((id: string) => {
+    setSelectedRecordIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
+  const clearSelection = useCallback(() => setSelectedRecordIds(new Set()), []);
+  const selectAllRecords = useCallback((recs: RuntimeRecord[]) => {
+    setSelectedRecordIds(new Set(recs.map((r) => r.id)));
+  }, []);
 
   /* ── NEW: Recently viewed records ── */
   const [recentlyViewed, setRecentlyViewed] = useLocalState<RuntimeRecord[]>([]);
@@ -480,8 +505,35 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
     setTimeout(() => setIsSaving(false), 1200);
   }, []);
 
+  /* ── Batch move executor (needs flashSaving, so placed after it) ── */
+  const executeBatchMove = useCallback((targetStage: string) => {
+    const ids = [...selectedRecordIds];
+    if (ids.length === 0) return;
+    ids.forEach((id) => {
+      const rec = selectedRecords.find((r) => r.id === id);
+      updateRecord(id, { status: targetStage });
+      if (rec) {
+        auditLog?.logEntry({ action: 'transition', entityType: 'record', entityId: id, entityName: rec.title || id, after: { detail: `Batch move → ${targetStage}` } });
+      }
+    });
+    addNotification?.({ type: 'system', title: 'Batch Move Complete', body: `${ids.length} record${ids.length > 1 ? 's' : ''} moved to "${targetStage}".`, severity: 'success' });
+    showToast(`${ids.length} record${ids.length > 1 ? 's' : ''} moved to ${targetStage}`, 'success');
+    setIsSaving(true);
+    setTimeout(() => setIsSaving(false), 1200);
+    setBatchMovedStage(targetStage);
+    setFilterStatus(targetStage);
+    setSelectedRecordIds(new Set());
+    setTimeout(() => setBatchMovedStage(null), 3500);
+  }, [selectedRecordIds, selectedRecords, updateRecord, auditLog, addNotification, setIsSaving]);
+
   /* ── NEW: Inject UX animations (once) ── */
   React.useEffect(() => { injectUxAnimations(); }, []);
+
+  /* ── Clear batch selection on subspace/workspace change ── */
+  React.useEffect(() => {
+    setSelectedRecordIds(new Set());
+    setBatchMovedStage(null);
+  }, [selectedSubSpaceId, selectedWorkspaceId]);
 
   /* ── NEW: Deep linking – read/write URL hash ── */
   React.useEffect(() => {
@@ -802,7 +854,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                 );
               })}
               <View style={{ height: 1, width: '80%' as any, backgroundColor: 'rgba(255,255,255,0.06)' }} />
-              {workspaces.slice(0, 4).map((ws) => {
+              {displayedWorkspaces.slice(0, 4).map((ws) => {
                 const sel = selectedWorkspaceId === ws.id;
                 return (
                   <Pressable key={ws.id} onPress={() => setSelectedWorkspaceId(ws.id)} style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: sel ? accentSoft : 'rgba(255,255,255,0.06)', alignItems: 'center' as any, justifyContent: 'center' as any, borderLeftWidth: sel ? 3 : 0, borderLeftColor: accentColor }}>
@@ -812,6 +864,56 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
               })}
             </View>
           ) : (<>
+          {businessFunctions.length > 0 && (
+            <View style={{ marginBottom: 6 }}>
+              <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#E878F6' }}>
+                {appData.shellConfig.functionLabelPlural?.toUpperCase() ?? 'FUNCTIONS'}
+              </Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 3 }}>
+                <View style={{ flexDirection: 'row', gap: 4, paddingVertical: 2 }}>
+                  <Pressable
+                    onPress={() => { setSelectedFunctionId(''); setSelectedObjectId(''); }}
+                    style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, backgroundColor: !selectedFunctionId ? accentColor : 'rgba(255,255,255,0.06)' }}
+                  >
+                    <Text style={{ fontSize: 10, fontWeight: '700', color: !selectedFunctionId ? accentTextColor : dimColor }}>All</Text>
+                  </Pressable>
+                  {businessFunctions.sort((a, b) => a.order - b.order).map((fn) => {
+                    const isSel = selectedFunctionId === fn.id;
+                    return (
+                      <Pressable
+                        key={fn.id}
+                        onPress={() => { setSelectedFunctionId(fn.id); setSelectedObjectId(''); }}
+                        style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, flexDirection: 'row', gap: 4, alignItems: 'center' as any, backgroundColor: isSel ? accentSoft : 'rgba(255,255,255,0.06)', borderLeftWidth: 2, borderLeftColor: isSel ? (fn.color ?? accentColor) : 'transparent' }}
+                      >
+                        {!!fn.icon && <Text style={{ fontSize: 11 }}>{fn.icon}</Text>}
+                        <Text style={{ fontSize: 10, fontWeight: '700', color: isSel ? '#FFFFFF' : dimColor }} numberOfLines={1}>{fn.name}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+              {selectedFunction && selectedFunction.objects.length > 0 && (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 3 }}>
+                  <View style={{ flexDirection: 'row', gap: 4, paddingVertical: 2 }}>
+                    {selectedFunction.objects.map((obj) => {
+                      const isSel = selectedObjectId === obj.id;
+                      return (
+                        <Pressable
+                          key={obj.id}
+                          onPress={() => setSelectedObjectId(isSel ? '' : obj.id)}
+                          style={{ paddingVertical: 3, paddingHorizontal: 7, borderRadius: 8, flexDirection: 'row', gap: 3, alignItems: 'center' as any, backgroundColor: isSel ? accentColor : 'rgba(255,255,255,0.06)', borderWidth: isSel ? 1 : 0, borderColor: accentColor }}
+                        >
+                          {!!obj.icon && <Text style={{ fontSize: 10 }}>{obj.icon}</Text>}
+                          <Text style={{ fontSize: 10, fontWeight: '700', color: isSel ? accentTextColor : dimColor }} numberOfLines={1}>{obj.name}</Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </ScrollView>
+              )}
+            </View>
+          )}
+
           {/* Batch selector (compact) */}
           <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#E878F6' }}>BATCHES</Text>
           <ScrollView nativeID="eu-batch-list" style={{ maxHeight: isCompact ? 80 : 140 }} showsVerticalScrollIndicator={false}>
@@ -836,7 +938,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           {/* Workspace tabs */}
           <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#E878F6' }}>WORKSPACES</Text>
           <ScrollView nativeID="eu-workspace-list" style={{ maxHeight: isCompact ? 100 : 160 }} showsVerticalScrollIndicator={false}>
-            {workspaces.map((ws) => {
+            {displayedWorkspaces.map((ws) => {
               const sel = selectedWorkspaceId === ws.id;
               const fCount = flows.filter((f) => f.workspaceId === ws.id && f.status === 'published').length;
               return (
@@ -927,12 +1029,16 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             {/* Stage distribution pills inline */}
             {Object.entries(stageDistribution).length > 0 && (
               <View style={{ width: '100%' as any, flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
-                {Object.entries(stageDistribution).map(([stage, count]) => (
-                  <View key={`sd-${stage}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
-                    {chip(stage)}
-                    <Text style={{ fontSize: 10, color: dimColor }}>{count}</Text>
-                  </View>
-                ))}
+                {Object.entries(stageDistribution).map(([stage, count]) => {
+                  const isHighlighted = stage === batchMovedStage;
+                  return (
+                    <View key={`sd-${stage}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 3, ...(isHighlighted ? { borderRadius: 10, borderWidth: 1.5, borderColor: accentColor, paddingHorizontal: 4, paddingVertical: 2, backgroundColor: accentSoft } as any : {}) }}>
+                      {chip(stage)}
+                      <Text style={{ fontSize: 10, color: isHighlighted ? accentColor : dimColor, fontWeight: isHighlighted ? '700' : '400' }}>{count}</Text>
+                      {isHighlighted && <Text style={{ fontSize: 9, color: accentColor, fontWeight: '700' }}>←</Text>}
+                    </View>
+                  );
+                })}
               </View>
             )}
           </View>
@@ -1041,6 +1147,28 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                 </ScrollView>
               </View>
 
+              {/* Batch action bar — shared for both board and list views */}
+              {selectedRecordIds.size > 0 && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: mode === 'day' ? `${accentColor}14` : `${accentColor}1A`, borderBottomWidth: 1, borderBottomColor: `${accentColor}44`, flexWrap: 'wrap' as any }}>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: accentColor }}>{selectedRecordIds.size} selected</Text>
+                  <Text style={{ fontSize: 10, color: dimColor }}>→ Move to:</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ gap: 6 }}>
+                    {lifecycleStages.map((stage) => (
+                      <Pressable
+                        key={`bm-${stage.id}`}
+                        onPress={() => executeBatchMove(stage.name)}
+                        style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: accentColor, borderWidth: 1, borderColor: `${accentColor}CC` }}
+                      >
+                        <Text style={{ fontSize: 10, fontWeight: '700', color: accentTextColor }}>{stage.name}</Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                  <Pressable onPress={clearSelection} style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: subtleBg }}>
+                    <Text style={{ fontSize: 10, fontWeight: '700', color: dimColor }}>✕ Clear</Text>
+                  </Pressable>
+                </View>
+              )}
+
               {/* Record content */}
               {viewMode === 'board' ? (
                 <ScrollView style={{ flex: 1, padding: 10 }}>
@@ -1056,13 +1184,23 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                       showToast(`Moved to ${newStatus}`, 'success');
                       auditLog?.logEntry({ action: 'transition', entityType: 'record', entityId: recordId, entityName: recordId, after: { detail: `Board drop → ${newStatus}` } });
                     }}
+                    selectedRecordIds={selectedRecordIds}
+                    toggleRecordSelection={toggleRecordSelection}
+                    selectAllInColumn={(recs) => setSelectedRecordIds((prev) => { const next = new Set(prev); recs.forEach((r) => next.add(r.id)); return next; })}
                   />
                 </ScrollView>
               ) : (
                 <View style={{ flex: 1, overflow: 'hidden' as any }}>
                   {/* Sort header row */}
                   {Platform.OS === 'web' && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 22px', borderBottom: `1px solid ${subtleBorder}`, fontSize: 10, fontWeight: 700, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 12px 6px 8px', borderBottom: `1px solid ${subtleBorder}`, fontSize: 10, fontWeight: 700, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+                      {/* Select-all checkbox */}
+                      <div
+                        onClick={() => selectedRecordIds.size === filteredRecords.length && filteredRecords.length > 0 ? clearSelection() : selectAllRecords(filteredRecords)}
+                        style={{ width: 18, height: 18, borderRadius: 4, border: `1.5px solid ${selectedRecordIds.size > 0 ? accentColor : (mode === 'day' ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.22)')}`, backgroundColor: selectedRecordIds.size === filteredRecords.length && filteredRecords.length > 0 ? accentColor : selectedRecordIds.size > 0 ? `${accentColor}44` : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, transition: 'all 0.15s' } as any}
+                      >
+                        {selectedRecordIds.size > 0 && <span style={{ color: '#FFF', fontSize: 10, lineHeight: '1', fontWeight: 900 }}>{selectedRecordIds.size === filteredRecords.length ? '✓' : '–'}</span>}
+                      </div>
                       {([['title', 'Title', '1'], ['status', 'Status', '0 0 70px'], ['date', 'Date', '0 0 80px'], ['amount', 'Amount', '0 0 80px']] as const).map(([field, label, flex]) => (
                         <span
                           key={field}
@@ -1077,11 +1215,27 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                   )}
                   <ScrollView nativeID="eu-record-list" style={{ flex: 1, padding: 10 }} showsVerticalScrollIndicator={false}>
                     {filteredRecords.length === 0 && <Text style={{ fontSize: 12, color: dimColor, padding: 12 }}>{searchQuery || filterStatus ? 'No matching records.' : `No records in this ${subSpaceLabel.toLowerCase()}.`}</Text>}
-                    {filteredRecords.map((rec) => (
-                      <Pressable key={rec.id} onPress={() => { trackRecentView(rec); setSelectedDrawerRecord(rec); setRecordDrawerVisible(true); }}
-                        style={{ ...g(0.03), padding: 12, marginBottom: 6, gap: 6 }}
-                        {...(Platform.OS === 'web' ? { dataSet: { animateIn: '' } } : {})}
-                      >
+                    {filteredRecords.map((rec) => {
+                      const isSelected = selectedRecordIds.has(rec.id);
+                      return (
+                        <View key={rec.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                          {/* Per-row checkbox (web only) */}
+                          {Platform.OS === 'web' && (
+                            <div
+                              onClick={() => toggleRecordSelection(rec.id)}
+                              style={{ width: 18, height: 18, borderRadius: 4, border: `1.5px solid ${isSelected ? accentColor : (mode === 'day' ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.22)')}`, backgroundColor: isSelected ? accentColor : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, transition: 'all 0.12s' } as any}
+                            >
+                              {isSelected && <span style={{ color: '#FFF', fontSize: 10, lineHeight: '1', fontWeight: 900 }}>✓</span>}
+                            </div>
+                          )}
+                          <Pressable
+                            onPress={() => {
+                              if (selectedRecordIds.size > 0) { toggleRecordSelection(rec.id); return; }
+                              trackRecentView(rec); setSelectedDrawerRecord(rec); setRecordDrawerVisible(true);
+                            }}
+                            style={{ flex: 1, ...g(0.03), padding: 12, gap: 6, ...(isSelected ? { borderColor: `${accentColor}BB`, borderWidth: 1.5, backgroundColor: `${accentColor}0A` } as any : {}) }}
+                            {...(Platform.OS === 'web' ? { dataSet: { animateIn: '' } } : {})}
+                          >
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                           {chip(rec.status)}
                           <Text style={{ flex: 1, fontSize: 13, fontWeight: '700', color: txtColor }} numberOfLines={1}>{rec.title}</Text>
@@ -1108,8 +1262,10 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                           ))}
                         </View>
                       )}
-                    </Pressable>
-                  ))}
+                          </Pressable>
+                        </View>
+                      );
+                    })}
                 </ScrollView>
                 </View>
               )}

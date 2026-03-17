@@ -53,6 +53,9 @@ export const BoardView = React.memo(function BoardView({
   accentColor,
   formatAmount,
   onRecordDrop,
+  selectedRecordIds,
+  toggleRecordSelection,
+  selectAllInColumn,
 }: {
   records: RuntimeRecord[];
   subSpace?: SubSpaceDefinition;
@@ -60,6 +63,9 @@ export const BoardView = React.memo(function BoardView({
   accentColor?: string;
   formatAmount?: (amount: number) => string;
   onRecordDrop?: (recordId: string, newStatus: string) => void;
+  selectedRecordIds?: Set<string>;
+  toggleRecordSelection?: (id: string) => void;
+  selectAllInColumn?: (records: RuntimeRecord[]) => void;
 }) {
   const { mode } = useUiTheme();
   const isDark = mode === 'night';
@@ -156,7 +162,43 @@ export const BoardView = React.memo(function BoardView({
                 borderBottomColor: colBorder,
               }}
             >
-              <Text style={{ fontSize: 13, fontWeight: '700', color: textColor }} numberOfLines={1}>
+              {/* Select-all checkbox for this column (web only) */}
+              {isWeb && toggleRecordSelection && selectAllInColumn && (() => {
+                const allSelected = col.records.length > 0 && col.records.every((r) => selectedRecordIds?.has(r.id));
+                const someSelected = !allSelected && col.records.some((r) => selectedRecordIds?.has(r.id));
+                return (
+                  <div
+                    onClick={() => {
+                      if (allSelected) {
+                        col.records.forEach((r) => { if (selectedRecordIds?.has(r.id)) toggleRecordSelection(r.id); });
+                      } else {
+                        selectAllInColumn(col.records);
+                      }
+                    }}
+                    style={{
+                      width: 16,
+                      height: 16,
+                      borderRadius: 3,
+                      border: `1.5px solid ${allSelected || someSelected ? accent : 'rgba(140,91,245,0.35)'}`,
+                      backgroundColor: allSelected ? accent : someSelected ? `${accent}44` : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                      marginRight: 6,
+                      transition: 'all 0.15s',
+                    } as any}
+                  >
+                    {(allSelected || someSelected) && (
+                      <span style={{ color: '#FFF', fontSize: 9, lineHeight: '1', fontWeight: 900 }}>
+                        {allSelected ? '✓' : '–'}
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
+              <Text style={{ fontSize: 13, fontWeight: '700', color: textColor, flex: 1 }} numberOfLines={1}>
                 {col.label}
               </Text>
               <View
@@ -183,27 +225,59 @@ export const BoardView = React.memo(function BoardView({
                 </View>
               ) : (
                 col.records.map((rec) => {
-                  const webCardProps = isWeb ? {
-                    draggable: true,
-                    onDragStart: (e: any) => handleDragStart(e, rec),
-                    onDragEnd: handleDragEnd,
-                    'data-dnd-card': '',
-                  } : {};
+                    const isSelected = !!selectedRecordIds?.has(rec.id);
+                    const hasSelection = (selectedRecordIds?.size ?? 0) > 0;
+                    const webCardProps = isWeb ? {
+                      draggable: !hasSelection,
+                      onDragStart: (e: any) => { if (!hasSelection) handleDragStart(e, rec); },
+                      onDragEnd: handleDragEnd,
+                      'data-dnd-card': '',
+                    } : {};
 
-                  return (
-                    <Pressable
-                      key={rec.id}
-                      onPress={() => onRecordPress?.(rec)}
-                      style={{
-                        borderRadius: 10,
-                        borderWidth: 1,
-                        borderColor: cardBorder,
-                        backgroundColor: cardBg,
-                        padding: 12,
-                        gap: 4,
-                      }}
-                      {...webCardProps as any}
-                    >
+                    return (
+                      <View
+                        key={rec.id}
+                        style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 6 }}
+                      >
+                        {/* Per-card checkbox (web only) */}
+                        {isWeb && toggleRecordSelection && (
+                          <div
+                            onClick={() => toggleRecordSelection(rec.id)}
+                            style={{
+                              width: 16,
+                              height: 16,
+                              borderRadius: 3,
+                              border: `1.5px solid ${isSelected ? accent : 'rgba(140,91,245,0.35)'}`,
+                              backgroundColor: isSelected ? accent : 'transparent',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              flexShrink: 0,
+                              marginTop: 14,
+                              transition: 'all 0.12s',
+                            } as any}
+                          >
+                            {isSelected && <span style={{ color: '#FFF', fontSize: 9, lineHeight: '1', fontWeight: 900 }}>✓</span>}
+                          </div>
+                        )}
+                        <Pressable
+                          onPress={() => {
+                            if (hasSelection && toggleRecordSelection) { toggleRecordSelection(rec.id); return; }
+                            onRecordPress?.(rec);
+                          }}
+                          style={{
+                            flex: 1,
+                            borderRadius: 10,
+                            borderWidth: isSelected ? 1.5 : 1,
+                            borderColor: isSelected ? `${accent}BB` : cardBorder,
+                            backgroundColor: isSelected ? `${accent}0E` : cardBg,
+                            padding: 12,
+                            gap: 4,
+                            ...(isWeb ? { transition: 'border-color 0.12s, background-color 0.12s' } : {}),
+                          }}
+                          {...webCardProps as any}
+                        >
                       <Text style={{ fontSize: 13, fontWeight: '600', color: textColor }} numberOfLines={1}>
                         {rec.title}
                       </Text>
@@ -237,9 +311,10 @@ export const BoardView = React.memo(function BoardView({
                           {(formatAmount ?? formatCurrency)(rec.amount)}
                         </Text>
                       )}
-                    </Pressable>
-                  );
-                })
+                        </Pressable>
+                      </View>
+                    );
+                  })
               )}
             </ScrollView>
           </View>

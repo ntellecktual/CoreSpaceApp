@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import './assets/guidedTour.css';
 import React, { useEffect, useState } from 'react';
 import { GuidedTourProvider, TourStep } from './src/components/GuidedTour';
+import { SpotlightTourProvider, SpotlightStep } from './src/components/SpotlightTour';
 import { ActivityIndicator, Platform, SafeAreaView, Text, View } from 'react-native';
 import { AppStateProvider } from './src/context/AppStateContext';
 import { useAppState } from './src/context/AppStateContext';
@@ -324,15 +325,68 @@ const tourSteps: TourStep[] = [
   },
 ];
 
+const spotlightSteps: SpotlightStep[] = [
+  {
+    target: 'tour-nav-panel',
+    title: 'Navigation Panel',
+    content: 'All six CoreSpace modules live here. Switch between AI, Design, Automate, Integrate, Analyze, and Operate with one click.',
+    placement: 'right',
+  },
+  {
+    target: 'tour-nav-bebo',
+    title: 'AI — Bebo',
+    content: 'Your AI co-pilot. Ask Bebo to build workspaces, generate flows, or explain any record in natural language.',
+    placement: 'right',
+  },
+  {
+    target: 'tour-nav-admin',
+    title: 'Design — Workspace Creator',
+    content: 'Build custom workspaces, SubSpaces, and field definitions with drag-and-drop — zero code required.',
+    placement: 'right',
+  },
+  {
+    target: 'tour-nav-signal',
+    title: 'Automate — Signal Studio',
+    content: 'Event-driven automation flows. Connect triggers to multi-step actions across your entire workspace graph.',
+    placement: 'right',
+  },
+  {
+    target: 'tour-nav-orbital',
+    title: 'Integrate — Orbital',
+    content: 'Connect CoreSpace to any external API, data source, or service. Marketplace integrations included.',
+    placement: 'right',
+  },
+  {
+    target: 'tour-nav-cosmograph',
+    title: 'Analyze — Cosmograph',
+    content: 'Force-directed knowledge graph that visualizes every record and relationship across your entire platform.',
+    placement: 'right',
+  },
+  {
+    target: 'tour-nav-enduser',
+    title: 'Operate — End User',
+    content: 'The tenant-branded UI your field users see. Configure roles, titles, and layouts per client.',
+    placement: 'right',
+  },
+  {
+    target: 'tour-notifications',
+    title: 'Notifications',
+    content: 'Real-time alerts, system events, and audit log entries — with unread count and instant access.',
+    placement: 'bottom',
+  },
+];
+
 function AppContent() {
   const { mode } = useUiTheme();
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar style={mode === 'night' ? 'light' : 'dark'} />
-      <GuidedTourProvider steps={tourSteps}>
-        <AppErrorBoundary>
-          <AppShell />
-        </AppErrorBoundary>
+      <GuidedTourProvider steps={tourSteps} mode={mode}>
+        <SpotlightTourProvider steps={spotlightSteps}>
+          <AppErrorBoundary>
+            <AppShell />
+          </AppErrorBoundary>
+        </SpotlightTourProvider>
       </GuidedTourProvider>
     </SafeAreaView>
   );

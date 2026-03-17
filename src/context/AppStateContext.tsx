@@ -9,6 +9,8 @@ import {
   AuthProvider,
   AuthSession,
   AuthUser,
+  BusinessFunction,
+  BusinessObject,
   ClientProfile,
   FormDefinition,
   FormFieldDefinition,
@@ -79,6 +81,11 @@ interface AppStateContextValue {
   activateIntegration: (activation: IntegrationActivation) => void;
   updateIntegration: (id: string, updates: Partial<Omit<IntegrationActivation, 'id'>>) => void;
   deactivateIntegration: (id: string) => { ok: boolean; reason?: string };
+  businessFunctions: BusinessFunction[];
+  upsertBusinessFunction: (fn: BusinessFunction) => void;
+  deleteBusinessFunction: (fnId: string) => { ok: boolean; reason?: string };
+  upsertBusinessObject: (fnId: string, obj: BusinessObject) => void;
+  deleteBusinessObject: (fnId: string, objId: string) => { ok: boolean; reason?: string };
   signInWithEmail: (email: string, password: string) => AuthResult;
   signInWithProvider: (provider: Exclude<AuthProvider, 'email'>) => AuthResult;
   createAccount: (fullName: string, email: string, password: string, asAdmin: boolean) => AuthResult;
@@ -239,6 +246,7 @@ function createBlankTenantData(): AppData {
     users: [],
     session: null,
     integrations: [],
+    businessFunctions: [],
   };
 }
 
@@ -275,6 +283,12 @@ function normalizeData(parsed: Partial<AppData> & { activeRole?: string }): AppD
       subjectPlural: parsed.shellConfig?.subjectPlural ?? defaultData.shellConfig.subjectPlural,
       workspaceLabel: parsed.shellConfig?.workspaceLabel ?? defaultData.shellConfig.workspaceLabel,
       subSpaceLabel: parsed.shellConfig?.subSpaceLabel ?? defaultData.shellConfig.subSpaceLabel,
+      functionLabel: parsed.shellConfig?.functionLabel ?? defaultData.shellConfig.functionLabel,
+      functionLabelPlural: parsed.shellConfig?.functionLabelPlural ?? defaultData.shellConfig.functionLabelPlural,
+      objectLabel: parsed.shellConfig?.objectLabel ?? defaultData.shellConfig.objectLabel,
+      objectLabelPlural: parsed.shellConfig?.objectLabelPlural ?? defaultData.shellConfig.objectLabelPlural,
+      collectionLabel: parsed.shellConfig?.collectionLabel ?? defaultData.shellConfig.collectionLabel,
+      collectionLabelPlural: parsed.shellConfig?.collectionLabelPlural ?? defaultData.shellConfig.collectionLabelPlural,
       intakeFields: parsed.shellConfig?.intakeFields ?? defaultData.shellConfig.intakeFields,
       personas: parsed.shellConfig?.personas ?? defaultData.shellConfig.personas,
       lifecycleStages,
@@ -305,6 +319,7 @@ function normalizeData(parsed: Partial<AppData> & { activeRole?: string }): AppD
     users,
     session,
     integrations: parsed.integrations ?? [],
+    businessFunctions: parsed.businessFunctions ?? defaultData.businessFunctions ?? [],
   };
 }
 
@@ -953,6 +968,69 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
           return {
             ...current,
             integrations: current.integrations.filter((item) => item.id !== id),
+          };
+        });
+        return result;
+      },
+      businessFunctions: data.businessFunctions ?? [],
+      upsertBusinessFunction: (fn) => {
+        setTenantData((current) => {
+          const existing = (current.businessFunctions ?? []);
+          const idx = existing.findIndex((f) => f.id === fn.id);
+          return {
+            ...current,
+            businessFunctions: idx >= 0
+              ? existing.map((f) => f.id === fn.id ? fn : f)
+              : [...existing, fn],
+          };
+        });
+      },
+      deleteBusinessFunction: (fnId) => {
+        let result: { ok: boolean; reason?: string } = { ok: true };
+        setTenantData((current) => {
+          const exists = (current.businessFunctions ?? []).some((f) => f.id === fnId);
+          if (!exists) {
+            result = { ok: false, reason: 'Business function not found.' };
+            return current;
+          }
+          return {
+            ...current,
+            businessFunctions: (current.businessFunctions ?? []).filter((f) => f.id !== fnId),
+          };
+        });
+        return result;
+      },
+      upsertBusinessObject: (fnId, obj) => {
+        setTenantData((current) => {
+          const fns = current.businessFunctions ?? [];
+          return {
+            ...current,
+            businessFunctions: fns.map((f) => {
+              if (f.id !== fnId) return f;
+              const idx = f.objects.findIndex((o) => o.id === obj.id);
+              return {
+                ...f,
+                objects: idx >= 0
+                  ? f.objects.map((o) => o.id === obj.id ? obj : o)
+                  : [...f.objects, obj],
+              };
+            }),
+          };
+        });
+      },
+      deleteBusinessObject: (fnId, objId) => {
+        let result: { ok: boolean; reason?: string } = { ok: true };
+        setTenantData((current) => {
+          const fn = (current.businessFunctions ?? []).find((f) => f.id === fnId);
+          if (!fn || !fn.objects.some((o) => o.id === objId)) {
+            result = { ok: false, reason: 'Business object not found.' };
+            return current;
+          }
+          return {
+            ...current,
+            businessFunctions: (current.businessFunctions ?? []).map((f) =>
+              f.id === fnId ? { ...f, objects: f.objects.filter((o) => o.id !== objId) } : f,
+            ),
           };
         });
         return result;

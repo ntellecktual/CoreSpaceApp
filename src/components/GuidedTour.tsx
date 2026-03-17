@@ -51,9 +51,10 @@ export const useGuidedTour = (): GuidedTourContextType => {
 type GuidedTourProviderProps = {
   steps: TourStep[];
   children: React.ReactNode;
+  mode?: 'day' | 'night';
 };
 
-export const GuidedTourProvider: React.FC<GuidedTourProviderProps> = ({ steps, children }) => {
+export const GuidedTourProvider: React.FC<GuidedTourProviderProps> = ({ steps, children, mode = 'night' }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
@@ -153,6 +154,7 @@ export const GuidedTourProvider: React.FC<GuidedTourProviderProps> = ({ steps, c
             role="dialog"
             aria-modal="true"
             aria-label="CoreSpace Guided Tour"
+            data-theme={mode}
           >
 
             {/* ── Section nav strip ── */}
@@ -171,7 +173,7 @@ export const GuidedTourProvider: React.FC<GuidedTourProviderProps> = ({ steps, c
                     aria-current={isActive ? 'step' : undefined}
                     title={`Jump to ${cfg.label}`}
                   >
-                    <span className="guided-tour-section-chip-icon">{cfg.icon}</span>
+                    <span className="guided-tour-section-chip-icon" />
                     {cfg.label}
                   </button>
                 );
@@ -189,7 +191,7 @@ export const GuidedTourProvider: React.FC<GuidedTourProviderProps> = ({ steps, c
               {isWelcome ? (
                 /* Hero layout for welcome step */
                 <div className="guided-tour-hero">
-                  <span className="guided-tour-hero-logo">✦</span>
+                  <span className="guided-tour-hero-logo" />
                   <h2 className="guided-tour-title guided-tour-title-center">{step.title}</h2>
                   <p className="guided-tour-hero-tagline">CoreSpace Platform Walkthrough</p>
                   <p className="guided-tour-content guided-tour-content-center">{step.content}</p>
@@ -204,9 +206,7 @@ export const GuidedTourProvider: React.FC<GuidedTourProviderProps> = ({ steps, c
                 /* Standard step layout */
                 <>
                   <div className="guided-tour-section-header">
-                    <div className="guided-tour-section-icon">
-                      {sectionCfg.icon}
-                    </div>
+                    <div className="guided-tour-section-icon" />
                     <div className="guided-tour-section-meta">
                       <span className="guided-tour-section-label">
                         {sectionCfg.label}

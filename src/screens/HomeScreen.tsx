@@ -28,6 +28,7 @@ import { CosmographPage } from './home/CosmographPage';
 import { ModulePageActions } from './home/types';
 import type { CommandPaletteItem } from '../types';
 import { useGuidedTour } from '../components/GuidedTour';
+import { useSpotlightTour } from '../components/SpotlightTour';
 import type { Page } from './home/types';
 
 const tenantTitleOptions = [
@@ -90,6 +91,7 @@ export function HomeScreen() {
   const { page, guidedMode, activeGuide, setPage, toggleGuidedMode, openGuide, closeGuide } = useHomeScreenState();
   const { activeRole, roles, setActiveRoleId } = useRbac();
   const { currentStep, steps, isOpen: tourOpen, openTour } = useGuidedTour();
+  const { openSpotlightTour } = useSpotlightTour();
 
   // Auto-navigate to the correct page when the guided tour step changes
   useEffect(() => {
@@ -639,12 +641,13 @@ export function HomeScreen() {
                 <Text style={styles.dashboardCreateButtonText}>Create</Text>
               </Pressable>
 
-              <View style={styles.dashboardNavSection}>
+              <View style={styles.dashboardNavSection} nativeID="tour-nav-panel">
                 {pages.map((item) => (
                   item.id === 'bebo' ? (
                     <React.Fragment key={item.id}>
                       <Text style={styles.dashboardSectionLabel}>AI</Text>
                       <Pressable
+                        nativeID="tour-nav-bebo"
                         onPress={() => {
                           setTenantAccessOpen(false);
                           setPage(item.id);
@@ -678,6 +681,7 @@ export function HomeScreen() {
                       <Text style={[styles.dashboardSectionLabel, { marginTop: 12 }]}>Operate</Text>
                       <View style={styles.dashboardTenantNavGroup}>
                       <Pressable
+                        nativeID="tour-nav-enduser"
                         onPress={() => {
                           setTenantAccessOpen(false);
                           setPage('enduser');
@@ -756,6 +760,7 @@ export function HomeScreen() {
                     <React.Fragment key={item.id}>
                       <Text style={[styles.dashboardSectionLabel, { marginTop: 12 }]}>Operate</Text>
                       <Pressable
+                      nativeID="tour-nav-enduser"
                       onPress={() => {
                         setTenantAccessOpen(false);
                         setPage(item.id);
@@ -788,6 +793,7 @@ export function HomeScreen() {
                     <React.Fragment key={item.id}>
                       <Text style={[styles.dashboardSectionLabel, { marginTop: 12 }]}>{item.desc}</Text>
                       <Pressable
+                        nativeID={`tour-nav-${item.id}`}
                         onPress={() => {
                           setTenantAccessOpen(false);
                           setPage(item.id);
@@ -862,6 +868,14 @@ export function HomeScreen() {
                   <Text style={[styles.dashboardSidebarActionText, guidedMode && styles.dashboardSidebarActionTextActive]}>
                     Guided Tour: {guidedMode ? 'On' : 'Off'}
                   </Text>
+                </Pressable>
+                <Pressable
+                  style={styles.dashboardSidebarAction}
+                  onPress={openSpotlightTour}
+                  accessibilityRole="button"
+                  accessibilityLabel="Take a spotlight tour of the home screen"
+                >
+                  <Text style={styles.dashboardSidebarActionText}>Spotlight Tour</Text>
                 </Pressable>
                 <Pressable
                   style={[styles.dashboardSidebarAction, mode === 'day' && styles.dashboardSidebarActionActive]}
@@ -942,6 +956,7 @@ export function HomeScreen() {
               <Text style={[styles.dashboardMainTitle, { fontSize: shellTitleSize, lineHeight: shellTitleLineHeight }, tenantBrandedMode && mode === 'day' && { color: '#2D1F4E' }]}>{mainPaneTitle}</Text>
             </View>
             <Pressable
+              nativeID="tour-notifications"
               onPress={() => setNotificationsOpen(true)}
               accessibilityRole="button"
               accessibilityLabel={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}

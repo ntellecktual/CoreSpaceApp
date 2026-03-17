@@ -57,6 +57,30 @@ export interface WorkspaceDefinition {
   published?: boolean;
 }
 
+// ─── Business Architecture ──────────────────────────────────────────
+// The hierarchy above Workspace/SubSpace that covers a full business:
+//   BusinessFunction → BusinessObject → (ClientProfile / Batch) → Workspace → SubSpace → Record
+
+export interface BusinessObject {
+  id: string;
+  functionId: string;
+  name: string;              // Fully configurable: "Drug Inventory", "Client Portfolio", "Order Book"
+  namePlural: string;        // Plural form
+  icon?: string;             // Emoji identifier
+  description?: string;
+  workspaceIds: string[];    // Workspaces that process items belonging to this object
+}
+
+export interface BusinessFunction {
+  id: string;
+  name: string;              // "Supply Chain", "Distribution", "Finance", "Sales"
+  icon?: string;             // Emoji
+  description?: string;
+  color?: string;            // Optional accent color override
+  order: number;             // Display order
+  objects: BusinessObject[];
+}
+
 export interface FormFieldDefinition {
   id: string;
   label: string;
@@ -139,6 +163,7 @@ export interface ClientProfile {
   profileData?: Record<string, string>;
   tags: string[];
   createdAt: string;
+  objectId?: string;  // Links this batch/collection to a BusinessObject
 }
 
 export type ShellFieldType = 'text' | 'number' | 'date' | 'select';
@@ -178,6 +203,13 @@ export interface ShellConfig {
   subjectPlural: string;
   workspaceLabel: string;
   subSpaceLabel: string;
+  // Business architecture terminology — all optional with sensible defaults
+  functionLabel?: string;         // "Function" or custom: "Division", "Domain", "Department"
+  functionLabelPlural?: string;
+  objectLabel?: string;           // "Registry" or custom: "Inventory", "Ledger", "Portfolio"
+  objectLabelPlural?: string;
+  collectionLabel?: string;       // "Collection" or custom: "Batch", "Campaign", "Portfolio"
+  collectionLabelPlural?: string;
   intakeFields: ShellIntakeField[];
   personas: EndUserPersona[];
   lifecycleStages: LifecycleStage[];
@@ -271,6 +303,7 @@ export interface AppData {
   users: AuthUser[];
   session: AuthSession | null;
   integrations: IntegrationActivation[];
+  businessFunctions?: BusinessFunction[];
 }
 
 // ─── Orbital Integration Framework ──────────────────────────────────
@@ -421,7 +454,9 @@ export type AuditEntityType =
   | 'shell-config'
   | 'form'
   | 'user'
-  | 'integration';
+  | 'integration'
+  | 'business-function'
+  | 'business-object';
 
 // ─── Notifications ───────────────────────────────────────────────────
 

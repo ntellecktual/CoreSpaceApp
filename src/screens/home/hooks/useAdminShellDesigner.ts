@@ -25,6 +25,12 @@ export function useAdminShellDesigner() {
   const [subjectPlural, setSubjectPlural] = useState(shellConfig.subjectPlural);
   const [workspaceLabel, setWorkspaceLabel] = useState(shellConfig.workspaceLabel);
   const [subSpaceLabel, setSubSpaceLabel] = useState(shellConfig.subSpaceLabel);
+  const [functionLabel, setFunctionLabel] = useState(shellConfig.functionLabel ?? 'Function');
+  const [functionLabelPlural, setFunctionLabelPlural] = useState(shellConfig.functionLabelPlural ?? 'Functions');
+  const [objectLabel, setObjectLabel] = useState(shellConfig.objectLabel ?? 'Inventory');
+  const [objectLabelPlural, setObjectLabelPlural] = useState(shellConfig.objectLabelPlural ?? 'Inventories');
+  const [collectionLabel, setCollectionLabel] = useState(shellConfig.collectionLabel ?? 'Batch');
+  const [collectionLabelPlural, setCollectionLabelPlural] = useState(shellConfig.collectionLabelPlural ?? 'Batches');
 
   const [newFieldLabel, setNewFieldLabel] = useState('');
   const [newFieldType, setNewFieldType] = useState<ShellFieldType>('text');
@@ -50,7 +56,13 @@ export function useAdminShellDesigner() {
     setSubjectPlural(shellConfig.subjectPlural);
     setWorkspaceLabel(shellConfig.workspaceLabel);
     setSubSpaceLabel(shellConfig.subSpaceLabel);
-  }, [shellConfig.subjectSingular, shellConfig.subjectPlural, shellConfig.workspaceLabel, shellConfig.subSpaceLabel]);
+    setFunctionLabel(shellConfig.functionLabel ?? 'Function');
+    setFunctionLabelPlural(shellConfig.functionLabelPlural ?? 'Functions');
+    setObjectLabel(shellConfig.objectLabel ?? 'Inventory');
+    setObjectLabelPlural(shellConfig.objectLabelPlural ?? 'Inventories');
+    setCollectionLabel(shellConfig.collectionLabel ?? 'Batch');
+    setCollectionLabelPlural(shellConfig.collectionLabelPlural ?? 'Batches');
+  }, [shellConfig.subjectSingular, shellConfig.subjectPlural, shellConfig.workspaceLabel, shellConfig.subSpaceLabel, shellConfig.functionLabel, shellConfig.functionLabelPlural, shellConfig.objectLabel, shellConfig.objectLabelPlural, shellConfig.collectionLabel, shellConfig.collectionLabelPlural]);
 
   useEffect(() => {
     if (!shellConfig.lifecycleStages.some((stage) => stage.id === transitionFromStageId)) {
@@ -83,6 +95,12 @@ export function useAdminShellDesigner() {
       subjectPlural: plural,
       workspaceLabel: workspace,
       subSpaceLabel: subSpace,
+      functionLabel: functionLabel.trim() || 'Function',
+      functionLabelPlural: functionLabelPlural.trim() || 'Functions',
+      objectLabel: objectLabel.trim() || 'Inventory',
+      objectLabelPlural: objectLabelPlural.trim() || 'Inventories',
+      collectionLabel: collectionLabel.trim() || 'Batch',
+      collectionLabelPlural: collectionLabelPlural.trim() || 'Batches',
     });
 
     setNotice('App words saved. People will see the new words right away.');
@@ -385,6 +403,18 @@ export function useAdminShellDesigner() {
     setWorkspaceLabel,
     subSpaceLabel,
     setSubSpaceLabel,
+    functionLabel,
+    setFunctionLabel,
+    functionLabelPlural,
+    setFunctionLabelPlural,
+    objectLabel,
+    setObjectLabel,
+    objectLabelPlural,
+    setObjectLabelPlural,
+    collectionLabel,
+    setCollectionLabel,
+    collectionLabelPlural,
+    setCollectionLabelPlural,
     newFieldLabel,
     setNewFieldLabel,
     newFieldType,

@@ -17,7 +17,105 @@ import { BrandLogo } from '../../components/BrandLogo';
 import { formatDate } from '../../formatDate';
 import { searchFdaDrugs, formatCurrency, formatUnitCount } from '../../api';
 import type { FdaDrug } from '../../api';
-import type { RuntimeRecord } from '../../types';
+import type { RuntimeRecord, SubSpaceBuilderField } from '../../types';
+
+/* ── CSV/JSON parser (no dependencies) ─────────────────── */
+function parseCsvOrJson(raw: string): Record<string, string>[] {
+  const t = raw.trim();
+  if (!t) return [];
+  try {
+    if (t.startsWith('[')) {
+      const parsed = JSON.parse(t);
+      if (Array.isArray(parsed)) {
+        return parsed.map((row: Record<string, unknown>) =>
+          Object.fromEntries(Object.entries(row).map(([k, v]) => [k, String(v ?? '')]))
+        );
+      }
+    }
+  } catch { /* fall through to CSV */ }
+  const lines = t.split(/\r?\n/).filter(Boolean);
+  if (lines.length < 2) return [];
+  const parseRow = (line: string) => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQuotes = !inQuotes; continue; }
+      if (ch === ',' && !inQuotes) { result.push(current.trim()); current = ''; continue; }
+      current += ch;
+    }
+    result.push(current.trim());
+    return result;
+  };
+  const headers = parseRow(lines[0]);
+  return lines.slice(1).map((line) => {
+    const vals = parseRow(line);
+    return Object.fromEntries(headers.map((h, i) => [h, vals[i] ?? '']));
+  });
+}
+
+/* ── GS1-128 barcode parser ─────────────────────────────── */
+function parseGs1Barcode(code: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  const aiPattern = /([0-9]{2,4})((?:(?![0-9]{2,4}(?=[^0-9]|$)).)+)/g;
+  // Remove common GS1 delimiters and try to extract Application Identifiers
+  // Support both parenthesised format `(01)12345...` and raw concatenated format
+  const normalized = code.replace(/[()]/g, '');
+  // Try parenthesised: (01)xxx(10)yyy
+  const parenPattern = /\(([0-9]{2,4})\)([^(]+)/g;
+  let m: RegExpExecArray | null;
+  let matched = false;
+  while ((m = parenPattern.exec(code)) !== null) {
+    matched = true;
+    const ai = m[1]; const val = m[2].trim();
+    if (ai === '01') result['ndc'] = val.slice(-12);
+    else if (ai === '10') result['lot'] = val;
+    else if (ai === '17') {
+      const y = `20${val.slice(0, 2)}`, mo = val.slice(2, 4), d = val.slice(4, 6);
+      result['expiration'] = `${mo}-${d}-${y}`;
+    } else if (ai === '21') result['serial'] = val;
+  }
+  if (!matched && normalized.length >= 20) {
+    // Raw GS1-128: AI 01 is 14 digits, AI 17 is 6 digits, AI 10 variable, AI 21 variable
+    let pos = 0;
+    while (pos < normalized.length) {
+      const ai2 = normalized.slice(pos, pos + 2);
+      const ai4 = normalized.slice(pos, pos + 4);
+      if (ai2 === '01') { result['ndc'] = normalized.slice(pos + 2, pos + 16).slice(-12); pos += 16; }
+      else if (ai2 === '17') { const d = normalized.slice(pos + 2, pos + 8); const y = `20${d.slice(0,2)}`; result['expiration'] = `${d.slice(2,4)}-${d.slice(4,6)}-${y}`; pos += 8; }
+      else if (ai2 === '10') { const end = normalized.indexOf('21', pos + 2); const v = end > 0 ? normalized.slice(pos + 2, end) : normalized.slice(pos + 2, pos + 22); result['lot'] = v; pos += 2 + v.length; }
+      else if (ai2 === '21') { result['serial'] = normalized.slice(pos + 2); pos = normalized.length; }
+      else { pos++; }
+    }
+  }
+  return result;
+}
+
+/* ── Map GS1/raw barcode to form fields ─────────────────── */
+function applyBarcodeToFields(
+  code: string,
+  fields: SubSpaceBuilderField[],
+  setField: (id: string, val: string) => void,
+): boolean {
+  const gs1 = parseGs1Barcode(code);
+  const hasGs1 = Object.keys(gs1).length > 0;
+  fields.forEach((f) => {
+    const lbl = f.label.toLowerCase();
+    if (hasGs1) {
+      if ((lbl.includes('ndc') || lbl.includes('code') || lbl.includes('product')) && gs1['ndc']) setField(f.id, gs1['ndc']);
+      else if (lbl.includes('lot') && gs1['lot']) setField(f.id, gs1['lot']);
+      else if ((lbl.includes('exp') || (lbl.includes('date') && !lbl.includes('create'))) && gs1['expiration']) setField(f.id, gs1['expiration']);
+      else if ((lbl.includes('serial') || lbl.includes('unit')) && gs1['serial']) setField(f.id, gs1['serial']);
+    } else if (
+      lbl.includes('serial') || lbl.includes('barcode') || lbl.includes('sku') ||
+      lbl.includes('id') || lbl.includes('code') || f.type === 'text'
+    ) {
+      setField(f.id, code);
+    }
+  });
+  return true;
+}
 
 /* ── Helpers ─────────────────────────────────────────────── */
 
@@ -292,6 +390,9 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const canIntakeClient = can('client.intake');
   const canCreateRecord = can('record.create');
 
+  /* ── Direct addRecord for batch operations ── */
+  const { addRecord: addRecordDirect } = useAppState();
+
   /* ── Local UI state ── */
   const [recordDrawerVisible, setRecordDrawerVisible] = useLocalState(false);
   const [selectedDrawerRecord, setSelectedDrawerRecord] = useLocalState<RuntimeRecord | null>(null);
@@ -300,6 +401,18 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const [createModalOpen, setCreateModalOpen] = useLocalState(false);
   const [timelineModalOpen, setTimelineModalOpen] = useLocalState(false);
   const [flowsModalOpen, setFlowsModalOpen] = useLocalState(false);
+
+  /* ── Create Record modal – tabs ── */
+  const [createTab, setCreateTab] = useLocalState<'form' | 'import' | 'scan'>('form');
+
+  /* ── CSV/JSON import state ── */
+  const [csvText, setCsvText] = useLocalState('');
+  const [csvPreviewRows, setCsvPreviewRows] = useLocalState<Record<string, string>[]>([]);
+  const [csvImportError, setCsvImportError] = useLocalState('');
+
+  /* ── Barcode scan state ── */
+  const [barcodeInput, setBarcodeInput] = useLocalState('');
+  const [barcodeApplied, setBarcodeApplied] = useLocalState(false);
 
   /* ── Hooks ── */
   const {
@@ -325,6 +438,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const [fdaQuery, setFdaQuery] = useLocalState('');
   const [fdaResults, setFdaResults] = useLocalState<FdaDrug[]>([]);
   const [fdaLoading, setFdaLoading] = useLocalState(false);
+  const [fdaSelectedDrug, setFdaSelectedDrug] = useLocalState<FdaDrug | null>(null);
   const isPharmWorkspace = /dscsa|serial|pharma|drug|ndc|fda|medication|prescription/i.test(
     (workspace?.name ?? '') + ' ' + (workspace?.rootEntity ?? ''),
   );
@@ -1101,75 +1215,326 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
       </Modal>
 
       {/* ═══════════════ CREATE RECORD MODAL ═══════════════ */}
-      <Modal transparent visible={createModalOpen} animationType="fade" onRequestClose={() => setCreateModalOpen(false)}>
-        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => setCreateModalOpen(false)}>
-          <Pressable onPress={() => {}} style={{ width: 440, maxWidth: '92%' as any, maxHeight: '85%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any }}>
-            <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={{ fontSize: 16, fontWeight: '800', color: '#FFFFFF' }}>Create Record</Text>
-              <Pressable onPress={() => setCreateModalOpen(false)} style={{ padding: 6 }}>
-                <Text style={{ fontSize: 14, color: dimColor }}>✕</Text>
-              </Pressable>
-            </View>
-            <ScrollView style={{ padding: 20 }} contentContainerStyle={{ gap: 12, paddingBottom: 20 }}>
-              {!activeForm && <Text style={{ fontSize: 12, color: dimColor }}>Add fields in Form Builder for this {subSpaceLabel} to generate its form.</Text>}
-              {!canCreateRecord && <Text style={styles.notice}>{deniedMessage('record.create')}</Text>}
-              {allowedLifecycleStageNames.length > 0 && (
-                <View style={{ gap: 6 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>Lifecycle Stage</Text>
-                  <View style={[styles.inlineRow, { flexWrap: 'wrap' }]}>
-                    {allowedLifecycleStageNames.map((sn) => {
-                      const sel = (formValues.status || defaultLifecycleStageName) === sn;
-                      return (
-                        <Pressable key={sn} onPress={() => setLifecycleStatus(sn)}
-                          style={[styles.pill, sel && { backgroundColor: accentSoft, borderColor: accentColor }]}>
-                          <Text style={[styles.pillText, sel && { color: '#FFF', fontWeight: '700' }]}>{sn}</Text>
-                        </Pressable>
-                      );
-                    })}
-                  </View>
-                </View>
-              )}
-              {isPharmWorkspace && createModalOpen && (
-                <View style={{ gap: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', paddingBottom: 12 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase' as any, color: '#60A5FA' }}>FDA Drug Lookup</Text>
-                  <LabeledInput label="Search FDA database" value={fdaQuery} onChangeText={setFdaQuery} placeholder="Search by drug name or NDC code..." />
-                  {fdaLoading && <Text style={{ fontSize: 11, color: dimColor }}>Searching FDA database...</Text>}
-                  {fdaResults.map((drug) => (
-                    <Pressable key={drug.product_ndc} onPress={() => {
-                      activeForm?.fields.forEach((f) => {
-                        const lbl = f.label.toLowerCase();
-                        if (lbl.includes('product') || lbl.includes('name') || lbl.includes('drug')) setField(f.id, drug.brand_name || drug.generic_name);
-                        else if (lbl.includes('ndc') || lbl.includes('code')) setField(f.id, drug.product_ndc);
-                        else if (lbl.includes('manufacturer') || lbl.includes('labeler')) setField(f.id, drug.manufacturer_name);
-                        else if (lbl.includes('dosage') || lbl.includes('form')) setField(f.id, drug.dosage_form);
-                        else if (lbl.includes('route')) setField(f.id, drug.route);
-                      });
-                      setFdaQuery(''); setFdaResults([]);
-                    }} style={{ ...g(0.04), padding: 10, gap: 2 }}>
-                      <Text style={{ fontSize: 12, fontWeight: '700', color: '#FFFFFF' }}>{drug.brand_name || drug.generic_name}</Text>
-                      <Text style={{ fontSize: 10, color: dimColor }}>NDC: {drug.product_ndc} · {drug.manufacturer_name}</Text>
-                      <Text style={{ fontSize: 10, color: dimColor }}>{drug.dosage_form} · {drug.route}</Text>
-                    </Pressable>
-                  ))}
-                </View>
-              )}
-              {activeForm?.fields.map((field) => (
-                <LabeledInput
-                  key={`cf-${field.id}`}
-                  label={`${field.label}${field.required ? ' *' : ''}`}
-                  value={formValues[field.id] ?? ''}
-                  onChangeText={(v) => setField(field.id, v)}
-                  placeholder={field.id === 'status' ? `Options: ${allowedLifecycleStageNames.join(', ')}` : field.options ? `Options: ${field.options.join(', ')}` : field.type === 'date' ? 'MM-DD-YYYY' : `Enter ${field.label.toLowerCase()}`}
-                />
-              ))}
-              {activeForm && (
-                <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); }}
-                  style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any }}>
-                  <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient) ? accentTextColor : dimColor }}>Create Entry</Text>
+      <Modal transparent visible={createModalOpen} animationType="fade" onRequestClose={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setFdaSelectedDrug(null); }}>
+        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setFdaSelectedDrug(null); }}>
+          <Pressable onPress={() => {}} style={{ width: 520, maxWidth: '94%' as any, maxHeight: '88%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any }}>
+            {/* ── Modal Header ── */}
+            <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12 }}>
+                <Text style={{ fontSize: 16, fontWeight: '800', color: '#FFFFFF' }}>Create Record</Text>
+                <Pressable onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setFdaSelectedDrug(null); }} style={{ padding: 6 }}>
+                  <Text style={{ fontSize: 14, color: dimColor }}>✕</Text>
                 </Pressable>
-              )}
-              {!!message && <Text style={styles.notice}>{message}</Text>}
-            </ScrollView>
+              </View>
+              {/* ── Tab Bar ── */}
+              <View style={{ flexDirection: 'row', gap: 4, marginBottom: -1 }}>
+                {(['form', 'import', 'scan'] as const).map((tab) => {
+                  const labels: Record<typeof tab, string> = { form: '📋 Form', import: '📥 Import CSV/JSON', scan: '🔲 Scan Barcode' };
+                  const active = createTab === tab;
+                  return (
+                    <Pressable key={tab} onPress={() => setCreateTab(tab)} style={{ paddingHorizontal: 12, paddingVertical: 8, borderTopLeftRadius: 8, borderTopRightRadius: 8, backgroundColor: active ? 'rgba(255,255,255,0.07)' : 'transparent', borderBottomWidth: active ? 2 : 0, borderBottomColor: accentColor }}>
+                      <Text style={{ fontSize: 12, fontWeight: active ? '700' : '500', color: active ? accentColor : dimColor }}>{labels[tab]}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+
+            {/* ══ FORM TAB ══ */}
+            {createTab === 'form' && (
+              <ScrollView style={{ padding: 20 }} contentContainerStyle={{ gap: 12, paddingBottom: 20 }}>
+                {!activeForm && <Text style={{ fontSize: 12, color: dimColor }}>Add fields in Form Builder for this {subSpaceLabel} to generate its form.</Text>}
+                {!canCreateRecord && <Text style={styles.notice}>{deniedMessage('record.create')}</Text>}
+                {allowedLifecycleStageNames.length > 0 && (
+                  <View style={{ gap: 6 }}>
+                    <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>Lifecycle Stage</Text>
+                    <View style={[styles.inlineRow, { flexWrap: 'wrap' }]}>
+                      {allowedLifecycleStageNames.map((sn) => {
+                        const sel = (formValues.status || defaultLifecycleStageName) === sn;
+                        return (
+                          <Pressable key={sn} onPress={() => setLifecycleStatus(sn)}
+                            style={[styles.pill, sel && { backgroundColor: accentSoft, borderColor: accentColor }]}>
+                            <Text style={[styles.pillText, sel && { color: '#FFF', fontWeight: '700' }]}>{sn}</Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
+                {/* FDA Drug Lookup — pharma workspaces only */}
+                {isPharmWorkspace && createModalOpen && (
+                  <View style={{ gap: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', paddingBottom: 12 }}>
+                    <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase' as any, color: '#60A5FA' }}>FDA Drug Lookup</Text>
+                    {/* Selected drug badge */}
+                    {fdaSelectedDrug ? (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(96,165,250,0.12)', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(96,165,250,0.3)', paddingHorizontal: 12, paddingVertical: 8 }}>
+                        <View style={{ flex: 1, gap: 2 }}>
+                          <Text style={{ fontSize: 13, fontWeight: '700', color: '#60A5FA' }}>✓ {fdaSelectedDrug.brand_name || fdaSelectedDrug.generic_name}</Text>
+                          <Text style={{ fontSize: 10, color: dimColor }}>NDC: {fdaSelectedDrug.product_ndc} · {fdaSelectedDrug.manufacturer_name}</Text>
+                        </View>
+                        <Pressable onPress={() => { setFdaSelectedDrug(null); }} style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.06)' }}>
+                          <Text style={{ fontSize: 11, color: dimColor }}>Clear</Text>
+                        </Pressable>
+                      </View>
+                    ) : (
+                      <>
+                        <LabeledInput label="Search FDA database" value={fdaQuery} onChangeText={setFdaQuery} placeholder="Search by drug name or NDC code..." />
+                        {fdaLoading && <Text style={{ fontSize: 11, color: dimColor }}>Searching FDA database...</Text>}
+                        {fdaResults.map((drug) => (
+                          <Pressable key={drug.product_ndc} onPress={() => {
+                            activeForm?.fields.forEach((f) => {
+                              const lbl = f.label.toLowerCase();
+                              if (lbl.includes('product') || lbl.includes('name') || lbl.includes('drug')) setField(f.id, drug.brand_name || drug.generic_name);
+                              else if (lbl.includes('ndc') || lbl.includes('code')) setField(f.id, drug.product_ndc);
+                              else if (lbl.includes('manufacturer') || lbl.includes('labeler')) setField(f.id, drug.manufacturer_name);
+                              else if (lbl.includes('dosage') || lbl.includes('form')) setField(f.id, drug.dosage_form);
+                              else if (lbl.includes('route')) setField(f.id, drug.route);
+                            });
+                            setFdaSelectedDrug(drug);
+                            setFdaQuery(''); setFdaResults([]);
+                          }} style={{ ...g(0.04), padding: 10, gap: 2 }}>
+                            <Text style={{ fontSize: 12, fontWeight: '700', color: '#FFFFFF' }}>{drug.brand_name || drug.generic_name}</Text>
+                            <Text style={{ fontSize: 10, color: dimColor }}>NDC: {drug.product_ndc} · {drug.manufacturer_name}</Text>
+                            <Text style={{ fontSize: 10, color: dimColor }}>{drug.dosage_form} · {drug.route}</Text>
+                          </Pressable>
+                        ))}
+                      </>
+                    )}
+                  </View>
+                )}
+                {activeForm?.fields.map((field) => (
+                  <LabeledInput
+                    key={`cf-${field.id}`}
+                    label={`${field.label}${field.required ? ' *' : ''}`}
+                    value={formValues[field.id] ?? ''}
+                    onChangeText={(v) => setField(field.id, v)}
+                    placeholder={field.id === 'status' ? `Options: ${allowedLifecycleStageNames.join(', ')}` : field.options ? `Options: ${field.options.join(', ')}` : field.type === 'date' ? 'MM-DD-YYYY' : `Enter ${field.label.toLowerCase()}`}
+                  />
+                ))}
+                {activeForm && (
+                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setFdaSelectedDrug(null); }}
+                    style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any }}>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient) ? accentTextColor : dimColor }}>Create Entry</Text>
+                  </Pressable>
+                )}
+                {!!message && <Text style={styles.notice}>{message}</Text>}
+              </ScrollView>
+            )}
+
+            {/* ══ IMPORT CSV/JSON TAB ══ */}
+            {createTab === 'import' && (
+              <ScrollView style={{ padding: 20 }} contentContainerStyle={{ gap: 14, paddingBottom: 20 }}>
+                {!selectedClient && <Text style={styles.notice}>Select a {shellConfig.subjectSingular.toLowerCase()} first to import records.</Text>}
+                {!canCreateRecord && <Text style={styles.notice}>{deniedMessage('record.create')}</Text>}
+                <Text style={{ fontSize: 12, color: dimColor, lineHeight: 18 }}>
+                  Paste CSV rows or a JSON array below. Column headers are mapped to {selectedSubSpace?.name ?? 'workspace'} field names automatically.
+                  Downloaded Bebo sample files can be imported directly.
+                </Text>
+                {/* File upload button (web) */}
+                {Platform.OS === 'web' && (
+                  <Pressable onPress={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file'; input.accept = '.csv,.json,.txt';
+                    input.onchange = async () => {
+                      const file = input.files?.[0];
+                      if (!file) return;
+                      const text = await file.text();
+                      setCsvText(text);
+                      setCsvImportError('');
+                      try { const rows = parseCsvOrJson(text); setCsvPreviewRows(rows.slice(0, 5)); }
+                      catch (e) { setCsvImportError('Could not parse file. Check format.'); }
+                    };
+                    input.click();
+                  }} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 9, borderRadius: 10, borderWidth: 1, borderColor: accentColor, backgroundColor: accentSoft, alignSelf: 'flex-start' as any }}>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: accentColor }}>📂 Upload File</Text>
+                  </Pressable>
+                )}
+                <View style={{ gap: 4 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>Paste CSV or JSON</Text>
+                  <TextInput
+                    multiline
+                    numberOfLines={8}
+                    style={{ fontSize: 11, fontFamily: 'monospace', color: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', borderRadius: 10, padding: 10, minHeight: 120, backgroundColor: 'rgba(255,255,255,0.04)', textAlignVertical: 'top' as any }}
+                    value={csvText}
+                    onChangeText={(v) => {
+                      setCsvText(v);
+                      setCsvImportError('');
+                      if (v.trim()) {
+                        try { const rows = parseCsvOrJson(v); setCsvPreviewRows(rows.slice(0, 5)); }
+                        catch { setCsvImportError('Could not parse. Expected CSV with header row or JSON array.'); }
+                      } else { setCsvPreviewRows([]); }
+                    }}
+                    placeholder={'name,status,amount\nAcme Corp,Active,5000\n...\n\nor paste JSON array:\n[{"name":"Acme Corp","status":"Active"}]'}
+                    placeholderTextColor={dimColor}
+                  />
+                </View>
+                {csvImportError ? (
+                  <Text style={{ fontSize: 12, color: '#EF4444' }}>{csvImportError}</Text>
+                ) : csvPreviewRows.length > 0 ? (
+                  <View style={{ gap: 6 }}>
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: dimColor }}>PREVIEW — first {csvPreviewRows.length} rows</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator>
+                      <View style={{ gap: 4 }}>
+                        {/* Headers */}
+                        <View style={{ flexDirection: 'row', gap: 8 }}>
+                          {Object.keys(csvPreviewRows[0]).map((h) => (
+                            <View key={h} style={{ minWidth: 90, backgroundColor: accentSoft, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 3 }}>
+                              <Text style={{ fontSize: 10, fontWeight: '700', color: accentColor }}>{h}</Text>
+                            </View>
+                          ))}
+                        </View>
+                        {csvPreviewRows.map((row, ri) => (
+                          <View key={ri} style={{ flexDirection: 'row', gap: 8 }}>
+                            {Object.values(row).map((v, vi) => (
+                              <View key={vi} style={{ minWidth: 90, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 3, backgroundColor: 'rgba(255,255,255,0.04)' }}>
+                                <Text style={{ fontSize: 10, color: dimColor }} numberOfLines={1}>{v}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        ))}
+                      </View>
+                    </ScrollView>
+                  </View>
+                ) : null}
+                <Pressable
+                  disabled={!canCreateRecord || !selectedClient || csvPreviewRows.length === 0}
+                  onPress={() => {
+                    if (!workspace || !selectedSubSpace || !selectedClientId) return;
+                    let rows: Record<string, string>[] = [];
+                    try { rows = parseCsvOrJson(csvText); } catch { setCsvImportError('Parse failed.'); return; }
+                    if (rows.length === 0) { setCsvImportError('No data rows found.'); return; }
+                    const fieldsByLabel = new Map<string, SubSpaceBuilderField>();
+                    activeForm?.fields.forEach((f) => {
+                      fieldsByLabel.set(f.label.toLowerCase(), f);
+                      fieldsByLabel.set(f.id.toLowerCase(), f);
+                    });
+                    let created = 0;
+                    for (const row of rows) {
+                      const data: Record<string, string | number> = {};
+                      let titleVal = '';
+                      for (const [col, val] of Object.entries(row)) {
+                        const field = fieldsByLabel.get(col.toLowerCase());
+                        const key = field ? field.id : col.toLowerCase().replace(/\s+/g, '_');
+                        const num = Number(val);
+                        data[key] = val !== '' && !isNaN(num) && String(num) === val.trim() ? num : val;
+                        if (!titleVal && /name|title|subject|product|employee|customer|item/i.test(col)) titleVal = val;
+                      }
+                      const rec: RuntimeRecord = {
+                        id: `rec-import-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+                        clientId: selectedClientId,
+                        workspaceId: workspace.id,
+                        subSpaceId: selectedSubSpace.id,
+                        title: titleVal || Object.values(row)[0] || 'Imported Record',
+                        status: defaultLifecycleStageName ?? lifecycleStages[0]?.name ?? 'New',
+                        tags: [`Client:${selectedClientId}`, `Workspace:${workspace.name}`, 'Import:CSV'],
+                        data,
+                      };
+                      addRecordDirect(rec);
+                      if (addNotification) flowEngine.onRecordCreated(rec, addNotification);
+                      created++;
+                    }
+                    showToast(`Imported ${created} record${created !== 1 ? 's' : ''}`, 'success');
+                    setCsvText(''); setCsvPreviewRows([]); setCreateModalOpen(false); setCreateTab('form');
+                  }}
+                  style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient && csvPreviewRows.length > 0) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any }}>
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient && csvPreviewRows.length > 0) ? accentTextColor : dimColor }}>
+                    {csvPreviewRows.length > 0 ? `Import All Rows from File` : 'Paste or upload data above'}
+                  </Text>
+                </Pressable>
+              </ScrollView>
+            )}
+
+            {/* ══ SCAN BARCODE TAB ══ */}
+            {createTab === 'scan' && (
+              <ScrollView style={{ padding: 20 }} contentContainerStyle={{ gap: 14, paddingBottom: 20 }}>
+                {!selectedClient && <Text style={styles.notice}>Select a {shellConfig.subjectSingular.toLowerCase()} first.</Text>}
+                <Text style={{ fontSize: 12, color: dimColor, lineHeight: 18 }}>
+                  Scan or type a barcode. GS1-128 barcodes (DSCSA, shipping, retail) are auto-parsed into
+                  NDC, Lot, Expiration, and Serial fields. Any other code maps to the first matching field.
+                </Text>
+                {/* Scan input */}
+                <View style={{ gap: 4 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>Barcode / QR Code</Text>
+                  <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+                    <TextInput
+                      style={{ flex: 1, fontSize: 14, fontFamily: 'monospace', color: '#FFFFFF', borderWidth: 1, borderColor: barcodeApplied ? '#86EFAC' : 'rgba(255,255,255,0.18)', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: 'rgba(255,255,255,0.04)' }}
+                      value={barcodeInput}
+                      onChangeText={(v) => { setBarcodeInput(v); setBarcodeApplied(false); }}
+                      onSubmitEditing={() => {
+                        if (barcodeInput.trim() && activeForm) {
+                          applyBarcodeToFields(barcodeInput.trim(), activeForm.fields, setField);
+                          setBarcodeApplied(true);
+                          showToast('Barcode mapped to form fields', 'success');
+                        }
+                      }}
+                      placeholder="Scan or paste barcode here — press Enter to map"
+                      placeholderTextColor={dimColor}
+                      autoFocus
+                      returnKeyType="done"
+                    />
+                    <Pressable
+                      onPress={() => {
+                        if (barcodeInput.trim() && activeForm) {
+                          applyBarcodeToFields(barcodeInput.trim(), activeForm.fields, setField);
+                          setBarcodeApplied(true);
+                          showToast('Barcode mapped to form fields', 'success');
+                        }
+                      }}
+                      style={{ paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: accentColor }}>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: accentTextColor }}>Map</Text>
+                    </Pressable>
+                  </View>
+                  {barcodeApplied && (
+                    <Text style={{ fontSize: 11, color: '#86EFAC' }}>✓ Fields populated — review below then submit</Text>
+                  )}
+                </View>
+                {/* Parsed field preview */}
+                {barcodeApplied && activeForm && (
+                  <View style={{ gap: 8, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(134,239,172,0.2)', backgroundColor: 'rgba(134,239,172,0.04)', padding: 12 }}>
+                    <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.5, color: '#86EFAC', textTransform: 'uppercase' as any }}>Mapped Fields</Text>
+                    {activeForm.fields.map((f) => formValues[f.id] ? (
+                      <View key={f.id} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{ fontSize: 12, color: dimColor }}>{f.label}</Text>
+                        <Text style={{ fontSize: 12, fontWeight: '600', color: '#FFFFFF' }}>{formValues[f.id]}</Text>
+                      </View>
+                    ) : null)}
+                  </View>
+                )}
+                {/* Editable form fields after scan */}
+                {activeForm?.fields.map((field) => (
+                  <LabeledInput
+                    key={`sc-${field.id}`}
+                    label={`${field.label}${field.required ? ' *' : ''}`}
+                    value={formValues[field.id] ?? ''}
+                    onChangeText={(v) => setField(field.id, v)}
+                    placeholder={field.type === 'date' ? 'MM-DD-YYYY' : `Enter ${field.label.toLowerCase()}`}
+                  />
+                ))}
+                {allowedLifecycleStageNames.length > 0 && (
+                  <View style={{ gap: 6 }}>
+                    <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>Lifecycle Stage</Text>
+                    <View style={[styles.inlineRow, { flexWrap: 'wrap' }]}>
+                      {allowedLifecycleStageNames.map((sn) => {
+                        const sel = (formValues.status || defaultLifecycleStageName) === sn;
+                        return (
+                          <Pressable key={sn} onPress={() => setLifecycleStatus(sn)}
+                            style={[styles.pill, sel && { backgroundColor: accentSoft, borderColor: accentColor }]}>
+                            <Text style={[styles.pillText, sel && { color: '#FFF', fontWeight: '700' }]}>{sn}</Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
+                {activeForm && (
+                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setCreateTab('form'); setBarcodeInput(''); setBarcodeApplied(false); }}
+                    style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any }}>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient) ? accentTextColor : dimColor }}>Create Entry from Scan</Text>
+                  </Pressable>
+                )}
+                {!!message && <Text style={styles.notice}>{message}</Text>}
+              </ScrollView>
+            )}
           </Pressable>
         </Pressable>
       </Modal>

@@ -27,6 +27,8 @@ import { BeboPage } from './home/BeboPage';
 import { CosmographPage } from './home/CosmographPage';
 import { ModulePageActions } from './home/types';
 import type { CommandPaletteItem } from '../types';
+import { useGuidedTour } from '../components/GuidedTour';
+import type { Page } from './home/types';
 
 const tenantTitleOptions = [
   'Operations Coordinator',
@@ -87,6 +89,17 @@ export function HomeScreen() {
   } = useAppState();
   const { page, guidedMode, activeGuide, setPage, toggleGuidedMode, openGuide, closeGuide } = useHomeScreenState();
   const { activeRole, roles, setActiveRoleId } = useRbac();
+  const { currentStep, steps, isOpen: tourOpen, openTour } = useGuidedTour();
+
+  // Auto-navigate to the correct page when the guided tour step changes
+  useEffect(() => {
+    if (!tourOpen) return;
+    const tourStep = steps[currentStep];
+    if (tourStep?.navigateTo) {
+      setTenantAccessOpen(false);
+      setPage(tourStep.navigateTo as Page);
+    }
+  }, [tourOpen, currentStep, steps]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -183,7 +196,7 @@ export function HomeScreen() {
       { id: 'nav-enduser', label: 'Go to End User', category: 'navigation', keywords: ['enduser', 'runtime', 'dashboard'], action: () => { setTenantAccessOpen(false); setPage('enduser'); } },
       { id: 'nav-architecture', label: 'Go to Architecture Docs', category: 'navigation', keywords: ['docs', 'architecture', 'documentation'], action: () => { setTenantAccessOpen(false); setPage('architecture'); } },
       { id: 'settings-theme', label: `Switch to ${mode === 'day' ? 'Night' : 'Day'} Mode`, category: 'settings', keywords: ['theme', 'dark', 'light', 'mode'], action: toggleMode },
-      { id: 'settings-guided', label: `${guidedMode ? 'Disable' : 'Enable'} Guided Tour`, category: 'settings', keywords: ['guide', 'walkthrough', 'tutorial'], action: handleGuidedModeToggle },
+      { id: 'settings-guided', label: 'Start Guided Tour', category: 'settings', keywords: ['guide', 'walkthrough', 'tutorial', 'tour'], action: openTour },
       { id: 'settings-sidebar', label: `${isSidebarCollapsed ? 'Expand' : 'Collapse'} Sidebar`, category: 'settings', keywords: ['sidebar', 'collapse', 'expand'], action: () => setSidebarCollapsed((c) => !c) },
       { id: 'tenant-access', label: 'Open Tenant Access', category: 'tenant', keywords: ['tenant', 'manage', 'admin'], action: () => setTenantAccessOpen(true) },
       { id: 'notifications-open', label: 'Open Notifications', category: 'settings', keywords: ['notifications', 'alerts', 'bell'], action: () => setNotificationsOpen(true) },

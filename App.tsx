@@ -109,125 +109,218 @@ function AppShell() {
 
 
 const tourSteps: TourStep[] = [
-  // ── Welcome ──
+
+  // ═══════════════════════════════════════════════════════
+  // INTRO
+  // ═══════════════════════════════════════════════════════
   {
     id: 'welcome',
+    section: 'intro',
     title: 'Welcome to CoreSpace',
-    content: 'CoreSpace is a configurable workspace platform that powers end-to-end traceability, automation, and role-based experiences. This tour walks you through every major area — from workspace design to supply-chain tracking.',
+    content: 'CoreSpace is a fully configurable enterprise platform — sign in once and access AI-powered workspace design, automation, integrations, data analysis, and role-based end-user experiences. This tour walks you through every section end to end.',
+    tip: 'Use the section chips at the top to jump to any module. Press → or ← to move between steps, Escape to exit.',
+  },
+  {
+    id: 'intro-signin',
+    section: 'intro',
+    title: 'Signing In',
+    content: 'From the landing page, click "Get Started" to reach the sign-in screen. Enter your email and password — or use the demo credentials pre-filled for you. CoreSpace supports multi-tenant access; your role and tenant are loaded automatically on sign-in.',
+    tip: 'First-time users land on the Marketing screen. Returning users go straight to the dashboard.',
   },
 
-  // ── Workspace Library ──
+  // ═══════════════════════════════════════════════════════
+  // AI — BEBO
+  // ═══════════════════════════════════════════════════════
   {
-    id: 'workspace-overview',
-    title: 'Workspace Library',
-    content: 'The Workspace Library is your starting point. Each workspace represents a distinct operational area — like Manufacturer Serialization or Pharmacy Dispense. Workspaces contain SubSpaces, builder fields, and count badges.',
+    id: 'ai-intro',
+    section: 'ai',
+    title: 'Meet Bebo — Your AI Co-Pilot',
+    content: 'Bebo AI is CoreSpace\'s built-in assistant. It understands the full platform — workspaces, flows, integrations, records, and roles — and can help you build anything through natural language. No prompting expertise required.',
+    navigateTo: 'bebo',
+    tip: 'Bebo is running locally with streamed responses. Everything you build with Bebo is persisted in your workspace.',
   },
   {
-    id: 'workspace-creator',
-    title: 'Workspace Creator',
-    content: 'Admins can create workspaces from scratch or start from templates. Define the root entity, add builder fields, and configure SubSpaces with their own field schemas and display types (grid, timeline, summary, split, board).',
+    id: 'ai-chat',
+    section: 'ai',
+    title: 'Starting a Conversation',
+    content: 'Type any question or request in the Bebo chat panel. You can ask Bebo to explain a concept, generate workspace schemas, write automation flows, or walk you through any feature. Bebo responds with structured, actionable answers.',
+    tip: 'Try: "Explain what a SubSpace is" or "What can Signal Studio do?" — Bebo knows the full platform.',
   },
   {
-    id: 'workspace-dscsa-demo',
-    title: 'DSCSA Demo Workspace',
-    content: 'The pre-loaded "DSCSA Serialization Workflow Example" workspace mirrors the exact serialization hierarchy: Carton → Boxes → Individual Units → Lot Information. Use it for investor demos and onboarding.',
-  },
-
-  // ── DSCSA Serialization Hierarchy ──
-  {
-    id: 'dscsa-carton',
-    title: 'Step 1 — Carton',
-    content: 'Each carton carries a unique Carton Serial (e.g. ABC1234678), Lot Number (XY1234), and Expiration Date (12/2025). This is the top-level packaging unit under DSCSA serialization.',
+    id: 'ai-build',
+    section: 'ai',
+    title: 'Building with Bebo',
+    content: 'Bebo can scaffold entire workspaces from a single sentence. Tell it your use case — pharmaceutical serialization, case management, field inspection — and it returns a complete workspace blueprint including SubSpaces, fields, and lifecycle stages.',
+    tip: 'Try: "Create a workspace for pharmaceutical supply chain serialization with carton, box, and unit tracking".',
   },
   {
-    id: 'dscsa-boxes',
-    title: 'Step 2 — Boxes Inside Carton',
-    content: 'Cartons contain multiple boxes, each with its own Box Serial (e.g. 56789YYZ001, 56789XYZ002). Box serials are aggregated under the parent carton for traceability.',
-  },
-  {
-    id: 'dscsa-units',
-    title: 'Step 3 — Individual Units',
-    content: 'Each box holds individual drug units — bottles, blister packs, etc. Every unit receives a unique Unit Serial (e.g. SN12345678, SN98765432) that is tracked from manufacturing to dispensing.',
-  },
-  {
-    id: 'dscsa-lot',
-    title: 'Step 4 — Lot Information',
-    content: 'All units in a batch share the same Lot Number (XY1234) and Expiration Date (12/2025). Lot data ties together the entire hierarchy for recall management and compliance reporting.',
+    id: 'ai-apply',
+    section: 'ai',
+    title: 'Applying Bebo\'s Output',
+    content: 'When Bebo generates a workspace, flow, or template, an "Apply" button appears inline. Clicking it loads the output directly into the relevant module — workspace into Design, flow into Signal Studio, template into Orbital. No copy-pasting.',
+    tip: 'Bebo specializes across 6 verticals: Workspace Design, Signal Flows, Orbital Integrations, Analytics, End User UX, and Admin Policies.',
   },
 
-  // ── Supply Chain Workflow Stages ──
+  // ═══════════════════════════════════════════════════════
+  // DESIGN — WORKSPACE CREATOR
+  // ═══════════════════════════════════════════════════════
   {
-    id: 'workflow-manufacturer',
-    title: 'Manufacturer Serialization',
-    content: 'The manufacturer assigns serial numbers to units and cartons, records lot and expiration data, aggregates cartons and boxes, and uploads EPCIS events to the compliance repository.',
+    id: 'design-intro',
+    section: 'design',
+    title: 'Workspace Creator — Overview',
+    content: 'Design is where you create and configure every operational workspace in your platform. A workspace is a structured data container with its own fields, SubSpaces, lifecycle stages, and display configurations.',
+    navigateTo: 'admin',
+    tip: 'Think of a workspace as a vertical slice of your operations — one per business domain (serialization, case intake, inspections, etc.).',
   },
   {
-    id: 'workflow-distributor',
-    title: 'Distributor / Wholesaler Verification',
-    content: 'The distributor receives and scans inbound shipments, verifies that serial numbers match manufacturer records, and tracks movement through the distribution network.',
+    id: 'design-create',
+    section: 'design',
+    title: 'Creating a Workspace',
+    content: 'Click "New Workspace" to open the creation form. Give it a name and description. You can start from a blank canvas or pick from industry templates. Each workspace gets a unique ID used by Signal flows and the End User runtime.',
+    tip: 'Templates include DSCSA Serialization, Case Management, Field Inspection, Pharmacy Dispense, and Compliance Audit.',
   },
   {
-    id: 'workflow-pharmacy',
-    title: 'Pharmacy / Dispenser',
-    content: 'The pharmacy receives and verifies incoming units, maintains a serial inventory, and logs each dispense event with Rx reference and pharmacist details.',
+    id: 'design-subspaces',
+    section: 'design',
+    title: 'Configuring SubSpaces & Fields',
+    content: 'SubSpaces are tabs or sections within a workspace — like "Line Items", "Audit Trail", or "Attachments". Each SubSpace has its own field schema (text, date, select, barcode, signature) and display type: Grid, Timeline, Summary Card, Split View, or Board.',
+    tip: 'Board display gives you a Kanban-style view. Timeline is ideal for lifecycle tracking. Grid is best for bulk record data.',
   },
   {
-    id: 'workflow-traceability',
-    title: 'Network Traceability & Exceptions',
-    content: 'Track serials end-to-end from factory → distributor → pharmacy. Handle exceptions like returns and losses, and investigate suspect products — all from a unified trace ledger.',
-  },
-
-  // ── Signal Studio ──
-  {
-    id: 'signal-studio-overview',
-    title: 'Signal Studio — Overview',
-    content: 'Signal Studio is the automation engine. Create flows that react to data events — like a serial mismatch triggering an exception review, or a shipment confirmation auto-advancing the lifecycle stage.',
-  },
-  {
-    id: 'signal-studio-flows',
-    title: 'Signal Studio — Flows',
-    content: 'Flows connect a signal (trigger) to rules and actions. The demo includes flows for Serial Mismatch Alert, Suspect Product Escalation, Expiration Warning, Auto-Advance on Ship Confirmation, and Dispense Completion Logger.',
-  },
-  {
-    id: 'signal-studio-publish',
-    title: 'Signal Studio — Publishing',
-    content: 'Draft flows can be tested and then published. Published flows run automatically, with metrics visible: total runs, failure rate, and average execution time.',
+    id: 'design-roles',
+    section: 'design',
+    title: 'Roles, Tags & Policies',
+    content: 'In the Admin tab, define roles with granular permissions: workspace.manage, record.create, flow.publish, subspace.manage. Assign roles to tenant users. Tag Policies attach structured metadata to records — used for RBAC filtering, automation triggers, and retention rules.',
+    tip: 'Tags like "Batch:XY1234" or "Priority:High" power Signal flows and analytics without any code.',
   },
 
-  // ── End User Space ──
+  // ═══════════════════════════════════════════════════════
+  // AUTOMATE — SIGNAL STUDIO
+  // ═══════════════════════════════════════════════════════
   {
-    id: 'enduser-overview',
-    title: 'End User Experience',
-    content: 'End users interact through persona-scoped views. Each persona — Manufacturer Lead, Distributor Receiver, Pharmacy Manager, Compliance Analyst — sees only the workspaces relevant to their role.',
+    id: 'automate-intro',
+    section: 'automate',
+    title: 'Signal Studio — Automation Engine',
+    content: 'Signal Studio lets you build event-driven automation flows with zero code. A flow has three parts: a Signal (trigger), optional Rules (conditions), and Actions (what happens). Flows run automatically across your workspace data.',
+    navigateTo: 'signal',
+    tip: 'Flows can react to any record event: created, updated, stage changed, tag added, field matched, time elapsed, or inbound webhook.',
   },
   {
-    id: 'enduser-intake',
-    title: 'Client Intake & Records',
-    content: 'New serialized batches are created through the intake form (Product Name, Lot Number, Expiration Date, Carton Serial). Records move through lifecycle stages as they progress through the supply chain.',
+    id: 'automate-trigger',
+    section: 'automate',
+    title: 'Creating a Flow — Trigger',
+    content: 'Click "New Flow" and start by choosing a signal trigger. Options include: Record Created, Stage Changed, Field Value Matched, Serial Mismatch Detected, Shipment Confirmed, Time-Based (cron), and Inbound Webhook. Each trigger type has configurable parameters.',
+    tip: 'For pharmaceutical traceability, try the "Serial Mismatch Detected" trigger to automatically flag discrepancies.',
   },
   {
-    id: 'enduser-lifecycle',
-    title: 'Lifecycle Stages',
-    content: 'Every batch follows a lifecycle: Serialized → Shipped to Distributor → Received by Distributor → Shipped to Pharmacy → Received by Pharmacy → Dispensed. Exceptions branch to Exception Review when needed.',
+    id: 'automate-rules',
+    section: 'automate',
+    title: 'Adding Rules & Actions',
+    content: 'Rules filter when the flow fires — e.g. "only if Workspace = DSCSA Serialization AND Stage = Received". Actions define what happens: Send Notification, Update Record Field, Advance Lifecycle Stage, Call Webhook, or Log to Audit Trail. Chain multiple actions per flow.',
+    tip: 'The "Auto-Advance on Ship Confirmation" demo flow runs in under 50ms on average with a 0% failure rate.',
+  },
+  {
+    id: 'automate-publish',
+    section: 'automate',
+    title: 'Testing & Publishing',
+    content: 'Before publishing, use the test runner to simulate a trigger event and see which rules matched and which actions would fire. Once validated, click Publish. Live flows show run metrics: total executions, failure rate, and average execution time.',
+    tip: 'Published flows are versioned. Roll back to a previous version from the flow history panel at any time.',
   },
 
-  // ── Admin ──
+  // ═══════════════════════════════════════════════════════
+  // INTEGRATE — ORBITAL
+  // ═══════════════════════════════════════════════════════
   {
-    id: 'admin-roles',
-    title: 'Admin — Roles & Permissions',
-    content: 'Admins define roles with granular permissions: workspace.manage, subspace.manage, client.intake, record.create, flow.publish. Roles can be scoped to all workspaces or specific ones.',
+    id: 'integrate-intro',
+    section: 'integrate',
+    title: 'Orbital — Integration Marketplace',
+    content: 'Orbital connects CoreSpace to your external systems — ERP, CRM, EPCIS repositories, shipping carriers, compliance databases, and custom APIs. Browse the integration library, configure credentials, and test connections in seconds.',
+    navigateTo: 'orbital',
+    tip: 'Orbital integrations are referenced by Signal flows — e.g. "On Stage Changed, push update to SAP via the SAP Integration".',
   },
   {
-    id: 'admin-tags-policies',
-    title: 'Admin — Tags & Policies',
-    content: 'Tag Policies organize data for RBAC, analytics, automation, and retention. Tags like Batch:XY1234, Carton:ABC1234678, and Priority:High drive automation rules and visibility filters.',
+    id: 'integrate-connect',
+    section: 'integrate',
+    title: 'Connecting an Integration',
+    content: 'Click any integration card to open its detail panel. Fill in credentials (API keys, OAuth, webhook URLs) in the Connection tab. Hit "Test Connection" — CoreSpace sends a live ping and shows latency + status in the event log. Save to activate.',
+    tip: 'Connection credentials are stored encrypted per-tenant. Switching tenants automatically loads that tenant\'s credential set.',
+  },
+  {
+    id: 'integrate-sync',
+    section: 'integrate',
+    title: 'Data Sync & Event Log',
+    content: 'Each active integration shows a live event log: last sync timestamp, records synced, errors, and payload previews. Use the "Sync Now" button for manual refreshes. Signal flows can also trigger targeted sync pushes on specific record events.',
+    tip: 'The event log retains the last 500 integration events per tenant. Filter by integration, status, or time range.',
   },
 
-  // ── Wrap-up ──
+  // ═══════════════════════════════════════════════════════
+  // ANALYZE — COSMOGRAPH
+  // ═══════════════════════════════════════════════════════
   {
-    id: 'tour-complete',
-    title: 'You\'re Ready!',
-    content: 'That covers the full CoreSpace platform — workspaces, DSCSA serialization, supply chain workflows, Signal Studio automation, end user personas, lifecycle management, and admin controls. Explore on your own or restart this tour anytime from Settings.',
+    id: 'analyze-intro',
+    section: 'analyze',
+    title: 'Cosmograph — Graph Analytics',
+    content: 'Cosmograph renders your workspace data as a live force-directed graph. Each workspace record becomes a node; relationships (parent-child, referencing, same-lot) become edges. You can immediately see clusters, bottlenecks, and anomalies.',
+    navigateTo: 'cosmograph',
+    tip: 'Zoom with scroll, pan by drag, and click any node to open its full record in a slide-over drawer.',
+  },
+  {
+    id: 'analyze-read',
+    section: 'analyze',
+    title: 'Reading the Graph',
+    content: 'Node color maps to lifecycle stage — green = complete, yellow = in-progress, red = exception. Node size reflects the number of child records. Dense clusters are healthy batches; isolated red nodes indicate open exceptions requiring review.',
+    tip: 'Use the filter panel to focus on a specific workspace, date range, or tag. The graph re-renders instantly.',
+  },
+  {
+    id: 'analyze-insights',
+    section: 'analyze',
+    title: 'Insights & Reporting',
+    content: 'The Analytics panel below the graph shows: total records, stage distribution, average lifecycle duration, top exception types, and flow trigger frequency. Export any view as CSV or share a live dashboard link with your team.',
+    tip: 'Cosmograph updates in real time as records are created or stage-advanced — no manual refresh needed.',
+  },
+
+  // ═══════════════════════════════════════════════════════
+  // OPERATE — END USER
+  // ═══════════════════════════════════════════════════════
+  {
+    id: 'operate-intro',
+    section: 'operate',
+    title: 'End User — Tenant-Branded Runtime',
+    content: 'The Operate (End User) view is the tenant-branded workspace your field users interact with every day. It applies the tenant\'s logo, colors, and role-scoped workspace access automatically. Each user sees only what their role permits.',
+    navigateTo: 'enduser',
+    tip: 'SuperAdmins can switch tenants from the left panel to preview any tenant\'s End User experience live.',
+  },
+  {
+    id: 'operate-record',
+    section: 'operate',
+    title: 'Creating a Record',
+    content: 'Click "Create Record" on any workspace card to open the intake modal. The Form tab has all fields defined in Design. The Import tab accepts CSV or JSON uploads. The Scan tab decodes GS1-128 barcodes directly from your camera or file, auto-filling product fields.',
+    tip: 'Signal Studio flows fire immediately on "Record Created" — status notifications, audit log entries, and lifecycle advancement happen in real time.',
+  },
+  {
+    id: 'operate-lifecycle',
+    section: 'operate',
+    title: 'Lifecycle Management',
+    content: 'Every record moves through stages defined in the workspace (e.g. Serialized → Shipped → Received → Dispensed). Click the stage badge on any record to advance it — or let Signal flows auto-advance based on field values or incoming webhooks.',
+    tip: 'Exception stages (red) pause normal lifecycle flow and route records to the exception review queue, visible to Compliance Officers.',
+  },
+  {
+    id: 'operate-rbac',
+    section: 'operate',
+    title: 'Role-Based Access & Personas',
+    content: 'Role-based access means each persona — Manufacturer Lead, Distributor Receiver, Pharmacy Manager, Compliance Analyst — sees a tailored workspace set with their permitted actions only. Buttons for restricted actions are hidden, not just disabled.',
+    tip: 'Use the Role Switcher in the toolbar (top-right of the End User view) to preview what any role sees without logging out.',
+  },
+
+  // ═══════════════════════════════════════════════════════
+  // FINISH
+  // ═══════════════════════════════════════════════════════
+  {
+    id: 'tour-finish',
+    section: 'finish',
+    title: 'You\'re Ready to Build',
+    content: 'That\'s the full CoreSpace platform — AI-powered workspace design, event-driven automation, external integrations, graph analytics, and role-scoped end-user experiences, all in one shell. Everything you build here is production-grade and deployable.',
+    tip: 'Restart this tour anytime from Settings → Guided Tour. Use Ctrl+K (⌘K) to open the Command Palette and jump to any module instantly.',
   },
 ];
 

@@ -153,6 +153,7 @@ function useScrollReveal() {
 const ssLogo = require('../../assets/cs_sslightlogo.png');
 const orbitalLogo = require('../../assets/cs_orbitallightlogo.png');
 const cosmoLogo = require('../../assets/cs_orbitallightlogo.png'); // placeholder until cs_cosmolightlogo.png ships
+const planetLogo = require('../../assets/cs_planetlogo.png');
 
 /* ─── Section-nav keys ──────────────────────────────────────────── */
 type NavKey = 'home' | 'problem' | 'how' | 'industries' | 'investors' | 'pricing' | 'about' | 'blog' | 'careers';
@@ -447,7 +448,7 @@ const ABOUT_MODULES = [
 /* ─── Blog posts (static company news + live Dev.to SaaS feed) ──── */
 type BlogPost = { id: string; title: string; summary: string; author: string; date: string; tag: string; readTime: number; url: string | null; emoji: string };
 const BLOG_POSTS_STATIC: BlogPost[] = [
-  { id: 'cs-1', title: 'CoreSpace Closes $1M Seed Round to Build the Operational Platform for Every Business', summary: 'We are thrilled to announce our $1M seed round, backed by Veridian Ventures and BlueBridge Capital. This capital will accelerate engineering, Cosmograph, and our go-to-market motion.', author: 'CoreSpace Team', date: 'March 12, 2026', tag: 'Company News', readTime: 3, url: null, emoji: '🎉' },
+  { id: 'cs-1', title: 'Why We\'re Building the Operational Platform for Every Business', summary: 'Most service businesses are held together by spreadsheets, sticky notes, and group chats. CoreSpace exists to change that — giving every team the same operational clarity that enterprise companies pay millions for, without the dev team.', author: 'CoreSpace Team', date: 'March 12, 2026', tag: 'Company News', readTime: 3, url: null, emoji: '🎉' },
   { id: 'cs-2', title: 'Introducing Cosmograph: Smart Data Import Is Finally Here', summary: 'Today we are shipping Cosmograph to Pro and Enterprise users. Scan, classify, and import any CSV or Excel file in under 3 minutes — PII detection and schema mapping included.', author: 'CoreSpace Engineering', date: 'March 8, 2026', tag: 'Product Update', readTime: 4, url: null, emoji: '🧬' },
   { id: 'cs-3', title: 'Why DSCSA Compliance Teams Choose CoreSpace Over Custom Software', summary: 'Healthcare supply chain teams need serialized batch tracking, lifecycle governance, and Orbital integrations — in one place. Here is how CoreSpace wins the compliance conversation.', author: 'CoreSpace Product', date: 'February 28, 2026', tag: 'Industry Insight', readTime: 6, url: null, emoji: '💊' },
   { id: 'cs-4', title: 'Signal Studio Update: Webhook Triggers, Retry Policies, and Run Metrics v2', summary: 'Signal Studio got a major update: inbound webhooks now support payload parsing, failed runs auto-retry up to 3 times, and the run stats dashboard shows per-flow failure patterns.', author: 'CoreSpace Engineering', date: 'February 14, 2026', tag: 'Product Update', readTime: 5, url: null, emoji: '⚡' },
@@ -463,10 +464,24 @@ const JOBS = [
 
 /* ─── Team ───────────────────────────────────────────────────────── */
 const TEAM = [
-  { name: 'D. Eck', title: 'Founder & CEO', emoji: '🧠', bio: 'Built CoreSpace to close the gap between scattered spreadsheets and expensive custom software. 10+ years in operations and product.' },
-  { name: 'Alex Morin', title: 'Head of Engineering', emoji: '⚙️', bio: 'Led platform engineering at two SaaS exits. Owns CoreSpace architecture, multi-tenant infra, and Bebo AI.' },
-  { name: 'Tanya Walsh', title: 'Head of Customer Success', emoji: '🚀', bio: 'Onboarded 200+ SMB teams across healthcare, logistics, and finance. Runs rapid deployment and retention playbooks.' },
-  { name: 'Sam Okafor', title: 'Lead Designer', emoji: '🎨', bio: 'Designed the CoreSpace visual system from scratch — Nebula background, branded shell, and the Workspace Creator UX.' },
+  {
+    name: 'Kieth Echols',
+    title: 'Founder & CTO',
+    emoji: '🧠',
+    bio: 'Kieth is the builder behind CoreSpace — he designed and engineered the entire platform from the ground up. Every module you see — Signal Studio, Orbital, Cosmograph, Bebo, the Workspace Creator — was built by him. He\'s the sync point between product vision and technical execution, turning complex operational problems into clean, shippable software. When an idea enters the room, Kieth is the one who makes it real.',
+  },
+  {
+    name: 'Sayeesha Ramnani',
+    title: 'Founder & CEO',
+    emoji: '⚙️',
+    bio: 'Sayeesha is the connector. She brings the right people into the room — customers, partners, investors, and champions — and turns conversations into contracts. Her superpower is understanding what a business actually needs and showing them exactly how CoreSpace closes the gap. She drives pipeline, builds relationships, and makes sure every demo ends with a decision.',
+  },
+  {
+    name: 'Neco Goode',
+    title: 'Founder & CAiO',
+    emoji: '🚀',
+    bio: 'Neco is the idea engine and AI strategist. He identifies the problems worth solving, designs the solutions, and maps how AI can close gaps that software alone can\'t. As Chief AI Officer, he leads CoreSpace\'s intelligence layer — from how Bebo understands a business to how AI surfaces insights across workflows. Neco sees what\'s coming before it arrives and makes sure CoreSpace is already there.',
+  },
 ];
 
 type MarketingScreenProps = {
@@ -686,6 +701,9 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
       </View>
     </View>
 
+    {/* Preload planet logo so it's cached before the user scrolls to it */}
+    <Image source={planetLogo} style={{ width: 0, height: 0, position: 'absolute', opacity: 0 }} />
+
     {/* ─── Scrollable content ─────────────────────────────────── */}
     <ScrollView
       ref={scrollRef}
@@ -748,7 +766,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
           </div>
         </div>
 
-        <div className="cs-reveal cs-visible cs-hero-demo">
+        {/* <div className="cs-reveal cs-visible cs-hero-demo">
           <Text style={[styles.landingTrustText, { marginTop: 32 }]}>See It In Action</Text>
           <div className="cs-hero-demo-iframe">
             <iframe
@@ -759,6 +777,68 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
               style={{ aspectRatio: '800 / 679', border: 0, minHeight: 480, display: 'block' } as any}
             />
           </div>
+        </div> */}
+      </View>
+
+      <div className="cs-section-divider" />
+
+      {/* ═══ 60-MINUTE BUILD ════════════════════════════════════ */}
+      <View>
+        <div ref={revealRef}>
+          <SectionGlass>
+            <Text style={[styles.landingSectionEyebrow, { textAlign: 'center', width: '100%' }]}>⏱️ THE CONFERENCE PROMISE</Text>
+            <Text style={[styles.landingSectionTitle, { fontSize: sectionTitleSize, lineHeight: sectionTitleLineHeight, textAlign: 'center', width: '100%' }]}>
+              Meet us. In 60 minutes, your business is built.
+            </Text>
+            <Text style={[styles.landingSectionText, { fontSize: sectionBodySize, lineHeight: sectionBodyLineHeight, textAlign: 'center', width: '100%', maxWidth: 700, alignSelf: 'center' }]}>
+              No dev team. No six-month project. No spreadsheets. You describe what you do — we hand you back a fully operational business system before you leave the booth.
+            </Text>
+
+            {/* Timeline */}
+            <View style={{ gap: 10, marginTop: 8 }}>
+              {[
+                { time: '0–5 min',  icon: '💬', title: 'Tell Bebo what your business does',       detail: 'Describe your industry, team, and how you track work. Plain English — no forms.' },
+                { time: '5–15 min', icon: '🤖', title: 'AI builds your workspace',                 detail: 'Bebo generates your data fields, record stages, intake forms, and team roles automatically.' },
+                { time: '15–30 min',icon: '🛠️', title: 'Customize with the Workspace Creator',    detail: 'Drag fields, rename stages, adjust permissions. You own every detail — no dev needed.' },
+                { time: '30–45 min',icon: '⚡', title: 'Automate your most repeated task',          detail: 'Drag a Signal Studio flow: "When a new record is created → notify the team → assign an owner." Done in minutes.' },
+                { time: '45–55 min',icon: '🔗', title: 'Connect a tool you already use',           detail: 'One-click Orbital integrations — QuickBooks, DocuSign, Slack, or any webhook endpoint.' },
+                { time: '55–60 min',icon: '🚀', title: 'Your team goes live',                       detail: 'Share the link. Your staff can create records, complete workflows, and track progress — right now.' },
+              ].map((step, i) => (
+                <View key={`conf-${i}`} style={{ ...(glassCard as any), flexDirection: 'row', gap: 18, alignItems: 'flex-start', padding: compactCtas ? 14 : 18 }}>
+                  <View style={{ alignItems: 'center', minWidth: compactCtas ? 52 : 72, gap: 4 }}>
+                    <Text style={{ fontSize: compactCtas ? 22 : 28 }}>{step.icon}</Text>
+                    <Text style={{ color: '#8C5BF5', fontSize: 10, fontWeight: '800', letterSpacing: 0.5, textAlign: 'center' }}>{step.time}</Text>
+                  </View>
+                  <View style={{ flex: 1, gap: 3 }}>
+                    <Text style={{ color: '#FFFFFF', fontSize: compactCtas ? 13 : 15, fontWeight: '800', lineHeight: 20 }}>{step.title}</Text>
+                    <Text style={{ color: '#C9B8EA', fontSize: compactCtas ? 12 : 13, lineHeight: 19 }}>{step.detail}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            {/* Bottom CTA strip */}
+            <View style={{ ...(glassCard as any), padding: compactCtas ? 16 : 22, gap: 8, marginTop: 6, borderColor: 'rgba(139,92,246,0.30)', background: 'linear-gradient(135deg, rgba(139,92,246,0.12), rgba(59,130,246,0.08))' } as any}>
+              <Text style={{ color: '#FFFFFF', fontSize: compactCtas ? 16 : 20, fontWeight: '900', textAlign: 'center' }}>
+                "This is the first tool I've seen that actually replaces custom software for the price of a SaaS subscription."
+              </Text>
+              <Text style={{ color: '#8C5BF5', fontSize: 12, fontWeight: '700', textAlign: 'center', letterSpacing: 0.4 }}>
+                — What we hear every time we demo.
+              </Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'center', marginTop: 6 }}>
+                {[
+                  '✅ No developer required',
+                  '✅ Works for any service business',
+                  '✅ Live in under an hour',
+                  '✅ Your data, your database',
+                ].map((badge, i) => (
+                  <View key={`badge-${i}`} style={{ paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(139,92,246,0.35)', backgroundColor: 'rgba(139,92,246,0.10)' }}>
+                    <Text style={{ color: '#D8BBFF', fontSize: 12, fontWeight: '700' }}>{badge}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </SectionGlass>
         </div>
       </View>
 
@@ -769,19 +849,58 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
         <div ref={revealRef}>
           <SectionGlass>
             <Text style={[styles.landingSectionEyebrow, { textAlign: 'center', width: '100%' }]}>⚠️ THE PROBLEM</Text>
-            <Text style={[styles.landingSectionTitle, { fontSize: sectionTitleSize, lineHeight: sectionTitleLineHeight, textAlign: 'center', width: '100%' }]}>Your tools are scattered. Your process is broken.</Text>
-            <div className="cs-problem-panel">
-              { [
-                { pain: '📂 Data in 5+ different apps', cost: 'Hours wasted every week.' },
-                { pain: '🔀 No consistent process', cost: 'Quality drops at scale.' },
-                { pain: '💸 Custom software costs $100K+', cost: 'Too slow for small teams.' },
+            <Text style={[styles.landingSectionTitle, { fontSize: sectionTitleSize, lineHeight: sectionTitleLineHeight, textAlign: 'center', width: '100%' }]}>
+              Every service business hits the same wall.
+            </Text>
+            <Text style={[styles.landingSectionText, { fontSize: sectionBodySize, lineHeight: sectionBodyLineHeight, textAlign: 'center', width: '100%', maxWidth: 680, alignSelf: 'center' }]}>
+              You started with a spreadsheet. Then you added another. Then a form tool, a project manager, a CRM. Now nobody knows where anything is — and your process only works if you're in the room.
+            </Text>
+            <View style={{ gap: 10, marginTop: 4 }}>
+              {[
+                {
+                  icon: '📂',
+                  pain: 'Your data lives in five different places',
+                  reality: 'Spreadsheet for tracking. Email for approvals. Slack for status. A form tool for intake. A calendar for scheduling. Nothing talks to anything else.',
+                  cost: 'Your team spends hours each week just moving information between tools.',
+                },
+                {
+                  icon: '🔀',
+                  pain: 'Your process only works if you\'re there',
+                  reality: 'When you\'re in the room, things get done right. When you\'re not, tasks fall through the cracks — because the only process documentation is in your head.',
+                  cost: 'Quality becomes inconsistent the moment your team grows beyond 3 people.',
+                },
+                {
+                  icon: '💸',
+                  pain: 'Real software is out of reach',
+                  reality: 'Custom development starts at $100,000 and takes 6–18 months. Off-the-shelf tools don\'t fit your industry. So you keep patching the problem with more spreadsheets.',
+                  cost: 'Your competitors who can afford custom ops are pulling ahead — and the gap keeps widening.',
+                },
+                {
+                  icon: '🧱',
+                  pain: 'Every new client breaks your system',
+                  reality: 'Onboarding one client is manageable. Onboarding twenty means 20 different variations of your process. Deadlines get missed. Clients get confused. Your reputation takes the hit.',
+                  cost: 'Growth creates operational chaos instead of operational leverage.',
+                },
               ].map((item, i) => (
-                <div key={`pain-${i}`} className="cs-glass-card cs-problem-card">
-                  <Text style={{ color: '#FF8A8A', fontSize: 13, fontWeight: '700', textAlign: 'center' }}>{item.pain}</Text>
-                  <Text style={{ color: '#C9B8EA', fontSize: 12, lineHeight: 18, textAlign: 'center' }}>{item.cost}</Text>
-                </div>
+                <View key={`pain-${i}`} style={{ ...(glassCard as any), flexDirection: 'row', gap: 18, alignItems: 'flex-start', padding: compactCtas ? 14 : 20 }}>
+                  <Text style={{ fontSize: compactCtas ? 24 : 32, minWidth: 40 }}>{item.icon}</Text>
+                  <View style={{ flex: 1, gap: 6 }}>
+                    <Text style={{ color: '#FF8A8A', fontSize: compactCtas ? 13 : 15, fontWeight: '800', lineHeight: 20 }}>{item.pain}</Text>
+                    <Text style={{ color: '#EBDFFF', fontSize: compactCtas ? 12 : 13, lineHeight: 20 }}>{item.reality}</Text>
+                    <View style={{ flexDirection: 'row', gap: 6, alignItems: 'flex-start', marginTop: 2 }}>
+                      <Text style={{ color: '#F59E0B', fontSize: 13, fontWeight: '800' }}>→</Text>
+                      <Text style={{ color: '#F59E0B', fontSize: compactCtas ? 11 : 12, lineHeight: 18, flex: 1, fontWeight: '700' }}>{item.cost}</Text>
+                    </View>
+                  </View>
+                </View>
               ))}
-            </div>
+            </View>
+            <View style={{ ...(glassCard as any), padding: compactCtas ? 14 : 20, gap: 6, borderColor: 'rgba(139,92,246,0.28)', background: 'linear-gradient(135deg, rgba(139,92,246,0.10), rgba(59,130,246,0.06))', flexDirection: 'row', alignItems: 'center' } as any}>
+              <Image source={planetLogo} style={{ width: compactCtas ? 52 : 72, height: compactCtas ? 52 : 72, marginRight: compactCtas ? 12 : 18, opacity: 0.92 }} resizeMode="contain" />
+              <Text style={{ color: '#FFFFFF', fontSize: compactCtas ? 15 : 18, fontWeight: '900', flex: 1, lineHeight: compactCtas ? 22 : 26 }}>
+                CoreSpace is the fix — built specifically for service businesses that need enterprise structure without the enterprise price tag.
+              </Text>
+            </View>
           </SectionGlass>
         </div>
       </View>
@@ -793,18 +912,57 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
         <div ref={revealRef}>
           <SectionGlass>
             <Text style={[styles.landingSectionEyebrow, { textAlign: 'center', width: '100%' }]}>📖 HOW IT WORKS</Text>
-            <Text style={[styles.landingSectionTitle, { fontSize: sectionTitleSize, lineHeight: sectionTitleLineHeight, textAlign: 'center', width: '100%' }]}>Four steps — you're live</Text>
-            <div className="cs-how-panel">
-              {HOW_STEPS.map((s, i) => (
-                <div key={`step-${i}`} className="cs-glass-card cs-how-card">
-                  <View style={{ width: 48, height: 48, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(139,92,246,0.45)', backgroundColor: 'rgba(139,92,246,0.14)', alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ color: '#D8BBFF', fontSize: 15, fontWeight: '800' }}>{s.step}</Text>
+            <Text style={[styles.landingSectionTitle, { fontSize: sectionTitleSize, lineHeight: sectionTitleLineHeight, textAlign: 'center', width: '100%' }]}>
+              From zero to fully operational — in four steps.
+            </Text>
+            <Text style={[styles.landingSectionText, { fontSize: sectionBodySize, lineHeight: sectionBodyLineHeight, textAlign: 'center', width: '100%', maxWidth: 680, alignSelf: 'center' }]}>
+              No developer. No project manager. No six-week onboarding. Just describe your business and CoreSpace builds the structure around it.
+            </Text>
+            <View style={{ gap: 10, marginTop: 4 }}>
+              {[
+                {
+                  step: '01', icon: '💬', color: '#8C5BF5',
+                  title: 'Describe your business to Bebo',
+                  detail: 'Tell the AI what your business does — your industry, what you track, who\'s on your team. Plain English. No forms, no templates to fill out.',
+                  outcome: 'Bebo maps your description to a complete workspace configuration.',
+                },
+                {
+                  step: '02', icon: '🏗️', color: '#3B82F6',
+                  title: 'Bebo builds your workspace automatically',
+                  detail: 'Fields, record stages, intake forms, team roles, and permissions — all generated in seconds based on exactly what you described. Not a generic template. Your business.',
+                  outcome: 'You get a fully structured ops system before you finish your coffee.',
+                },
+                {
+                  step: '03', icon: '🛠️', color: '#F59E0B',
+                  title: 'Refine it in the Workspace Creator',
+                  detail: 'Drag fields to reorder them. Rename lifecycle stages. Add a dropdown. Tighten permissions so only managers can approve changes. Every control is visual — no code.',
+                  outcome: 'Your workspace matches exactly how your team actually works.',
+                },
+                {
+                  step: '04', icon: '🚀', color: '#22C55E',
+                  title: 'Automate, integrate, and go live',
+                  detail: 'Add a Signal Studio flow that fires when a record moves to a new stage. Connect QuickBooks or DocuSign from the Orbital marketplace. Share the link — your team starts working immediately.',
+                  outcome: 'Day one: your operations run like a company three times your size.',
+                },
+              ].map((s, i) => (
+                <View key={`how-${i}`} style={{ ...(glassCard as any), flexDirection: compactCtas ? 'column' : 'row', gap: 18, alignItems: 'flex-start', padding: compactCtas ? 14 : 22 }}>
+                  <View style={{ alignItems: 'center', minWidth: compactCtas ? undefined : 64, gap: 6 }}>
+                    <View style={{ width: 52, height: 52, borderRadius: 26, borderWidth: 1, borderColor: `${s.color}55`, backgroundColor: `${s.color}22`, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ fontSize: 22 }}>{s.icon}</Text>
+                    </View>
+                    <Text style={{ color: s.color, fontSize: 11, fontWeight: '900', letterSpacing: 1 }}>STEP {s.step}</Text>
                   </View>
-                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700', textAlign: 'center' }}>{s.title}</Text>
-                  <Text style={{ color: '#EBDFFF', fontSize: 12, lineHeight: 18, textAlign: 'center' }}>{s.text}</Text>
-                </div>
+                  <View style={{ flex: 1, gap: 6 }}>
+                    <Text style={{ color: '#FFFFFF', fontSize: compactCtas ? 14 : 16, fontWeight: '800', lineHeight: 22 }}>{s.title}</Text>
+                    <Text style={{ color: '#C9B8EA', fontSize: compactCtas ? 12 : 13, lineHeight: 20 }}>{s.detail}</Text>
+                    <View style={{ flexDirection: 'row', gap: 6, alignItems: 'flex-start', marginTop: 2 }}>
+                      <Text style={{ color: s.color, fontSize: 13, fontWeight: '800' }}>→</Text>
+                      <Text style={{ color: s.color, fontSize: compactCtas ? 11 : 12, lineHeight: 18, flex: 1, fontWeight: '700' }}>{s.outcome}</Text>
+                    </View>
+                  </View>
+                </View>
               ))}
-            </div>
+            </View>
           </SectionGlass>
         </div>
       </View>
@@ -843,11 +1001,17 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
           <SectionGlass>
             <Text style={styles.landingSectionEyebrow}>💎 INVESTOR OVERVIEW</Text>
             <Text style={[styles.landingSectionTitle, { fontSize: sectionTitleSize, lineHeight: sectionTitleLineHeight }]}>
-              Why invest in CoreSpace
+              A massive gap. A clear solution. The right time.
             </Text>
-            <Text style={[styles.landingSectionText, { fontSize: sectionBodySize, lineHeight: sectionBodyLineHeight }]}>
-              No direct competitor. Huge gap between cheap CRMs and expensive custom apps — we fill it.
+            <Text style={[styles.landingSectionText, { fontSize: sectionBodySize, lineHeight: sectionBodyLineHeight, maxWidth: 760 }]}>
+              There are 32 million small businesses in the US. Most run on spreadsheets. Enterprise ops software is too expensive, too rigid, and requires a dev team to maintain. CoreSpace is the first platform that makes enterprise-grade operational structure accessible to any service business — no code, no developer, no six-figure contract.
             </Text>
+            <View style={{ ...(glassCard as any), padding: compactCtas ? 14 : 20, gap: 10, borderColor: 'rgba(139,92,246,0.28)' }}>
+              <Text style={{ color: '#FD9CFD', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>🎯 THE THESIS IN ONE SENTENCE</Text>
+              <Text style={{ color: '#FFFFFF', fontSize: compactCtas ? 15 : 19, fontWeight: '900', lineHeight: compactCtas ? 22 : 28 }}>
+                "Every service business needs what enterprise companies have — structured data, enforced workflow, and team-level permissions. CoreSpace delivers it without the $200K price tag or the 18-month build."
+              </Text>
+            </View>
 
             <View style={{ ...(glassCard as any), padding: 20, gap: 12, marginTop: 4 }}>
               <Text style={{ color: '#FD9CFD', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>📊 MARKET OPPORTUNITY</Text>
@@ -973,27 +1137,78 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
               </View>
             </View>
 
-            <View style={{ ...(glassCard as any), padding: 20, gap: 12 }}>
+            <View style={{ gap: 10 }}>
               <Text style={{ color: '#FD9CFD', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>🏆 TRACTION & MILESTONES</Text>
-              <View style={{ gap: 8 }}>
-                { [
-                  { milestone: 'Full platform live and working', status: '✅ Shipped' },
-                  { milestone: 'AI builds workspaces from plain English', status: '✅ Shipped' },
-                  { milestone: 'Multiple database options ready', status: '✅ Shipped' },
-                  { milestone: '12 industry templates deployed', status: '✅ Shipped' },
-                  { milestone: 'Live on two public domains', status: '✅ Live' },
-                  { milestone: 'Smart data importer in progress', status: '🔧 Building' },
-                  { milestone: '3 enterprise pilots in pipeline', status: '🎯 Next Quarter' },
-                  { milestone: 'SOC 2 security certification', status: '🎯 Next Quarter' },
-                ].map((item, i) => (
-                  <View key={`ms-${i}`} style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-                    <Text style={{ fontSize: 13, minWidth: 28 }}>{item.status.split(' ')[0]}</Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ color: '#EBDFFF', fontSize: 13, lineHeight: 19 }}>{item.milestone}</Text>
-                      <Text style={{ color: '#8C5BF5', fontSize: 11, fontWeight: '700' }}>{item.status}</Text>
+              {/* Kanban columns */}
+              <View style={{ flexDirection: compactCtas ? 'column' : 'row', gap: 10, alignItems: 'stretch' }}>
+
+                {/* ── Shipped ── */}
+                <View style={{ flex: 1, ...(glassCard as any), padding: 14, gap: 10, borderColor: 'rgba(34,197,94,0.25)', borderTopWidth: 3, borderTopColor: '#22C55E' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#22C55E' }} />
+                    <Text style={{ color: '#22C55E', fontSize: 10, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' }}>Shipped</Text>
+                    <View style={{ marginLeft: 'auto' as any, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 999, backgroundColor: 'rgba(34,197,94,0.15)' }}>
+                      <Text style={{ color: '#22C55E', fontSize: 10, fontWeight: '800' }}>5</Text>
                     </View>
                   </View>
-                ))}
+                  {[
+                    { label: 'Full platform live', detail: 'Workspace Creator, Board Runtime, Intake, RBAC.' },
+                    { label: 'AI workspace builder', detail: 'Bebo builds from plain English.' },
+                    { label: 'Portable persistence', detail: 'Cosmos DB, PostgreSQL, local adapters.' },
+                    { label: '12 industry templates', detail: 'Healthcare, legal, property, pharma + more.' },
+                    { label: 'Live on public domains', detail: 'corespace.surge.sh globally accessible.' },
+                  ].map((item, i) => (
+                    <View key={`ms-done-${i}`} style={{ ...(glassCard as any), padding: 10, gap: 3, borderRadius: 10 }}>
+                      <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+                        <Text style={{ color: '#22C55E', fontSize: 12, fontWeight: '900' }}>✓</Text>
+                        <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700', flex: 1 }}>{item.label}</Text>
+                      </View>
+                      <Text style={{ color: '#9B8ABE', fontSize: 11, lineHeight: 16, paddingLeft: 18 }}>{item.detail}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                {/* ── In Progress ── */}
+                <View style={{ flex: 1, ...(glassCard as any), padding: 14, gap: 10, borderColor: 'rgba(245,158,11,0.25)', borderTopWidth: 3, borderTopColor: '#F59E0B' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#F59E0B' }} />
+                    <Text style={{ color: '#F59E0B', fontSize: 10, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' }}>In Progress</Text>
+                    <View style={{ marginLeft: 'auto' as any, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 999, backgroundColor: 'rgba(245,158,11,0.15)' }}>
+                      <Text style={{ color: '#F59E0B', fontSize: 10, fontWeight: '800' }}>1</Text>
+                    </View>
+                  </View>
+                  <View style={{ ...(glassCard as any), padding: 10, gap: 3, borderRadius: 10 }}>
+                    <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+                      <Text style={{ color: '#F59E0B', fontSize: 12, fontWeight: '900' }}>⚙</Text>
+                      <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700', flex: 1 }}>Cosmograph importer</Text>
+                    </View>
+                    <Text style={{ color: '#9B8ABE', fontSize: 11, lineHeight: 16, paddingLeft: 18 }}>Auto-maps CSV/Excel to workspace fields with PII detection. Final testing.</Text>
+                  </View>
+                </View>
+
+                {/* ── Next Quarter ── */}
+                <View style={{ flex: 1, ...(glassCard as any), padding: 14, gap: 10, borderColor: 'rgba(139,92,246,0.25)', borderTopWidth: 3, borderTopColor: '#8C5BF5' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#8C5BF5' }} />
+                    <Text style={{ color: '#8C5BF5', fontSize: 10, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' }}>Next Quarter</Text>
+                    <View style={{ marginLeft: 'auto' as any, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 999, backgroundColor: 'rgba(139,92,246,0.15)' }}>
+                      <Text style={{ color: '#8C5BF5', fontSize: 10, fontWeight: '800' }}>2</Text>
+                    </View>
+                  </View>
+                  {[
+                    { label: '3 enterprise pilots', detail: 'Healthcare, logistics, and legal verticals.' },
+                    { label: 'SOC 2 Type I', detail: 'Audit scoped, vendor selected. Required for enterprise.' },
+                  ].map((item, i) => (
+                    <View key={`ms-next-${i}`} style={{ ...(glassCard as any), padding: 10, gap: 3, borderRadius: 10 }}>
+                      <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+                        <Text style={{ color: '#8C5BF5', fontSize: 12, fontWeight: '900' }}>→</Text>
+                        <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700', flex: 1 }}>{item.label}</Text>
+                      </View>
+                      <Text style={{ color: '#9B8ABE', fontSize: 11, lineHeight: 16, paddingLeft: 18 }}>{item.detail}</Text>
+                    </View>
+                  ))}
+                </View>
+
               </View>
             </View>
 

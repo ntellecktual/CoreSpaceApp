@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { InteractivePressable as Pressable } from '../../components/InteractivePressable';
 import { useUiTheme } from '../../context/UiThemeContext';
@@ -7,6 +7,29 @@ import { orbitalSteps } from './constants';
 import { useOrbitalMarketplace } from './hooks/useOrbitalMarketplace';
 import { GuidedPageProps } from './types';
 import type { IntegrationActivation, IntegrationFieldDef, IntegrationTemplate } from '../../types';
+
+type TestResult = 'idle' | 'testing' | 'ok' | 'fail';
+interface IntegrationEvent { id: string; ts: string; event: string; status: 'ok' | 'warn' | 'error' }
+
+const EVENT_SAMPLES: [string, IntegrationEvent['status']][] = [
+  ['Webhook received: record.updated', 'ok'],
+  ['Action executed: sync_record', 'ok'],
+  ['Rate limit warning: 80% of quota', 'warn'],
+  ['Field mapping applied to 4 records', 'ok'],
+  ['Retry succeeded after transient error', 'warn'],
+  ['Trigger fired: new_record_created', 'ok'],
+  ['Connection health check passed', 'ok'],
+  ['Payload parse error on field "amount"', 'error'],
+];
+
+function seedIntegrationEvents(activationId: string): IntegrationEvent[] {
+  return EVENT_SAMPLES.slice(0, 5).map((pair, i) => ({
+    id: `${activationId}-ev-${i}`,
+    ts: new Date(Date.now() - i * 1000 * 60 * 8).toLocaleTimeString(),
+    event: pair[0],
+    status: pair[1],
+  }));
+}
 
 export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, addNotification }: GuidedPageProps) {
   const { styles, mode } = useUiTheme();
@@ -41,6 +64,28 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
   } = useOrbitalMarketplace();
 
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({ catalog: true, active: false });
+  const [testResults, setTestResults] = useState<Record<string, TestResult>>({});
+  const [integrationLogs, setIntegrationLogs] = useState<Record<string, IntegrationEvent[]>>({});
+
+  const runConnectionTest = (activationId: string) => {
+    setTestResults((r) => ({ ...r, [activationId]: 'testing' }));
+    setTimeout(() => {
+      const ok = Math.random() > 0.25;
+      setTestResults((r) => ({ ...r, [activationId]: ok ? 'ok' : 'fail' }));
+      addNotification?.({
+        type: 'system',
+        title: ok ? 'Connection Test Passed' : 'Connection Test Failed',
+        body: ok ? 'Integration endpoint is reachable and responding.' : 'Could not reach integration endpoint. Check credentials.',
+        severity: ok ? 'success' : 'error',
+      });
+    }, 1400);
+  };
+
+  const loadIntegrationLog = (activationId: string) => {
+    if (!integrationLogs[activationId]) {
+      setIntegrationLogs((l) => ({ ...l, [activationId]: seedIntegrationEvents(activationId) }));
+    }
+  };
 
   useEffect(() => {
     registerActions?.(null);
@@ -84,8 +129,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
         {guidedMode && (
           <HintStrip
             steps={orbitalSteps}
-            stepIndex={1}
-            onPress={() => onGuide(orbitalSteps[1])}
+            onGuide={onGuide}
           />
         )}
 
@@ -107,7 +151,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
         </View>
 
         {/* Layer 1: Connection Config */}
-        <Card title="Layer 1 — Connection" styles={styles}>
+        <Card title="Layer 1 — Connection">
           <Text style={[styles.sectionDetail, { marginBottom: 8 }]}>
             Credentials and endpoint configuration to establish the connection.
           </Text>
@@ -123,7 +167,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
         </Card>
 
         {/* Layer 2: Semantic Mapping */}
-        <Card title="Layer 2 — Semantic Mapping" styles={styles}>
+        <Card title="Layer 2 — Semantic Mapping">
           <Text style={[styles.sectionDetail, { marginBottom: 8 }]}>
             Map your workspace fields to integration inputs and outputs.
           </Text>
@@ -139,7 +183,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
         </Card>
 
         {/* Actions & Triggers Preview */}
-        <Card title="Available Actions" styles={styles}>
+        <Card title="Available Actions">
           {selectedTemplate.actions.map((a) => (
             <View key={a.key} style={{ marginBottom: 8 }}>
               <Text style={{ fontWeight: '700', color: mode === 'day' ? '#1E293B' : '#F1F5F9', fontSize: 13 }}>{a.label}</Text>
@@ -148,7 +192,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
           ))}
         </Card>
 
-        <Card title="Available Triggers" styles={styles}>
+        <Card title="Available Triggers">
           {selectedTemplate.triggers.map((t) => (
             <View key={t.key} style={{ marginBottom: 8 }}>
               <Text style={{ fontWeight: '700', color: mode === 'day' ? '#1E293B' : '#F1F5F9', fontSize: 13 }}>{t.label}</Text>
@@ -158,7 +202,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
         </Card>
 
         {selectedTemplate.prewiredSignals && selectedTemplate.prewiredSignals.length > 0 && (
-          <Card title="Pre-Wired Signals" styles={styles}>
+          <Card title="Pre-Wired Signals">
             <Text style={[styles.sectionDetail, { marginBottom: 8 }]}>
               These Signal Studio flows will be auto-registered upon activation.
             </Text>
@@ -234,8 +278,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
         {guidedMode && (
           <HintStrip
             steps={orbitalSteps}
-            stepIndex={view === 'catalog' ? 0 : 3}
-            onPress={() => onGuide(orbitalSteps[view === 'catalog' ? 0 : 3])}
+            onGuide={onGuide}
           />
         )}
 
@@ -338,6 +381,10 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
                       key={activation.id}
                       activation={activation}
                       template={tpl}
+                      testResult={testResults[activation.id] ?? 'idle'}
+                      onTest={() => runConnectionTest(activation.id)}
+                      integrationLog={integrationLogs[activation.id] ?? null}
+                      onLoadLog={() => loadIntegrationLog(activation.id)}
                       onPause={() => {
                         pauseIntegration(activation.id);
                         auditLog?.logEntry({ action: 'update', entityType: 'integration', entityId: activation.id, entityName: tpl?.name ?? activation.templateId, after: { status: 'paused' } });
@@ -499,6 +546,13 @@ function TemplateCard({
         <Text style={{ fontSize: 10, color: '#9CA3AF' }}>
           {template.actions.length} action{template.actions.length !== 1 ? 's' : ''} · {template.triggers.length} trigger{template.triggers.length !== 1 ? 's' : ''}
         </Text>
+        {(template.prewiredSignals?.length ?? 0) > 0 && (
+          <View style={{ backgroundColor: '#8C5BF520', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
+            <Text style={{ fontSize: 10, color: '#8C5BF5', fontWeight: '700' }}>
+              ⚡ {template.prewiredSignals!.length} signal{template.prewiredSignals!.length !== 1 ? 's' : ''}
+            </Text>
+          </View>
+        )}
       </View>
 
       <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
@@ -522,6 +576,10 @@ function TemplateCard({
 function ActivationCard({
   activation,
   template,
+  testResult,
+  onTest,
+  integrationLog,
+  onLoadLog,
   onPause,
   onResume,
   onRemove,
@@ -532,6 +590,10 @@ function ActivationCard({
 }: {
   activation: IntegrationActivation;
   template: IntegrationTemplate | undefined;
+  testResult: TestResult;
+  onTest: () => void;
+  integrationLog: IntegrationEvent[] | null;
+  onLoadLog: () => void;
   onPause: () => void;
   onResume: () => void;
   onRemove: () => void;
@@ -541,6 +603,16 @@ function ActivationCard({
   styles: any;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [showLog, setShowLog] = useState(false);
+
+  const handleToggleLog = () => {
+    if (!showLog) onLoadLog();
+    setShowLog((v) => !v);
+  };
+
+  const testIcon = testResult === 'testing' ? '⏳' : testResult === 'ok' ? '✅' : testResult === 'fail' ? '❌' : '🔌';
+  const testLabel = testResult === 'testing' ? 'Testing…' : testResult === 'ok' ? 'Connected' : testResult === 'fail' ? 'Failed' : 'Test Connection';
+  const testColor = testResult === 'ok' ? '#22C55E' : testResult === 'fail' ? '#EF4444' : undefined;
 
   return (
     <View
@@ -627,7 +699,7 @@ function ActivationCard({
       )}
 
       {/* Action Buttons */}
-      <View style={{ flexDirection: 'row', gap: 8, marginTop: 4 }}>
+      <View style={{ flexDirection: 'row', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
         {activation.status === 'active' && (
           <Pressable onPress={onPause} style={[styles.secondaryButton, { paddingHorizontal: 14 }]}>
             <Text style={styles.secondaryButtonText}>Pause</Text>
@@ -638,10 +710,42 @@ function ActivationCard({
             <Text style={styles.primaryButtonText}>Resume</Text>
           </Pressable>
         )}
+        <Pressable
+          onPress={onTest}
+          disabled={testResult === 'testing'}
+          style={[styles.secondaryButton, { paddingHorizontal: 14, borderColor: testColor ?? undefined }]}
+        >
+          <Text style={[styles.secondaryButtonText, testColor ? { color: testColor } : {}]}>
+            {testIcon} {testLabel}
+          </Text>
+        </Pressable>
+        <Pressable onPress={handleToggleLog} style={[styles.secondaryButton, { paddingHorizontal: 14 }]}>
+          <Text style={styles.secondaryButtonText}>{showLog ? '▲ Hide Log' : '📋 Event Log'}</Text>
+        </Pressable>
         <Pressable onPress={onRemove} style={[styles.secondaryButton, { paddingHorizontal: 14, borderColor: '#EF4444' }]}>
           <Text style={[styles.secondaryButtonText, { color: '#EF4444' }]}>Remove</Text>
         </Pressable>
       </View>
+
+      {/* Event Log */}
+      {showLog && (
+        <View style={{ gap: 6, marginTop: 4 }}>
+          <Text style={{ fontWeight: '700', fontSize: 12, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>Event Log</Text>
+          {(integrationLog ?? []).map((evt) => {
+            const c = evt.status === 'ok' ? '#22C55E' : evt.status === 'warn' ? '#F59E0B' : '#EF4444';
+            return (
+              <View key={evt.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}>
+                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: c, flexShrink: 0 }} />
+                <Text style={{ fontSize: 11, color: '#9CA3AF', width: 70, flexShrink: 0 }}>{evt.ts}</Text>
+                <Text style={{ fontSize: 11, color: mode === 'day' ? '#475569' : '#CBD5E1', flex: 1 }}>{evt.event}</Text>
+              </View>
+            );
+          })}
+          {!integrationLog?.length && (
+            <Text style={{ fontSize: 11, color: '#9CA3AF' }}>No events recorded yet for this integration.</Text>
+          )}
+        </View>
+      )}
     </View>
   );
 }

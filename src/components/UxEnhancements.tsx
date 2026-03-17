@@ -196,6 +196,8 @@ export function injectUxAnimations() {
     @keyframes cs-slide-in { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes cs-scale-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
     @keyframes cs-count-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes cs-pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(140,91,245,0); } 50% { box-shadow: 0 0 0 4px rgba(140,91,245,0.22); } }
+    @keyframes cs-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
     [data-animate-in] { animation: cs-fade-in 0.35s ease both; }
     [data-animate-stagger] > * { animation: cs-fade-in 0.35s ease both; }
@@ -226,6 +228,98 @@ export function injectUxAnimations() {
     /* Light mode improvements */
     [data-theme="day"] { --surface: #FAFBFC; --surface-raised: #FFFFFF; --border: rgba(0,0,0,0.08); --text: #1A1230; --text-dim: rgba(0,0,0,0.5); --accent-soft: rgba(140,91,245,0.08); }
     [data-theme="night"] { --surface: #0A0E18; --surface-raised: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08); --text: #E2D9F3; --text-dim: rgba(255,255,255,0.45); --accent-soft: rgba(140,91,245,0.18); }
+
+    /* ── Modern interaction utilities ── */
+
+    /* Button hover lift + colour-shift */
+    .cs-btn-primary {
+      transition: background 0.18s ease, transform 0.14s ease, box-shadow 0.18s ease;
+    }
+    .cs-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(140,91,245,0.35);
+      filter: brightness(1.08);
+    }
+    .cs-btn-primary:active { transform: translateY(0); box-shadow: none; }
+
+    .cs-btn-secondary {
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+    }
+    .cs-btn-secondary:hover {
+      border-color: rgba(140,91,245,0.55) !important;
+      background: rgba(140,91,245,0.08) !important;
+      transform: translateY(-1px);
+    }
+    .cs-btn-secondary:active { transform: translateY(0); }
+
+    /* Card hover lift */
+    .cs-card-hover {
+      transition: box-shadow 0.2s ease, transform 0.18s ease;
+    }
+    .cs-card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+    }
+
+    /* Input focus glow */
+    .cs-input {
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .cs-input:focus {
+      outline: none;
+      border-color: rgba(140,91,245,0.65) !important;
+      box-shadow: 0 0 0 3px rgba(140,91,245,0.18);
+    }
+
+    /* Nav item smooth highlight */
+    .cs-nav-item {
+      transition: background 0.15s ease, color 0.15s ease, border-left-color 0.15s ease;
+    }
+    .cs-nav-item:hover {
+      background: rgba(140,91,245,0.08) !important;
+    }
+
+    /* Pill toggle */
+    .cs-pill {
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+    .cs-pill:hover {
+      border-color: rgba(140,91,245,0.55) !important;
+    }
+
+    /* Status dot pulse for active states */
+    .cs-dot-active {
+      animation: cs-pulse-glow 2s ease infinite;
+    }
+
+    /* Gradient text utility */
+    .cs-gradient-text {
+      background: linear-gradient(135deg, #A78BFA 0%, #E878F6 60%, #60A5FA 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Glass card surface */
+    .cs-glass {
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    /* Scrollbar modernisation */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(140,91,245,0.25); border-radius: 6px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(140,91,245,0.45); }
+
+    /* Selection highlight */
+    ::selection { background: rgba(140,91,245,0.28); color: inherit; }
+
+    /* Smooth focus-visible ring for accessibility */
+    :focus-visible {
+      outline: 2px solid rgba(140,91,245,0.70);
+      outline-offset: 2px;
+    }
   `;
   document.head.appendChild(style);
 }

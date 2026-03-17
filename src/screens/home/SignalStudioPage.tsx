@@ -1,5 +1,55 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Platform, ScrollView, Text, TextInput, View, useWindowDimensions } from 'react-native';
+
+/* ── Local sub-types ────────────────────────────────────────────── */
+type ActionStepType =
+  | 'notify_team' | 'update_field' | 'set_lifecycle_stage' | 'create_record'
+  | 'call_webhook' | 'send_email' | 'add_tag' | 'remove_tag';
+interface ActionStep { id: string; type: ActionStepType; config: string }
+interface CondRow { id: string; field: string; op: string; value: string }
+interface CondGroup { id: string; combinator: 'AND' | 'OR'; rows: CondRow[] }
+type FlowEventStatus = 'success' | 'failed' | 'skipped';
+interface FlowEvent { id: string; flowName: string; ts: string; status: FlowEventStatus; durationMs: number; note: string }
+
+const ACTION_STEP_LABELS: Record<ActionStepType, { icon: string; label: string; placeholder: string }> = {
+  notify_team:          { icon: '🔔', label: 'Notify Team',          placeholder: 'Channel or user…' },
+  update_field:         { icon: '✏️', label: 'Update Field',          placeholder: 'field = value…' },
+  set_lifecycle_stage:  { icon: '🔄', label: 'Set Lifecycle Stage',   placeholder: 'Stage name…' },
+  create_record:        { icon: '📄', label: 'Create Record',         placeholder: 'Workspace / SubSpace…' },
+  call_webhook:         { icon: '🌐', label: 'Call Webhook',          placeholder: 'https://…' },
+  send_email:           { icon: '✉️', label: 'Send Email',            placeholder: 'Template name or address…' },
+  add_tag:              { icon: '🏷️', label: 'Add Tag',               placeholder: 'Tag name…' },
+  remove_tag:           { icon: '🗑️', label: 'Remove Tag',            placeholder: 'Tag name…' },
+};
+
+const COND_OPS = ['equals', 'not equals', 'contains', 'starts with', '>', '<', '>=', '<=', 'is empty', 'is not empty'];
+
+function makeId() { return Math.random().toString(36).slice(2, 9); }
+
+function seedFlowEvents(flows: { name: string }[]): FlowEvent[] {
+  if (!flows.length) return [];
+  const statuses: FlowEventStatus[] = ['success', 'success', 'success', 'failed', 'skipped'];
+  const notes = [
+    'Trigger matched, all actions completed.',
+    'Field update applied to 3 records.',
+    'Notification dispatched via Slack connector.',
+    'Webhook endpoint returned 500.',
+    'No matching records for tag filter.',
+  ];
+  return Array.from({ length: 8 }, (_, i) => {
+    const st = statuses[i % statuses.length];
+    const fl = flows[i % flows.length];
+    const d = new Date(Date.now() - i * 1000 * 60 * 34);
+    return {
+      id: `evt-${i}`,
+      flowName: fl.name,
+      ts: d.toLocaleString(),
+      status: st,
+      durationMs: 80 + Math.round(Math.random() * 420),
+      note: notes[i % notes.length],
+    };
+  });
+}
 import { InteractivePressable as Pressable } from '../../components/InteractivePressable';
 import { AiChatPanel } from '../../components/AiChatPanel';
 import { useUiTheme } from '../../context/UiThemeContext';
@@ -13,7 +63,7 @@ import { GuidedPageProps } from './types';
 export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLog, addNotification }: GuidedPageProps) {
   const { styles } = useUiTheme();
   const { width: windowWidth } = useWindowDimensions();
-  const [signalPane, setSignalPane] = useState<'builder' | 'monitor'>('builder');
+  const [signalPane, setSignalPane] = useState<'builder' | 'conditions' | 'chain' | 'monitor' | 'eventlog'>('builder');
   const [expandedSignalSections, setExpandedSignalSections] = useState<Record<string, boolean>>({ design: true, monitoring: false });
   const { can, deniedMessage } = useRbac();
   const canPublishFlow = can('flow.publish');
@@ -53,6 +103,43 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
   const aiFlow = useAiFlowBuilder();
   const [aiFlowPanelOpen, setAiFlowPanelOpen] = useState(false);
 
+  // Enhanced: action chain, condition groups, event log
+  const [actionChain, setActionChain] = useState<ActionStep[]>([
+    { id: makeId(), type: 'notify_team', config: '' },
+  ]);
+  const [condGroups, setCondGroups] = useState<CondGroup[]>([
+    { id: makeId(), combinator: 'AND', rows: [{ id: makeId(), field: '', op: 'equals', value: '' }] },
+  ]);
+  const [flowEvents, setFlowEvents] = useState<FlowEvent[]>([]);
+  // Seed event log once flows are available
+  const eventsSeeded = useRef(false);
+  useEffect(() => {
+    if (!eventsSeeded.current && flows.length) {
+      setFlowEvents(seedFlowEvents(flows));
+      eventsSeeded.current = true;
+    }
+  }, [flows]);
+
+  const addActionStep = () => setActionChain((c) => [...c, { id: makeId(), type: 'notify_team', config: '' }]);
+  const removeActionStep = (id: string) => setActionChain((c) => c.filter((s) => s.id !== id));
+  const updateActionStep = (id: string, key: keyof ActionStep, val: string) =>
+    setActionChain((c) => c.map((s) => s.id === id ? { ...s, [key]: val } : s));
+
+  const addCondGroup = () =>
+    setCondGroups((g) => [...g, { id: makeId(), combinator: 'AND', rows: [{ id: makeId(), field: '', op: 'equals', value: '' }] }]);
+  const removeCondGroup = (gid: string) => setCondGroups((g) => g.filter((gr) => gr.id !== gid));
+  const toggleCombinator = (gid: string) =>
+    setCondGroups((g) => g.map((gr) => gr.id === gid ? { ...gr, combinator: gr.combinator === 'AND' ? 'OR' : 'AND' } : gr));
+  const addCondRow = (gid: string) =>
+    setCondGroups((g) => g.map((gr) => gr.id === gid ? { ...gr, rows: [...gr.rows, { id: makeId(), field: '', op: 'equals', value: '' }] } : gr));
+  const removeCondRow = (gid: string, rid: string) =>
+    setCondGroups((g) => g.map((gr) => gr.id === gid ? { ...gr, rows: gr.rows.filter((r) => r.id !== rid) } : gr));
+  const updateCondRow = (gid: string, rid: string, key: keyof CondRow, val: string) =>
+    setCondGroups((g) => g.map((gr) => gr.id === gid
+      ? { ...gr, rows: gr.rows.map((r) => r.id === rid ? { ...r, [key]: val } : r) }
+      : gr,
+    ));
+
   useEffect(() => {
     registerActions?.({
       saveDraftLabel: 'Save Flow Draft',
@@ -81,6 +168,8 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
       description: 'Create automation rules with triggers, conditions, and actions.',
       items: [
         { label: 'Build Flow', detail: 'Create triggers, rules, and automation actions', onPress: () => setSignalPane('builder') },
+        { label: 'Condition Groups', detail: 'Visual AND/OR condition builder for complex rules', onPress: () => setSignalPane('conditions') },
+        { label: 'Action Chain', detail: 'Multi-step action sequence triggered by this flow', onPress: () => setSignalPane('chain') },
         { label: 'Flow Packs', detail: 'Load pre-built automation templates', onPress: () => { setSignalPane('builder'); applyWarehouseServiceFlowPack(); } },
         { label: 'Bebo Flow Builder', detail: 'Describe a flow in plain English and let Bebo build it', onPress: () => { setAiFlowPanelOpen(true); if (!aiFlow.session) aiFlow.startSession('flow_builder'); } },
       ],
@@ -91,25 +180,45 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
       description: 'Track published flow performance, run counts, and failure rates.',
       items: [
         { label: 'Active Flows', detail: 'Published flows, run counts, and SLA metrics', onPress: () => setSignalPane('monitor') },
+        { label: 'Flow Event Log', detail: 'Recent executions with status and duration', onPress: () => setSignalPane('eventlog') },
       ],
     },
   ];
 
   const signalNavToSection: Record<string, string> = {
     builder: 'design',
+    conditions: 'design',
+    chain: 'design',
     monitor: 'monitoring',
+    eventlog: 'monitoring',
   };
 
-  const signalActiveNavItemKey = signalPane === 'builder' ? 'Build Flow' : 'Active Flows';
+  const signalActiveNavItemKey =
+    signalPane === 'builder' ? 'Build Flow' :
+    signalPane === 'conditions' ? 'Condition Groups' :
+    signalPane === 'chain' ? 'Action Chain' :
+    signalPane === 'eventlog' ? 'Flow Event Log' : 'Active Flows';
 
   const signalContentHeaders: Record<string, { title: string; description: string }> = {
     builder: {
       title: 'Build Flow',
       description: 'Define the trigger event, add conditional rules, and choose the action the system takes. Tag records to scope which items are affected.',
     },
+    conditions: {
+      title: 'Condition Groups',
+      description: 'Build visual AND/OR condition groups to precisely control when this flow fires. Each group can have multiple field-level conditions.',
+    },
+    chain: {
+      title: 'Action Chain',
+      description: 'Define a sequence of actions that run in order when this flow fires. Drag to reorder, remove steps, or add new action types.',
+    },
     monitor: {
       title: 'Active Flows',
       description: 'Review published automations, track total runs and recent failures, and monitor average execution time across your workflows.',
+    },
+    eventlog: {
+      title: 'Flow Event Log',
+      description: 'A real-time log of recent flow executions showing trigger timestamps, execution duration, and pass/fail status.',
     },
   };
 
@@ -292,6 +401,170 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                 </View>
               );
             })}
+          </Card>
+        )}
+
+        {/* ── Condition Groups pane ── */}
+        {signalPane === 'conditions' && (
+          <Card title="Condition Groups" blurred>
+            <Text style={styles.bodyText}>
+              Each group is evaluated independently. Within a group, all conditions must match (AND) or any must match (OR). Groups themselves are combined with AND between them.
+            </Text>
+            {condGroups.map((group, gi) => (
+              <View key={group.id} style={[styles.listCard, { gap: 10 }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  <Text style={[styles.listTitle, { flex: 1 }]}>Group {gi + 1}</Text>
+                  <Pressable
+                    onPress={() => toggleCombinator(group.id)}
+                    style={[styles.pill, styles.pillActive]}
+                  >
+                    <Text style={styles.pillTextActive}>{group.combinator}</Text>
+                  </Pressable>
+                  {condGroups.length > 1 && (
+                    <Pressable onPress={() => removeCondGroup(group.id)} style={styles.pill}>
+                      <Text style={styles.pillText}>Remove Group</Text>
+                    </Pressable>
+                  )}
+                </View>
+                {group.rows.map((row) => (
+                  <View key={row.id} style={{ flexDirection: 'row', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <TextInput
+                      style={[styles.input, { flex: 2, minWidth: 80 }]}
+                      value={row.field}
+                      onChangeText={(v) => updateCondRow(group.id, row.id, 'field', v)}
+                      placeholder="field name"
+                    />
+                    <View style={{ flex: 2, minWidth: 100 }}>
+                      {Platform.OS === 'web' ? (
+                        <select
+                          title="Condition operator"
+                          value={row.op}
+                          onChange={(e) => updateCondRow(group.id, row.id, 'op', e.target.value)}
+                          style={{ fontSize: 13, padding: '7px 8px', borderRadius: 8, border: '1px solid rgba(111,75,207,0.22)', background: 'transparent', color: 'inherit', width: '100%', outline: 'none' }}
+                        >
+                          {COND_OPS.map((op) => <option key={op} value={op}>{op}</option>)}
+                        </select>
+                      ) : (
+                        <TextInput style={[styles.input]} value={row.op} onChangeText={(v) => updateCondRow(group.id, row.id, 'op', v)} placeholder="operator" />
+                      )}
+                    </View>
+                    <TextInput
+                      style={[styles.input, { flex: 2, minWidth: 80 }]}
+                      value={row.value}
+                      onChangeText={(v) => updateCondRow(group.id, row.id, 'value', v)}
+                      placeholder="value"
+                    />
+                    {group.rows.length > 1 && (
+                      <Pressable onPress={() => removeCondRow(group.id, row.id)} style={{ paddingHorizontal: 8 }}>
+                        <Text style={{ color: '#EF4444', fontSize: 18, lineHeight: 22 }}>×</Text>
+                      </Pressable>
+                    )}
+                  </View>
+                ))}
+                <Pressable onPress={() => addCondRow(group.id)} style={styles.secondaryButton}>
+                  <Text style={styles.secondaryButtonText}>+ Add Condition</Text>
+                </Pressable>
+              </View>
+            ))}
+            <Pressable onPress={addCondGroup} style={styles.secondaryButton}>
+              <Text style={styles.secondaryButtonText}>+ Add Condition Group</Text>
+            </Pressable>
+          </Card>
+        )}
+
+        {/* ── Action Chain pane ── */}
+        {signalPane === 'chain' && (
+          <Card title="Action Chain" blurred>
+            <Text style={styles.bodyText}>
+              Actions run sequentially in order. If any action fails and no retry policy is set, subsequent steps are skipped and the flow is marked failed.
+            </Text>
+            {actionChain.map((step, si) => {
+              const meta = ACTION_STEP_LABELS[step.type];
+              return (
+                <View key={step.id} style={[styles.listCard, { gap: 8 }]}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Text style={{ fontSize: 11, color: '#A78BFA', fontWeight: '800', minWidth: 22 }}>#{si + 1}</Text>
+                    <Text style={{ fontSize: 16 }}>{meta.icon}</Text>
+                    <View style={{ flex: 1 }}>
+                      {Platform.OS === 'web' ? (
+                        <select
+                          title="Action step type"
+                          value={step.type}
+                          onChange={(e) => updateActionStep(step.id, 'type', e.target.value)}
+                          style={{ fontSize: 13, padding: '7px 8px', borderRadius: 8, border: '1px solid rgba(111,75,207,0.22)', background: 'transparent', color: 'inherit', width: '100%', outline: 'none' }}
+                        >
+                          {(Object.keys(ACTION_STEP_LABELS) as ActionStepType[]).map((t) => (
+                            <option key={t} value={t}>{ACTION_STEP_LABELS[t].icon} {ACTION_STEP_LABELS[t].label}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <Text style={styles.listTitle}>{meta.label}</Text>
+                      )}
+                    </View>
+                    {actionChain.length > 1 && (
+                      <Pressable onPress={() => removeActionStep(step.id)} style={{ paddingHorizontal: 8 }}>
+                        <Text style={{ color: '#EF4444', fontSize: 18, lineHeight: 22 }}>×</Text>
+                      </Pressable>
+                    )}
+                  </View>
+                  <TextInput
+                    style={styles.input}
+                    value={step.config}
+                    onChangeText={(v) => updateActionStep(step.id, 'config', v)}
+                    placeholder={meta.placeholder}
+                  />
+                </View>
+              );
+            })}
+            <Pressable onPress={addActionStep} style={styles.secondaryButton}>
+              <Text style={styles.secondaryButtonText}>+ Add Action Step</Text>
+            </Pressable>
+            <Pressable
+              disabled={!canPublishFlow}
+              style={[styles.primaryButton, !canPublishFlow && styles.buttonDisabled]}
+              onPress={() => {
+                const chainStr = actionChain.map((s, i) => `${i + 1}. ${ACTION_STEP_LABELS[s.type].label}: ${s.config || '(not configured)'}`).join(' → ');
+                setAction(chainStr);
+                publish();
+                addNotification?.({ type: 'flow-triggered', title: 'Flow with Action Chain Published', body: `${actionChain.length} action steps chained and published.`, severity: 'success' });
+              }}
+            >
+              <Text style={styles.primaryButtonText}>Save Chain &amp; Publish Flow</Text>
+            </Pressable>
+          </Card>
+        )}
+
+        {/* ── Flow Event Log pane ── */}
+        {signalPane === 'eventlog' && (
+          <Card title="Flow Event Log" blurred>
+            {flowEvents.length === 0 && (
+              <Text style={styles.bodyText}>No flow executions recorded yet. Publish a flow to start logging events.</Text>
+            )}
+            {flowEvents.map((evt) => {
+              const statusColor = evt.status === 'success' ? '#22C55E' : evt.status === 'failed' ? '#EF4444' : '#F59E0B';
+              const statusIcon = evt.status === 'success' ? '✅' : evt.status === 'failed' ? '❌' : '⏭️';
+              return (
+                <View key={evt.id} style={[styles.listCard, { gap: 4 }]}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Text style={{ fontSize: 14 }}>{statusIcon}</Text>
+                    <Text style={[styles.listTitle, { flex: 1 }]} numberOfLines={1}>{evt.flowName}</Text>
+                    <View style={{ backgroundColor: statusColor + '22', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: statusColor + '44' }}>
+                      <Text style={{ color: statusColor, fontSize: 11, fontWeight: '700' }}>{evt.status.toUpperCase()}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.metaText}>{evt.ts} · {evt.durationMs} ms</Text>
+                  <Text style={styles.metaText}>{evt.note}</Text>
+                </View>
+              );
+            })}
+            {flowEvents.length > 0 && (
+              <Pressable
+                onPress={() => setFlowEvents(seedFlowEvents(flows))}
+                style={styles.secondaryButton}
+              >
+                <Text style={styles.secondaryButtonText}>↻ Simulate New Events</Text>
+              </Pressable>
+            )}
           </Card>
         )}
         </View>

@@ -24,6 +24,7 @@ import { useNotifications, useAuditLog } from './home/hooks/useNotificationAudit
 import { SignalStudioPage } from './home/SignalStudioPage';
 import { OrbitalPage } from './home/OrbitalPage';
 import { BeboPage } from './home/BeboPage';
+import { CosmographPage } from './home/CosmographPage';
 import { ModulePageActions } from './home/types';
 import type { CommandPaletteItem } from '../types';
 
@@ -1255,13 +1256,7 @@ export function HomeScreen() {
                 {page === 'signal' && <SignalStudioPage guidedMode={guidedMode} onGuide={openGuide} registerActions={registerModuleActions} auditLog={auditLog} addNotification={addNotification} />}
                 {page === 'orbital' && <OrbitalPage guidedMode={guidedMode} onGuide={openGuide} registerActions={registerModuleActions} auditLog={auditLog} addNotification={addNotification} />}
                 {page === 'bebo' && <BeboPage guidedMode={guidedMode} onGuide={openGuide} />}
-                {page === 'cosmograph' && (
-                  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 }}>
-                    <Text style={{ fontSize: 48 }}>🧬</Text>
-                    <Text style={[styles.cardTitle, { fontSize: 22 }]}>Cosmograph</Text>
-                    <Text style={styles.bodyText}>Schema Intelligence Engine — coming soon.</Text>
-                  </View>
-                )}
+                {page === 'cosmograph' && <CosmographPage guidedMode={guidedMode} onGuide={openGuide} registerActions={registerModuleActions} auditLog={auditLog} addNotification={addNotification} />}
               </>
             )}
           </View>

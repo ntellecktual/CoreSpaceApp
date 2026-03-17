@@ -143,6 +143,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const [walkthroughIndex, setWalkthroughIndex] = useState(0);
   const [completedWalkthroughStepIds, setCompletedWalkthroughStepIds] = useState<string[]>([]);
   const [showCreateModeBanner, setShowCreateModeBanner] = useState(true);
+  const [signalHintFieldId, setSignalHintFieldId] = useState<string | null>(null);
   const [expandedAdminSections, setExpandedAdminSections] = useState<Record<string, boolean>>({
     workspace: true,
     shell: false,
@@ -238,6 +239,21 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const fieldTypeIcons: Record<SubSpaceBuilderFieldType, string> = {
     text: 'Aa', longText: '¶', number: '#', date: '📅', datetime: '🕐',
     select: '▾', checkbox: '☑', email: '@', phone: '☎', attachment: '📎',
+  };
+
+  const buildSignalSuggestion = (fieldLabel: string, fieldType: SubSpaceBuilderFieldType): string => {
+    const label = fieldLabel.trim() || 'this field';
+    const suggestions: Partial<Record<SubSpaceBuilderFieldType, string>> = {
+      date: `When "${label}" passes its due date, move record to "Overdue" stage and notify the assigned owner.`,
+      datetime: `When "${label}" is within 24 hours, send a reminder notification to the team channel.`,
+      number: `When "${label}" drops below threshold (e.g. < 10), trigger a reorder or escalation flow.`,
+      select: `When "${label}" changes to a specific value (e.g. "Rejected"), log the change and notify the reviewer.`,
+      checkbox: `When "${label}" is checked, mark the record complete and log an audit entry.`,
+      text: `When "${label}" is populated on a new record, auto-assign to the relevant team based on value.`,
+      email: `When a record's "${label}" changes, send a confirmation email to the new address.`,
+      phone: `When "${label}" is set, add the record to the callback queue and notify the assigned agent.`,
+    };
+    return suggestions[fieldType] ?? `When "${label}" changes, create a Signal Studio flow to automate the next step in your workflow.`;
   };
 
   const visualWsFields = useMemo(() => {
@@ -990,6 +1006,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                     style={{
                                       display: 'flex',
                                       flexDirection: 'row',
+                                      flexWrap: 'wrap',
                                       alignItems: 'center',
                                       gap: 10,
                                       padding: 10,
@@ -1043,6 +1060,12 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                         <Text style={[styles.secondaryButtonText, { fontSize: 10, fontWeight: '700' }]}>{field.required ? '★ Required' : '☆ Optional'}</Text>
                                       </Pressable>
                                       <Pressable
+                                        style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(167,139,250,0.35)', backgroundColor: signalHintFieldId === field.id ? 'rgba(167,139,250,0.18)' : 'transparent' }}
+                                        onPress={() => setSignalHintFieldId(signalHintFieldId === field.id ? null : field.id)}
+                                      >
+                                        <Text style={[styles.secondaryButtonText, { fontSize: 10, color: '#A78BFA' }]}>⚡ Signal</Text>
+                                      </Pressable>
+                                      <Pressable
                                         disabled={!canManageWorkspace}
                                         style={[
                                           { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(239,68,68,0.3)', backgroundColor: 'rgba(239,68,68,0.08)' },
@@ -1053,6 +1076,13 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                         <Text style={[styles.secondaryButtonText, { fontSize: 10, color: '#EF4444' }]}>✕</Text>
                                       </Pressable>
                                     </View>
+                                    {signalHintFieldId === field.id && (
+                                      <div style={{ width: '100%', padding: '8px 12px 10px', marginTop: 4, borderRadius: 8, background: 'rgba(167,139,250,0.09)', border: '1px solid rgba(167,139,250,0.22)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                        <span style={{ fontSize: 12, fontWeight: 700, color: '#A78BFA' }}>⚡ Signal Studio Suggestion</span>
+                                        <span style={{ fontSize: 12, color: '#C4B5FD', lineHeight: 1.5 }}>{buildSignalSuggestion(field.label, field.type)}</span>
+                                        <span style={{ fontSize: 11, color: 'rgba(196,181,253,0.6)' }}>Navigate to Signal Studio → Build Flow to create this automation.</span>
+                                      </div>
+                                    )}
                                   </div>
                                 );
                               })}
@@ -1060,7 +1090,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                           ) : (
                             <View style={{ gap: 6 }}>
                               {workspaceBuilderFields.map((field, index) => (
-                                <View key={field.id} style={[styles.builderPreviewFieldRow, { flexDirection: 'row', alignItems: 'center', gap: 10 }]}>
+                                <React.Fragment key={field.id}>
+                                <View style={[styles.builderPreviewFieldRow, { flexDirection: 'row', alignItems: 'center', gap: 10 }]}>
                                   <View style={{ width: 24, alignItems: 'center', justifyContent: 'center' }}>
                                     <Text style={[styles.builderStudioTextSecondary, { fontSize: 16, lineHeight: 20 }]}>⠿</Text>
                                   </View>
@@ -1075,6 +1106,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                     <Pressable disabled={!canManageWorkspace} style={[{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: field.required ? 'rgba(167,139,250,0.5)' : 'rgba(255,255,255,0.12)', backgroundColor: field.required ? 'rgba(167,139,250,0.18)' : 'transparent' }, !canManageWorkspace && styles.buttonDisabled]} onPress={() => toggleWorkspaceFieldRequired(field.id)}>
                                       <Text style={[styles.secondaryButtonText, { fontSize: 10, fontWeight: '700' }]}>{field.required ? '★ Required' : '☆ Optional'}</Text>
                                     </Pressable>
+                                    <Pressable style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(167,139,250,0.35)', backgroundColor: signalHintFieldId === field.id ? 'rgba(167,139,250,0.18)' : 'transparent' }} onPress={() => setSignalHintFieldId(signalHintFieldId === field.id ? null : field.id)}>
+                                      <Text style={{ fontSize: 10, color: '#A78BFA', fontWeight: '700' }}>⚡</Text>
+                                    </Pressable>
                                     <Pressable disabled={!canManageWorkspace || index === 0} style={[styles.secondaryButton, { paddingHorizontal: 6, paddingVertical: 4 }, (!canManageWorkspace || index === 0) && styles.buttonDisabled]} onPress={() => moveBuilderFieldInWorkspace(field.id, 'up')}>
                                       <Text style={styles.secondaryButtonText}>↑</Text>
                                     </Pressable>
@@ -1086,6 +1120,14 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                     </Pressable>
                                   </View>
                                 </View>
+                                {signalHintFieldId === field.id && (
+                                  <View style={{ marginTop: 4, marginBottom: 4, padding: 10, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(167,139,250,0.25)', backgroundColor: 'rgba(167,139,250,0.08)', gap: 4 }}>
+                                    <Text style={{ fontSize: 12, fontWeight: '700', color: '#A78BFA' }}>⚡ Signal Studio Suggestion</Text>
+                                    <Text style={{ fontSize: 11, color: '#C4B5FD', lineHeight: 17 }}>{buildSignalSuggestion(field.label, field.type)}</Text>
+                                    <Text style={{ fontSize: 10, color: 'rgba(196,181,253,0.55)' }}>Go to Signal Studio → Build Flow to create this automation.</Text>
+                                  </View>
+                                )}
+                                </React.Fragment>
                               ))}
                             </View>
                           )}

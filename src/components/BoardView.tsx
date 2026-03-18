@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Platform, ScrollView, Text, View } from 'react-native';
+import { Image, Platform, ScrollView, Text, View } from 'react-native';
 import { InteractivePressable as Pressable } from './InteractivePressable';
 import { useUiTheme } from '../context/UiThemeContext';
 import { formatDate } from '../formatDate';
@@ -278,6 +278,13 @@ export const BoardView = React.memo(function BoardView({
                           }}
                           {...webCardProps as any}
                         >
+                      {rec.imageUri && (
+                        <Image
+                          source={{ uri: rec.imageUri }}
+                          style={{ width: 40, height: 40, borderRadius: 8, marginBottom: 6, alignSelf: 'flex-start' }}
+                          resizeMode="cover"
+                        />
+                      )}
                       <Text style={{ fontSize: 13, fontWeight: '600', color: textColor }} numberOfLines={1}>
                         {rec.title}
                       </Text>

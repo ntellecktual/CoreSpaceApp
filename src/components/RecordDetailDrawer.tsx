@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Modal, Platform, Pressable as RNPressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Image, Modal, Platform, Pressable as RNPressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { InteractivePressable as Pressable } from './InteractivePressable';
 import { useUiTheme } from '../context/UiThemeContext';
 import { formatDate } from '../formatDate';
@@ -158,6 +158,13 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
             }}
           >
             <View style={{ flex: 1, gap: 2 }}>
+              {record.imageUri && (
+                <Image
+                  source={{ uri: record.imageUri }}
+                  style={{ width: 56, height: 56, borderRadius: 12, marginBottom: 8, alignSelf: 'flex-start' }}
+                  resizeMode="cover"
+                />
+              )}
               <Text style={{ fontSize: 18, fontWeight: '700', color: textColor }} numberOfLines={2}>
                 {record.title}
               </Text>

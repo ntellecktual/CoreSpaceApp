@@ -1,5 +1,5 @@
 import React, { useState as useLocalState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { Modal, Platform, ScrollView, Text, TextInput, View, useWindowDimensions } from 'react-native';
+import { Image, Modal, Platform, ScrollView, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { InteractivePressable as Pressable } from '../../components/InteractivePressable';
 import { BoardView } from '../../components/BoardView';
 import { RecordDetailDrawer } from '../../components/RecordDetailDrawer';
@@ -1241,6 +1241,13 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                             {...(Platform.OS === 'web' ? { dataSet: { animateIn: '' } } : {})}
                           >
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                          {rec.imageUri && (
+                            <Image
+                              source={{ uri: rec.imageUri }}
+                              style={{ width: 36, height: 36, borderRadius: 8, flexShrink: 0 }}
+                              resizeMode="cover"
+                            />
+                          )}
                           {chip(rec.status)}
                           <Text style={{ flex: 1, fontSize: 13, fontWeight: '700', color: txtColor }} numberOfLines={1}>{rec.title}</Text>
                           {rec.date && <Text style={{ fontSize: 10, color: dimColor }}>{formatDate(rec.date)}</Text>}

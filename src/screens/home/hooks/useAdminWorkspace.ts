@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { useAppState } from '../../../context/AppStateContext';
 import { DisplayType, SubSpaceBuilderField, SubSpaceBuilderFieldType, SubSpaceDefinition, VisibilityRule, WorkspaceDefinition } from '../../../types';
 import { useRbac } from './useRbac';
+import { getRecordPlaceholderImage } from '../../../data/pipelineConfig';
 
 const displayOrder: DisplayType[] = ['grid', 'split', 'timeline', 'summary'];
 
@@ -946,40 +947,42 @@ export function useAdminWorkspace() {
         },
       });
 
+      const _phrImg = getRecordPlaceholderImage(baseWorkspace.name);
+      const _phrRec = (r: any) => addRecord({ ...r, imageUri: _phrImg });
       // Carton
       if (ssMap.Carton) {
-        addRecord({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap.Carton, title: 'Carton CTN-78450-A (100 boxes × 24 units)', status: 'Serialized', amount: 2400, tags: ['Product:Lisinopril', 'Level:Carton'], data: { 'carton-serial': 'CTN-78450-A', 'lot-number': 'XY-1234', 'expiration-date': '12-25-2026' } });
+        _phrRec({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap.Carton, title: 'Carton CTN-78450-A (100 boxes × 24 units)', status: 'Serialized', amount: 2400, tags: ['Product:Lisinopril', 'Level:Carton'], data: { 'carton-serial': 'CTN-78450-A', 'lot-number': 'XY-1234', 'expiration-date': '12-25-2026' } });
       }
       // Boxes
       if (ssMap['Boxes Inside Carton']) {
-        addRecord({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Boxes Inside Carton'], title: 'BOX-78450-001 (24 units)', status: 'Serialized', tags: ['Product:Lisinopril', 'Level:Box'], data: { 'box-serial': 'BOX-78450-001', 'carton-serial': 'CTN-78450-A' } });
-        addRecord({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Boxes Inside Carton'], title: 'BOX-78450-002 (24 units)', status: 'Serialized', tags: ['Product:Lisinopril', 'Level:Box'], data: { 'box-serial': 'BOX-78450-002', 'carton-serial': 'CTN-78450-A' } });
+        _phrRec({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Boxes Inside Carton'], title: 'BOX-78450-001 (24 units)', status: 'Serialized', tags: ['Product:Lisinopril', 'Level:Box'], data: { 'box-serial': 'BOX-78450-001', 'carton-serial': 'CTN-78450-A' } });
+        _phrRec({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Boxes Inside Carton'], title: 'BOX-78450-002 (24 units)', status: 'Serialized', tags: ['Product:Lisinopril', 'Level:Box'], data: { 'box-serial': 'BOX-78450-002', 'carton-serial': 'CTN-78450-A' } });
       }
       // Units
       if (ssMap['Individual Units']) {
-        addRecord({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Individual Units'], title: 'SN-LIS-000001 — Lisinopril 10mg', status: 'Serialized', tags: ['Product:Lisinopril', 'Level:Unit', 'NDC:68180-0517-01'], data: { 'unit-serial': 'SN-LIS-000001', 'ndc-product-code': '68180-0517-01', 'box-serial': 'BOX-78450-001' } });
-        addRecord({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Individual Units'], title: 'SN-LIS-000002 — Lisinopril 10mg', status: 'Serialized', tags: ['Product:Lisinopril', 'Level:Unit', 'NDC:68180-0517-01'], data: { 'unit-serial': 'SN-LIS-000002', 'ndc-product-code': '68180-0517-01', 'box-serial': 'BOX-78450-002' } });
+        _phrRec({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Individual Units'], title: 'SN-LIS-000001 — Lisinopril 10mg', status: 'Serialized', tags: ['Product:Lisinopril', 'Level:Unit', 'NDC:68180-0517-01'], data: { 'unit-serial': 'SN-LIS-000001', 'ndc-product-code': '68180-0517-01', 'box-serial': 'BOX-78450-001' } });
+        _phrRec({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Individual Units'], title: 'SN-LIS-000002 — Lisinopril 10mg', status: 'Serialized', tags: ['Product:Lisinopril', 'Level:Unit', 'NDC:68180-0517-01'], data: { 'unit-serial': 'SN-LIS-000002', 'ndc-product-code': '68180-0517-01', 'box-serial': 'BOX-78450-002' } });
       }
       // Lot info
       if (ssMap['Lot Information']) {
-        addRecord({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Lot Information'], title: 'Lot XY-1234 — Lisinopril 10mg Tablet', status: 'Active', tags: ['Product:Lisinopril', 'Level:Lot'], data: { 'lot-number': 'XY-1234', 'expiration-date': '12-25-2026', 'product-name': 'Lisinopril 10mg Tablet' } });
+        _phrRec({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Lot Information'], title: 'Lot XY-1234 — Lisinopril 10mg Tablet', status: 'Active', tags: ['Product:Lisinopril', 'Level:Lot'], data: { 'lot-number': 'XY-1234', 'expiration-date': '12-25-2026', 'product-name': 'Lisinopril 10mg Tablet' } });
       }
       // Manufacturer serialization event
       if (ssMap['Manufacturer Serialization']) {
-        addRecord({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Manufacturer Serialization'], title: '2,400 units serialized — Lisinopril 10mg', status: 'Serialized', amount: 2400, tags: ['Product:Lisinopril', 'Stage:Manufacturer'], data: { 'unit-serial-number': 'SN-LIS-000001 → SN-LIS-002400', 'carton-serial-number': 'CTN-78450-A', 'aggregation-date': '02-27-2026', 'epcis-upload-status': 'Confirmed' } });
+        _phrRec({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Manufacturer Serialization'], title: '2,400 units serialized — Lisinopril 10mg', status: 'Serialized', amount: 2400, tags: ['Product:Lisinopril', 'Stage:Manufacturer'], data: { 'unit-serial-number': 'SN-LIS-000001 → SN-LIS-002400', 'carton-serial-number': 'CTN-78450-A', 'aggregation-date': '02-27-2026', 'epcis-upload-status': 'Confirmed' } });
       }
       // Distributor verification — passed
       if (ssMap['Distributor Verification']) {
-        addRecord({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Distributor Verification'], title: 'Verification passed — 2,400 of 2,400 matched', status: 'Received by Distributor', amount: 2400, tags: ['Verification:Passed', 'Facility:McKesson-DC-East'], data: { 'scanned-carton-serial': 'CTN-78450-A', 'verification-result': 'Match', 'matched-serial-count': 2400, 'received-time': '02-28-2026T08:14:00' } });
+        _phrRec({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Distributor Verification'], title: 'Verification passed — 2,400 of 2,400 matched', status: 'Received by Distributor', amount: 2400, tags: ['Verification:Passed', 'Facility:McKesson-DC-East'], data: { 'scanned-carton-serial': 'CTN-78450-A', 'verification-result': 'Match', 'matched-serial-count': 2400, 'received-time': '02-28-2026T08:14:00' } });
       }
       // Pharmacy dispense
       if (ssMap['Pharmacy Dispense']) {
-        addRecord({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Pharmacy Dispense'], title: 'Dispensed SN-LIS-000012 to patient — Rx #RX-83014', status: 'Dispensed', amount: 1, tags: ['Lifecycle:Dispensed', 'Trace:Complete'], data: { 'dispensed-unit-serial': 'SN-LIS-000012', 'rx-reference': 'RX-83014', 'dispense-date': '03-03-2026', 'pharmacist': 'Dr. Sarah Kim, PharmD' } });
+        _phrRec({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Pharmacy Dispense'], title: 'Dispensed SN-LIS-000012 to patient — Rx #RX-83014', status: 'Dispensed', amount: 1, tags: ['Lifecycle:Dispensed', 'Trace:Complete'], data: { 'dispensed-unit-serial': 'SN-LIS-000012', 'rx-reference': 'RX-83014', 'dispense-date': '03-03-2026', 'pharmacist': 'Dr. Sarah Kim, PharmD' } });
       }
       // Traceability — full trace + exception
       if (ssMap['Traceability & Exceptions']) {
-        addRecord({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Traceability & Exceptions'], title: 'Full trace: manufacturer → distributor → pharmacy → patient', status: 'Dispensed', amount: 2400, tags: ['Trace:EndToEnd', 'Product:Lisinopril'], data: { 'event-type': 'End-to-End Trace', 'impacted-serial': 'SN-LIS-000001 → SN-LIS-002400', 'exception-status': 'None', 'investigation-notes': 'Complete supply chain traceability verified.' } });
-        addRecord({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Traceability & Exceptions'], title: 'Exception: 1 unit damaged in transit — resolved', status: 'Exception Review', amount: 1, tags: ['Exception:Damage', 'Priority:Low'], data: { 'event-type': 'Damage', 'impacted-serial': 'SN-LIS-000198', 'exception-status': 'Resolved', 'investigation-notes': 'Unit SN-LIS-000198 sustained packaging damage during distributor shipment. Replaced and resolved.' } });
+        _phrRec({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Traceability & Exceptions'], title: 'Full trace: manufacturer → distributor → pharmacy → patient', status: 'Dispensed', amount: 2400, tags: ['Trace:EndToEnd', 'Product:Lisinopril'], data: { 'event-type': 'End-to-End Trace', 'impacted-serial': 'SN-LIS-000001 → SN-LIS-002400', 'exception-status': 'None', 'investigation-notes': 'Complete supply chain traceability verified.' } });
+        _phrRec({ id: '', clientId: clLisinopril.id, workspaceId: wsId, subSpaceId: ssMap['Traceability & Exceptions'], title: 'Exception: 1 unit damaged in transit — resolved', status: 'Exception Review', amount: 1, tags: ['Exception:Damage', 'Priority:Low'], data: { 'event-type': 'Damage', 'impacted-serial': 'SN-LIS-000198', 'exception-status': 'Resolved', 'investigation-notes': 'Unit SN-LIS-000198 sustained packaging damage during distributor shipment. Replaced and resolved.' } });
       }
 
       // ── Batch 2: Amoxicillin 500mg — Lot MZ-9021 ──
@@ -999,10 +1002,10 @@ export function useAdminWorkspace() {
       });
 
       if (ssMap['Manufacturer Serialization']) {
-        addRecord({ id: '', clientId: clAmoxicillin.id, workspaceId: wsId, subSpaceId: ssMap['Manufacturer Serialization'], title: '12,000 capsules serialized — Amoxicillin 500mg', status: 'Serialized', amount: 12000, tags: ['Product:Amoxicillin', 'Stage:Manufacturer'], data: { 'unit-serial-number': 'SN-AMX-000001 → SN-AMX-012000', 'carton-serial-number': 'CTN-92103-B', 'aggregation-date': '02-28-2026', 'epcis-upload-status': 'Confirmed' } });
+        _phrRec({ id: '', clientId: clAmoxicillin.id, workspaceId: wsId, subSpaceId: ssMap['Manufacturer Serialization'], title: '12,000 capsules serialized — Amoxicillin 500mg', status: 'Serialized', amount: 12000, tags: ['Product:Amoxicillin', 'Stage:Manufacturer'], data: { 'unit-serial-number': 'SN-AMX-000001 → SN-AMX-012000', 'carton-serial-number': 'CTN-92103-B', 'aggregation-date': '02-28-2026', 'epcis-upload-status': 'Confirmed' } });
       }
       if (ssMap['Distributor Verification']) {
-        addRecord({ id: '', clientId: clAmoxicillin.id, workspaceId: wsId, subSpaceId: ssMap['Distributor Verification'], title: '⚠ Verification mismatch — 3 of 12,000 serials flagged', status: 'Received by Distributor', amount: 12000, tags: ['Verification:Mismatch', 'Alert:SerialMismatch', 'Priority:High'], data: { 'scanned-carton-serial': 'CTN-92103-B', 'verification-result': 'Mismatch', 'matched-serial-count': 11997, 'received-time': '03-01-2026T10:30:00' } });
+        _phrRec({ id: '', clientId: clAmoxicillin.id, workspaceId: wsId, subSpaceId: ssMap['Distributor Verification'], title: '⚠ Verification mismatch — 3 of 12,000 serials flagged', status: 'Received by Distributor', amount: 12000, tags: ['Verification:Mismatch', 'Alert:SerialMismatch', 'Priority:High'], data: { 'scanned-carton-serial': 'CTN-92103-B', 'verification-result': 'Mismatch', 'matched-serial-count': 11997, 'received-time': '03-01-2026T10:30:00' } });
       }
 
       // ── Batch 3: Epinephrine 1mg/mL — Lot JK-4410 ──
@@ -1022,10 +1025,10 @@ export function useAdminWorkspace() {
       });
 
       if (ssMap['Manufacturer Serialization']) {
-        addRecord({ id: '', clientId: clEpinephrine.id, workspaceId: wsId, subSpaceId: ssMap['Manufacturer Serialization'], title: '500 injectables serialized — Epinephrine 1mg/mL', status: 'Serialized', amount: 500, tags: ['Product:Epinephrine', 'Stage:Manufacturer', 'Cold-Chain'], data: { 'unit-serial-number': 'SN-EPI-000001 → SN-EPI-000500', 'carton-serial-number': 'CTN-44109-C', 'aggregation-date': '03-01-2026', 'epcis-upload-status': 'Confirmed' } });
+        _phrRec({ id: '', clientId: clEpinephrine.id, workspaceId: wsId, subSpaceId: ssMap['Manufacturer Serialization'], title: '500 injectables serialized — Epinephrine 1mg/mL', status: 'Serialized', amount: 500, tags: ['Product:Epinephrine', 'Stage:Manufacturer', 'Cold-Chain'], data: { 'unit-serial-number': 'SN-EPI-000001 → SN-EPI-000500', 'carton-serial-number': 'CTN-44109-C', 'aggregation-date': '03-01-2026', 'epcis-upload-status': 'Confirmed' } });
       }
       if (ssMap['Traceability & Exceptions']) {
-        addRecord({ id: '', clientId: clEpinephrine.id, workspaceId: wsId, subSpaceId: ssMap['Traceability & Exceptions'], title: '🔴 SUSPECT: Counterfeit serials detected in secondary market', status: 'Exception Review', amount: 500, tags: ['Suspect', 'Quarantine', 'Priority:Critical', 'FDA-Reportable'], data: { 'event-type': 'Suspect Product', 'impacted-serial': 'SN-EPI-000001 → SN-EPI-000500', 'exception-status': 'Open', 'investigation-notes': 'Third-party marketplace listing contained 12 units with serial numbers matching Lot JK-4410 but with duplicate GS1 barcodes. FDA DSCSA Section 582 suspect product notification triggered.' } });
+        _phrRec({ id: '', clientId: clEpinephrine.id, workspaceId: wsId, subSpaceId: ssMap['Traceability & Exceptions'], title: '🔴 SUSPECT: Counterfeit serials detected in secondary market', status: 'Exception Review', amount: 500, tags: ['Suspect', 'Quarantine', 'Priority:Critical', 'FDA-Reportable'], data: { 'event-type': 'Suspect Product', 'impacted-serial': 'SN-EPI-000001 → SN-EPI-000500', 'exception-status': 'Open', 'investigation-notes': 'Third-party marketplace listing contained 12 units with serial numbers matching Lot JK-4410 but with duplicate GS1 barcodes. FDA DSCSA Section 582 suspect product notification triggered.' } });
       }
 
       // ── DSCSA Signal Studio Flows ──
@@ -1061,7 +1064,7 @@ export function useAdminWorkspace() {
           namePlural: 'Drug Inventories',
           icon: '💊',
           description: 'Track serialized pharmaceutical batches across the DSCSA supply chain from carton to dispensing',
-          workspaceIds: [wsId],
+          workspaceIds: [baseWorkspace.id],
         },
       ],
     });
@@ -1155,6 +1158,8 @@ export function useAdminWorkspace() {
       for (const ss of nextSubSpaces) { ssMap[ss.name] = ss.id; }
 
       // ── WO-5001: Dell Latitude 5540 — Full lifecycle ──
+      const _itImg = getRecordPlaceholderImage(baseWorkspace.name);
+      const _itRec = (r: any) => addRecord({ ...r, imageUri: _itImg });
       const clDell = addClient({
         id: '',
         firstName: 'Dell Latitude 5540',
@@ -1171,40 +1176,40 @@ export function useAdminWorkspace() {
       });
 
       if (ssMap['Inbound Dock Log']) {
-        addRecord({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Inbound Dock Log'], title: 'Dock receipt — 1 pallet, FedEx Freight', status: 'Received', amount: 1, tags: ['Carrier:FedEx', 'Receiving'], data: { 'dock-receipt-id': 'DOCK-2026-0401-001', 'carrier-name': 'FedEx Freight', 'pallet-count': 1, 'received-datetime': '04-01-2026 09:15:00' } });
+        _itRec({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Inbound Dock Log'], title: 'Dock receipt — 1 pallet, FedEx Freight', status: 'Received', amount: 1, tags: ['Carrier:FedEx', 'Receiving'], data: { 'dock-receipt-id': 'DOCK-2026-0401-001', 'carrier-name': 'FedEx Freight', 'pallet-count': 1, 'received-datetime': '04-01-2026 09:15:00' } });
       }
       if (ssMap['Serial Capture & Tagging']) {
-        addRecord({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Serial Capture & Tagging'], title: 'Serial captured — SVC-DELL-5540-0001', status: 'Received', amount: 1, tags: ['Device:Laptop', 'OEM:Dell'], data: { 'device-serial': 'SVC-DELL-5540-0001', 'device-model': 'Dell Latitude 5540', 'oem-vendor': 'Dell Technologies', 'intake-condition': 'Functional — cosmetic damage' } });
+        _itRec({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Serial Capture & Tagging'], title: 'Serial captured — SVC-DELL-5540-0001', status: 'Received', amount: 1, tags: ['Device:Laptop', 'OEM:Dell'], data: { 'device-serial': 'SVC-DELL-5540-0001', 'device-model': 'Dell Latitude 5540', 'oem-vendor': 'Dell Technologies', 'intake-condition': 'Functional — cosmetic damage' } });
       }
       if (ssMap['Visual Inspection']) {
-        addRecord({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Visual Inspection'], title: 'Visual inspection — Grade B (minor scratches)', status: 'Triaged', amount: 1, tags: ['Cosmetic:B', 'Triage'], data: { 'cosmetic-grade': 'B', 'damage-notes': 'Minor scratches on lid, keyboard in good condition.', 'photos-attached': true } });
+        _itRec({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Visual Inspection'], title: 'Visual inspection — Grade B (minor scratches)', status: 'Triaged', amount: 1, tags: ['Cosmetic:B', 'Triage'], data: { 'cosmetic-grade': 'B', 'damage-notes': 'Minor scratches on lid, keyboard in good condition.', 'photos-attached': true } });
       }
       if (ssMap['Diagnostic Test Results']) {
-        addRecord({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Diagnostic Test Results'], title: 'Diagnostics — battery health 62%, SSD passed', status: 'Triaged', amount: 1, tags: ['Diagnostics:Complete', 'Battery:Replace'], data: { 'test-id': 'DIAG-2026-0402-001', 'category': 'Hardware Health', 'result': 'Partial Fail', 'notes': 'Battery health 62% — replace. SSD/RAM/Wi-Fi passed.' } });
+        _itRec({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Diagnostic Test Results'], title: 'Diagnostics — battery health 62%, SSD passed', status: 'Triaged', amount: 1, tags: ['Diagnostics:Complete', 'Battery:Replace'], data: { 'test-id': 'DIAG-2026-0402-001', 'category': 'Hardware Health', 'result': 'Partial Fail', 'notes': 'Battery health 62% — replace. SSD/RAM/Wi-Fi passed.' } });
       }
       if (ssMap['Repair Cost Evaluation']) {
-        addRecord({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Repair Cost Evaluation'], title: 'Cost eval — $145 (parts $85 + 2h labor)', status: 'Triaged', amount: 145, tags: ['Cost:Approved', 'BER:Repair'], data: { 'estimated-cost': 145, 'parts-cost': 85, 'labor-hours': 2, 'ber-decision': 'Repair — below BER threshold' } });
+        _itRec({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Repair Cost Evaluation'], title: 'Cost eval — $145 (parts $85 + 2h labor)', status: 'Triaged', amount: 145, tags: ['Cost:Approved', 'BER:Repair'], data: { 'estimated-cost': 145, 'parts-cost': 85, 'labor-hours': 2, 'ber-decision': 'Repair — below BER threshold' } });
       }
       if (ssMap['Repair Tasks']) {
-        addRecord({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Repair Tasks'], title: 'Battery replaced — OEM Dell 54Wh', status: 'Repaired', amount: 1, tags: ['Repair:Battery', 'Technician:Rivera'], data: { 'repair-type': 'Battery Replacement', 'technician': 'James Rivera', 'parts-replaced': 'Dell OEM 54Wh Li-Ion Battery (P/N: 3DDDG)' } });
+        _itRec({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Repair Tasks'], title: 'Battery replaced — OEM Dell 54Wh', status: 'Repaired', amount: 1, tags: ['Repair:Battery', 'Technician:Rivera'], data: { 'repair-type': 'Battery Replacement', 'technician': 'James Rivera', 'parts-replaced': 'Dell OEM 54Wh Li-Ion Battery (P/N: 3DDDG)' } });
       }
       if (ssMap['Retest & Validation']) {
-        addRecord({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Retest & Validation'], title: 'Retest passed — battery 100%, all systems nominal', status: 'Retested', amount: 1, tags: ['Retest:Passed'], data: { 'result': 'Pass', 'test-date': '04-03-2026', 'notes': 'Battery health 100%. Full diagnostics passed.' } });
+        _itRec({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Retest & Validation'], title: 'Retest passed — battery 100%, all systems nominal', status: 'Retested', amount: 1, tags: ['Retest:Passed'], data: { 'result': 'Pass', 'test-date': '04-03-2026', 'notes': 'Battery health 100%. Full diagnostics passed.' } });
       }
       if (ssMap['Configuration & Firmware']) {
-        addRecord({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Configuration & Firmware'], title: 'BIOS updated to 1.18.0, Windows 11 Pro image deployed', status: 'Configured', amount: 1, tags: ['Config:BIOS', 'Config:OS'], data: { 'firmware-version': 'Dell BIOS 1.18.0', 'bios-version': '1.18.0', 'os-image': 'Windows 11 Pro 23H2', 'config-date': '04-04-2026' } });
+        _itRec({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Configuration & Firmware'], title: 'BIOS updated to 1.18.0, Windows 11 Pro image deployed', status: 'Configured', amount: 1, tags: ['Config:BIOS', 'Config:OS'], data: { 'firmware-version': 'Dell BIOS 1.18.0', 'bios-version': '1.18.0', 'os-image': 'Windows 11 Pro 23H2', 'config-date': '04-04-2026' } });
       }
       if (ssMap['Kit BOM & Components']) {
-        addRecord({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Kit BOM & Components'], title: 'Kit KIT-5001 — laptop + charger + dock', status: 'Kitting', amount: 3, tags: ['Kit:KIT-5001'], data: { 'kit-id': 'KIT-5001', 'parent-serial': 'SVC-DELL-5540-0001', 'child-serials': 'CHG-DELL-65W-0044, DOCK-WD19S-0112', 'component-count': 3 } });
+        _itRec({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Kit BOM & Components'], title: 'Kit KIT-5001 — laptop + charger + dock', status: 'Kitting', amount: 3, tags: ['Kit:KIT-5001'], data: { 'kit-id': 'KIT-5001', 'parent-serial': 'SVC-DELL-5540-0001', 'child-serials': 'CHG-DELL-65W-0044, DOCK-WD19S-0112', 'component-count': 3 } });
       }
       if (ssMap['Final QA Checklist']) {
-        addRecord({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Final QA Checklist'], title: 'Final QA passed — all checks green', status: 'QA Passed', amount: 1, tags: ['QA:Passed'], data: { 'qa-result': 'Pass', 'inspector': 'Linda Torres', 'qa-date': '04-05-2026' } });
+        _itRec({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Final QA Checklist'], title: 'Final QA passed — all checks green', status: 'QA Passed', amount: 1, tags: ['QA:Passed'], data: { 'qa-result': 'Pass', 'inspector': 'Linda Torres', 'qa-date': '04-05-2026' } });
       }
       if (ssMap['Packing & Labeling']) {
-        addRecord({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Packing & Labeling'], title: 'Packed — 1 box, 4.2 lbs', status: 'Packed', amount: 1, tags: ['Packing:Complete'], data: { 'pack-slip-id': 'PACK-2026-0405-001', 'box-count': 1, 'weight-lbs': 4.2, 'hazmat-flag': false } });
+        _itRec({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Packing & Labeling'], title: 'Packed — 1 box, 4.2 lbs', status: 'Packed', amount: 1, tags: ['Packing:Complete'], data: { 'pack-slip-id': 'PACK-2026-0405-001', 'box-count': 1, 'weight-lbs': 4.2, 'hazmat-flag': false } });
       }
       if (ssMap['Shipping & Tracking']) {
-        addRecord({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Shipping & Tracking'], title: 'Shipped to ACME Corp — UPS 1Z999AA10123456784', status: 'Shipped', amount: 1, tags: ['Carrier:UPS', 'Shipping:Complete'], data: { 'tracking-number': '1Z999AA10123456784', 'carrier': 'UPS Ground', 'ship-date': '04-06-2026', 'destination': 'ACME Corp HQ, Austin TX' } });
+        _itRec({ id: '', clientId: clDell.id, workspaceId: wsId, subSpaceId: ssMap['Shipping & Tracking'], title: 'Shipped to ACME Corp — UPS 1Z999AA10123456784', status: 'Shipped', amount: 1, tags: ['Carrier:UPS', 'Shipping:Complete'], data: { 'tracking-number': '1Z999AA10123456784', 'carrier': 'UPS Ground', 'ship-date': '04-06-2026', 'destination': 'ACME Corp HQ, Austin TX' } });
       }
 
       // ── WO-5002: HP Printer — BER ──
@@ -1224,10 +1229,10 @@ export function useAdminWorkspace() {
       });
 
       if (ssMap['Serial Capture & Tagging']) {
-        addRecord({ id: '', clientId: clHP.id, workspaceId: wsId, subSpaceId: ssMap['Serial Capture & Tagging'], title: 'Serial captured — SVC-HP-M404-0001', status: 'Received', amount: 1, tags: ['Device:Printer', 'OEM:HP'], data: { 'device-serial': 'SVC-HP-M404-0001', 'device-model': 'HP LaserJet Pro M404', 'oem-vendor': 'HP Inc.', 'intake-condition': 'Non-functional — paper jam mechanism broken' } });
+        _itRec({ id: '', clientId: clHP.id, workspaceId: wsId, subSpaceId: ssMap['Serial Capture & Tagging'], title: 'Serial captured — SVC-HP-M404-0001', status: 'Received', amount: 1, tags: ['Device:Printer', 'OEM:HP'], data: { 'device-serial': 'SVC-HP-M404-0001', 'device-model': 'HP LaserJet Pro M404', 'oem-vendor': 'HP Inc.', 'intake-condition': 'Non-functional — paper jam mechanism broken' } });
       }
       if (ssMap['Repair Cost Evaluation']) {
-        addRecord({ id: '', clientId: clHP.id, workspaceId: wsId, subSpaceId: ssMap['Repair Cost Evaluation'], title: '⚠ BER — repair cost $320 exceeds unit value $280', status: 'BER', amount: 320, tags: ['BER:Exceeded', 'Cost:Denied'], data: { 'estimated-cost': 320, 'parts-cost': 210, 'labor-hours': 3, 'ber-decision': 'BER — Beyond Economical Repair' } });
+        _itRec({ id: '', clientId: clHP.id, workspaceId: wsId, subSpaceId: ssMap['Repair Cost Evaluation'], title: '⚠ BER — repair cost $320 exceeds unit value $280', status: 'BER', amount: 320, tags: ['BER:Exceeded', 'Cost:Denied'], data: { 'estimated-cost': 320, 'parts-cost': 210, 'labor-hours': 3, 'ber-decision': 'BER — Beyond Economical Repair' } });
       }
 
       // ── WO-5003: Cisco Server — Retest failure ──
@@ -1247,10 +1252,10 @@ export function useAdminWorkspace() {
       });
 
       if (ssMap['Repair Tasks']) {
-        addRecord({ id: '', clientId: clCisco.id, workspaceId: wsId, subSpaceId: ssMap['Repair Tasks'], title: 'RAID controller replaced — Cisco UCS C220', status: 'Repaired', amount: 1, tags: ['Repair:RAID', 'Priority:High'], data: { 'repair-type': 'RAID Controller Replacement', 'technician': 'Amir Patel', 'parts-replaced': 'Cisco 12G SAS RAID Controller (UCSC-RAID-M6)' } });
+        _itRec({ id: '', clientId: clCisco.id, workspaceId: wsId, subSpaceId: ssMap['Repair Tasks'], title: 'RAID controller replaced — Cisco UCS C220', status: 'Repaired', amount: 1, tags: ['Repair:RAID', 'Priority:High'], data: { 'repair-type': 'RAID Controller Replacement', 'technician': 'Amir Patel', 'parts-replaced': 'Cisco 12G SAS RAID Controller (UCSC-RAID-M6)' } });
       }
       if (ssMap['Retest & Validation']) {
-        addRecord({ id: '', clientId: clCisco.id, workspaceId: wsId, subSpaceId: ssMap['Retest & Validation'], title: '🔴 Retest FAILED — RAID rebuild incomplete', status: 'Retest Failed', amount: 1, tags: ['Retest:Failed', 'Priority:Critical', 'Escalation'], data: { 'result': 'Fail', 'test-date': '04-05-2026', 'notes': 'RAID rebuild stalled at 78%. Possible firmware incompatibility. Escalated.' } });
+        _itRec({ id: '', clientId: clCisco.id, workspaceId: wsId, subSpaceId: ssMap['Retest & Validation'], title: '🔴 Retest FAILED — RAID rebuild incomplete', status: 'Retest Failed', amount: 1, tags: ['Retest:Failed', 'Priority:Critical', 'Escalation'], data: { 'result': 'Fail', 'test-date': '04-05-2026', 'notes': 'RAID rebuild stalled at 78%. Possible firmware incompatibility. Escalated.' } });
       }
 
       // ── WRVAS Signal Studio Flows ──
@@ -1288,7 +1293,7 @@ export function useAdminWorkspace() {
           namePlural: 'Device Inventories',
           icon: '🖥️',
           description: 'Serialized IT hardware assets moving through diagnostic, repair, kitting, QA, and shipping stages',
-          workspaceIds: [wsId],
+          workspaceIds: [baseWorkspace.id],
         },
       ],
     });

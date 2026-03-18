@@ -78,3 +78,18 @@ export function hasPipelinePattern(workspaceName: string): boolean {
     p.workspaceKeywords.some((kw) => lowerName.includes(kw)),
   );
 }
+
+/**
+ * Returns a placeholder image URI for a record based on the workspace name.
+ * Pharma/DSCSA → blue pill badge, IT/WRVAS → green device badge, generic → purple item badge.
+ */
+export function getRecordPlaceholderImage(workspaceName: string): string {
+  const lower = workspaceName.toLowerCase();
+  if (/dscsa|pharma|drug|serial|medication|ndc|lot/.test(lower)) {
+    return 'https://placehold.co/80x80/dbeafe/1d4ed8?text=Rx';
+  }
+  if (/wrvas|repair|device|it service|hardware|firmware/.test(lower)) {
+    return 'https://placehold.co/80x80/dcfce7/15803d?text=IT';
+  }
+  return 'https://placehold.co/80x80/ede9fe/6d28d9?text=Item';
+}

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAppState } from '../../../context/AppStateContext';
 import type { RuntimeRecord } from '../../../types';
 import { useRbac } from './useRbac';
+import { getRecordPlaceholderImage } from '../../../data/pipelineConfig';
 
 function toNumericValue(value: string): string | number {
   const asNumber = Number(value);
@@ -373,6 +374,7 @@ export function useEndUserRuntime(selectedClientId: string) {
       amount,
       date: formValues.date,
       tags: [clientTag, workspaceTag, subSpaceTag, ...(tagCarrier ? [tagCarrier] : [])],
+      imageUri: getRecordPlaceholderImage(workspace.name),
       data: Object.entries(formValues).reduce<Record<string, string | number>>((acc, [key, value]) => {
         acc[key] = toNumericValue(value);
         return acc;

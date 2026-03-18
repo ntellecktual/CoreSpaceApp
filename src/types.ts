@@ -108,6 +108,7 @@ export interface RuntimeRecord {
   date?: string;
   tags: string[];
   data: Record<string, string | number>;
+  imageUri?: string;
 }
 
 export type FlowTriggerType = 'event' | 'webhook' | 'schedule';

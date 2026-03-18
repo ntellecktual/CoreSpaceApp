@@ -53,6 +53,7 @@ function seedFlowEvents(flows: { name: string }[]): FlowEvent[] {
 import { InteractivePressable as Pressable } from '../../components/InteractivePressable';
 import { AiChatPanel } from '../../components/AiChatPanel';
 import { useUiTheme } from '../../context/UiThemeContext';
+import { useAppState } from '../../context/AppStateContext';
 import { Card, HintStrip, LabeledInput, ProcessStepper } from './components';
 import { signalSteps } from './constants';
 import { useRbac } from './hooks/useRbac';
@@ -61,8 +62,9 @@ import { useAiFlowBuilder } from '../../ai/useAiHooks';
 import { GuidedPageProps } from './types';
 
 export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLog, addNotification }: GuidedPageProps) {
-  const { styles } = useUiTheme();
+  const { styles, mode } = useUiTheme();
   const { width: windowWidth } = useWindowDimensions();
+  const { data: appData } = useAppState();
   const [signalPane, setSignalPane] = useState<'builder' | 'conditions' | 'chain' | 'monitor' | 'eventlog'>('builder');
   const [expandedSignalSections, setExpandedSignalSections] = useState<Record<string, boolean>>({ design: true, monitoring: false });
   const { can, deniedMessage } = useRbac();
@@ -386,13 +388,51 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                 </Pressable>
               ))}
             </View>
-            {(builderSelectedWsId ? flowsForWorkspace : flows).length === 0 && <Text style={styles.bodyText}>No published flows yet. Build one in the Flow Designer, or load the DSCSA Supply Chain flow pack to see how it works.</Text>}
+            {(builderSelectedWsId ? flowsForWorkspace : flows).length === 0 && (
+              <View style={{ backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.07)' : 'rgba(140,91,245,0.04)', borderRadius: 12, padding: 20, borderWidth: 1, borderColor: 'rgba(140,91,245,0.18)', gap: 12 }}>
+                <View style={{ alignItems: 'center', gap: 6 }}>
+                  <Text style={{ fontSize: 30 }}>⚡</Text>
+                  <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontSize: 15, fontWeight: '800', textAlign: 'center' }}>No automation flows yet</Text>
+                  <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.50)', fontSize: 12, textAlign: 'center', maxWidth: 440, lineHeight: 18 }}>Load a pre-built flow pack to see how automation works, or build a flow manually in the Flow Designer tab.</Text>
+                </View>
+                <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' as any, justifyContent: 'center' }}>
+                  <Pressable
+                    disabled={!canPublishFlow}
+                    style={[{ backgroundColor: '#8C5BF5', borderRadius: 8, paddingVertical: 9, paddingHorizontal: 16, alignItems: 'center' }, !canPublishFlow && { opacity: 0.4 }]}
+                    onPress={() => { applyWarehouseServiceFlowPack(); auditLog?.logEntry({ action: 'import', entityType: 'flow', entityId: 'dscsa-flow-pack', entityName: 'DSCSA Supply Chain Flow Pack', after: { flows: 5 } }); addNotification?.({ type: 'system', title: 'Flow Pack Imported', body: 'DSCSA Supply Chain Flow Pack loaded with 5 automation flows.', severity: 'success' }); }}
+                  >
+                    <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 12 }}>📥 Load DSCSA Flow Pack</Text>
+                  </Pressable>
+                  <Pressable
+                    style={{ backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)', borderRadius: 8, paddingVertical: 9, paddingHorizontal: 16, alignItems: 'center', borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.10)' }}
+                    onPress={() => setSignalPane('builder')}
+                  >
+                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.70)', fontWeight: '600', fontSize: 12 }}>✏️ Build a Flow Manually</Text>
+                  </Pressable>
+                </View>
+              </View>
+            )}
             {(builderSelectedWsId ? flowsForWorkspace : flows).map((flow) => {
               const ws = builderWorkspaces.find((w) => w.id === flow.workspaceId);
               const ss = ws?.subSpaces.find((s) => s.id === flow.subSpaceId);
+              // Resolve business object context
+              const bizObj = flow.businessObjectId
+                ? (appData.businessFunctions ?? []).flatMap(f => f.objects).find(o => o.id === flow.businessObjectId)
+                : (appData.businessFunctions ?? []).flatMap(f => f.objects).find(o => o.workspaceIds.includes(flow.workspaceId));
+              const bizFn = bizObj
+                ? (appData.businessFunctions ?? []).find(f => f.objects.some(o => o.id === bizObj.id))
+                : null;
               return (
                 <View key={flow.id} style={styles.listCard}>
-                  <Text style={styles.listTitle}>{flow.name}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <Text style={[styles.listTitle, { flex: 1 }]}>{flow.name}</Text>
+                    {bizObj && (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: `${bizFn?.color ?? '#8C5BF5'}18`, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2, borderWidth: 1, borderColor: `${bizFn?.color ?? '#8C5BF5'}33` }}>
+                        {!!bizObj.icon && <Text style={{ fontSize: 11 }}>{bizObj.icon}</Text>}
+                        <Text style={{ fontSize: 10, fontWeight: '700', color: bizFn?.color ?? '#8C5BF5' }}>{bizObj.name}</Text>
+                      </View>
+                    )}
+                  </View>
                   <Text style={styles.metaText}>{ws?.name ?? 'Unknown'} → {ss?.name ?? 'Unknown'}</Text>
                   <Text style={styles.metaText}>{flow.signal} • {flow.status.toUpperCase()} • Trigger: {flow.triggerType ?? 'event'}</Text>
                   <Text style={styles.metaText}>Runs: {flow.totalRuns.toLocaleString()} • Failures (7d): {flow.failures7d} • Avg: {flow.avgTimeMs.toLocaleString()} ms</Text>

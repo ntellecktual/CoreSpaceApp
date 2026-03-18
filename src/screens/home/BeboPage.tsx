@@ -17,6 +17,7 @@ import { useAppState } from '../../context/AppStateContext';
 import { useUiTheme } from '../../context/UiThemeContext';
 import {
   BeboCard,
+  BeboCardArchitecture,
   BeboCardDataPreview,
   BeboCardIntegrationStatus,
   BeboCardSignalFlows,
@@ -330,6 +331,72 @@ function StatsCard({ card, accent }: { card: BeboCardStats; accent: string }) {
   );
 }
 
+function ArchitectureCard({
+  card, onApply, applied, accent,
+}: {
+  card: BeboCardArchitecture;
+  onApply: (p: ScenarioApplyPayload) => void;
+  applied: boolean;
+  accent: string;
+}) {
+  return (
+    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 16, gap: 12, borderWidth: 1, borderColor: `${accent}30` }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Text style={{ fontSize: 18 }}>🏗️</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>Business Architecture</Text>
+          <Text style={{ color: '#9CA3AF', fontSize: 11 }}>{card.industry}</Text>
+        </View>
+        <View style={{ backgroundColor: `${accent}20`, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
+          <Text style={{ color: accent, fontSize: 10, fontWeight: '700' }}>{card.functions.length} function{card.functions.length !== 1 ? 's' : ''}</Text>
+        </View>
+      </View>
+
+      {card.functions.map((fn) => (
+        <View key={fn.fnId} style={{ borderLeftWidth: 3, borderLeftColor: fn.color, paddingLeft: 12, gap: 6 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Text style={{ fontSize: 14 }}>{fn.icon}</Text>
+            <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 13 }}>{fn.name}</Text>
+          </View>
+          {!!fn.description && (
+            <Text style={{ color: '#9CA3AF', fontSize: 11 }}>{fn.description}</Text>
+          )}
+          <View style={{ gap: 4 }}>
+            {fn.objects.map((obj, oi) => (
+              <View key={oi} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, backgroundColor: `${fn.color}10`, borderRadius: 8, padding: 8 }}>
+                <Text style={{ fontSize: 16 }}>{obj.icon}</Text>
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text style={{ color: '#E8E4FF', fontWeight: '600', fontSize: 12 }}>{obj.name} <Text style={{ color: '#9CA3AF', fontWeight: '400' }}>({obj.namePlural})</Text></Text>
+                  {!!obj.description && <Text style={{ color: '#9CA3AF', fontSize: 10 }}>{obj.description}</Text>}
+                  {obj.workspaceNames.length > 0 && (
+                    <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap', marginTop: 2 }}>
+                      <Text style={{ color: '#6B7280', fontSize: 9, alignSelf: 'center' }}>Links to:</Text>
+                      {obj.workspaceNames.map((wn, wi) => (
+                        <View key={wi} style={{ backgroundColor: `${fn.color}20`, borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1 }}>
+                          <Text style={{ color: fn.color, fontSize: 9, fontWeight: '600' }}>{wn}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      ))}
+
+      <TouchableOpacity
+        onPress={() => !applied && onApply(card.applyPayload)}
+        style={{ backgroundColor: applied ? '#22C55E' : accent, borderRadius: 8, paddingVertical: 10, alignItems: 'center' }}
+      >
+        <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 13 }}>
+          {applied ? '✅  Architecture Applied' : 'Apply Architecture  →'}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 function CardRenderer({
   card, onApply, applied, accent, vertical,
 }: {
@@ -342,6 +409,7 @@ function CardRenderer({
     case 'integration_status': return <IntegrationStatusCard card={card} accent={accent} />;
     case 'signal_flows':       return <SignalFlowsCard card={card} onApply={onApply} applied={applied} accent={accent} />;
     case 'stats':              return <StatsCard card={card} accent={accent} />;
+    case 'architecture':       return <ArchitectureCard card={card} onApply={onApply} applied={applied} accent={accent} />;
     default:                   return null;
   }
 }
@@ -438,6 +506,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     payload.flows.forEach(fl => appState.upsertFlow(fl));
     payload.integrations.forEach(intg => appState.activateIntegration(intg));
     payload.records.forEach(rec => appState.addRecord(rec));
+    payload.businessFunctions?.forEach(fn => appState.upsertBusinessFunction(fn));
 
     setAppliedCardIds(prev => new Set([...prev, cardId]));
     setAppliedVerticals(prev => new Set([...prev, vertical]));
@@ -446,7 +515,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     setMessages(prev => [...prev, {
       id: uid(),
       role: 'assistant',
-      text: `✅ **Applied!** Your **${icon} ${label}** scenario is now live across CoreSpace.\n\n• **${payload.workspaces.length}** workspace${payload.workspaces.length !== 1 ? 's' : ''} created in Admin\n• **${payload.records.length}** records added to End User\n• **${payload.flows.length}** Signal flows published\n• **${payload.integrations.length}** Orbital integrations activated\n• Shell labels updated to ${label} terminology\n\nNavigate to **Admin** → Workspace Design to inspect the structure, or go to **End User** to interact with live ${label.toLowerCase()} data.`,
+      text: `✅ **Applied!** Your **${icon} ${label}** scenario is now live across CoreSpace.\n\n• **${payload.workspaces.length}** workspace${payload.workspaces.length !== 1 ? 's' : ''} created in Admin\n• **${payload.records.length}** records added to End User\n• **${payload.flows.length}** Signal flows published\n• **${payload.integrations.length}** Orbital integrations activated${(payload.businessFunctions?.length ?? 0) > 0 ? `\n• **${payload.businessFunctions!.length}** business function${payload.businessFunctions!.length !== 1 ? 's' : ''} loaded in Architecture` : ''}\n• Shell labels updated to ${label} terminology\n\nNavigate to **Admin** → Workspace Design to inspect the structure, or go to **End User** to interact with live ${label.toLowerCase()} data.`,
       cards: [],
       quickReplies: ['Generate more sample data', 'Show platform analytics', 'Customize workspace fields', 'Try another scenario'],
       timestamp: new Date(),

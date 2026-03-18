@@ -130,7 +130,7 @@ const adminWalkthroughSteps: AdminWalkthroughStep[] = [
 ];
 
 export function AdminPage({ guidedMode, registerActions, auditLog, addNotification }: GuidedPageProps) {
-  const { styles } = useUiTheme();
+  const { styles, mode } = useUiTheme();
   const { width: windowWidth } = useWindowDimensions();
   const [adminTab, setAdminTab] = useState<'workspace' | 'shell' | 'role' | 'governance' | 'forms' | 'architecture'>('workspace');
   const [workspacePane, setWorkspacePane] = useState<'workspace' | 'subspaces'>('workspace');
@@ -202,7 +202,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     updateSelectedSubSpace,
   } = useAdminWorkspace();
   const insights = useAdminEnterpriseInsights(workspace);
-  const { activeTenantId, data, getFormForSubSpace, upsertBusinessFunction, deleteBusinessFunction, upsertBusinessObject, deleteBusinessObject } = useAppState();
+  const { activeTenantId, data, isSuperAdmin, tenants, copyActiveDataToAllTenants, getFormForSubSpace, upsertBusinessFunction, deleteBusinessFunction, upsertBusinessObject, deleteBusinessObject } = useAppState();
   const [editingFunctionId, setEditingFunctionId] = useState<string | null>(null);
   const [editingObjectKey, setEditingObjectKey] = useState<string | null>(null);
   const [newFnName, setNewFnName] = useState('');
@@ -859,6 +859,79 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               {workspacePane === 'workspace' && (
                 <>
                   {!canManageWorkspace && <Text style={styles.notice}>{deniedMessage('workspace.manage')}</Text>}
+
+                  {/* ── Empty-state hero: first visit, no workspaces ── */}
+                  {workspaces.length === 0 && canManageWorkspace && (
+                    <View style={{
+                      backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.07)' : 'rgba(140,91,245,0.05)',
+                      borderRadius: 14,
+                      padding: 24,
+                      marginBottom: 16,
+                      borderWidth: 1,
+                      borderColor: 'rgba(140,91,245,0.22)',
+                      gap: 16,
+                    }}>
+                      <View style={{ alignItems: 'center', gap: 8 }}>
+                        <Text style={{ fontSize: 36 }}>🏗️</Text>
+                        <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontSize: 18, fontWeight: '800', textAlign: 'center' }}>
+                          Build your first workspace
+                        </Text>
+                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)', fontSize: 13, textAlign: 'center', maxWidth: 480, lineHeight: 20 }}>
+                          Load a pre-built template to get up and running in seconds — complete with SubSpaces, records, Signal flows, and business architecture. Or start from scratch.
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap' as any }}>
+                        {/* DSCSA template card */}
+                        <Pressable
+                          nativeID="wt-load-template"
+                          style={{
+                            flex: 1, minWidth: 220,
+                            backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.14)' : 'rgba(140,91,245,0.08)',
+                            borderRadius: 12, padding: 16, gap: 10,
+                            borderWidth: 1, borderColor: 'rgba(140,91,245,0.30)',
+                          }}
+                          onPress={() => {
+                            applyDscsaSerializationTemplate();
+                            auditLog?.logEntry({ action: 'import', entityType: 'workspace', entityId: 'template', entityName: 'DSCSA Serialization Template', after: { template: 'DSCSA', subSpaces: 8, records: 17, flows: 5 } });
+                            addNotification?.({ type: 'system', title: 'Template Imported', body: 'DSCSA Serialization Template loaded with 8 subspaces, 17 records, and 5 flows.', severity: 'success' });
+                          }}
+                        >
+                          <Text style={{ fontSize: 28 }}>💊</Text>
+                          <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '700', fontSize: 14 }}>DSCSA Pharma Serialization</Text>
+                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.50)', fontSize: 11, lineHeight: 17 }}>8 SubSpaces · 17 sample records · 5 automation flows · Full supply chain architecture</Text>
+                          <View style={{ backgroundColor: '#8C5BF5', borderRadius: 8, paddingVertical: 9, alignItems: 'center' }}>
+                            <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 12 }}>Load Template →</Text>
+                          </View>
+                        </Pressable>
+                        {/* WRVAS template card */}
+                        <Pressable
+                          nativeID="wt-load-wrvas-template"
+                          style={{
+                            flex: 1, minWidth: 220,
+                            backgroundColor: mode === 'night' ? 'rgba(59,130,246,0.10)' : 'rgba(59,130,246,0.06)',
+                            borderRadius: 12, padding: 16, gap: 10,
+                            borderWidth: 1, borderColor: 'rgba(59,130,246,0.28)',
+                          }}
+                          onPress={() => {
+                            applyWrvasTemplate();
+                            auditLog?.logEntry({ action: 'import', entityType: 'workspace', entityId: 'template', entityName: 'WRVAS Service Template', after: { template: 'WRVAS', subSpaces: 12, records: 22, flows: 5 } });
+                            addNotification?.({ type: 'system', title: 'Template Imported', body: 'WRVAS Service Template loaded with 12 subspaces, 22 records, and 5 flows.', severity: 'success' });
+                          }}
+                        >
+                          <Text style={{ fontSize: 28 }}>🖥️</Text>
+                          <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '700', fontSize: 14 }}>WRVAS Service Operations</Text>
+                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.50)', fontSize: 11, lineHeight: 17 }}>12 SubSpaces · 22 sample records · 5 automation flows · IT device service architecture</Text>
+                          <View style={{ backgroundColor: '#3B82F6', borderRadius: 8, paddingVertical: 9, alignItems: 'center' }}>
+                            <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 12 }}>Load Template →</Text>
+                          </View>
+                        </Pressable>
+                      </View>
+                      <Pressable onPress={beginCreateWorkspace} style={{ alignSelf: 'center' }}>
+                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)', fontSize: 12, textDecorationLine: 'underline' }}>Or start from scratch →</Text>
+                      </Pressable>
+                    </View>
+                  )}
+
                   <View style={[styles.builderFormSection, useCompactBuilderSections && styles.builderFormSectionCompact]}>
                     <View
                       style={[
@@ -895,6 +968,23 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         >
                           <Text style={styles.secondaryButtonText}>Load WRVAS Service Template</Text>
                         </Pressable>
+                        {isSuperAdmin && tenants.length > 1 && (
+                          <Pressable
+                            nativeID="wt-seed-all-tenants"
+                            style={[styles.secondaryButton, { borderColor: '#8C5BF5' }]}
+                            onPress={() => {
+                              const result = copyActiveDataToAllTenants();
+                              if (result.ok) {
+                                addNotification?.({ type: 'system', title: 'All Tenants Seeded', body: `Current workspace data copied to ${result.count} other tenant${result.count === 1 ? '' : 's'}.`, severity: 'success' });
+                                auditLog?.logEntry({ action: 'import', entityType: 'workspace', entityId: 'all-tenants', entityName: 'Seed All Tenants', after: { detail: `Copied active tenant data to ${result.count} tenants` } });
+                              } else {
+                                addNotification?.({ type: 'system', title: 'Seed Failed', body: result.reason ?? 'Unable to seed tenants.', severity: 'warning' });
+                              }
+                            }}
+                          >
+                            <Text style={[styles.secondaryButtonText, { color: '#8C5BF5' }]}>⬆ Seed Current Data → All Tenants</Text>
+                          </Pressable>
+                        )}
                       </View>
                       <View style={styles.builderActionRow}>
                         {workspaces.map((item) => (
@@ -1605,13 +1695,189 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
       </Card>}
 
       {adminTab === 'architecture' && <Card title="" blurred>
-        <Text style={styles.bodyText}>
-          {`Define ${data.shellConfig.functionLabelPlural ?? 'Functions'} and ${data.shellConfig.objectLabelPlural ?? 'Objects'} \u2014 the layer above workspaces that maps your full operation. Each ${data.shellConfig.objectLabel ?? 'Object'} links to the workspaces that process its ${data.shellConfig.collectionLabelPlural ?? 'collections'}.`}
-        </Text>
-        <Text style={styles.metaText}>{`Hierarchy: ${data.shellConfig.functionLabel ?? 'Function'} \u2192 ${data.shellConfig.objectLabel ?? 'Object'} \u2192 ${data.shellConfig.collectionLabel ?? 'Batch'} \u2192 Workspace \u2192 SubSpace \u2192 Record`}</Text>
 
-        {(data.businessFunctions ?? []).length === 0 && (
-          <Text style={[styles.metaText, { marginTop: 8 }]}>No functions defined yet. Add one below to start mapping your business architecture.</Text>
+        {/* ── Architecture Wizard Banner ── */}
+        {(data.businessFunctions ?? []).length === 0 ? (
+          <View style={{ gap: 14 }}>
+            {/* Hero */}
+            <View style={{ backgroundColor: 'rgba(140,91,245,0.08)', borderWidth: 1, borderColor: 'rgba(140,91,245,0.24)', borderRadius: 12, padding: 16, gap: 8 }}>
+              <Text style={{ fontSize: 22, textAlign: 'center' }}>🏗️</Text>
+              <Text style={[styles.listTitle, { textAlign: 'center', fontSize: 16 }]}>Define Your Business Architecture</Text>
+              <Text style={[styles.bodyText, { textAlign: 'center', fontSize: 13 }]}>
+                {`The architecture layer sits above all your workspaces and answers: "What does this business do?" An admin who loads this page for the first time can understand your entire operation in under 2 minutes.`}
+              </Text>
+            </View>
+
+            {/* Hierarchy diagram */}
+            <View style={[styles.listCard, { gap: 4, paddingVertical: 12 }]}>
+              <Text style={[styles.metaText, { fontWeight: '700', marginBottom: 4 }]}>The 6-Layer Architecture Hierarchy</Text>
+              {[
+                { icon: '🏢', label: data.shellConfig.functionLabel ?? 'Function', desc: 'A major division of your business (e.g. Supply Chain, Finance, Service Ops)', color: '#8C5BF5' },
+                { icon: '📦', label: data.shellConfig.objectLabel ?? 'Object', desc: `What each ${data.shellConfig.functionLabel ?? 'Function'} manages (e.g. Drug Inventory, Device Inventory, Policy Book)`, color: '#3B82F6' },
+                { icon: '🗂️', label: data.shellConfig.collectionLabel ?? 'Batch', desc: `Groups or collections of ${data.shellConfig.objectLabelPlural ?? 'Objects'} (e.g. Lot XY-1234, Work Order WO-5001)`, color: '#10B981' },
+                { icon: '🔲', label: 'Workspace', desc: 'The processing area — each workspace handles one stage of the workflow', color: '#F59E0B' },
+                { icon: '📋', label: 'SubSpace', desc: 'A lane inside a workspace (e.g. Distributor Verification, Repair Tasks)', color: '#EF4444' },
+                { icon: '📄', label: 'Record', desc: 'A single tracked item with fields, status, and history', color: '#6B7280' },
+              ].map((level, i) => (
+                <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 5, borderBottomWidth: i < 5 ? 1 : 0, borderBottomColor: 'rgba(255,255,255,0.06)' }}>
+                  <View style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: `${level.color}20`, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Text style={{ fontSize: 14 }}>{level.icon}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: level.color }}>{`Layer ${i + 1}`}</Text>
+                      <Text style={[styles.listTitle, { fontSize: 13 }]}>{level.label}</Text>
+                    </View>
+                    <Text style={[styles.metaText, { marginTop: 1 }]}>{level.desc}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            {/* Step guide */}
+            <View style={[styles.listCard, { gap: 10 }]}>
+              <Text style={[styles.metaText, { fontWeight: '700' }]}>How to build your architecture in 4 steps:</Text>
+              {[
+                { step: '1', title: `Define ${data.shellConfig.functionLabelPlural ?? 'Functions'}`, detail: `Name the major areas of your business. Example: "Supply Chain & Regulatory", "Service Operations", "Finance"`, color: '#8C5BF5' },
+                { step: '2', title: `Add ${data.shellConfig.objectLabelPlural ?? 'Objects'}`, detail: `Under each ${data.shellConfig.functionLabel ?? 'Function'}, define what it tracks. Example: "Drug Inventory" under Supply Chain, "Device Inventory" under Service Ops`, color: '#3B82F6' },
+                { step: '3', title: 'Link Workspaces', detail: `Tap each ${data.shellConfig.objectLabel ?? 'Object'} to connect it to the workspaces that process it. This powers the End User navigation and filtering.`, color: '#10B981' },
+                { step: '4', title: 'Set Terminology (Optional)', detail: `Go to App Terminology to rename ${data.shellConfig.functionLabel ?? 'Function'}, ${data.shellConfig.objectLabel ?? 'Object'}, and ${data.shellConfig.collectionLabel ?? 'Batch'} to match your industry.`, color: '#F59E0B' },
+              ].map((item, i) => (
+                <View key={i} style={{ flexDirection: 'row', gap: 10, alignItems: 'flex-start', paddingVertical: 4 }}>
+                  <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: `${item.color}22`, borderWidth: 1, borderColor: `${item.color}44`, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Text style={{ color: item.color, fontWeight: '800', fontSize: 11 }}>{item.step}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.listTitle, { fontSize: 13 }]}>{item.title}</Text>
+                    <Text style={[styles.metaText, { marginTop: 2 }]}>{item.detail}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            {/* Load Examples */}
+            <View style={[styles.listCard, { gap: 10 }]}>
+              <Text style={[styles.metaText, { fontWeight: '700' }]}>🚀 Load a Pre-Built Example</Text>
+              <Text style={styles.metaText}>One click loads a complete business architecture with Functions, Objects, and terminology pre-configured for your industry.</Text>
+              <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+                <Pressable
+                  style={[styles.secondaryButton, { borderColor: '#8C5BF5', flex: 1 }]}
+                  onPress={() => {
+                    const dscsaWsId = data.workspaces.find(w => w.name?.toLowerCase().includes('dscsa') || w.name?.toLowerCase().includes('serialization'))?.id ?? '';
+                    upsertBusinessFunction({
+                      id: 'bfn-supply-chain', name: 'Supply Chain & Regulatory', icon: '🔗', color: '#8C5BF5', order: 0,
+                      description: 'End-to-end pharmaceutical serialization from manufacturer to patient dispensing (DSCSA § 582)',
+                      objects: [{
+                        id: 'bobj-drug-inventory', functionId: 'bfn-supply-chain', name: 'Drug Inventory', namePlural: 'Drug Inventories',
+                        icon: '💊', description: 'Track serialized pharmaceutical batches across the DSCSA supply chain from carton to dispensing',
+                        workspaceIds: dscsaWsId ? [dscsaWsId] : [],
+                      }],
+                    });
+                    upsertBusinessFunction({
+                      id: 'bfn-distribution', name: 'Distribution & Logistics', icon: '🚚', color: '#F59E0B', order: 2,
+                      description: 'Last-mile pharmaceutical distribution tracking and verification',
+                      objects: [{
+                        id: 'bobj-shipment-record', functionId: 'bfn-distribution', name: 'Shipment Record', namePlural: 'Shipment Records',
+                        icon: '📦', description: 'EPCIS shipment events and delivery confirmations from distributor to pharmacy',
+                        workspaceIds: [],
+                      }],
+                    });
+                  }}
+                >
+                  <Text style={[styles.secondaryButtonText, { color: '#8C5BF5' }]}>💊 Load DSCSA Pharma Example</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.secondaryButton, { borderColor: '#3B82F6', flex: 1 }]}
+                  onPress={() => {
+                    const wrvasWsId = data.workspaces.find(w => w.name?.toLowerCase().includes('wrvas') || w.name?.toLowerCase().includes('service') || w.name?.toLowerCase().includes('work order'))?.id ?? '';
+                    upsertBusinessFunction({
+                      id: 'bfn-service-operations', name: 'Service Operations', icon: '🛠️', color: '#3B82F6', order: 1,
+                      description: 'Warrant, Refurbishment, Value-Added Services — full device lifecycle from inbound dock to shipment',
+                      objects: [{
+                        id: 'bobj-device-inventory', functionId: 'bfn-service-operations', name: 'Device Inventory', namePlural: 'Device Inventories',
+                        icon: '🖥️', description: 'Serialized IT hardware assets moving through diagnostic, repair, kitting, QA, and shipping stages',
+                        workspaceIds: wrvasWsId ? [wrvasWsId] : [],
+                      }],
+                    });
+                    upsertBusinessFunction({
+                      id: 'bfn-quality-assurance', name: 'Quality Assurance', icon: '✅', color: '#10B981', order: 3,
+                      description: 'Final inspection, grading, certifications, and pass/fail audit trail',
+                      objects: [{
+                        id: 'bobj-qa-record', functionId: 'bfn-quality-assurance', name: 'QA Record', namePlural: 'QA Records',
+                        icon: '🔍', description: 'Cosmetic grade, diagnostic results, and final pass/fail decisions per device work order',
+                        workspaceIds: wrvasWsId ? [wrvasWsId] : [],
+                      }],
+                    });
+                  }}
+                >
+                  <Text style={[styles.secondaryButtonText, { color: '#3B82F6' }]}>🖥️ Load WRVAS Service Example</Text>
+                </Pressable>
+              </View>
+              <Text style={[styles.metaText, { fontStyle: 'italic' }]}>
+                💡 Tip: Load a workspace template first (Workspace Design → Load DSCSA or WRVAS Template) so the example links automatically to active workspaces.
+              </Text>
+            </View>
+          </View>
+        ) : (
+          <View style={{ gap: 10 }}>
+            {/* Summary bar */}
+            <View style={{ backgroundColor: 'rgba(140,91,245,0.08)', borderWidth: 1, borderColor: 'rgba(140,91,245,0.20)', borderRadius: 10, padding: 12 }}>
+              <Text style={[styles.listTitle, { fontSize: 14, marginBottom: 4 }]}>🏗️ Your Operations Map</Text>
+              <View style={{ flexDirection: 'row', gap: 14, flexWrap: 'wrap' }}>
+                <Text style={styles.metaText}>
+                  <Text style={{ color: '#8C5BF5', fontWeight: '700' }}>{(data.businessFunctions ?? []).length}</Text>
+                  {` ${(data.businessFunctions?.length ?? 0) === 1 ? (data.shellConfig.functionLabel ?? 'Function') : (data.shellConfig.functionLabelPlural ?? 'Functions')}`}
+                </Text>
+                <Text style={styles.metaText}>
+                  <Text style={{ color: '#3B82F6', fontWeight: '700' }}>{(data.businessFunctions ?? []).reduce((a, f) => a + f.objects.length, 0)}</Text>
+                  {` ${(data.businessFunctions ?? []).reduce((a, f) => a + f.objects.length, 0) === 1 ? (data.shellConfig.objectLabel ?? 'Object') : (data.shellConfig.objectLabelPlural ?? 'Objects')}`}
+                </Text>
+                <Text style={styles.metaText}>
+                  <Text style={{ color: '#10B981', fontWeight: '700' }}>{(data.businessFunctions ?? []).reduce((a, f) => a + f.objects.reduce((b, o) => b + o.workspaceIds.length, 0), 0)}</Text>
+                  {' Workspace links'}
+                </Text>
+              </View>
+              <Text style={[styles.metaText, { marginTop: 6, fontSize: 11 }]}>
+                {`Hierarchy: ${data.shellConfig.functionLabel ?? 'Function'} → ${data.shellConfig.objectLabel ?? 'Object'} → ${data.shellConfig.collectionLabel ?? 'Batch'} → Workspace → SubSpace → Record`}
+              </Text>
+            </View>
+
+            {/* Load more examples if < 2 functions */}
+            {(data.businessFunctions ?? []).length < 2 && (
+              <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+                {!(data.businessFunctions ?? []).some(f => f.id === 'bfn-supply-chain') && (
+                  <Pressable
+                    style={[styles.secondaryButton, { borderColor: '#8C5BF5' }]}
+                    onPress={() => {
+                      const dscsaWsId = data.workspaces.find(w => w.name?.toLowerCase().includes('dscsa') || w.name?.toLowerCase().includes('serialization'))?.id ?? '';
+                      upsertBusinessFunction({
+                        id: 'bfn-supply-chain', name: 'Supply Chain & Regulatory', icon: '🔗', color: '#8C5BF5', order: 0,
+                        description: 'End-to-end pharmaceutical serialization from manufacturer to patient dispensing (DSCSA § 582)',
+                        objects: [{ id: 'bobj-drug-inventory', functionId: 'bfn-supply-chain', name: 'Drug Inventory', namePlural: 'Drug Inventories', icon: '💊', description: 'Track serialized pharmaceutical batches across the DSCSA supply chain', workspaceIds: dscsaWsId ? [dscsaWsId] : [] }],
+                      });
+                    }}
+                  >
+                    <Text style={[styles.secondaryButtonText, { color: '#8C5BF5' }]}>+ Add DSCSA Pharma Function</Text>
+                  </Pressable>
+                )}
+                {!(data.businessFunctions ?? []).some(f => f.id === 'bfn-service-operations') && (
+                  <Pressable
+                    style={[styles.secondaryButton, { borderColor: '#3B82F6' }]}
+                    onPress={() => {
+                      const wrvasWsId = data.workspaces.find(w => w.name?.toLowerCase().includes('wrvas') || w.name?.toLowerCase().includes('service') || w.name?.toLowerCase().includes('work order'))?.id ?? '';
+                      upsertBusinessFunction({
+                        id: 'bfn-service-operations', name: 'Service Operations', icon: '🛠️', color: '#3B82F6', order: 1,
+                        description: 'Warrant, Refurbishment, Value-Added Services — full device lifecycle from inbound dock to shipment',
+                        objects: [{ id: 'bobj-device-inventory', functionId: 'bfn-service-operations', name: 'Device Inventory', namePlural: 'Device Inventories', icon: '🖥️', description: 'Serialized IT hardware assets moving through diagnostic, repair, kitting, QA, and shipping stages', workspaceIds: wrvasWsId ? [wrvasWsId] : [] }],
+                      });
+                    }}
+                  >
+                    <Text style={[styles.secondaryButtonText, { color: '#3B82F6' }]}>+ Add WRVAS Service Function</Text>
+                  </Pressable>
+                )}
+              </View>
+            )}
+          </View>
         )}
 
         {(data.businessFunctions ?? []).sort((a, b) => a.order - b.order).map((fn) => {

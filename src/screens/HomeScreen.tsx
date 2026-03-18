@@ -31,6 +31,16 @@ import { useGuidedTour } from '../components/GuidedTour';
 import { useSpotlightTour } from '../components/SpotlightTour';
 import type { Page } from './home/types';
 
+// ─── Demo Journey — ordered 6-step demo flow ────────────────────────
+const DEMO_STEPS: Array<{ id: Page; icon: string; label: string; tip: string }> = [
+  { id: 'bebo',       icon: '✦', label: 'Bebo AI',       tip: 'Ask Bebo to instantly build workspaces, flows & data' },
+  { id: 'admin',      icon: '◈', label: 'Workspace',     tip: 'Design workspaces, SubSpaces, and data fields' },
+  { id: 'signal',     icon: '⚡', label: 'Signal Studio', tip: 'Set up automation flows that react to workspace events' },
+  { id: 'orbital',    icon: '🔗', label: 'Orbital',       tip: 'Connect to DocuSign, Stripe, SAP, and 30+ more' },
+  { id: 'cosmograph', icon: '⬡', label: 'Cosmograph',    tip: 'Import and analyze any CSV or JSON dataset' },
+  { id: 'enduser',    icon: '▣', label: 'End User',       tip: 'Live operational runtime — what your team sees' },
+];
+
 const tenantTitleOptions = [
   'Operations Coordinator',
   'Case Specialist',
@@ -858,15 +868,23 @@ export function HomeScreen() {
                   </Text>
                 </Pressable>
                 <Pressable
+                  style={styles.dashboardSidebarAction}
+                  onPress={openTour}
+                  accessibilityRole="button"
+                  accessibilityLabel="Launch the full guided tour"
+                >
+                  <Text style={styles.dashboardSidebarActionText}>🎯 Launch Full Tour</Text>
+                </Pressable>
+                <Pressable
                   style={[styles.dashboardSidebarAction, guidedMode && styles.dashboardSidebarActionActive]}
-                  onPress={handleGuidedModeToggle}
+                  onPress={toggleGuidedMode}
                   accessibilityRole="switch"
                   accessibilityState={{ checked: guidedMode }}
-                  accessibilityLabel="Guided Mode"
-                  accessibilityHint="Toggles step-by-step guidance overlays"
+                  accessibilityLabel="Step-by-Step Hints"
+                  accessibilityHint="Toggles inline step-by-step guidance on each page"
                 >
                   <Text style={[styles.dashboardSidebarActionText, guidedMode && styles.dashboardSidebarActionTextActive]}>
-                    Guided Tour: {guidedMode ? 'On' : 'Off'}
+                    Step-by-Step Hints: {guidedMode ? 'On' : 'Off'}
                   </Text>
                 </Pressable>
                 <Pressable
@@ -972,6 +990,67 @@ export function HomeScreen() {
           </View>
 
           <View style={styles.dashboardMainBody}>
+            {/* ── Demo Journey Strip ── */}
+            {!tenantAccessOpen && !compactShell && (
+              <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingHorizontal: 16,
+                paddingVertical: 6,
+                borderBottomWidth: 1,
+                borderBottomColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+                gap: 2,
+                flexWrap: 'wrap' as any,
+              }}>
+                <Text style={{ fontSize: 10, color: mode === 'night' ? 'rgba(255,255,255,0.36)' : 'rgba(0,0,0,0.36)', fontWeight: '600', marginRight: 8, letterSpacing: 0.5 }}>DEMO FLOW</Text>
+                {DEMO_STEPS.map((step, idx) => {
+                  const isCurrent = page === step.id;
+                  const accent = '#8C5BF5';
+                  return (
+                    <React.Fragment key={step.id}>
+                      {idx > 0 && (
+                        <Text style={{ fontSize: 10, color: mode === 'night' ? 'rgba(255,255,255,0.20)' : 'rgba(0,0,0,0.20)', marginHorizontal: 1 }}>›</Text>
+                      )}
+                      <Pressable
+                        onPress={() => { setTenantAccessOpen(false); setPage(step.id); }}
+                        style={[
+                          {
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 4,
+                            paddingHorizontal: 8,
+                            paddingVertical: 4,
+                            borderRadius: 6,
+                            borderWidth: 1,
+                            borderColor: isCurrent ? `${accent}50` : 'transparent',
+                            backgroundColor: isCurrent
+                              ? (mode === 'night' ? `${accent}22` : `${accent}12`)
+                              : 'transparent',
+                          },
+                        ]}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Go to ${step.label}`}
+                        accessibilityHint={step.tip}
+                      >
+                        <Text style={{ fontSize: 11, color: isCurrent ? accent : (mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)') }}>{step.icon}</Text>
+                        <Text style={{ fontSize: 11, fontWeight: isCurrent ? '700' : '500', color: isCurrent ? accent : (mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)') }}>{step.label}</Text>
+                        {isCurrent && <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: accent, marginLeft: 1 }} />}
+                      </Pressable>
+                    </React.Fragment>
+                  );
+                })}
+                <View style={{ flex: 1 }} />
+                <Pressable
+                  onPress={openTour}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.12)' : 'rgba(140,91,245,0.08)', borderWidth: 1, borderColor: 'rgba(140,91,245,0.25)' }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Start tour guide"
+                >
+                  <Text style={{ fontSize: 10, color: '#8C5BF5', fontWeight: '700' }}>🎯 Tour Guide</Text>
+                </Pressable>
+              </View>
+            )}
             {tenantAccessOpen && isSuperAdmin ? (
               <ScrollView style={styles.pageWrap} contentContainerStyle={[styles.pageContent, styles.pageContentTight]} keyboardShouldPersistTaps="handled">
                 <Text style={styles.sectionEyebrow}>Tenant Access</Text>

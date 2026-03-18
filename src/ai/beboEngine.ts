@@ -16,6 +16,7 @@ import type {
   EndUserPersona,
   LifecycleStage,
   LifecycleTransition,
+  BusinessFunction,
 } from '../types';
 
 // ─── Public Types ────────────────────────────────────────────────────
@@ -24,6 +25,7 @@ export type DemoVertical = 'pharma' | 'sales' | 'healthcare' | 'logistics' | 'le
 
 export type BeboIntent =
   | 'build_workspace'
+  | 'build_architecture'
   | 'generate_data'
   | 'show_signals'
   | 'show_orbital'
@@ -94,12 +96,34 @@ export interface BeboCardStats {
   stats: Array<{ label: string; value: string; delta?: string; positive?: boolean; icon: string }>;
 }
 
+export interface BeboCardArchitecture {
+  type: 'architecture';
+  id: string;
+  industry: string;
+  functions: Array<{
+    fnId: string;
+    name: string;
+    icon: string;
+    color: string;
+    description: string;
+    objects: Array<{
+      name: string;
+      namePlural: string;
+      icon: string;
+      description: string;
+      workspaceNames: string[];
+    }>;
+  }>;
+  applyPayload: ScenarioApplyPayload;
+}
+
 export type BeboCard =
   | BeboCardWorkspaceProposal
   | BeboCardDataPreview
   | BeboCardIntegrationStatus
   | BeboCardSignalFlows
-  | BeboCardStats;
+  | BeboCardStats
+  | BeboCardArchitecture;
 
 export interface BeboResponse {
   text: string;
@@ -113,6 +137,7 @@ export interface ScenarioApplyPayload {
   flows: SignalFlow[];
   integrations: IntegrationActivation[];
   records: RuntimeRecord[];
+  businessFunctions?: BusinessFunction[];
 }
 
 // ─── Internal Helpers ────────────────────────────────────────────────
@@ -700,6 +725,56 @@ export function buildInsurancePayload(): ScenarioApplyPayload {
   };
 }
 
+// ─── Business Architecture Builders ──────────────────────────────────
+
+function buildPharmaBusinessFunctions(): BusinessFunction[] {
+  return [{
+    id: 'bfn-supply-chain',
+    name: 'Supply Chain & Regulatory',
+    icon: '🔗',
+    color: '#8C5BF5',
+    order: 0,
+    description: 'End-to-end pharmaceutical serialization from manufacturer to patient dispensing',
+    objects: [{
+      id: 'bobj-drug-inventory',
+      functionId: 'bfn-supply-chain',
+      name: 'Drug Inventory',
+      namePlural: 'Drug Inventories',
+      icon: '💊',
+      description: 'Track serialized pharmaceutical batches across the DSCSA supply chain',
+      workspaceIds: ['ws-bebo-pharma-mfr', 'ws-bebo-pharma-dist', 'ws-bebo-pharma-rx'],
+    }],
+  }];
+}
+
+function buildSalesBusinessFunctions(): BusinessFunction[] {
+  return [{
+    id: 'bfn-revenue-ops',
+    name: 'Revenue Operations',
+    icon: '💰',
+    color: '#10B981',
+    order: 0,
+    description: 'Full-cycle revenue management from lead capture through closed deal',
+    objects: [{
+      id: 'bobj-deal-pipeline',
+      functionId: 'bfn-revenue-ops',
+      name: 'Deal Pipeline',
+      namePlural: 'Deal Pipelines',
+      icon: '📈',
+      description: 'Track opportunities and deals through the sales lifecycle',
+      workspaceIds: ['ws-bebo-sales-pipelines'],
+    }, {
+      id: 'bobj-account',
+      functionId: 'bfn-revenue-ops',
+      name: 'Account',
+      namePlural: 'Accounts',
+      icon: '🏢',
+      description: 'Company accounts and their contact relationships',
+      workspaceIds: ['ws-bebo-sales-accounts'],
+    }],
+  }];
+}
+
 export function getPayloadForVertical(vertical: DemoVertical): ScenarioApplyPayload {
   switch (vertical) {
     case 'pharma': return buildPharmaPayload();
@@ -715,6 +790,7 @@ export function getPayloadForVertical(vertical: DemoVertical): ScenarioApplyPayl
 
 const INTENT_PATTERNS: Array<{ intent: BeboIntent; keywords: string[] }> = [
   { intent: 'build_workspace', keywords: ['build workspace', 'create workspace', 'generate workspace', 'set up workspace', 'architect', 'scaffold', 'design workspace', 'workspace for', 'configure workspace', 'new workspace', 'workspace structure', 'make workspace', 'build me'] },
+  { intent: 'build_architecture', keywords: ['business architecture', 'map my business', 'operations map', 'define functions', 'business map', 'build architecture', 'functions and objects', 'business functions', 'business objects', 'build my ops', 'map operations', 'what are my objects'] },
   { intent: 'generate_data', keywords: ['fake data', 'sample data', 'generate data', 'test records', 'dummy data', 'populate', 'data for cosmograph', 'create records', 'generate records', 'add records', '20 records', '50 records', 'data file', 'test data'] },
   { intent: 'show_signals', keywords: ['signal', 'automation', 'flow', 'workflow', 'trigger', 'alert', 'automate', 'when ', 'notify', 'rules', 'action chain', 'set up flow', 'create flow', 'build flow', 'signal studio'] },
   { intent: 'show_orbital', keywords: ['orbital', 'integration', 'connect to', 'docusign', 'quickbooks', 'salesforce', 'hubspot', 'stripe', 'twilio', 'sap', 'netsuite', 'api', 'webhook', 'third-party', 'plug in', 'connector'] },
@@ -886,6 +962,38 @@ export function generateBeboResponse(userText: string, vertical: DemoVertical): 
         text: `Here's a **live platform snapshot** for your **${label}** deployment. All metrics update in real-time as records move through lifecycle stages, Signal flows execute, and Orbital integrations process events.`,
         cards: [statsCard],
         quickReplies: ['Build workspace structure', 'Set up automations', 'Show integrations', 'Generate sample data'],
+      };
+    }
+
+    case 'build_architecture': {
+      const bizFns = vertical === 'pharma' ? buildPharmaBusinessFunctions()
+        : vertical === 'sales' ? buildSalesBusinessFunctions()
+        : buildPharmaBusinessFunctions();
+      const archCard: BeboCardArchitecture = {
+        type: 'architecture',
+        id: cid(),
+        industry: label,
+        functions: bizFns.map(fn => ({
+          fnId: fn.id,
+          name: fn.name,
+          icon: fn.icon ?? '🏢',
+          color: fn.color ?? '#8C5BF5',
+          description: fn.description ?? '',
+          objects: fn.objects.map(obj => ({
+            name: obj.name,
+            namePlural: obj.namePlural,
+            icon: obj.icon ?? '📦',
+            description: obj.description ?? '',
+            workspaceNames: obj.workspaceIds.map(wid => payload.workspaces.find(w => w.id === wid)?.name ?? wid),
+          })),
+        })),
+        applyPayload: { ...payload, businessFunctions: bizFns },
+      };
+      const totalObjs = bizFns.reduce((a, f) => a + f.objects.length, 0);
+      return {
+        text: `I've mapped out the complete **${icon} ${label}** business architecture.\n\n**${bizFns.length} Business Function${bizFns.length !== 1 ? 's' : ''}** with **${totalObjs} Business Object${totalObjs !== 1 ? 's' : ''}** — pre-linked to your workspace structure.\n\nClick **Apply Architecture** to load this directly into the Architecture tab in Admin, where you can refine it further.`,
+        cards: [archCard],
+        quickReplies: ['Apply this architecture', 'Build workspaces too', 'Show Signal flows', 'Show platform stats'],
       };
     }
 

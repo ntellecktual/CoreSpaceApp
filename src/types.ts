@@ -134,6 +134,8 @@ export interface SignalFlow {
   scheduleConfig?: ScheduleConfig;
   workspaceId: string;
   subSpaceId: string;
+  businessObjectId?: string;   // Optional link to a BusinessObject
+  businessFunctionId?: string; // Optional link to a BusinessFunction
   rules: string[];
   action: string;
   runOnExisting: boolean;
@@ -385,6 +387,7 @@ export interface IntegrationTemplate {
   discoveryCalls?: DiscoveryCallDef[];
   prewiredSignals?: PrewiredSignalDef[];
   documentation?: string;
+  businessObjectIds?: string[];  // Business objects this integration serves
 }
 
 export interface IntegrationActivation {

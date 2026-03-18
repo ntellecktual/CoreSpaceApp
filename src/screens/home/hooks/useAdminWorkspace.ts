@@ -308,7 +308,7 @@ function createBuilderField(
 }
 
 export function useAdminWorkspace() {
-  const { data, upsertWorkspace, addSubSpace, deleteSubSpace, updateSubSpace, deleteWorkspace, addClient, addRecord, upsertFlow } = useAppState();
+  const { data, upsertWorkspace, addSubSpace, deleteSubSpace, updateSubSpace, deleteWorkspace, addClient, addRecord, upsertFlow, upsertBusinessFunction } = useAppState();
   const { can, deniedMessage } = useRbac();
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(data.workspaces[0]?.id ?? '');
   const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(data.workspaces.length === 0);
@@ -1045,6 +1045,27 @@ export function useAdminWorkspace() {
       }
     }
 
+    // ── Auto-inject pharma business architecture ──
+    upsertBusinessFunction({
+      id: 'bfn-supply-chain',
+      name: 'Supply Chain & Regulatory',
+      icon: '🔗',
+      color: '#8C5BF5',
+      order: 0,
+      description: 'End-to-end pharmaceutical serialization from manufacturer to patient dispensing (DSCSA)',
+      objects: [
+        {
+          id: 'bobj-drug-inventory',
+          functionId: 'bfn-supply-chain',
+          name: 'Drug Inventory',
+          namePlural: 'Drug Inventories',
+          icon: '💊',
+          description: 'Track serialized pharmaceutical batches across the DSCSA supply chain from carton to dispensing',
+          workspaceIds: [wsId],
+        },
+      ],
+    });
+
     setNotice('DSCSA Serialization template applied: Carton, Boxes, Units, Lot Info, Manufacturer, Distributor, Pharmacy, and Traceability lanes are ready. 5 Signal Studio flows created.' + (addedNewSubSpaces ? ' Demo data seeded with Lisinopril, Amoxicillin, and Epinephrine batches.' : ''));
   };
 
@@ -1250,6 +1271,27 @@ export function useAdminWorkspace() {
         upsertFlow({ ...flowBase, id: '', name: 'Shipment Audit Logger', signal: 'A tracking number is assigned and the shipment leaves the facility', workspaceId: wsId, subSpaceId: ssMap['Shipping & Tracking'], rules: ['tracking-number is set', 'carrier is set'], action: 'Write a tamper-proof audit entry with device serial, tracking number, carrier, and timestamp', runOnExisting: false, targetTags: ['Audit:Shipment', 'Trace:Complete'] });
       }
     }
+
+    // ── Auto-inject service operations business architecture ──
+    upsertBusinessFunction({
+      id: 'bfn-service-operations',
+      name: 'Service Operations',
+      icon: '🛠️',
+      color: '#3B82F6',
+      order: 1,
+      description: 'Warrant, Refurbishment, Value-Added Services — full device lifecycle from inbound dock to shipment',
+      objects: [
+        {
+          id: 'bobj-device-inventory',
+          functionId: 'bfn-service-operations',
+          name: 'Device Inventory',
+          namePlural: 'Device Inventories',
+          icon: '🖥️',
+          description: 'Serialized IT hardware assets moving through diagnostic, repair, kitting, QA, and shipping stages',
+          workspaceIds: [wsId],
+        },
+      ],
+    });
 
     setNotice('WRVAS template applied: Dock Log, Serial Capture, Inspection, Diagnostics, Cost Eval, Repair, Retest, Config, Kitting, QA, Packing, and Shipping lanes are ready. 5 Signal Studio flows created.' + (addedNewSubSpaces ? ' Demo data seeded with Dell Laptop, HP Printer (BER), and Cisco Server (retest fail) work orders.' : ''));
   };

@@ -242,21 +242,49 @@ export function useEndUserRuntime(selectedClientId: string) {
     if (!workspace || !selectedSubSpace) {
       return undefined;
     }
-    const form = getFormForSubSpace(workspace.id, selectedSubSpace.id);
-    if (!form) {
-      return undefined;
-    }
-    return {
-      ...form,
-      fields: form.fields.map((field) =>
-        field.id === 'status'
-          ? {
-              ...field,
-              options: allowedLifecycleStageNames,
-            }
-          : field,
-      ),
-    };
+    const explicit = getFormForSubSpace(workspace.id, selectedSubSpace.id);
+
+    // ── Synthesise a form from builderFields when no explicit FormDefinition exists ──
+    // Merge workspace-level fields + subspace-level fields into a unified create form.
+    const wsFields = workspace.builderFields ?? [];
+    const ssFields = selectedSubSpace.builderFields ?? [];
+    const allBuilderFields = [...wsFields, ...ssFields];
+
+    const baseForm = explicit ?? (allBuilderFields.length > 0 ? {
+      id: `auto-form-${selectedSubSpace.id}`,
+      name: `${selectedSubSpace.name} Form`,
+      workspaceId: workspace.id,
+      subSpaceId: selectedSubSpace.id,
+      fields: allBuilderFields.map((bf) => {
+        // Map the richer SubSpaceBuilderFieldType to the narrower FormFieldDefinition type
+        type FType = 'text' | 'number' | 'date' | 'select';
+        let fType: FType = 'text';
+        if (bf.type === 'number') fType = 'number';
+        else if (bf.type === 'date' || bf.type === 'datetime') fType = 'date';
+        else if (bf.type === 'select') fType = 'select';
+        else if (bf.type === 'checkbox') { fType = 'select'; }
+        return {
+          id: bf.id,
+          label: bf.label,
+          type: fType,
+          required: bf.required,
+          options: bf.type === 'checkbox' ? ['Yes', 'No'] : bf.options,
+        };
+      }),
+    } : undefined);
+
+    if (!baseForm) return undefined;
+
+    // Inject lifecycle status field if not already present
+    const hasStatus = baseForm.fields.some((f) => f.id === 'status');
+    const fields = hasStatus
+      ? baseForm.fields.map((f) => f.id === 'status' ? { ...f, options: allowedLifecycleStageNames } : f)
+      : [
+          ...baseForm.fields,
+          { id: 'status', label: 'Lifecycle Status', type: 'select' as const, required: false, options: allowedLifecycleStageNames },
+        ];
+
+    return { ...baseForm, fields };
   }, [workspace, selectedSubSpace, getFormForSubSpace, allowedLifecycleStageNames]);
 
   const userProgress = selectedRecords.length > 0 ? 1 : 0;
@@ -322,12 +350,25 @@ export function useEndUserRuntime(selectedClientId: string) {
         : defaultLifecycleStage?.name ?? lifecycleStages[0]?.name ?? 'Record';
 
     const recordId = `record-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+
+    // Derive a meaningful title from the form values (first non-status, non-trivial value)
+    const TITLE_KEYS = /serial|lot|order|product|name|title|device|patient|reference|item|batch|subject|case/i;
+    const derivedTitle = (() => {
+      const entries = Object.entries(formValues).filter(([k, v]) => k !== 'status' && v && TITLE_KEYS.test(k));
+      if (entries.length > 0) {
+        const [, val] = entries[0];
+        return `${selectedSubSpace.name} — ${val}`;
+      }
+      const firstVal = Object.entries(formValues).find(([k, v]) => k !== 'status' && v);
+      return firstVal ? `${selectedSubSpace.name} — ${firstVal[1]}` : `${selectedSubSpace.name} item`;
+    })();
+
     const newRecord: RuntimeRecord = {
       id: recordId,
       clientId: selectedClientId,
       workspaceId: workspace.id,
       subSpaceId: selectedSubSpace.id,
-      title: `${selectedSubSpace.name} item`,
+      title: derivedTitle,
       status: normalizedStatus,
       amount,
       date: formValues.date,
@@ -342,6 +383,13 @@ export function useEndUserRuntime(selectedClientId: string) {
     setFormValues({});
     setMessage('Entry created through governed form.');
     return newRecord;
+  };
+
+  const moveRecordToSubSpace = (recordId: string, targetSubSpaceId: string) => {
+    if (!can('record.update', workspace?.id)) {
+      return;
+    }
+    updateRecord(recordId, { subSpaceId: targetSubSpaceId });
   };
 
   return {
@@ -374,6 +422,7 @@ export function useEndUserRuntime(selectedClientId: string) {
     setField,
     setLifecycleStatus,
     submit,
+    moveRecordToSubSpace,
     updateRecord,
     deleteRecord,
   };

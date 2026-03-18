@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { InteractivePressable as Pressable } from '../../components/InteractivePressable';
 import { useUiTheme } from '../../context/UiThemeContext';
+import { useAppState } from '../../context/AppStateContext';
 import { Card, HintStrip } from './components';
 import { orbitalSteps } from './constants';
 import { useOrbitalMarketplace } from './hooks/useOrbitalMarketplace';
@@ -34,6 +35,7 @@ function seedIntegrationEvents(activationId: string): IntegrationEvent[] {
 export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, addNotification }: GuidedPageProps) {
   const { styles, mode } = useUiTheme();
   const { width: windowWidth } = useWindowDimensions();
+  const { data: appData } = useAppState();
   const compact = windowWidth < 900;
   const {
     view,
@@ -346,6 +348,16 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
                   mode={mode}
                   styles={styles}
                   compact={compact}
+                  businessObjectContext={
+                    (appData.businessFunctions ?? [])
+                      .flatMap(f => f.objects.map(o => ({ obj: o, fn: f })))
+                      .filter(({ obj }) =>
+                        (tpl.businessObjectIds?.includes(obj.id)) ||
+                        obj.workspaceIds.some(wid => (appData.workspaces ?? []).some(ws => ws.id === wid))
+                      )
+                      .map(({ obj, fn }) => ({ name: obj.name, icon: obj.icon, color: fn.color }))
+                      .slice(0, 3)
+                  }
                 />
               ))}
             </View>
@@ -501,6 +513,7 @@ function TemplateCard({
   mode,
   styles,
   compact,
+  businessObjectContext,
 }: {
   template: IntegrationTemplate;
   activated: boolean;
@@ -509,6 +522,7 @@ function TemplateCard({
   mode: string;
   styles: any;
   compact: boolean;
+  businessObjectContext?: Array<{ name: string; icon?: string; color?: string }>;
 }) {
   return (
     <View
@@ -539,7 +553,7 @@ function TemplateCard({
         {template.description}
       </Text>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <View style={{ backgroundColor: mode === 'day' ? '#F1F5F9' : '#334155', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
           <Text style={{ fontSize: 10, color: '#8C5BF5', fontWeight: '600' }}>{template.category}</Text>
         </View>
@@ -554,6 +568,19 @@ function TemplateCard({
           </View>
         )}
       </View>
+
+      {/* Business object context chips */}
+      {businessObjectContext && businessObjectContext.length > 0 && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
+          <Text style={{ fontSize: 9, color: '#9CA3AF', fontWeight: '600' }}>Works with:</Text>
+          {businessObjectContext.map((obj, i) => (
+            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: `${obj.color ?? '#8C5BF5'}18`, borderRadius: 5, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 1, borderColor: `${obj.color ?? '#8C5BF5'}33` }}>
+              {!!obj.icon && <Text style={{ fontSize: 9 }}>{obj.icon}</Text>}
+              <Text style={{ fontSize: 9, fontWeight: '700', color: obj.color ?? '#8C5BF5' }}>{obj.name}</Text>
+            </View>
+          ))}
+        </View>
+      )}
 
       <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
         {activated ? (

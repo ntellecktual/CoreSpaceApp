@@ -4,7 +4,8 @@ import { InteractivePressable as Pressable } from './InteractivePressable';
 import { useUiTheme } from '../context/UiThemeContext';
 import { formatDate } from '../formatDate';
 import { formatCurrency } from '../api';
-import type { RuntimeRecord, SubSpaceBuilderField } from '../types';
+import type { RuntimeRecord, SubSpaceBuilderField, SubSpaceDefinition } from '../types';
+import { getOrderedSubSpaces } from '../data/pipelineConfig';
 
 // ─── Record Detail Drawer ───────────────────────────────────────────
 // Slide-out right panel displaying full record details, fields, tags,
@@ -21,6 +22,9 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
   lifecycleStages,
   lifecycleTransitions,
   formatAmount,
+  subSpaces,
+  workspaceName,
+  onMoveToSubSpace,
 }: {
   visible: boolean;
   record: RuntimeRecord | null;
@@ -32,6 +36,9 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
   lifecycleStages?: { id: string; name: string }[];
   lifecycleTransitions?: { fromStageId: string; toStageId: string }[];
   formatAmount?: (amount: number) => string;
+  subSpaces?: SubSpaceDefinition[];
+  workspaceName?: string;
+  onMoveToSubSpace?: (recordId: string, targetSubSpaceId: string) => void;
 }) {
   const { mode } = useUiTheme();
   const isDark = mode === 'night';
@@ -521,6 +528,99 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                 </View>
               </View>
             )}
+
+            {/* ── SubSpace Pipeline ── */}
+            {subSpaces && subSpaces.length > 1 && onMoveToSubSpace && (() => {
+              const ordered = getOrderedSubSpaces(workspaceName ?? '', subSpaces);
+              const currentIdx = ordered.findIndex((ss) => ss.id === record.subSpaceId);
+              const nextSs = currentIdx >= 0 && currentIdx < ordered.length - 1 ? ordered[currentIdx + 1] : null;
+              return (
+                <View style={{ gap: 10, marginTop: 4 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: dimText }}>
+                    SubSpace Pipeline
+                  </Text>
+                  {/* Pipeline strip */}
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6, alignItems: 'center' }}>
+                    {ordered.map((ss, idx) => {
+                      const isCurrent = ss.id === record.subSpaceId;
+                      const isPast = currentIdx >= 0 && idx < currentIdx;
+                      return (
+                        <View key={ss.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                          <View
+                            style={{
+                              paddingHorizontal: 10,
+                              paddingVertical: 5,
+                              borderRadius: 8,
+                              borderWidth: isCurrent ? 1.5 : 1,
+                              borderColor: isCurrent ? accent : (isPast ? 'rgba(140,91,245,0.3)' : border),
+                              backgroundColor: isCurrent ? (isDark ? 'rgba(140,91,245,0.18)' : 'rgba(140,91,245,0.10)') : 'transparent',
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontSize: 10,
+                                fontWeight: isCurrent ? '700' : '500',
+                                color: isCurrent ? accent : (isPast ? (isDark ? 'rgba(140,91,245,0.6)' : 'rgba(140,91,245,0.5)') : dimText),
+                              }}
+                              numberOfLines={1}
+                            >
+                              {isPast ? '✓ ' : ''}{ss.name}
+                            </Text>
+                          </View>
+                          {idx < ordered.length - 1 && (
+                            <Text style={{ fontSize: 10, color: dimText, marginHorizontal: 2 }}>›</Text>
+                          )}
+                        </View>
+                      );
+                    })}
+                  </ScrollView>
+                  {/* Advance button */}
+                  {nextSs && (
+                    <Pressable
+                      onPress={() => onMoveToSubSpace(record.id, nextSs.id)}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 6,
+                        paddingVertical: 10,
+                        borderRadius: 10,
+                        backgroundColor: accent,
+                      }}
+                    >
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#FFF' }}>
+                        Advance → {nextSs.name}
+                      </Text>
+                    </Pressable>
+                  )}
+                  {/* Jump to any SubSpace */}
+                  {ordered.length > 2 && (
+                    <View style={{ gap: 6 }}>
+                      <Text style={{ fontSize: 10, color: dimText, fontWeight: '600' }}>Jump to SubSpace</Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                        {ordered
+                          .filter((ss) => ss.id !== record.subSpaceId)
+                          .map((ss) => (
+                            <Pressable
+                              key={ss.id}
+                              onPress={() => onMoveToSubSpace(record.id, ss.id)}
+                              style={{
+                                paddingHorizontal: 10,
+                                paddingVertical: 5,
+                                borderRadius: 8,
+                                borderWidth: 1,
+                                borderColor: border,
+                              }}
+                            >
+                              <Text style={{ fontSize: 11, color: dimText }}>→ {ss.name}</Text>
+                            </Pressable>
+                          ))}
+                      </View>
+                    </View>
+                  )}
+                </View>
+              );
+            })()}
           </ScrollView>
         </View>
       </Pressable>

@@ -429,7 +429,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
     activeForm, lifecycleStages, lifecycleTransitions,
     allowedLifecycleStageNames, defaultLifecycleStageName,
     formValues, message, userProgress, flows,
-    setField, setLifecycleStatus, submit, updateRecord, deleteRecord,
+    setField, setLifecycleStatus, submit, moveRecordToSubSpace, updateRecord, deleteRecord,
   } = useEndUserRuntime(selectedClientId);
 
   const flowEngine = useFlowEngine();
@@ -514,6 +514,8 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
       updateRecord(id, { status: targetStage });
       if (rec) {
         auditLog?.logEntry({ action: 'transition', entityType: 'record', entityId: id, entityName: rec.title || id, after: { detail: `Batch move → ${targetStage}` } });
+        const updatedRec = { ...rec, status: targetStage };
+        if (addNotification) flowEngine.onLifecycleTransition(updatedRec, addNotification);
       }
     });
     addNotification?.({ type: 'system', title: 'Batch Move Complete', body: `${ids.length} record${ids.length > 1 ? 's' : ''} moved to "${targetStage}".`, severity: 'success' });
@@ -1183,6 +1185,8 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                       flashSaving();
                       showToast(`Moved to ${newStatus}`, 'success');
                       auditLog?.logEntry({ action: 'transition', entityType: 'record', entityId: recordId, entityName: recordId, after: { detail: `Board drop → ${newStatus}` } });
+                      const rec = allRecordsForWorkspace.find((r) => r.id === recordId);
+                      if (rec && addNotification) flowEngine.onLifecycleTransition({ ...rec, status: newStatus }, addNotification);
                     }}
                     selectedRecordIds={selectedRecordIds}
                     toggleRecordSelection={toggleRecordSelection}
@@ -1291,6 +1295,20 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
         lifecycleStages={lifecycleStages}
         lifecycleTransitions={lifecycleTransitions}
         formatAmount={fmtAmount}
+        subSpaces={workspace?.subSpaces}
+        workspaceName={workspace?.name}
+        onMoveToSubSpace={(recordId, targetSubSpaceId) => {
+          moveRecordToSubSpace(recordId, targetSubSpaceId);
+          const targetSs = workspace?.subSpaces.find((ss) => ss.id === targetSubSpaceId);
+          showToast(`Record moved to ${targetSs?.name ?? 'SubSpace'}`, 'success');
+          flashSaving();
+          if (selectedDrawerRecord?.id === recordId) {
+            const updatedRec = { ...selectedDrawerRecord, subSpaceId: targetSubSpaceId } as RuntimeRecord;
+            setSelectedDrawerRecord(updatedRec);
+            auditLog?.logEntry({ action: 'update', entityType: 'record', entityId: recordId, entityName: selectedDrawerRecord.title || recordId, after: { detail: `Moved to SubSpace: ${targetSs?.name ?? targetSubSpaceId}` } });
+            if (addNotification) flowEngine.onRecordUpdated(updatedRec, addNotification);
+          }
+        }}
         onClose={() => { setRecordDrawerVisible(false); setSelectedDrawerRecord(null); }}
         onTransition={(id, newStatus) => {
           updateRecord(id, { status: newStatus });

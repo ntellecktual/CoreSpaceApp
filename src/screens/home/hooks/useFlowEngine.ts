@@ -113,6 +113,27 @@ export function resolveFieldValue(
     }
   }
 
+  // Compute derived temporal fields: days_to_expiration / days_till_expiration
+  if (
+    normalizedKey === 'days_to_expiration' ||
+    normalizedKey === 'daystooexpiration' ||
+    normalizedKey === 'daystoexpiration' ||
+    normalizedKey === 'daystillexpiration' ||
+    normalizedKey === 'days_till_expiration' ||
+    normalizedKey === 'daysuntilexpiration'
+  ) {
+    const expEntry = Object.entries(record.data).find(([k]) => {
+      const nk = normalizeFieldKey(k);
+      return (nk.includes('expiration') || nk.includes('expiry')) && (nk.includes('date') || nk === 'expiration' || nk === 'expiry');
+    });
+    if (expEntry) {
+      const expDate = new Date(String(expEntry[1]));
+      if (!isNaN(expDate.getTime())) {
+        return Math.ceil((expDate.getTime() - Date.now()) / 86400000);
+      }
+    }
+  }
+
   return undefined;
 }
 

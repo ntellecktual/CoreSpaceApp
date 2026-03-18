@@ -61,6 +61,7 @@ interface AppStateContextValue {
     tenantId: string,
     target: PortableDatabaseTarget,
   ) => { ok: boolean; reason?: string; fileName?: string; mimeType?: string; payload?: string };
+  copyActiveDataToAllTenants: () => { ok: boolean; reason?: string; count?: number };
   upsertShellConfig: (config: ShellConfig) => void;
   setActiveRoleId: (roleId: string) => void;
   upsertRole: (role: RoleDefinition) => RoleDefinition;
@@ -679,6 +680,22 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
           mimeType: 'application/json',
           payload,
         };
+      },
+      copyActiveDataToAllTenants: () => {
+        if (!isSuperAdmin) {
+          return { ok: false, reason: 'Only super admins can seed all tenants.' };
+        }
+        if (tenantRecords.length < 2) {
+          return { ok: false, reason: 'No other tenants to seed.' };
+        }
+        const sourceData = stripGlobalAuthFields(currentTenantRecord?.data ?? createBlankTenantData());
+        setTenantRecords((current) =>
+          current.map((tenant) => {
+            if (tenant.id === activeTenantId) return tenant;
+            return { ...tenant, data: sourceData };
+          }),
+        );
+        return { ok: true, count: tenantRecords.length - 1 };
       },
       upsertShellConfig: (config) => {
         setTenantData((current) => ({

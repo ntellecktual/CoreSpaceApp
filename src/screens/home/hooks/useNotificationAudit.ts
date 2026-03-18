@@ -8,7 +8,7 @@ function uid(prefix: string) {
 // ─── Notifications Hook ─────────────────────────────────────────────
 
 export function useNotifications(tenantId: string) {
-  const [notifications, setNotifications] = useState<AppNotification[]>(() => generateDemoNotifications(tenantId));
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
   const addNotification = useCallback(
     (partial: Omit<AppNotification, 'id' | 'tenantId' | 'read' | 'createdAt'>) => {
@@ -70,9 +70,9 @@ export function useAuditLog(tenantId: string, currentUser?: { id: string; fullNa
   return { entries, filterEntity, setFilterEntity, logEntry };
 }
 
-// ─── Demo Data Generators ───────────────────────────────────────────
+// ─── (Demo data generators removed) ────────────────────────────────
 
-function generateDemoNotifications(tenantId: string): AppNotification[] {
+/* function generateDemoNotifications(tenantId: string): AppNotification[] {
   const now = Date.now();
   return [
     {
@@ -136,9 +136,9 @@ function generateDemoNotifications(tenantId: string): AppNotification[] {
       createdAt: new Date(now - 86400000).toISOString(),
     },
   ];
-}
+} */
 
-function generateDemoAuditLog(tenantId: string): AuditLogEntry[] {
+/* function generateDemoAuditLog(tenantId: string): AuditLogEntry[] {
   const now = Date.now();
   const user = { userId: 'user-admin', userName: 'Kieth M.' };
 
@@ -233,4 +233,4 @@ function generateDemoAuditLog(tenantId: string): AuditLogEntry[] {
       timestamp: new Date(now - 86400000).toISOString(),
     },
   ];
-}
+} */

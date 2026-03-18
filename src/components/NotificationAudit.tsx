@@ -134,7 +134,6 @@ export function NotificationCenter({
               const colors = SEVERITY_COLORS[notif.severity] ?? SEVERITY_COLORS.info;
               const icon = SEVERITY_ICONS[notif.severity] ?? 'ℹ️';
               const sevColor = isDark ? colors.dark : colors.light;
-              const isDemo = notif.id.startsWith('demo-');
               return (
                 <Pressable
                   key={notif.id}
@@ -166,11 +165,6 @@ export function NotificationCenter({
                       <Text style={{ fontSize: 13, fontWeight: notif.read ? '500' : '700', color: textColor, flex: 1 }} numberOfLines={1}>
                         {notif.title}
                       </Text>
-                      {isDemo && (
-                        <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1 }}>
-                          <Text style={{ fontSize: 9, fontWeight: '700', color: dimText, letterSpacing: 0.5 }}>DEMO</Text>
-                        </View>
-                      )}
                       {!notif.read && (
                         <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: accent }} />
                       )}

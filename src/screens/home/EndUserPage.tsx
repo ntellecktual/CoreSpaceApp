@@ -18,6 +18,7 @@ import { formatDate } from '../../formatDate';
 import { searchFdaDrugs, formatCurrency, formatUnitCount } from '../../api';
 import type { FdaDrug } from '../../api';
 import type { RuntimeRecord, SubSpaceBuilderField } from '../../types';
+import { getRecordPlaceholderImage } from '../../data/pipelineConfig';
 
 /* ── CSV/JSON parser (no dependencies) ─────────────────── */
 function parseCsvOrJson(raw: string): Record<string, string>[] {
@@ -1608,6 +1609,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                         title: titleVal || Object.values(row)[0] || 'Imported Record',
                         status: defaultLifecycleStageName ?? lifecycleStages[0]?.name ?? 'New',
                         tags: [`Client:${selectedClientId}`, `Workspace:${workspace.name}`, 'Import:CSV'],
+                        imageUri: getRecordPlaceholderImage(workspace.name),
                         data,
                       };
                       addRecordDirect(rec);

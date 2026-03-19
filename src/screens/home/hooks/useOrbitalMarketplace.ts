@@ -111,7 +111,13 @@ export function useOrbitalMarketplace() {
 
     // Register pre-wired signals as Signal Studio flows
     if (selectedTemplate.prewiredSignals && selectedTemplate.prewiredSignals.length > 0) {
-      const firstWorkspace = data.workspaces[0];
+      // Try to match a workspace by category name for smarter workspace assignment
+      const category = selectedTemplate.category.toLowerCase();
+      const matchedWorkspace = data.workspaces.find((ws) => {
+        const wsName = ws.name.toLowerCase();
+        return wsName.includes(category) || category.split(/\s+/).some((word) => word.length > 3 && wsName.includes(word));
+      }) ?? data.workspaces[0];
+      const firstWorkspace = matchedWorkspace;
       const firstSubSpace = firstWorkspace?.subSpaces[0];
       if (firstWorkspace && firstSubSpace) {
         for (const signal of selectedTemplate.prewiredSignals) {

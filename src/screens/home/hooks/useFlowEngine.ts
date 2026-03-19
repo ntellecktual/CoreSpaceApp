@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { useAppState } from '../../../context/AppStateContext';
-import type { RuntimeRecord, SignalFlow, AppNotification, NotificationType } from '../../../types';
+import type { FlowRunEntry, RuntimeRecord, SignalFlow, AppNotification, NotificationType } from '../../../types';
 
 // ─── Flow Execution Engine ──────────────────────────────────────────
 // Evaluates published Signal Studio flows against record events.
@@ -199,7 +199,7 @@ export function executeAction(
 }
 
 export function useFlowEngine() {
-  const { data, updateRecord, upsertFlow } = useAppState();
+  const { data, updateRecord, upsertFlow, addFlowRunEntry } = useAppState();
   const runningRef = useRef(false);
 
   const evaluateFlows = useCallback(
@@ -258,7 +258,7 @@ export function useFlowEngine() {
 
         // Execute action
         try {
-          const { notificationType, notificationTitle, notificationBody, recordUpdates } = executeAction(
+          const { notificationType, notificationTitle, notificationBody, notificationSeverity, recordUpdates } = executeAction(
             flow.action,
             record,
             flow,
@@ -272,7 +272,7 @@ export function useFlowEngine() {
             type: notificationType,
             title: notificationTitle,
             body: notificationBody,
-            severity: 'info',
+            severity: notificationSeverity,
             sourceEntityType: 'record',
             sourceEntityId: record.id,
           });
@@ -286,6 +286,20 @@ export function useFlowEngine() {
             ),
             lastRun: new Date().toISOString(),
           });
+
+          const runEntry: FlowRunEntry = {
+            id: `fre-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            flowId: flow.id,
+            flowName: flow.name,
+            recordId: record.id,
+            recordTitle: record.title,
+            event,
+            status: 'success',
+            actionTaken: flow.action,
+            durationMs,
+            timestamp: new Date().toISOString(),
+          };
+          addFlowRunEntry(runEntry);
 
           results.push({
             flowId: flow.id,
@@ -316,6 +330,21 @@ export function useFlowEngine() {
             sourceEntityId: flow.id,
           });
 
+          const errorEntry: FlowRunEntry = {
+            id: `fre-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            flowId: flow.id,
+            flowName: flow.name,
+            recordId: record.id,
+            recordTitle: record.title,
+            event,
+            status: 'failed',
+            actionTaken: null,
+            durationMs,
+            error: String(err),
+            timestamp: new Date().toISOString(),
+          };
+          addFlowRunEntry(errorEntry);
+
           results.push({
             flowId: flow.id,
             flowName: flow.name,
@@ -331,7 +360,7 @@ export function useFlowEngine() {
       runningRef.current = false;
       return results;
     },
-    [data.flows, updateRecord, upsertFlow],
+    [data.flows, updateRecord, upsertFlow, addFlowRunEntry],
   );
 
   const onRecordCreated = useCallback(

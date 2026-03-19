@@ -12,6 +12,7 @@ import {
   BusinessFunction,
   BusinessObject,
   ClientProfile,
+  FlowRunEntry,
   FormDefinition,
   FormFieldDefinition,
   IntegrationActivation,
@@ -87,6 +88,7 @@ interface AppStateContextValue {
   deleteBusinessFunction: (fnId: string) => { ok: boolean; reason?: string };
   upsertBusinessObject: (fnId: string, obj: BusinessObject) => void;
   deleteBusinessObject: (fnId: string, objId: string) => { ok: boolean; reason?: string };
+  addFlowRunEntry: (entry: FlowRunEntry) => void;
   signInWithEmail: (email: string, password: string) => AuthResult;
   signInWithProvider: (provider: Exclude<AuthProvider, 'email'>) => AuthResult;
   createAccount: (fullName: string, email: string, password: string, asAdmin: boolean) => AuthResult;
@@ -321,6 +323,7 @@ function normalizeData(parsed: Partial<AppData> & { activeRole?: string }): AppD
     session,
     integrations: parsed.integrations ?? [],
     businessFunctions: parsed.businessFunctions ?? defaultData.businessFunctions ?? [],
+    flowRuns: parsed.flowRuns ?? [],
   };
 }
 
@@ -1055,7 +1058,8 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       signInWithEmail: (email, password) => {
         const normalizedEmail = normalizeEmail(email);
         const user = users.find(
-          (item) => normalizeEmail(item.email) === normalizedEmail && item.provider === 'email' && item.password === password,
+          (item) => normalizeEmail(item.email) === normalizedEmail && item.provider === 'email' &&
+            (item.password === btoa(password) || item.password === password),
         );
 
         if (!user) {
@@ -1134,7 +1138,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
           id: uid('user'),
           fullName: fullName.trim(),
           email: normalizedEmail,
-          password,
+          password: btoa(password),
           roleId,
           tenantId: activeTenantId,
           isSuperAdmin,
@@ -1161,6 +1165,12 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
               ? 'Admin account created. You now have full admin capabilities for this tenant.'
             : 'Account created. You can now use CoreSpace.',
         };
+      },
+      addFlowRunEntry: (entry) => {
+        setTenantData((current) => ({
+          ...current,
+          flowRuns: [entry, ...(current.flowRuns ?? [])].slice(0, 200),
+        }));
       },
       signOut: () => {
         setSession(null);

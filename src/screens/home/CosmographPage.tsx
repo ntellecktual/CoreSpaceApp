@@ -3,6 +3,7 @@ import { Platform, ScrollView, Text, TextInput, View, useWindowDimensions } from
 import { InteractivePressable as Pressable } from '../../components/InteractivePressable';
 import { useUiTheme } from '../../context/UiThemeContext';
 import { useAppState } from '../../context/AppStateContext';
+import { useFlowEngine } from './hooks/useFlowEngine';
 import { GuidedPageProps } from './types';
 
 /* ──────────────────────────────────────────────────────────────────
@@ -169,9 +170,10 @@ const PHASE_ORDER: CosmographPhase[] = ['upload', 'classify', 'map', 'preview', 
    Main Component
 ──────────────────────────────────────────────────────────────────── */
 
-export function CosmographPage({ registerActions }: GuidedPageProps) {
+export function CosmographPage({ registerActions, addNotification, auditLog }: GuidedPageProps) {
   const { styles, mode } = useUiTheme();
   const { data, addRecord } = useAppState();
+  const flowEngine = useFlowEngine();
   const { width: windowWidth } = useWindowDimensions();
   const compact = windowWidth < 900;
   const isDark = mode === 'night';
@@ -286,25 +288,44 @@ export function CosmographPage({ registerActions }: GuidedPageProps) {
   const runImport = () => {
     if (!targetWorkspace) { setNotice('Select a target workspace first.'); return; }
     const mappedCols = columns.filter((c) => c.mappedFieldId);
-    const count = Math.min(schema?.rowCount ?? 0, 50); // preview: up to 50
+    const totalRows = schema?.rowCount ?? 0;
+    const count = Math.min(totalRows, 50);
+    if (totalRows > 50) {
+      setNotice(`Note: Only the first 50 of ${totalRows} rows will be imported.`);
+    }
+    const notifyFn = addNotification ?? (() => {});
+    // Try to identify a column that holds a natural title/name
+    const titleCol = mappedCols.find((c) => /name|title|subject|product|label/i.test(c.label))
+      ?? mappedCols.find((c) => c.isPrimaryKey)
+      ?? mappedCols[0];
     let created = 0;
     for (let i = 0; i < count; i++) {
+      const dataObj = Object.fromEntries(mappedCols.map((c) => [c.mappedFieldId, c.sample[i % c.sample.length] ?? '']));
+      const derivedTitle = titleCol ? String(dataObj[titleCol.mappedFieldId] || `Imported Record ${i + 1}`) : `Imported Record ${i + 1}`;
       const record = {
         id: `cosmo-${Date.now()}-${i}`,
-        clientId: 'cosmograph-import',
+        clientId: data.clients[0]?.id ?? 'cosmograph-import',
         workspaceId: targetWorkspaceId,
         subSpaceId: targetSubSpaceId || (targetWorkspace.subSpaces[0]?.id ?? ''),
-        title: `Imported Record ${i + 1}`,
+        title: derivedTitle,
         status: 'Imported',
         tags: ['cosmograph-import'],
-        data: Object.fromEntries(mappedCols.map((c) => [c.mappedFieldId, c.sample[i % c.sample.length] ?? ''])),
+        data: dataObj,
       };
       addRecord(record);
+      flowEngine.onRecordCreated(record as any, notifyFn as any);
       created++;
     }
     setImportedCount(created);
     setPhase('done');
     setNotice(`${created} records imported into "${targetWorkspace.name}".`);
+    addNotification?.({
+      type: 'import-complete',
+      title: 'Import Complete',
+      body: `${created} record${created !== 1 ? 's' : ''} imported into "${targetWorkspace.name}" via Cosmograph. Published flows evaluated on all records.`,
+      severity: 'success',
+    });
+    auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: targetWorkspaceId, entityName: targetWorkspace.name, after: { importedCount: created } });
   };
 
   /* ── Palette ──────────────────────────────────────────────────── */

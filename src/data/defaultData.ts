@@ -54,6 +54,22 @@ export const defaultData: AppData = {
         workspaceIds: ['ws-network-traceability'],
         defaultTags: ['Team:Compliance'],
       },
+      {
+        id: 'persona-warehouse-receiver',
+        name: 'Warehouse Receiver',
+        description: 'Receives inbound devices, creates work orders, and assigns to the repair queue.',
+        workspaceScope: 'selected',
+        workspaceIds: ['ws-wrvas-receiving'],
+        defaultTags: ['Team:Warehouse'],
+      },
+      {
+        id: 'persona-repair-tech',
+        name: 'Repair Technician',
+        description: 'Diagnoses and repairs devices, updates work order status through resolution.',
+        workspaceScope: 'selected',
+        workspaceIds: ['ws-wrvas-repair'],
+        defaultTags: ['Team:Repair'],
+      },
     ],
     lifecycleStages: [
       { id: 'stage-serialized', name: 'Serialized', description: 'Units and cartons have assigned serial numbers.' },

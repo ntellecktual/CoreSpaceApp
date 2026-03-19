@@ -227,13 +227,21 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
         <Pressable
           onPress={() => {
             const msg = confirmActivation();
-            if (msg && !msg.includes('Missing') && auditLog) {
-              auditLog.logEntry({
-                action: 'create',
-                entityType: 'integration',
-                entityId: selectedTemplate.id,
-                entityName: selectedTemplate.name,
-                after: { status: 'active', templateVersion: selectedTemplate.version },
+            if (msg && !msg.includes('Missing')) {
+              if (auditLog) {
+                auditLog.logEntry({
+                  action: 'create',
+                  entityType: 'integration',
+                  entityId: selectedTemplate.id,
+                  entityName: selectedTemplate.name,
+                  after: { status: 'active', templateVersion: selectedTemplate.version },
+                });
+              }
+              addNotification?.({
+                type: 'integration-triggered',
+                title: `Integration Activated: ${selectedTemplate.name}`,
+                body: `${selectedTemplate.name} by ${selectedTemplate.vendor} is now active. Pre-wired signals registered as Signal Studio flows.`,
+                severity: 'success',
               });
             }
           }}

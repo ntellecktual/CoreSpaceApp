@@ -307,6 +307,7 @@ export interface AppData {
   session: AuthSession | null;
   integrations: IntegrationActivation[];
   businessFunctions?: BusinessFunction[];
+  flowRuns?: FlowRunEntry[];
 }
 
 // ─── Orbital Integration Framework ──────────────────────────────────
@@ -485,7 +486,24 @@ export type NotificationType =
   | 'lifecycle-transition'
   | 'record-created'
   | 'tenant-created'
+  | 'import-complete'
+  | 'integration-triggered'
+  | 'integration-failed'
   | 'system';
+
+export interface FlowRunEntry {
+  id: string;
+  flowId: string;
+  flowName: string;
+  recordId: string;
+  recordTitle: string;
+  event: 'record.created' | 'record.updated' | 'lifecycle.transition';
+  status: 'success' | 'failed' | 'skipped';
+  actionTaken: string | null;
+  durationMs: number;
+  error?: string;
+  timestamp: string;
+}
 
 // ─── AI / Agentic ───────────────────────────────────────────────────
 

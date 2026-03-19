@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Platform, ScrollView, Text, TextInput, View, useWindowDimensions } from 'react-native';
 
 /* ── Local sub-types ────────────────────────────────────────────── */
@@ -105,22 +105,29 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
   const aiFlow = useAiFlowBuilder();
   const [aiFlowPanelOpen, setAiFlowPanelOpen] = useState(false);
 
-  // Enhanced: action chain, condition groups, event log
+  // Enhanced: action chain, condition groups
   const [actionChain, setActionChain] = useState<ActionStep[]>([
     { id: makeId(), type: 'notify_team', config: '' },
   ]);
   const [condGroups, setCondGroups] = useState<CondGroup[]>([
     { id: makeId(), combinator: 'AND', rows: [{ id: makeId(), field: '', op: 'equals', value: '' }] },
   ]);
-  const [flowEvents, setFlowEvents] = useState<FlowEvent[]>([]);
-  // Seed event log once flows are available
-  const eventsSeeded = useRef(false);
-  useEffect(() => {
-    if (!eventsSeeded.current && flows.length) {
-      setFlowEvents(seedFlowEvents(flows));
-      eventsSeeded.current = true;
-    }
-  }, [flows]);
+
+  // Real event log from persisted flow run entries
+  const flowEvents = useMemo<FlowEvent[]>(
+    () =>
+      (appData.flowRuns ?? [])
+        .slice(0, 50)
+        .map((r) => ({
+          id: r.id,
+          flowName: r.flowName,
+          ts: new Date(r.timestamp).toLocaleString(),
+          status: r.status,
+          durationMs: r.durationMs,
+          note: r.error ?? r.actionTaken ?? 'Flow evaluated successfully.',
+        })),
+    [appData.flowRuns],
+  );
 
   const addActionStep = () => setActionChain((c) => [...c, { id: makeId(), type: 'notify_team', config: '' }]);
   const removeActionStep = (id: string) => setActionChain((c) => c.filter((s) => s.id !== id));
@@ -506,6 +513,29 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                 </Pressable>
               </View>
             ))}
+            <Pressable
+              disabled={!canPublishFlow}
+              style={[styles.primaryButton, !canPublishFlow && styles.buttonDisabled]}
+              onPress={() => {
+                // Synthesize condition groups into rules and apply before publishing
+                const synthesized = condGroups.flatMap((g) =>
+                  g.rows
+                    .filter((r) => r.field.trim())
+                    .map((r) => `${r.field.trim()} ${r.op} ${r.value.trim()}`)
+                );
+                if (synthesized.length > 0) {
+                  setRules(synthesized.join('; '));
+                }
+                addNotification?.({
+                  type: 'system',
+                  title: 'Conditions Applied',
+                  body: `${synthesized.length} condition rule${synthesized.length !== 1 ? 's' : ''} applied to "${name || 'current flow'}".`,
+                  severity: 'info',
+                });
+              }}
+            >
+              <Text style={styles.primaryButtonText}>Apply Conditions to Flow</Text>
+            </Pressable>
             <Pressable onPress={addCondGroup} style={styles.secondaryButton}>
               <Text style={styles.secondaryButtonText}>+ Add Condition Group</Text>
             </Pressable>
@@ -578,7 +608,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
         {signalPane === 'eventlog' && (
           <Card title="Flow Event Log" blurred>
             {flowEvents.length === 0 && (
-              <Text style={styles.bodyText}>No flow executions recorded yet. Publish a flow to start logging events.</Text>
+              <Text style={styles.bodyText}>No flow executions yet. Publish a flow and create or import records to see real-time events here.</Text>
             )}
             {flowEvents.map((evt) => {
               const statusColor = evt.status === 'success' ? '#22C55E' : evt.status === 'failed' ? '#EF4444' : '#F59E0B';
@@ -598,12 +628,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
               );
             })}
             {flowEvents.length > 0 && (
-              <Pressable
-                onPress={() => setFlowEvents(seedFlowEvents(flows))}
-                style={styles.secondaryButton}
-              >
-                <Text style={styles.secondaryButtonText}>↻ Simulate New Events</Text>
-              </Pressable>
+              <Text style={[styles.metaText, { textAlign: 'center', marginTop: 4 }]}>{flowEvents.length} execution{flowEvents.length !== 1 ? 's' : ''} logged — live data from your published flows.</Text>
             )}
           </Card>
         )}

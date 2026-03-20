@@ -14,12 +14,17 @@ import {
   BusinessObject,
   ClientProfile,
   DistributionWaterfall,
+  FieldMappingTemplate,
+  FieldTagRecord,
   FinancialCounterparty,
   FinancialValidationError,
   FlowRunEntry,
   FormDefinition,
   FormFieldDefinition,
   GlAccount,
+  IngestionRecord,
+  IngestionReviewStatus,
+  IngestionSourceConfig,
   IntegrationActivation,
   JournalEntry,
   Payable,
@@ -32,6 +37,7 @@ import {
   SubSpaceBuilderFieldType,
   SubSpaceDefinition,
   TenantBrandingProfile,
+  UserPresence,
   WorkspaceDefinition,
 } from '../types';
 
@@ -117,6 +123,14 @@ interface AppStateContextValue {
   approveWaterfall: (waterfallId: string, approverId: string) => { ok: boolean; errors?: FinancialValidationError[] };
   addAccountingPeriod: (period: Omit<AccountingPeriod, 'id'>) => AccountingPeriod;
   closeAccountingPeriod: (periodId: string, closedBy: string) => { ok: boolean; reason?: string };
+  // ─── Ingestion Layer (WS-048) ─────────────────────────────────
+  addIngestionRecord: (record: Omit<IngestionRecord, 'id'>) => IngestionRecord;
+  confirmIngestionRecord: (recordId: string, correctedValues: Record<string, string>, reviewedBy: string) => { ok: boolean; reason?: string };
+  rejectIngestionRecord: (recordId: string, reason: string, rejectedBy: string) => { ok: boolean };
+  updateIngestionSourceConfig: (id: string, updates: Partial<Omit<IngestionSourceConfig, 'id'>>) => { ok: boolean };
+  applyFieldTag: (tag: Omit<FieldTagRecord, 'id'>) => FieldTagRecord;
+  isFieldLocked: (recordType: string, recordId: string, fieldSlug: string) => { locked: boolean; tagName?: string; appliedByEvent?: string };
+  updateUserPresence: (userId: string, updates: Partial<Omit<UserPresence, 'userId' | 'tenantId'>>) => void;
 }
 
 const AppStateContext = createContext<AppStateContextValue | undefined>(undefined);
@@ -355,6 +369,11 @@ function normalizeData(parsed: Partial<AppData> & { activeRole?: string }): AppD
     receivables: parsed.receivables ?? [],
     financialCounterparties: parsed.financialCounterparties ?? (defaultData.financialCounterparties as FinancialCounterparty[]) ?? [],
     waterfalls: parsed.waterfalls ?? [],
+    ingestionSources: parsed.ingestionSources ?? (defaultData.ingestionSources as IngestionSourceConfig[]) ?? [],
+    fieldMappingTemplates: parsed.fieldMappingTemplates ?? (defaultData.fieldMappingTemplates as FieldMappingTemplate[]) ?? [],
+    ingestionRecords: parsed.ingestionRecords ?? (defaultData.ingestionRecords as IngestionRecord[]) ?? [],
+    fieldTags: parsed.fieldTags ?? (defaultData.fieldTags as FieldTagRecord[]) ?? [],
+    userPresence: parsed.userPresence ?? (defaultData.userPresence as UserPresence[]) ?? [],
   };
 }
 
@@ -1302,7 +1321,25 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
             result = { ok: false, errors: validationErrors };
             return current;
           }
-          return { ...current, journalEntries: entries.map((e) => e.id === entryId ? { ...e, postingStatus: 'posted' } : e) };
+          // WS-047-ADD: Apply gl-locked field tag — pre-write gate will block any
+          // subsequent write to this JE's fields. Applied AFTER the write succeeds.
+          const glTag: FieldTagRecord = {
+            id: uid('ftag'),
+            tenantId: activeTenantId,
+            recordType: 'journal_entry',
+            recordId: entryId,
+            fieldSlug: '*',
+            tagName: 'gl-locked',
+            isActive: true,
+            appliedAt: new Date().toISOString(),
+            appliedByEvent: 'posting_status:posted',
+            appliedByUserId: posterId,
+          };
+          return {
+            ...current,
+            journalEntries: entries.map((e) => e.id === entryId ? { ...e, postingStatus: 'posted' } : e),
+            fieldTags: [...(current.fieldTags ?? []), glTag],
+          };
         });
         return result;
       },
@@ -1421,6 +1458,94 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
           return { ...current, accountingPeriods: periods.map((p) => p.id === periodId ? { ...p, status: 'closed', closedBy, closedAt: new Date().toISOString() } : p) };
         });
         return result;
+      },
+
+      // ─── Ingestion Layer (WS-048) ─────────────────────────────────────
+      addIngestionRecord: (record) => {
+        const next: IngestionRecord = { ...record, id: uid('ing') };
+        setTenantData((current) => ({ ...current, ingestionRecords: [next, ...(current.ingestionRecords ?? [])] }));
+        return next;
+      },
+
+      // WS-048-ADD: Reviewer confirms (possibly correcting) fields below threshold.
+      // Updates the ingestion_record with corrected values + review_status='reviewed',
+      // then the downstream financial workflow can continue as if auto-processed.
+      confirmIngestionRecord: (recordId, correctedValues, reviewedBy) => {
+        let result: { ok: boolean; reason?: string } = { ok: true };
+        setTenantData((current) => {
+          const records = current.ingestionRecords ?? [];
+          const rec = records.find((r) => r.id === recordId);
+          if (!rec) { result = { ok: false, reason: 'Ingestion record not found.' }; return current; }
+          if (rec.reviewStatus !== 'pending_review') { result = { ok: false, reason: 'Record is not pending review.' }; return current; }
+          // Apply corrected values to the field map and mark all fields as confirmed
+          const updatedFields = { ...rec.fieldMap.fields };
+          Object.entries(correctedValues).forEach(([slug, value]) => {
+            updatedFields[slug] = { value, confidence: 1.0, confirmed: true };
+          });
+          const updatedRecord: IngestionRecord = {
+            ...rec,
+            reviewStatus: 'reviewed' as IngestionReviewStatus,
+            reviewedBy,
+            reviewedAt: new Date().toISOString(),
+            fieldsBelowThreshold: [],
+            overallConfidence: 1.0,
+            fieldMap: { ...rec.fieldMap, fields: updatedFields },
+          };
+          return { ...current, ingestionRecords: records.map((r) => r.id === recordId ? updatedRecord : r) };
+        });
+        return result;
+      },
+
+      rejectIngestionRecord: (recordId, reason, _rejectedBy) => {
+        setTenantData((current) => {
+          const records = current.ingestionRecords ?? [];
+          return { ...current, ingestionRecords: records.map((r) => r.id === recordId ? { ...r, reviewStatus: 'rejected' as IngestionReviewStatus, rejectionReason: reason } : r) };
+        });
+        return { ok: true };
+      },
+
+      updateIngestionSourceConfig: (id, updates) => {
+        setTenantData((current) => {
+          const sources = current.ingestionSources ?? [];
+          return { ...current, ingestionSources: sources.map((s) => s.id === id ? { ...s, ...updates } : s) };
+        });
+        return { ok: true };
+      },
+
+      // ─── System Field Tags (WS-047-ADD) ────────────────────────────────────
+      applyFieldTag: (tag) => {
+        const next: FieldTagRecord = { ...tag, id: uid('ftag') };
+        setTenantData((current) => ({ ...current, fieldTags: [...(current.fieldTags ?? []), next] }));
+        return next;
+      },
+
+      // Pre-write gate simulation: checks if a field on a record is locked by a system tag.
+      // Returns locked=true immediately if gl-locked or reconciled tag is active.
+      // Called by Layer 1 validators before any write proceeds.
+      isFieldLocked: (recordType, recordId, fieldSlug) => {
+        const tags = tenantData.fieldTags ?? [];
+        // Check both record-specific and record_id=null (definition-time) tags
+        const match = tags.find((t) =>
+          t.isActive &&
+          t.recordType === recordType &&
+          (t.recordId === recordId || t.recordId === null) &&
+          (t.fieldSlug === fieldSlug || t.fieldSlug === '*') &&
+          (t.tagName === 'gl-locked' || t.tagName === 'reconciled')
+        );
+        if (match) return { locked: true, tagName: match.tagName, appliedByEvent: match.appliedByEvent };
+        return { locked: false };
+      },
+
+      // ─── Presence Registry (WS-048 v2.1) ──────────────────────────────────
+      updateUserPresence: (userId, updates) => {
+        setTenantData((current) => {
+          const presence = current.userPresence ?? [];
+          const exists = presence.find((p) => p.userId === userId);
+          if (exists) {
+            return { ...current, userPresence: presence.map((p) => p.userId === userId ? { ...p, ...updates } : p) };
+          }
+          return { ...current, userPresence: [...presence, { userId, tenantId: activeTenantId, activityStatus: 'active', lastSeenAt: new Date().toISOString(), connectionCount: 1, ...updates }] };
+        });
       },
       signOut: () => {
         setSession(null);

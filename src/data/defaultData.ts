@@ -1737,4 +1737,180 @@ export const defaultData: AppData = {
       ],
     },
   ],
+
+  // ─── System Field Tags (WS-047-ADD) ──────────────────────────────────────
+  // Applied by the engine when a record transitions to a locking state.
+  // Pre-write gate checks these before any validator runs.
+  fieldTags: [
+    {
+      id: 'ftag-001', tenantId: 'tenant-a',
+      recordType: 'journal_entry', recordId: 'je-001',
+      fieldSlug: '*', tagName: 'gl-locked', isActive: true,
+      appliedAt: '2026-03-01T10:00:00Z',
+      appliedByEvent: 'posting_status:posted', appliedByUserId: 'user-finance',
+    },
+  ],
+
+  // ─── Ingestion Layer — Field Mapping Templates (WS-048) ──────────────────
+  fieldMappingTemplates: [
+    {
+      id: 'fmt-001', name: 'Vendor Invoice (PDF/OCR)', sourceFormat: 'ocr',
+      documentTypeHint: 'vendor_invoice', confidenceThreshold: 0.85,
+      mappings: [
+        { extractedKey: 'Invoice Number', fieldSlug: 'external_ref', required: true },
+        { extractedKey: 'Vendor Name',    fieldSlug: 'payable_to',   required: true },
+        { extractedKey: 'Invoice Date',   fieldSlug: 'obligation_date', required: true },
+        { extractedKey: 'Due Date',       fieldSlug: 'due_date',     required: true },
+        { extractedKey: 'Amount Due',     fieldSlug: 'amount_due',   required: true },
+        { extractedKey: 'PO Number',      fieldSlug: 'po_number',    required: false },
+      ],
+    },
+    {
+      id: 'fmt-002', name: 'Settlement Statement (PDF/OCR)', sourceFormat: 'ocr',
+      documentTypeHint: 'settlement_statement', confidenceThreshold: 0.90,
+      mappings: [
+        { extractedKey: 'Client Name',       fieldSlug: 'receivable_from',   required: true },
+        { extractedKey: 'Settlement Amount', fieldSlug: 'invoiced_amount',   required: true },
+        { extractedKey: 'Case Number',       fieldSlug: 'source_record_id',  required: false },
+        { extractedKey: 'Receipt Date',      fieldSlug: 'receipt_date',      required: false },
+      ],
+    },
+    {
+      id: 'fmt-003', name: 'Bank Statement CSV', sourceFormat: 'csv',
+      documentTypeHint: 'bank_statement', confidenceThreshold: 1.0,
+      mappings: [
+        { extractedKey: 'Date',        fieldSlug: 'transaction_date', required: true },
+        { extractedKey: 'Description', fieldSlug: 'description',      required: true },
+        { extractedKey: 'Amount',      fieldSlug: 'amount',           required: true },
+        { extractedKey: 'Reference',   fieldSlug: 'external_ref',     required: false },
+      ],
+    },
+    {
+      id: 'fmt-004', name: 'Payment Processor Webhook', sourceFormat: 'webhook',
+      documentTypeHint: 'payment_received', confidenceThreshold: 1.0,
+      mappings: [
+        { extractedKey: 'data.amount',         fieldSlug: 'received_amount',  required: true },
+        { extractedKey: 'data.payment_intent', fieldSlug: 'external_ref',     required: true },
+        { extractedKey: 'data.customer.name',  fieldSlug: 'receivable_from',  required: true },
+        { extractedKey: 'created',             fieldSlug: 'receipt_date',     required: true },
+      ],
+    },
+  ],
+
+  // ─── Ingestion Layer — Source Configurations (WS-048) ────────────────────
+  ingestionSources: [
+    {
+      id: 'src-001', name: 'Accounts Payable OCR', sourceRef: 'ap-ocr-upload',
+      format: 'ocr', eventType: 'ingestion.payable_received',
+      fieldMappingTemplateId: 'fmt-001', isActive: true,
+      createdAt: '2026-01-15T00:00:00Z',
+    },
+    {
+      id: 'src-002', name: 'Settlement Statement OCR', sourceRef: 'settlement-ocr',
+      format: 'ocr', eventType: 'ingestion.payment_received',
+      fieldMappingTemplateId: 'fmt-002', isActive: true,
+      createdAt: '2026-01-15T00:00:00Z',
+    },
+    {
+      id: 'src-003', name: 'First National Bank — Statement Import', sourceRef: 'fnb-csv-import',
+      format: 'csv', eventType: 'ingestion.statement_received',
+      fieldMappingTemplateId: 'fmt-003',
+      csvDelimiter: ',',
+      csvColumnMappings: { Date: 'transaction_date', Description: 'description', Amount: 'amount' },
+      isActive: true, createdAt: '2026-01-20T00:00:00Z',
+    },
+    {
+      id: 'src-004', name: 'Payment Processor Webhook (Stripe)', sourceRef: 'stripe-payment-webhook',
+      format: 'webhook', eventType: 'ingestion.payment_received',
+      fieldMappingTemplateId: 'fmt-004',
+      webhookJsonPaths: { 'data.amount': 'amount', 'data.customer.name': 'receivable_from' },
+      isActive: true, createdAt: '2026-02-01T00:00:00Z',
+    },
+  ],
+
+  // ─── Ingestion Records — Sample Pipeline History (WS-048) ────────────────
+  ingestionRecords: [
+    // Auto-processed: OCR vendor invoice with high confidence — created payable ap-003
+    {
+      id: 'ing-001', sourceFormat: 'ocr', sourceRef: 'ap-ocr-upload',
+      tenantId: 'tenant-a', receivedAt: '2026-03-10T09:15:00Z',
+      overallConfidence: 0.94, reviewStatus: 'auto_processed',
+      eventFired: 'ingestion.payable_received',
+      downstreamRecordType: 'payable', downstreamRecordId: 'ap-003',
+      fieldMap: {
+        sourceFormat: 'ocr', sourceRef: 'ap-ocr-upload',
+        tenantId: 'tenant-a', receivedAt: '2026-03-10T09:15:00Z',
+        fields: {
+          external_ref:    { value: 'INV-2026-8841', confidence: 0.97, confirmed: true },
+          payable_to:      { value: 'Compliance Shield Inc', confidence: 0.94, confirmed: true },
+          obligation_date: { value: '2026-03-08', confidence: 0.99, confirmed: true },
+          due_date:        { value: '2026-04-08', confidence: 0.91, confirmed: true },
+          amount_due:      { value: '1200.00', confidence: 0.96, confirmed: true },
+        },
+      },
+    },
+    // Pending review: OCR settlement with two low-confidence fields
+    {
+      id: 'ing-002', sourceFormat: 'ocr', sourceRef: 'settlement-ocr',
+      tenantId: 'tenant-a', receivedAt: '2026-03-15T14:30:00Z',
+      overallConfidence: 0.71, reviewStatus: 'pending_review',
+      eventFired: 'ingestion.review_required',
+      fieldsBelowThreshold: [
+        { slug: 'invoiced_amount', value: '$48,500.00', confidence: 0.71, threshold: 0.90 },
+        { slug: 'source_record_id', value: 'CASE-2024-0831', confidence: 0.68, threshold: 0.90 },
+      ],
+      fieldMap: {
+        sourceFormat: 'ocr', sourceRef: 'settlement-ocr',
+        tenantId: 'tenant-a', receivedAt: '2026-03-15T14:30:00Z',
+        fields: {
+          receivable_from:  { value: 'Beta Pharma LLC', confidence: 0.95, confirmed: true },
+          invoiced_amount:  { value: '$48,500.00', confidence: 0.71, confirmed: false },
+          source_record_id: { value: 'CASE-2024-0831', confidence: 0.68, confirmed: false },
+          receipt_date:     { value: '2026-03-14', confidence: 0.93, confirmed: true },
+        },
+      },
+    },
+    // Webhook: Stripe payment processed — auto confirmed (confidence always 1.0)
+    {
+      id: 'ing-003', sourceFormat: 'webhook', sourceRef: 'stripe-payment-webhook',
+      tenantId: 'tenant-a', receivedAt: '2026-03-18T11:00:00Z',
+      overallConfidence: 1.0, reviewStatus: 'auto_processed',
+      eventFired: 'ingestion.payment_received',
+      downstreamRecordType: 'receivable', downstreamRecordId: 'ar-001',
+      fieldMap: {
+        sourceFormat: 'webhook', sourceRef: 'stripe-payment-webhook',
+        tenantId: 'tenant-a', receivedAt: '2026-03-18T11:00:00Z',
+        fields: {
+          received_amount:  { value: '15000.00', confidence: 1.0, confirmed: true },
+          external_ref:     { value: 'pi_3OxK2bLkdIwHu7ix0Qg8abcd', confidence: 1.0, confirmed: true },
+          receivable_from:  { value: 'Alpha Client Corp', confidence: 1.0, confirmed: true },
+          receipt_date:     { value: '2026-03-18', confidence: 1.0, confirmed: true },
+        },
+      },
+    },
+    // CSV bank statement: batch ingestion for reconciliation
+    {
+      id: 'ing-004', sourceFormat: 'csv', sourceRef: 'fnb-csv-import',
+      tenantId: 'tenant-a', receivedAt: '2026-03-19T08:00:00Z',
+      overallConfidence: 1.0, reviewStatus: 'auto_processed',
+      eventFired: 'ingestion.statement_received',
+      fieldMap: {
+        sourceFormat: 'csv', sourceRef: 'fnb-csv-import', batchId: 'batch-fnb-20260319',
+        tenantId: 'tenant-a', receivedAt: '2026-03-19T08:00:00Z',
+        fields: {
+          transaction_date: { value: '2026-03-18', confidence: 1.0, confirmed: true },
+          description:      { value: 'ACH CREDIT ALPHA CLIENT CORP', confidence: 1.0, confirmed: true },
+          amount:           { value: '15000.00', confidence: 1.0, confirmed: true },
+          external_ref:     { value: 'ACH20260318001', confidence: 1.0, confirmed: true },
+        },
+      },
+    },
+  ],
+
+  // ─── Presence Registry — Initial State (WS-048 v2.1) ─────────────────────
+  userPresence: [
+    { userId: 'user-admin', tenantId: 'tenant-a', activityStatus: 'active', lastSeenAt: '2026-03-20T10:00:00Z', currentRoute: '/financial', connectionCount: 1 },
+    { userId: 'user-finance', tenantId: 'tenant-a', activityStatus: 'idle', lastSeenAt: '2026-03-20T09:45:00Z', connectionCount: 1 },
+    { userId: 'user-compliance', tenantId: 'tenant-a', activityStatus: 'away', lastSeenAt: '2026-03-20T08:00:00Z', connectionCount: 0 },
+  ],
 };

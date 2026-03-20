@@ -316,6 +316,12 @@ export interface AppData {
   receivables?: Receivable[];
   financialCounterparties?: FinancialCounterparty[];
   waterfalls?: DistributionWaterfall[];
+  // ─── Ingestion Layer (WS-048) ─────────────────────────────────────
+  ingestionSources?: IngestionSourceConfig[];
+  fieldMappingTemplates?: FieldMappingTemplate[];
+  ingestionRecords?: IngestionRecord[];
+  fieldTags?: FieldTagRecord[];
+  userPresence?: UserPresence[];
 }
 
 // ─── Orbital Integration Framework ──────────────────────────────────
@@ -479,7 +485,10 @@ export type AuditEntityType =
   | 'gl-account'
   | 'accounting-period'
   | 'counterparty'
-  | 'waterfall';
+  | 'waterfall'
+  | 'ingestion-record'
+  | 'field-tag'
+  | 'ingestion-source';
 
 // ─── Notifications ───────────────────────────────────────────────────
 
@@ -514,6 +523,10 @@ export type NotificationType =
   | 'period-closed'
   | 'waterfall-approved'
   | 'mission-control-action'
+  | 'ingestion-auto-processed'
+  | 'ingestion-review-required'
+  | 'ingestion-reviewed'
+  | 'ingestion-rejected'
   | 'system';
 
 export interface FlowRunEntry {
@@ -665,6 +678,121 @@ export interface FilterCondition {
   field: string;
   operator: 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'contains' | 'startsWith';
   value: string | number;
+}
+
+// ─── System Tags (WS-047-ADD) ────────────────────────────────────────
+// System tags are applied to specific fields on specific records by the
+// platform engine. They enforce immutable constraints at the pre-write gate
+// BEFORE any validator runs. Tenants cannot create or remove system tags.
+
+export type SystemTagName = 'gl-locked' | 'period-controlled' | 'reconciled' | 'audit-required';
+
+export interface FieldTagRecord {
+  id: string;
+  tenantId: string;
+  recordType: string;           // 'journal_entry' | 'payable' | 'receivable' | 'disbursement_waterfall'
+  recordId: string | null;      // null = definition-time (applies to ALL records of this type)
+  fieldSlug: string;            // specific field slug, or '*' = all #gl-locked fields on this type
+  tagName: SystemTagName;
+  isActive: boolean;
+  appliedAt: string;
+  appliedByEvent: string;       // 'posting_status:posted' | 'definition_time' | 'reconciliation_session.closed'
+  appliedByUserId?: string;
+}
+
+// ─── Ingestion System (WS-048) ────────────────────────────────────────
+// The universal ingestion layer accepts OCR, CSV, EDI, and webhook formats,
+// normalises them to a common field map, and fires events that start the
+// financial workflow chain. All formats produce the same output structure.
+// Adding a new document source is configuration, not engineering.
+
+export type IngestionFormat = 'ocr' | 'csv' | 'edi' | 'webhook';
+
+export interface IngestionFieldValue {
+  value: string;
+  confidence: number;     // 0.0–1.0; structured sources always 1.0
+  confirmed: boolean;     // true if >= threshold or structured source; false = needs human review
+}
+
+export interface NormalizedFieldMap {
+  sourceFormat: IngestionFormat;
+  sourceRef: string;
+  documentId?: string;
+  fields: Record<string, IngestionFieldValue>;
+  tenantId: string;
+  receivedAt: string;
+  batchId?: string;
+}
+
+export type IngestionReviewStatus = 'auto_processed' | 'pending_review' | 'reviewed' | 'rejected';
+
+export type IngestionEventType =
+  | 'ingestion.payable_received'
+  | 'ingestion.payment_received'
+  | 'ingestion.statement_received'
+  | 'ingestion.document_received'
+  | 'ingestion.review_required';
+
+export interface IngestionRecord {
+  id: string;
+  sourceFormat: IngestionFormat;
+  sourceRef: string;
+  documentId?: string;
+  fieldMap: NormalizedFieldMap;
+  overallConfidence: number;                    // min confidence across required fields after threshold evaluation
+  reviewStatus: IngestionReviewStatus;
+  eventFired?: IngestionEventType;
+  downstreamRecordType?: string;                // 'payable' | 'receivable' | etc.
+  downstreamRecordId?: string;
+  fieldsBelowThreshold?: { slug: string; value: string; confidence: number; threshold: number }[];
+  reviewedBy?: string;
+  reviewedAt?: string;
+  rejectionReason?: string;
+  receivedAt: string;
+  tenantId: string;
+}
+
+export interface FieldMappingTemplate {
+  id: string;
+  name: string;
+  sourceFormat: IngestionFormat;
+  documentTypeHint?: string;          // e.g. 'vendor_invoice', 'settlement_statement', 'eob'
+  mappings: { extractedKey: string; fieldSlug: string; required: boolean }[];
+  confidenceThreshold: number;        // 0.0–1.0; default 0.85
+}
+
+export interface IngestionSourceConfig {
+  id: string;
+  name: string;
+  sourceRef: string;                  // slug used in webhook URL and event references
+  format: IngestionFormat;
+  eventType: IngestionEventType;
+  fieldMappingTemplateId: string;
+  confidenceThresholdOverride?: number;
+  isActive: boolean;
+  createdAt: string;
+  // Format-specific settings
+  webhookSecret?: string;
+  webhookJsonPaths?: Record<string, string>;
+  csvColumnMappings?: Record<string, string>;
+  csvDelimiter?: string;
+  ediTradingPartnerId?: string;
+  ediTransactionTypes?: string[];
+}
+
+// ─── Presence Registry (WS-048 v2.1) ────────────────────────────────
+// Tracks user activity status. Updated via WebSocket heartbeats.
+// Used by routing algorithm to find active approvers.
+
+export type PresenceStatus = 'active' | 'idle' | 'away' | 'offline';
+
+export interface UserPresence {
+  userId: string;
+  tenantId: string;
+  activityStatus: PresenceStatus;
+  lastSeenAt: string;
+  currentRoute?: string;
+  connectionCount: number;
 }
 
 // ─── Financial Operations Engine (WS-047) ───────────────────────────

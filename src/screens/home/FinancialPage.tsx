@@ -8,6 +8,7 @@ import {
   DistributionWaterfall,
   FinancialValidationError,
   GlAccount,
+  IngestionRecord,
   JournalLine,
   Payable,
   Receivable,
@@ -110,6 +111,7 @@ export function FinancialPage({}: GuidedPageProps) {
     addReceivable, confirmReceivable,
     approveWaterfall, addWaterfall,
     closeAccountingPeriod,
+    confirmIngestionRecord, rejectIngestionRecord,
   } = useAppState();
   const { styles } = useUiTheme();
 
@@ -152,7 +154,8 @@ export function FinancialPage({}: GuidedPageProps) {
   const pendingJEs = journalEntries.filter((e) => e.postingStatus === 'pending_approval');
   const pendingPayables = payables.filter((p) => p.approvalStatus === 'pending_approval');
   const pendingWaterfalls = waterfalls.filter((w) => w.executionStatus === 'pending_approval');
-  const pendingTotal = pendingJEs.length + pendingPayables.length + pendingWaterfalls.length;
+  const pendingIngestionRecords: IngestionRecord[] = (data.ingestionRecords ?? []).filter((r) => r.reviewStatus === 'pending_review');
+  const pendingTotal = pendingJEs.length + pendingPayables.length + pendingWaterfalls.length + pendingIngestionRecords.length;
 
   // ── Trial Balance Computation ───────────────────────────────────────────────
   const trialBalance = useMemo(() => {
@@ -327,7 +330,7 @@ export function FinancialPage({}: GuidedPageProps) {
 
   // ── Mission Control ──────────────────────────────────────────────────────
   function renderMissionControl() {
-    const hasItems = pendingJEs.length + pendingPayables.length + pendingWaterfalls.length > 0;
+    const hasItems = pendingJEs.length + pendingPayables.length + pendingWaterfalls.length + pendingIngestionRecords.length > 0;
     return (
       <View style={{ gap: 16 }}>
         <View>
@@ -393,6 +396,60 @@ export function FinancialPage({}: GuidedPageProps) {
                   </Pressable>
                   <Pressable onPress={() => {/* reject */}} style={{ flex: 1, borderRadius: 8, paddingVertical: 8, backgroundColor: `${DANGER}18`, borderWidth: 1, borderColor: `${DANGER}44`, alignItems: 'center' }}>
                     <Text style={{ color: DANGER, fontSize: 12, fontWeight: '700' }}>Reject</Text>
+                  </Pressable>
+                </View>
+              </View>
+            ))}
+          </Card>
+        )}
+
+        {/* Ingestion Review Queue — WS-048-ADD */}
+        {pendingIngestionRecords.length > 0 && (
+          <Card title={`📥 Ingestion Review Queue (${pendingIngestionRecords.length})`}>
+            <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 12, marginBottom: 10, lineHeight: 18 }}>
+              These documents arrived via OCR but one or more extracted fields scored below the confidence threshold.
+              Review the extracted values, then confirm to continue downstream processing or reject the document.
+            </Text>
+            {pendingIngestionRecords.map((rec) => (
+              <View key={rec.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.3)', gap: 8, marginBottom: 8 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <View>
+                    <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '700' }}>{rec.id}</Text>
+                    <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 11 }}>{rec.sourceRef} · {rec.receivedAt.slice(0, 16).replace('T', ' ')}</Text>
+                  </View>
+                  <View style={{ borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3, backgroundColor: '#EF444422', borderWidth: 1, borderColor: '#EF444444' }}>
+                    <Text style={{ color: DANGER, fontSize: 10, fontWeight: '700' }}>PENDING REVIEW</Text>
+                  </View>
+                </View>
+                {(rec.fieldsBelowThreshold ?? []).length > 0 && (
+                  <View style={{ borderRadius: 8, padding: 8, backgroundColor: 'rgba(239,68,68,0.07)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.2)', gap: 4 }}>
+                    <Text style={{ color: DANGER, fontSize: 11, fontWeight: '700', marginBottom: 2 }}>Fields Below Confidence Threshold</Text>
+                    {(rec.fieldsBelowThreshold ?? []).map((f, i) => (
+                      <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text style={{ color: 'rgba(243,234,255,0.6)', fontSize: 11 }}>{f.slug}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                          <Text style={{ color: 'rgba(243,234,255,0.8)', fontSize: 11 }}>"{f.value}"</Text>
+                          <Text style={{ color: DANGER, fontSize: 11, fontWeight: '700' }}>{(f.confidence * 100).toFixed(0)}%</Text>
+                          <Text style={{ color: 'rgba(243,234,255,0.35)', fontSize: 10 }}>min {(f.threshold * 100).toFixed(0)}%</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                <Text style={{ color: 'rgba(243,234,255,0.4)', fontSize: 11 }}>
+                  Overall confidence: <Text style={{ color: DANGER, fontWeight: '700' }}>{(rec.overallConfidence * 100).toFixed(0)}%</Text>
+                  {rec.eventFired ? `  ·  ${rec.eventFired}` : ''}
+                </Text>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <Pressable
+                    onPress={() => confirmIngestionRecord(rec.id, {}, currentUser?.id ?? 'user-admin')}
+                    style={{ flex: 1, borderRadius: 8, paddingVertical: 8, backgroundColor: `${SUCCESS}22`, borderWidth: 1, borderColor: `${SUCCESS}55`, alignItems: 'center' }}>
+                    <Text style={{ color: SUCCESS, fontSize: 12, fontWeight: '700' }}>Confirm & Process</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => rejectIngestionRecord(rec.id, 'Rejected by reviewer', currentUser?.id ?? 'user-admin')}
+                    style={{ flex: 1, borderRadius: 8, paddingVertical: 8, backgroundColor: `${DANGER}18`, borderWidth: 1, borderColor: `${DANGER}44`, alignItems: 'center' }}>
+                    <Text style={{ color: DANGER, fontSize: 12, fontWeight: '700' }}>Reject Document</Text>
                   </Pressable>
                 </View>
               </View>

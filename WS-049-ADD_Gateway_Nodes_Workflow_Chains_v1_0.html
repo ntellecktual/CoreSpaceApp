@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workflow Chain Builder — Signal Studio — CoreSpace</title>
+<style>
+  :root{--navy:#1F3864;--blue:#2E75B6;--teal:#17375E;--green:#375623;--amber:#E36C09;--red:#C00000;--bg:#0F1923;--surface:#162230;--surface2:#1E2F42;--border:#2A3F55;--text:#E8EFF7;--muted:#7A95B0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+  .topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;}
+  .topbar h1{font-size:15px;font-weight:600;}
+  .chain-name{font-size:13px;color:var(--muted);padding:4px 12px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);}
+  .spacer{flex:1;}
+  .btn{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+  .btn-primary{background:var(--blue);color:#fff;}
+  .btn-green{background:rgba(55,86,35,0.3);color:#7ED957;border:1px solid rgba(55,86,35,0.5);}
+
+  .body{flex:1;display:flex;overflow:hidden;}
+
+  /* Chain canvas */
+  .canvas{flex:1;overflow:auto;padding:30px;display:flex;flex-direction:column;align-items:center;gap:0;}
+
+  .chain-node{width:580px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;position:relative;}
+  .chain-node.trigger-node{border-color:var(--teal);}
+  .chain-node.action-node{border-color:var(--border);}
+  .chain-node.gateway-node{border-color:var(--amber);background:rgba(227,108,9,0.05);}
+  .chain-node.gateway-resume{border-color:var(--green);background:rgba(55,86,35,0.05);}
+
+  .node-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .nt-trigger{color:#5CB8E8;}
+  .nt-action{color:var(--muted);}
+  .nt-gateway{color:#FFB347;}
+  .nt-resume{color:#7ED957;}
+  .node-dot{width:8px;height:8px;border-radius:50%;}
+  .nd-blue{background:#5CB8E8;}
+  .nd-muted{background:var(--muted);}
+  .nd-amber{background:#FFB347;}
+  .nd-green{background:#7ED957;}
+
+  .node-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;}
+  .node-detail{font-size:12px;color:var(--muted);font-family:monospace;}
+  .node-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .ntag{font-size:11px;padding:2px 8px;border-radius:4px;background:var(--surface);border:1px solid var(--border);color:var(--muted);}
+  .ntag.highlight{border-color:var(--blue);color:#5CB8E8;}
+  .ntag.highlight-amber{border-color:var(--amber);color:#FFB347;}
+  .ntag.highlight-green{border-color:var(--green);color:#7ED957;}
+
+  .connector{width:2px;height:32px;background:var(--border);margin:0 auto;position:relative;}
+  .connector::after{content:'▼';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--border);}
+  .connector.branch{width:2px;height:20px;background:var(--amber);}
+  .connector.branch::after{color:var(--amber);}
+  .connector.resume{background:var(--green);}
+  .connector.resume::after{color:var(--green);}
+
+  .branch-label{font-size:11px;font-weight:600;padding:3px 12px;border-radius:20px;margin:0 auto 4px;display:table;}
+  .bl-reject{background:rgba(192,0,0,0.15);color:#FF6B6B;border:1px solid rgba(192,0,0,0.3);}
+  .bl-approve{background:rgba(55,86,35,0.15);color:#7ED957;border:1px solid rgba(55,86,35,0.3);}
+
+  .human-badge{position:absolute;top:-10px;right:16px;background:var(--amber);color:#1a1000;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:0.4px;}
+  .auto-badge{position:absolute;top:-10px;right:16px;background:var(--surface);color:var(--muted);font-size:10px;font-weight:600;padding:2px 10px;border-radius:10px;border:1px solid var(--border);}
+
+  /* Side panel */
+  .side-panel{width:280px;border-left:1px solid var(--border);background:var(--surface2);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
+  .sp-header{padding:14px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+  .sp-section{padding:14px 16px;border-bottom:1px solid var(--border);}
+  .sp-title{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;}
+  .sp-stat{display:flex;justify-content:space-between;align-items:center;padding:5px 0;}
+  .sp-label{font-size:12px;color:var(--muted);}
+  .sp-val{font-size:12px;font-weight:600;color:var(--text);}
+  .sp-val.auto{color:#7ED957;}
+  .sp-val.human{color:#FFB347;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1>Signal Studio</h1>
+  <div class="chain-name">AP Inbound Obligation Chain</div>
+  <div class="spacer"></div>
+  <button class="btn btn-ghost">Test Chain</button>
+  <button class="btn btn-green">Active</button>
+  <button class="btn btn-primary">Save</button>
+</div>
+
+<div class="body">
+  <div class="canvas">
+
+    <!-- Step 1 -->
+    <div class="chain-node trigger-node">
+      <div class="auto-badge">Automated</div>
+      <div class="node-type"><div class="node-dot nd-blue"></div><span class="nt-trigger">Trigger</span></div>
+      <div class="node-title">Document Arrives via Ingestion Layer</div>
+      <div class="node-detail">event: ingestion.document_received | source: vendor_invoice_ocr</div>
+      <div class="node-tags"><span class="ntag">WS-048</span><span class="ntag">OCR</span></div>
+    </div>
+    <div class="connector"></div>
+
+    <!-- Step 2 -->
+    <div class="chain-node action-node">
+      <div class="auto-badge">Automated</div>
+      <div class="node-type"><div class="node-dot nd-muted"></div><span class="nt-action">Condition + Action</span></div>
+      <div class="node-title">Evaluate Confidence Threshold</div>
+      <div class="node-detail">IF overall_confidence &lt; tenant.default_threshold → gateway.send (mission_control)<br>IF overall_confidence &gt;= threshold → financial.create_payable</div>
+      <div class="node-tags"><span class="ntag highlight">WS-048-ADD</span><span class="ntag">Branching</span></div>
+    </div>
+    <div class="connector"></div>
+
+    <!-- Step 3 — conditional Gateway -->
+    <div class="chain-node gateway-node">
+      <div class="human-badge">⬡ Human Checkpoint</div>
+      <div class="node-type"><div class="node-dot nd-amber"></div><span class="nt-gateway">Gateway Action — Mission Control</span></div>
+      <div class="node-title">OCR Review Queue (if low confidence)</div>
+      <div class="node-detail">action: gateway.send | session_type: mission_control | routing_target: role:DocumentReview | available_actions: [confirm, reject]</div>
+      <div class="node-tags"><span class="ntag highlight-amber">WS-051</span><span class="ntag highlight-amber">Send to Gateway</span><span class="ntag">Conditional</span></div>
+    </div>
+    <div class="connector resume"></div>
+
+    <!-- Step 4 -->
+    <div class="chain-node action-node">
+      <div class="auto-badge">Automated</div>
+      <div class="node-type"><div class="node-dot nd-muted"></div><span class="nt-action">Action</span></div>
+      <div class="node-title">Create Payable from Field Map</div>
+      <div class="node-detail">action: financial.create_payable | payable_to_field: "payable_to" | amount_field: "amount_due" | due_date_field: "due_date"</div>
+      <div class="node-tags"><span class="ntag">WS-047</span><span class="ntag">AP</span></div>
+    </div>
+    <div class="connector"></div>
+
+    <!-- Step 5 — Approval Gateway -->
+    <div class="chain-node gateway-node">
+      <div class="human-badge">⬡ Human Checkpoint</div>
+      <div class="node-type"><div class="node-dot nd-amber"></div><span class="nt-gateway">Gateway Action — Mission Control</span></div>
+      <div class="node-title">Payable Approval Queue</div>
+      <div class="node-detail">action: gateway.send | session_type: mission_control | routing_target: role:Controller | escalation_chain_id: FinancialApprovalEscalation | available_actions: [approve, return_for_correction]</div>
+      <div class="node-tags"><span class="ntag highlight-amber">WS-051</span><span class="ntag highlight-amber">Send to Gateway</span><span class="ntag">Escalation Enabled</span></div>
+    </div>
+    <div class="connector resume"></div>
+
+    <!-- Step 6 -->
+    <div class="chain-node gateway-resume">
+      <div class="auto-badge" style="background:rgba(55,86,35,0.2);color:#7ED957;border:1px solid rgba(55,86,35,0.4);">Resumes Chain</div>
+      <div class="node-type"><div class="node-dot nd-green"></div><span class="nt-resume">Trigger — Gateway Action Received</span></div>
+      <div class="node-title">Approval Confirmed → Post GL Entry</div>
+      <div class="node-detail">trigger: gateway.action_received WHERE action_taken = "approve" | action: financial.post_journal_entry (DEBIT expense, CREDIT AP)</div>
+      <div class="node-tags"><span class="ntag highlight-green">WS-051</span><span class="ntag highlight-green">Gateway Resume</span><span class="ntag">WS-047 GL</span></div>
+    </div>
+
+  </div>
+
+  <!-- Side panel -->
+  <div class="side-panel">
+    <div class="sp-header">Chain Analytics</div>
+    <div class="sp-section">
+      <div class="sp-title">Automation Breakdown</div>
+      <div class="sp-stat"><span class="sp-label">Automated steps</span><span class="sp-val auto">4 of 6</span></div>
+      <div class="sp-stat"><span class="sp-label">Human checkpoints</span><span class="sp-val human">2</span></div>
+      <div class="sp-stat"><span class="sp-label">Est. automation %</span><span class="sp-val auto">87%</span></div>
+      <div class="sp-stat"><span class="sp-label">Human actions req.</span><span class="sp-val human">1–2 clicks</span></div>
+    </div>
+    <div class="sp-section">
+      <div class="sp-title">Gateway Nodes</div>
+      <div class="sp-stat"><span class="sp-label">Mission Control</span><span class="sp-val">2 nodes</span></div>
+      <div class="sp-stat"><span class="sp-label">Client Gateway</span><span class="sp-val">0 nodes</span></div>
+      <div class="sp-stat"><span class="sp-label">Partner Gateway</span><span class="sp-val">0 nodes</span></div>
+    </div>
+    <div class="sp-section">
+      <div class="sp-title">Escalation Chains</div>
+      <div class="sp-stat"><span class="sp-label">Chain</span><span class="sp-val">FinancialApproval</span></div>
+      <div class="sp-stat"><span class="sp-label">Roles</span><span class="sp-val">Controller → CFO</span></div>
+      <div class="sp-stat"><span class="sp-label">Terminal</span><span class="sp-val">task_create</span></div>
+    </div>
+    <div class="sp-section">
+      <div class="sp-title">Specs Referenced</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">
+        <span style="font-size:10px;padding:2px 7px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);">WS-047</span>
+        <span style="font-size:10px;padding:2px 7px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);">WS-048</span>
+        <span style="font-size:10px;padding:2px 7px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);">WS-048-ADD</span>
+        <span style="font-size:10px;padding:2px 7px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);">WS-049</span>
+        <span style="font-size:10px;padding:2px 7px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);">WS-049-ADD</span>
+        <span style="font-size:10px;padding:2px 7px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--muted);">WS-050-ADD</span>
+        <span style="font-size:10px;padding:2px 7px;background:var(--surface);border:1px solid var(--amber);border-radius:4px;color:#FFB347;">WS-051</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ingestion Review — Mission Control — CoreSpace</title>
+<style>
+  :root{--navy:#1F3864;--blue:#2E75B6;--teal:#17375E;--green:#375623;--amber:#E36C09;--red:#C00000;--bg:#0F1923;--surface:#162230;--surface2:#1E2F42;--border:#2A3F55;--text:#E8EFF7;--muted:#7A95B0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+  .topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;}
+  .topbar h1{font-size:15px;font-weight:600;}
+  .badge-crit{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(192,0,0,0.15);color:#FF6B6B;border:1px solid rgba(192,0,0,0.3);}
+  .spacer{flex:1;}
+  .meta{font-size:12px;color:var(--muted);}
+  .meta span{color:var(--text);}
+
+  .body{flex:1;display:flex;overflow:hidden;}
+
+  .doc-panel{width:400px;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--surface2);flex-shrink:0;}
+  .doc-header{padding:14px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:8px;}
+  .doc-preview{flex:1;padding:16px;display:flex;flex-direction:column;gap:0;}
+  .doc-page{background:#f5f5f0;border-radius:6px;padding:20px;flex:1;position:relative;overflow:hidden;}
+  .doc-line{height:12px;background:#d0d0c8;border-radius:2px;margin-bottom:8px;}
+  .doc-line.short{width:60%;}
+  .doc-line.med{width:75%;}
+  .doc-line.full{width:100%;}
+  .doc-line.highlighted{background:rgba(227,108,9,0.4);border:1px solid var(--amber);}
+  .doc-amount-box{position:absolute;right:20px;top:80px;background:rgba(227,108,9,0.1);border:2px dashed var(--amber);padding:8px 12px;border-radius:4px;}
+  .doc-amount-label{font-size:10px;color:var(--amber);margin-bottom:4px;}
+  .doc-amount-val{font-size:16px;font-weight:700;color:#F5A623;}
+  .doc-conf{font-size:10px;color:var(--amber);margin-top:2px;}
+  .doc-date-box{position:absolute;left:20px;top:140px;background:rgba(192,0,0,0.1);border:2px dashed var(--red);padding:8px 12px;border-radius:4px;}
+  .doc-date-label{font-size:10px;color:#FF6B6B;margin-bottom:4px;}
+  .doc-date-val{font-size:14px;font-weight:700;color:#FF6B6B;}
+  .doc-meta{padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);display:flex;gap:16px;}
+
+  .fields-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  .fp-header{padding:16px 20px;border-bottom:1px solid var(--border);}
+  .fp-title{font-size:15px;font-weight:600;margin-bottom:4px;}
+  .fp-sub{font-size:12px;color:var(--muted);}
+  .fp-stats{display:flex;gap:12px;margin-top:10px;}
+  .stat{padding:6px 12px;border-radius:6px;font-size:12px;font-weight:500;}
+  .stat-ok{background:rgba(55,86,35,0.2);color:#7ED957;}
+  .stat-warn{background:rgba(227,108,9,0.2);color:#FFB347;}
+  .stat-bad{background:rgba(192,0,0,0.2);color:#FF6B6B;}
+
+  .fields-list{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px;}
+  .field-row{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;}
+  .field-row.flagged{border-color:var(--amber);}
+  .field-row.error{border-color:var(--red);}
+  .field-row.ok{border-color:rgba(55,86,35,0.4);}
+  .fr-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .fr-slug{font-size:12px;font-family:monospace;color:var(--muted);}
+  .fr-conf{margin-left:auto;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;}
+  .conf-ok{background:rgba(55,86,35,0.2);color:#7ED957;}
+  .conf-warn{background:rgba(227,108,9,0.2);color:#FFB347;}
+  .conf-bad{background:rgba(192,0,0,0.2);color:#FF6B6B;}
+  .fr-extracted{font-size:14px;color:var(--muted);margin-bottom:6px;}
+  .fr-input{width:100%;background:var(--surface);border:1px solid var(--blue);border-radius:6px;padding:8px 12px;color:var(--text);font-size:14px;outline:none;}
+  .fr-input:focus{border-color:#5CB8E8;}
+  .conf-bar{height:3px;background:var(--border);border-radius:2px;margin-top:8px;}
+  .conf-fill{height:100%;border-radius:2px;transition:width 0.3s;}
+
+  .action-bar{padding:16px 20px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:12px;}
+  .note{font-size:12px;color:var(--muted);flex:1;}
+  .btn{padding:9px 20px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s;}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+  .btn-danger{background:rgba(192,0,0,0.15);color:#FF6B6B;border:1px solid rgba(192,0,0,0.3);}
+  .btn-primary{background:var(--blue);color:#fff;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1>Ingestion Review</h1>
+  <span class="badge-crit">2 Fields Below Threshold</span>
+  <div class="spacer"></div>
+  <div class="meta">Source: <span>Vendor Invoice OCR</span> · Received: <span>Today 11:14 AM</span> · Record: <span>IR-20260319-0041</span></div>
+</div>
+
+<div class="body">
+  <!-- Document preview -->
+  <div class="doc-panel">
+    <div class="doc-header">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      Original Document
+    </div>
+    <div class="doc-preview">
+      <div class="doc-page">
+        <div class="doc-line short" style="width:40%;background:#b0b0a0;"></div>
+        <div style="height:12px;"></div>
+        <div class="doc-line full"></div>
+        <div class="doc-line med"></div>
+        <div class="doc-line short"></div>
+        <div style="height:8px;"></div>
+        <div class="doc-line full"></div>
+        <div class="doc-line med"></div>
+        <div class="doc-date-box">
+          <div class="doc-date-label">⚠ DATE — 63% confidence</div>
+          <div class="doc-date-val">03/1/2026?</div>
+          <div class="doc-conf">Extracted: "03/1/2026" — ambiguous</div>
+        </div>
+        <div style="height:60px;"></div>
+        <div class="doc-line full"></div>
+        <div class="doc-line highlighted"></div>
+        <div class="doc-line med"></div>
+        <div class="doc-amount-box">
+          <div class="doc-amount-label">⚠ AMOUNT — 71% confidence</div>
+          <div class="doc-amount-val">$3,2I0.00?</div>
+          <div class="doc-conf">OCR: "3,2I0.00" — possible "1" vs "I"</div>
+        </div>
+        <div style="height:60px;"></div>
+        <div class="doc-line full"></div>
+        <div class="doc-line short"></div>
+      </div>
+    </div>
+    <div class="doc-meta">
+      <span>Format: PDF/OCR</span>
+      <span>Pages: 1</span>
+      <span>Fields extracted: 8</span>
+    </div>
+  </div>
+
+  <!-- Fields -->
+  <div class="fields-panel">
+    <div class="fp-header">
+      <div class="fp-title">Extracted Fields — Review & Correct</div>
+      <div class="fp-sub">Confirm all fields. Edit any that are incorrect. Threshold: 80%</div>
+      <div class="fp-stats">
+        <div class="stat stat-ok">✓ 6 fields confirmed</div>
+        <div class="stat stat-warn">⚠ 1 field needs review</div>
+        <div class="stat stat-bad">✕ 1 field needs correction</div>
+      </div>
+    </div>
+    <div class="fields-list">
+
+      <div class="field-row ok">
+        <div class="fr-top"><span class="fr-slug">payable_to</span><span class="fr-conf conf-ok">99%</span></div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);">Office Depot, Inc.</div>
+        <div class="conf-bar"><div class="conf-fill" style="width:99%;background:#7ED957;"></div></div>
+      </div>
+
+      <div class="field-row ok">
+        <div class="fr-top"><span class="fr-slug">external_ref</span><span class="fr-conf conf-ok">97%</span></div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);">INV-ODC-2026-88341</div>
+        <div class="conf-bar"><div class="conf-fill" style="width:97%;background:#7ED957;"></div></div>
+      </div>
+
+      <div class="field-row error">
+        <div class="fr-top"><span class="fr-slug">amount_due</span><span class="fr-conf conf-bad">71% — BELOW THRESHOLD</span></div>
+        <div class="fr-extracted">Extracted: "3,2I0.00" — OCR may have misread digit</div>
+        <input class="fr-input" value="3,240.00" placeholder="Enter correct amount..." />
+        <div class="conf-bar"><div class="conf-fill" style="width:71%;background:#FF6B6B;"></div></div>
+      </div>
+
+      <div class="field-row flagged">
+        <div class="fr-top"><span class="fr-slug">obligation_date</span><span class="fr-conf conf-warn">63% — BELOW THRESHOLD</span></div>
+        <div class="fr-extracted">Extracted: "03/1/2026" — day ambiguous (1 or 14?)</div>
+        <input class="fr-input" value="2026-03-14" placeholder="Enter correct date..." />
+        <div class="conf-bar"><div class="conf-fill" style="width:63%;background:#FFB347;"></div></div>
+      </div>
+
+      <div class="field-row ok">
+        <div class="fr-top"><span class="fr-slug">due_date</span><span class="fr-conf conf-ok">94%</span></div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);">2026-04-13</div>
+        <div class="conf-bar"><div class="conf-fill" style="width:94%;background:#7ED957;"></div></div>
+      </div>
+
+    </div>
+
+    <div class="action-bar">
+      <span class="note">Correcting these fields will mark this record as reviewed and re-trigger the AP creation workflow.</span>
+      <button class="btn btn-ghost">Skip to Next</button>
+      <button class="btn btn-danger">Reject Document</button>
+      <button class="btn btn-primary">Confirm & Process</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

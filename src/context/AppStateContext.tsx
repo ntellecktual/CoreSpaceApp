@@ -5,6 +5,7 @@ import { todayFormatted } from '../formatDate';
 import { PlatformSnapshot } from '../persistence/cosmos';
 import { mapPlatformSnapshotForTargets, normalizePortabilityTargets, PortableDatabaseTarget } from '../persistence/portable';
 import {
+  AccountingPeriod,
   AppData,
   AuthProvider,
   AuthSession,
@@ -12,11 +13,18 @@ import {
   BusinessFunction,
   BusinessObject,
   ClientProfile,
+  DistributionWaterfall,
+  FinancialCounterparty,
+  FinancialValidationError,
   FlowRunEntry,
   FormDefinition,
   FormFieldDefinition,
+  GlAccount,
   IntegrationActivation,
+  JournalEntry,
+  Payable,
   PermissionTemplate,
+  Receivable,
   RoleDefinition,
   RuntimeRecord,
   ShellConfig,
@@ -93,6 +101,22 @@ interface AppStateContextValue {
   signInWithProvider: (provider: Exclude<AuthProvider, 'email'>) => AuthResult;
   createAccount: (fullName: string, email: string, password: string, asAdmin: boolean) => AuthResult;
   signOut: () => void;
+  // ─── Financial Operations Engine ───────────────────────────────
+  addGlAccount: (account: Omit<GlAccount, 'id'>) => GlAccount;
+  updateGlAccount: (id: string, updates: Partial<Omit<GlAccount, 'id'>>) => { ok: boolean; reason?: string };
+  addJournalEntry: (entry: Omit<JournalEntry, 'id' | 'entryRef' | 'postingStatus' | 'debitTotal' | 'creditTotal'>) => { ok: boolean; entry?: JournalEntry; errors?: FinancialValidationError[] };
+  submitJournalEntryForApproval: (entryId: string) => { ok: boolean; reason?: string };
+  postJournalEntry: (entryId: string, posterId: string) => { ok: boolean; errors?: FinancialValidationError[] };
+  addPayable: (payable: Omit<Payable, 'id' | 'payableRef'>) => Payable;
+  approvePayable: (payableId: string, approverId: string) => { ok: boolean; reason?: string };
+  markPayablePaid: (payableId: string, paidAmount: number) => { ok: boolean; reason?: string };
+  addReceivable: (receivable: Omit<Receivable, 'id' | 'receivableRef'>) => Receivable;
+  confirmReceivable: (receivableId: string, receivedAmount: number) => { ok: boolean; reason?: string };
+  addFinancialCounterparty: (cp: Omit<FinancialCounterparty, 'id'>) => FinancialCounterparty;
+  addWaterfall: (waterfall: Omit<DistributionWaterfall, 'id' | 'waterfallRef'>) => { ok: boolean; waterfall?: DistributionWaterfall; errors?: FinancialValidationError[] };
+  approveWaterfall: (waterfallId: string, approverId: string) => { ok: boolean; errors?: FinancialValidationError[] };
+  addAccountingPeriod: (period: Omit<AccountingPeriod, 'id'>) => AccountingPeriod;
+  closeAccountingPeriod: (periodId: string, closedBy: string) => { ok: boolean; reason?: string };
 }
 
 const AppStateContext = createContext<AppStateContextValue | undefined>(undefined);
@@ -324,6 +348,13 @@ function normalizeData(parsed: Partial<AppData> & { activeRole?: string }): AppD
     integrations: parsed.integrations ?? [],
     businessFunctions: parsed.businessFunctions ?? defaultData.businessFunctions ?? [],
     flowRuns: parsed.flowRuns ?? [],
+    glAccounts: parsed.glAccounts ?? (defaultData.glAccounts as GlAccount[]) ?? [],
+    accountingPeriods: parsed.accountingPeriods ?? (defaultData.accountingPeriods as AccountingPeriod[]) ?? [],
+    journalEntries: parsed.journalEntries ?? [],
+    payables: parsed.payables ?? [],
+    receivables: parsed.receivables ?? [],
+    financialCounterparties: parsed.financialCounterparties ?? (defaultData.financialCounterparties as FinancialCounterparty[]) ?? [],
+    waterfalls: parsed.waterfalls ?? [],
   };
 }
 
@@ -1171,6 +1202,225 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
           ...current,
           flowRuns: [entry, ...(current.flowRuns ?? [])].slice(0, 200),
         }));
+      },
+      // ─── Financial Operations Engine ─────────────────────────────
+      addGlAccount: (account) => {
+        const next: GlAccount = { ...account, id: uid('acct') };
+        setTenantData((current) => ({
+          ...current,
+          glAccounts: [...(current.glAccounts ?? []), next],
+        }));
+        return next;
+      },
+      updateGlAccount: (id, updates) => {
+        let result: { ok: boolean; reason?: string } = { ok: true };
+        setTenantData((current) => {
+          const accounts = current.glAccounts ?? [];
+          if (!accounts.some((a) => a.id === id)) {
+            result = { ok: false, reason: 'GL account not found.' };
+            return current;
+          }
+          return { ...current, glAccounts: accounts.map((a) => a.id === id ? { ...a, ...updates } : a) };
+        });
+        return result;
+      },
+      addJournalEntry: (entry) => {
+        const lines = entry.lines ?? [];
+        const debitTotal = lines.reduce((sum, l) => sum + (l.debitAmount ?? 0), 0);
+        const creditTotal = lines.reduce((sum, l) => sum + (l.creditAmount ?? 0), 0);
+        if (Math.abs(debitTotal - creditTotal) > 0.001) {
+          return {
+            ok: false,
+            errors: [{
+              errorCode: 'DOUBLE_ENTRY_IMBALANCE' as const,
+              message: `Debits (${debitTotal.toFixed(2)}) must equal credits (${creditTotal.toFixed(2)}).`,
+              detail: { debitTotal, creditTotal },
+            }],
+          };
+        }
+        const period = (data.accountingPeriods ?? []).find((p) => p.id === entry.periodId);
+        if (period?.status === 'closed') {
+          return {
+            ok: false,
+            errors: [{
+              errorCode: 'POSTING_PERIOD_CLOSED' as const,
+              message: `Period "${period.periodName}" is closed. Use an open period.`,
+              detail: { periodId: entry.periodId },
+            }],
+          };
+        }
+        const now = new Date().toISOString();
+        const yyyymm = now.slice(0, 7).replace('-', '');
+        const seq = String(Math.floor(Math.random() * 900000) + 100000);
+        const next: JournalEntry = {
+          ...entry,
+          id: uid('je'),
+          entryRef: `JE-${yyyymm}-${seq}`,
+          postingStatus: 'draft',
+          debitTotal,
+          creditTotal,
+          lines: lines.map((l, i) => ({ ...l, id: l.id ?? uid('jl'), lineOrder: l.lineOrder ?? i + 1 })),
+        };
+        setTenantData((current) => ({
+          ...current,
+          journalEntries: [next, ...(current.journalEntries ?? [])],
+        }));
+        return { ok: true, entry: next };
+      },
+      submitJournalEntryForApproval: (entryId) => {
+        let result: { ok: boolean; reason?: string } = { ok: true };
+        setTenantData((current) => {
+          const entries = current.journalEntries ?? [];
+          const existing = entries.find((e) => e.id === entryId);
+          if (!existing) { result = { ok: false, reason: 'Journal entry not found.' }; return current; }
+          if (existing.postingStatus !== 'draft') { result = { ok: false, reason: 'Only draft entries can be submitted for approval.' }; return current; }
+          return { ...current, journalEntries: entries.map((e) => e.id === entryId ? { ...e, postingStatus: 'pending_approval' } : e) };
+        });
+        return result;
+      },
+      postJournalEntry: (entryId, posterId) => {
+        const validationErrors: FinancialValidationError[] = [];
+        let result: { ok: boolean; errors?: FinancialValidationError[] } = { ok: true };
+        setTenantData((current) => {
+          const entries = current.journalEntries ?? [];
+          const entry = entries.find((e) => e.id === entryId);
+          if (!entry) {
+            result = { ok: false, errors: [{ errorCode: 'GL_FIELD_LOCKED', message: 'Journal entry not found.' }] };
+            return current;
+          }
+          if (Math.abs(entry.debitTotal - entry.creditTotal) > 0.001) {
+            validationErrors.push({ errorCode: 'DOUBLE_ENTRY_IMBALANCE', message: `Debits (${entry.debitTotal.toFixed(2)}) ≠ Credits (${entry.creditTotal.toFixed(2)}).`, detail: { debitTotal: entry.debitTotal, creditTotal: entry.creditTotal } });
+          }
+          const period = (current.accountingPeriods ?? []).find((p) => p.id === entry.periodId);
+          if (period?.status === 'closed') {
+            validationErrors.push({ errorCode: 'POSTING_PERIOD_CLOSED', message: `Period "${period.periodName}" is closed.`, detail: { periodId: entry.periodId } });
+          }
+          if (entry.createdBy === posterId) {
+            validationErrors.push({ errorCode: 'SEGREGATION_OF_DUTIES_VIOLATION', message: 'The entry creator cannot also post it. A different user must approve.', detail: { createdBy: entry.createdBy, posterId } });
+          }
+          if (validationErrors.length > 0) {
+            result = { ok: false, errors: validationErrors };
+            return current;
+          }
+          return { ...current, journalEntries: entries.map((e) => e.id === entryId ? { ...e, postingStatus: 'posted' } : e) };
+        });
+        return result;
+      },
+      addPayable: (payable) => {
+        const now = new Date().toISOString();
+        const yyyymm = now.slice(0, 7).replace('-', '');
+        const seq = String(Math.floor(Math.random() * 900000) + 100000);
+        const next: Payable = { ...payable, id: uid('ap'), payableRef: `AP-${yyyymm}-${seq}` };
+        setTenantData((current) => ({ ...current, payables: [next, ...(current.payables ?? [])] }));
+        return next;
+      },
+      approvePayable: (payableId, _approverId) => {
+        let result: { ok: boolean; reason?: string } = { ok: true };
+        setTenantData((current) => {
+          const payables = current.payables ?? [];
+          const p = payables.find((item) => item.id === payableId);
+          if (!p) { result = { ok: false, reason: 'Payable not found.' }; return current; }
+          if (p.approvalStatus === 'approved' || p.approvalStatus === 'paid') { result = { ok: false, reason: 'Payable is already approved or paid.' }; return current; }
+          return { ...current, payables: payables.map((item) => item.id === payableId ? { ...item, approvalStatus: 'approved' } : item) };
+        });
+        return result;
+      },
+      markPayablePaid: (payableId, paidAmount) => {
+        let result: { ok: boolean; reason?: string } = { ok: true };
+        setTenantData((current) => {
+          const payables = current.payables ?? [];
+          const p = payables.find((item) => item.id === payableId);
+          if (!p) { result = { ok: false, reason: 'Payable not found.' }; return current; }
+          const newAmountPaid = (p.amountPaid ?? 0) + paidAmount;
+          const paymentStatus: Payable['paymentStatus'] = newAmountPaid >= p.amountDue ? 'paid' : 'partial';
+          return { ...current, payables: payables.map((item) => item.id === payableId ? { ...item, amountPaid: newAmountPaid, paymentStatus } : item) };
+        });
+        return result;
+      },
+      addReceivable: (receivable) => {
+        const now = new Date().toISOString();
+        const yyyymm = now.slice(0, 7).replace('-', '');
+        const seq = String(Math.floor(Math.random() * 900000) + 100000);
+        const next: Receivable = { ...receivable, id: uid('ar'), receivableRef: `AR-${yyyymm}-${seq}` };
+        setTenantData((current) => ({ ...current, receivables: [next, ...(current.receivables ?? [])] }));
+        return next;
+      },
+      confirmReceivable: (receivableId, receivedAmount) => {
+        let result: { ok: boolean; reason?: string } = { ok: true };
+        setTenantData((current) => {
+          const receivables = current.receivables ?? [];
+          const r = receivables.find((item) => item.id === receivableId);
+          if (!r) { result = { ok: false, reason: 'Receivable not found.' }; return current; }
+          const newReceivedAmount = (r.receivedAmount ?? 0) + receivedAmount;
+          const receiptStatus: Receivable['receiptStatus'] = newReceivedAmount >= r.invoicedAmount ? 'received' : 'partial';
+          return {
+            ...current,
+            receivables: receivables.map((item) =>
+              item.id === receivableId
+                ? { ...item, receivedAmount: newReceivedAmount, receiptStatus, receiptDate: item.receiptDate ?? new Date().toISOString().split('T')[0] }
+                : item,
+            ),
+          };
+        });
+        return result;
+      },
+      addFinancialCounterparty: (cp) => {
+        const next: FinancialCounterparty = { ...cp, id: uid('cp') };
+        setTenantData((current) => ({ ...current, financialCounterparties: [next, ...(current.financialCounterparties ?? [])] }));
+        return next;
+      },
+      addWaterfall: (waterfall) => {
+        const partySum = (waterfall.parties ?? []).reduce((sum, p) => sum + p.paymentAmount, 0);
+        if (Math.abs(partySum - waterfall.totalAmount) > 0.001) {
+          return {
+            ok: false,
+            errors: [{
+              errorCode: 'WATERFALL_IMBALANCE' as const,
+              message: `Party payments (${partySum.toFixed(2)}) must equal total amount (${waterfall.totalAmount.toFixed(2)}).`,
+              detail: { partySum, totalAmount: waterfall.totalAmount },
+            }],
+          };
+        }
+        const now = new Date().toISOString();
+        const yyyymm = now.slice(0, 7).replace('-', '');
+        const seq = String(Math.floor(Math.random() * 900000) + 100000);
+        const next: DistributionWaterfall = { ...waterfall, id: uid('wf'), waterfallRef: `WF-${yyyymm}-${seq}` };
+        setTenantData((current) => ({ ...current, waterfalls: [next, ...(current.waterfalls ?? [])] }));
+        return { ok: true, waterfall: next };
+      },
+      approveWaterfall: (waterfallId, _approverId) => {
+        let result: { ok: boolean; errors?: FinancialValidationError[] } = { ok: true };
+        setTenantData((current) => {
+          const waterfalls = current.waterfalls ?? [];
+          const wf = waterfalls.find((w) => w.id === waterfallId);
+          if (!wf) {
+            result = { ok: false, errors: [{ errorCode: 'WATERFALL_IMBALANCE', message: 'Waterfall not found.' }] };
+            return current;
+          }
+          const partySum = (wf.parties ?? []).reduce((sum, p) => sum + p.paymentAmount, 0);
+          if (Math.abs(partySum - wf.totalAmount) > 0.001) {
+            result = { ok: false, errors: [{ errorCode: 'WATERFALL_IMBALANCE', message: `Party payments (${partySum.toFixed(2)}) ≠ total (${wf.totalAmount.toFixed(2)}).`, detail: { partySum, totalAmount: wf.totalAmount } }] };
+            return current;
+          }
+          return { ...current, waterfalls: waterfalls.map((w) => w.id === waterfallId ? { ...w, executionStatus: 'approved' } : w) };
+        });
+        return result;
+      },
+      addAccountingPeriod: (period) => {
+        const next: AccountingPeriod = { ...period, id: uid('period') };
+        setTenantData((current) => ({ ...current, accountingPeriods: [...(current.accountingPeriods ?? []), next] }));
+        return next;
+      },
+      closeAccountingPeriod: (periodId, closedBy) => {
+        let result: { ok: boolean; reason?: string } = { ok: true };
+        setTenantData((current) => {
+          const periods = current.accountingPeriods ?? [];
+          const period = periods.find((p) => p.id === periodId);
+          if (!period) { result = { ok: false, reason: 'Accounting period not found.' }; return current; }
+          if (period.status === 'closed') { result = { ok: false, reason: 'Period is already closed.' }; return current; }
+          return { ...current, accountingPeriods: periods.map((p) => p.id === periodId ? { ...p, status: 'closed', closedBy, closedAt: new Date().toISOString() } : p) };
+        });
+        return result;
       },
       signOut: () => {
         setSession(null);

@@ -308,6 +308,14 @@ export interface AppData {
   integrations: IntegrationActivation[];
   businessFunctions?: BusinessFunction[];
   flowRuns?: FlowRunEntry[];
+  // ─── Financial Operations Engine ───────────────────────────────────
+  glAccounts?: GlAccount[];
+  accountingPeriods?: AccountingPeriod[];
+  journalEntries?: JournalEntry[];
+  payables?: Payable[];
+  receivables?: Receivable[];
+  financialCounterparties?: FinancialCounterparty[];
+  waterfalls?: DistributionWaterfall[];
 }
 
 // ─── Orbital Integration Framework ──────────────────────────────────
@@ -445,6 +453,9 @@ export type AuditAction =
   | 'transition'
   | 'import'
   | 'export'
+  | 'approve'
+  | 'post'
+  | 'close'
   | 'sign-in'
   | 'sign-out';
 
@@ -461,7 +472,14 @@ export type AuditEntityType =
   | 'user'
   | 'integration'
   | 'business-function'
-  | 'business-object';
+  | 'business-object'
+  | 'journal-entry'
+  | 'payable'
+  | 'receivable'
+  | 'gl-account'
+  | 'accounting-period'
+  | 'counterparty'
+  | 'waterfall';
 
 // ─── Notifications ───────────────────────────────────────────────────
 
@@ -489,6 +507,13 @@ export type NotificationType =
   | 'import-complete'
   | 'integration-triggered'
   | 'integration-failed'
+  | 'gl-entry-posted'
+  | 'payable-approved'
+  | 'receivable-received'
+  | 'period-close-requested'
+  | 'period-closed'
+  | 'waterfall-approved'
+  | 'mission-control-action'
   | 'system';
 
 export interface FlowRunEntry {
@@ -640,4 +665,158 @@ export interface FilterCondition {
   field: string;
   operator: 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'contains' | 'startsWith';
   value: string | number;
+}
+
+// ─── Financial Operations Engine (WS-047) ───────────────────────────
+// Universal accounting primitives: GL, AP, AR, periods, waterfalls.
+// Industry-agnostic — a "settlement receipt" and "customer payment" are
+// the same Receivable; a "lien payoff" and "vendor invoice" are the same Payable.
+
+export type AccountType = 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
+
+export interface GlAccount {
+  id: string;
+  accountNumber: string;
+  accountName: string;
+  accountType: AccountType;
+  normalBalance: 'debit' | 'credit'; // auto-set: asset/expense=debit, all others=credit
+  parentAccountId?: string;
+  isActive: boolean;
+}
+
+export interface AccountingPeriod {
+  id: string;
+  periodName: string;
+  periodStart: string;  // ISO date YYYY-MM-DD
+  periodEnd: string;    // ISO date YYYY-MM-DD
+  fiscalYear: number;
+  status: 'open' | 'closed';
+  closeApproverRole?: string;
+  closedAt?: string;
+  closedBy?: string;
+}
+
+export interface JournalLine {
+  id: string;
+  entryId: string;
+  accountId: string;
+  debitAmount: number;  // >= 0; only one of debit/credit may be > 0 per line
+  creditAmount: number;
+  memo?: string;
+  lineOrder: number;
+}
+
+export type PostingStatus = 'draft' | 'pending_approval' | 'approved' | 'posted';
+export type JournalSourceType = 'manual' | 'ap_payment' | 'ar_receipt' | 'disbursement' | 'reversal';
+
+export interface JournalEntry {
+  id: string;
+  entryRef: string;            // auto: JE-YYYYMM-######
+  transactionDate: string;     // ISO date
+  description: string;
+  postingStatus: PostingStatus;
+  debitTotal: number;          // SUM of lines.debitAmount
+  creditTotal: number;         // SUM of lines.creditAmount — must equal debitTotal to post
+  sourceType: JournalSourceType;
+  sourceRefId?: string;        // payable, receivable, or waterfall ID that created this
+  reversesEntryId?: string;
+  periodId: string;
+  createdBy: string;
+  createdAt: string;
+  lines: JournalLine[];
+}
+
+export type PaymentStatus = 'outstanding' | 'partial' | 'paid' | 'disputed';
+export type ApprovalStatus = 'draft' | 'pending_approval' | 'approved' | 'paid';
+
+export interface Payable {
+  id: string;
+  payableRef: string;          // auto: AP-YYYYMM-######
+  payableTo: string;
+  counterpartyId?: string;
+  externalRef?: string;        // invoice #, lien ID, PO #
+  obligationDate: string;
+  dueDate: string;
+  amountDue: number;
+  amountPaid: number;
+  paymentStatus: PaymentStatus;
+  approvalStatus: ApprovalStatus;
+  glEntryId?: string;
+  liabilityAccountId: string;
+  expenseAccountId: string;
+  notes?: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+export type ReceiptStatus = 'pending' | 'received' | 'partial' | 'written_off';
+
+export interface Receivable {
+  id: string;
+  receivableRef: string;       // auto: AR-YYYYMM-######
+  receivableFrom: string;
+  counterpartyId?: string;
+  sourceRecordId?: string;
+  invoicedAmount: number;
+  receivedAmount: number;
+  receiptDate?: string;
+  receiptStatus: ReceiptStatus;
+  glEntryId?: string;
+  arAccountId: string;
+  revenueAccountId: string;
+  notes?: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface FinancialCounterparty {
+  id: string;
+  name: string;
+  counterpartyType: string;    // tenant-defined: "vendor", "customer", "lienholder", etc.
+  defaultLiabilityAccountId?: string;
+  defaultExpenseAccountId?: string;
+  paymentMethod?: 'ach' | 'wire' | 'check';
+  isActive: boolean;
+}
+
+export type WaterfallStatus = 'draft' | 'pending_approval' | 'approved' | 'executing' | 'complete' | 'failed';
+
+export interface WaterfallParty {
+  id: string;
+  waterfallId: string;
+  partyName: string;
+  partyRole: string;           // tenant-defined: "attorney_fee", "client", "lienholder", etc.
+  paymentAmount: number;
+  paymentMethod?: 'ach' | 'wire' | 'check';
+  paymentStatus: 'pending' | 'sent' | 'confirmed';
+  counterpartyId?: string;
+}
+
+export interface DistributionWaterfall {
+  id: string;
+  waterfallRef: string;
+  sourceRecordId?: string;
+  receivableId?: string;
+  totalAmount: number;
+  executionStatus: WaterfallStatus;
+  glEntryId?: string;
+  description?: string;
+  createdBy: string;
+  createdAt: string;
+  parties: WaterfallParty[];
+}
+
+// Layer 1 validator error codes — enforced synchronously, cannot be bypassed
+export type FinancialValidationErrorCode =
+  | 'DOUBLE_ENTRY_IMBALANCE'
+  | 'POSTING_PERIOD_CLOSED'
+  | 'GL_FIELD_LOCKED'
+  | 'SEGREGATION_OF_DUTIES_VIOLATION'
+  | 'WATERFALL_IMBALANCE'
+  | 'LINE_BOTH_SIDES';
+
+export interface FinancialValidationError {
+  errorCode: FinancialValidationErrorCode;
+  message: string;
+  detail?: Record<string, unknown>;
 }

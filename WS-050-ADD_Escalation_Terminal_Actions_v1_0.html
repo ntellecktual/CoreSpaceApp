@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escalation Chains — Admin — CoreSpace</title>
+<style>
+  :root{--navy:#1F3864;--blue:#2E75B6;--teal:#17375E;--green:#375623;--amber:#E36C09;--red:#C00000;--bg:#0F1923;--surface:#162230;--surface2:#1E2F42;--border:#2A3F55;--text:#E8EFF7;--muted:#7A95B0;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+  .topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;}
+  .topbar h1{font-size:15px;font-weight:600;}
+  .breadcrumb{font-size:12px;color:var(--muted);}
+  .breadcrumb span{color:var(--text);}
+  .spacer{flex:1;}
+  .btn{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;}
+  .btn-primary{background:var(--blue);color:#fff;}
+
+  .body{flex:1;display:flex;overflow:hidden;}
+
+  /* Chain list */
+  .chain-list{width:300px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
+  .panel-header{padding:14px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:8px;}
+  .chain-items{flex:1;overflow-y:auto;padding:8px;}
+  .chain-item{padding:12px;border-radius:7px;cursor:pointer;border:1px solid transparent;margin-bottom:5px;}
+  .chain-item:hover{background:var(--surface2);border-color:var(--border);}
+  .chain-item.active{background:var(--surface2);border-color:var(--blue);}
+  .ci-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+  .ci-roles{font-size:11px;color:var(--muted);}
+  .ci-terminal{font-size:11px;margin-top:4px;padding:2px 8px;border-radius:4px;display:inline-block;}
+  .term-task{background:rgba(46,117,182,0.15);color:#5CB8E8;border:1px solid rgba(46,117,182,0.3);}
+  .term-broadcast{background:rgba(227,108,9,0.15);color:#FFB347;border:1px solid rgba(227,108,9,0.3);}
+  .term-fail{background:rgba(192,0,0,0.15);color:#FF6B6B;border:1px solid rgba(192,0,0,0.3);}
+
+  /* Detail */
+  .chain-detail{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  .cd-header{padding:20px 24px;border-bottom:1px solid var(--border);}
+  .cd-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+  .cd-sub{font-size:12px;color:var(--muted);}
+
+  .cd-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;gap:20px;}
+  .config-col{flex:1;}
+  .flow-col{width:320px;flex-shrink:0;}
+
+  .form-group{margin-bottom:20px;}
+  .form-label{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:0.4px;}
+  .form-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;}
+  .form-input:focus{border-color:var(--blue);}
+  .form-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;cursor:pointer;}
+  .form-hint{font-size:11px;color:var(--muted);margin-top:4px;}
+
+  .roles-builder{display:flex;flex-direction:column;gap:6px;}
+  .role-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;}
+  .role-step-num{width:22px;height:22px;border-radius:50%;background:var(--navy);border:1px solid var(--blue);color:var(--blue);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .role-name{font-size:13px;font-weight:500;color:var(--text);flex:1;}
+  .role-delay{font-size:11px;color:var(--muted);background:var(--surface);padding:2px 8px;border-radius:4px;border:1px solid var(--border);}
+  .add-role-btn{padding:8px 12px;border:1px dashed var(--border);border-radius:6px;color:var(--muted);font-size:12px;cursor:pointer;text-align:center;}
+
+  /* Flow diagram */
+  .flow-diagram{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;}
+  .flow-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:16px;}
+  .flow-step{display:flex;align-items:flex-start;gap:10px;padding:8px 0;}
+  .flow-conn{width:2px;height:24px;background:var(--border);margin-left:10px;}
+  .flow-conn.active{background:var(--blue);}
+  .flow-conn.terminal{background:var(--amber);}
+  .fs-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+  .fsi-blue{background:rgba(46,117,182,0.3);color:#5CB8E8;border:1px solid rgba(46,117,182,0.5);}
+  .fsi-amber{background:rgba(227,108,9,0.3);color:#FFB347;border:1px solid rgba(227,108,9,0.5);}
+  .fsi-red{background:rgba(192,0,0,0.3);color:#FF6B6B;border:1px solid rgba(192,0,0,0.5);}
+  .fsi-green{background:rgba(55,86,35,0.3);color:#7ED957;border:1px solid rgba(55,86,35,0.5);}
+  .fs-label{font-size:12px;font-weight:600;color:var(--text);}
+  .fs-detail{font-size:11px;color:var(--muted);margin-top:2px;}
+
+  .action-bar{padding:14px 24px;border-top:1px solid var(--border);background:var(--surface);display:flex;justify-content:flex-end;gap:10px;}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="breadcrumb">Admin › Mission Control › <span>Escalation Chains</span></div>
+  <div class="spacer"></div>
+  <button class="btn btn-primary">+ New Chain</button>
+</div>
+
+<div class="body">
+  <!-- Chain list -->
+  <div class="chain-list">
+    <div class="panel-header">Chains (3)</div>
+    <div class="chain-items">
+      <div class="chain-item active">
+        <div class="ci-name">FinancialApprovalEscalation</div>
+        <div class="ci-roles">Controller → CFO → FinancialAdmin</div>
+        <div class="ci-terminal term-task">terminal: task_create</div>
+      </div>
+      <div class="chain-item">
+        <div class="ci-name">DocumentReviewEscalation</div>
+        <div class="ci-roles">DocumentReview → Supervisor</div>
+        <div class="ci-terminal term-task">terminal: task_create</div>
+      </div>
+      <div class="chain-item">
+        <div class="ci-name">CriticalExceptionEscalation</div>
+        <div class="ci-roles">Controller → FinancialAdmin</div>
+        <div class="ci-terminal term-broadcast">terminal: broadcast</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail -->
+  <div class="chain-detail">
+    <div class="cd-header">
+      <div class="cd-title">FinancialApprovalEscalation</div>
+      <div class="cd-sub">Used by: AP Inbound Chain, Journal Entry Submission, Period Close</div>
+    </div>
+
+    <div class="cd-body">
+      <div class="config-col">
+
+        <div class="form-group">
+          <label class="form-label">Chain Name</label>
+          <input class="form-input" value="FinancialApprovalEscalation" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Role Iteration Order</label>
+          <div class="roles-builder">
+            <div class="role-row">
+              <div class="role-step-num">1</div>
+              <div class="role-name">Controller</div>
+              <span class="role-delay">wait 15 min if unavailable</span>
+            </div>
+            <div class="role-row">
+              <div class="role-step-num">2</div>
+              <div class="role-name">CFO</div>
+              <span class="role-delay">wait 15 min if unavailable</span>
+            </div>
+            <div class="role-row">
+              <div class="role-step-num">3</div>
+              <div class="role-name">FinancialAdmin</div>
+              <span class="role-delay">then → terminal action</span>
+            </div>
+            <div class="add-role-btn">+ Add Role</div>
+          </div>
+          <div class="form-hint">Roles are tried in order. If no active user in a role after the delay, the next role is tried.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Escalation Delay (minutes)</label>
+          <input class="form-input" value="15" type="number" />
+          <div class="form-hint">Wait time before moving to next role. Applied between every step.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Terminal Action</label>
+          <select class="form-select">
+            <option selected>task_create — Create task in role queue</option>
+            <option>broadcast — Send to all users in terminal role</option>
+            <option>fail_with_alert — Alert admin, log as failed</option>
+          </select>
+          <div class="form-hint">Fires when all roles exhausted with no active user.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Task Assignee Role (task_create only)</label>
+          <input class="form-input" value="FinancialAdmin" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Task Due In (hours)</label>
+          <input class="form-input" value="4" type="number" />
+        </div>
+
+      </div>
+
+      <div class="flow-col">
+        <div class="flow-diagram">
+          <div class="flow-title">Execution Flow Preview</div>
+
+          <div class="flow-step">
+            <div class="fs-icon fsi-blue">1</div>
+            <div><div class="fs-label">Route to Controller</div><div class="fs-detail">Check Presence Registry — Active/Idle users</div></div>
+          </div>
+          <div class="flow-conn active"></div>
+
+          <div class="flow-step">
+            <div class="fs-icon fsi-amber">!</div>
+            <div><div class="fs-label">No active Controller</div><div class="fs-detail">Wait 15 minutes, then escalate</div></div>
+          </div>
+          <div class="flow-conn active"></div>
+
+          <div class="flow-step">
+            <div class="fs-icon fsi-blue">2</div>
+            <div><div class="fs-label">Route to CFO</div><div class="fs-detail">Check Presence Registry</div></div>
+          </div>
+          <div class="flow-conn active"></div>
+
+          <div class="flow-step">
+            <div class="fs-icon fsi-amber">!</div>
+            <div><div class="fs-label">No active CFO</div><div class="fs-detail">Wait 15 minutes, then escalate</div></div>
+          </div>
+          <div class="flow-conn active"></div>
+
+          <div class="flow-step">
+            <div class="fs-icon fsi-blue">3</div>
+            <div><div class="fs-label">Route to FinancialAdmin</div><div class="fs-detail">Check Presence Registry</div></div>
+          </div>
+          <div class="flow-conn terminal"></div>
+
+          <div class="flow-step">
+            <div class="fs-icon fsi-green">T</div>
+            <div><div class="fs-label">Terminal: task_create</div><div class="fs-detail">Task created in FinancialAdmin queue · Due in 4h · Appears in Mission Control</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn btn-ghost">Cancel</button>
+      <button class="btn btn-primary">Save Chain</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

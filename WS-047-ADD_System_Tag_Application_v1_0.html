@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Tags — Field Inspector — CoreSpace</title>
+<style>
+  :root {
+    --navy:#1F3864;--blue:#2E75B6;--teal:#17375E;
+    --green:#375623;--amber:#E36C09;--red:#C00000;
+    --bg:#0F1923;--surface:#162230;--surface2:#1E2F42;
+    --border:#2A3F55;--text:#E8EFF7;--muted:#7A95B0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+  .topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;}
+  .topbar h1{font-size:15px;font-weight:600;}
+  .breadcrumb{font-size:12px;color:var(--muted);}
+  .breadcrumb span{color:var(--text);}
+  .spacer{flex:1;}
+  .search-bar{display:flex;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;gap:8px;width:280px;}
+  .search-bar input{background:none;border:none;outline:none;color:var(--text);font-size:13px;flex:1;}
+  .search-bar input::placeholder{color:var(--muted);}
+
+  .body{flex:1;display:flex;overflow:hidden;}
+
+  /* Record info side */
+  .left{width:320px;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
+  .panel-header{padding:14px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+  .record-card{margin:12px;padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;}
+  .record-type{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px;}
+  .record-ref{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+  .record-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 10px;border-radius:20px;background:rgba(55,86,35,0.2);color:#7ED957;border:1px solid rgba(55,86,35,0.4);}
+  .record-status-dot{width:6px;height:6px;border-radius:50%;background:#7ED957;}
+
+  .field-list{flex:1;overflow-y:auto;padding:8px 12px;}
+  .field-item{padding:10px;border-radius:6px;cursor:pointer;border:1px solid transparent;margin-bottom:4px;display:flex;align-items:center;gap:10px;}
+  .field-item:hover{background:var(--surface2);border-color:var(--border);}
+  .field-item.active{background:var(--surface2);border-color:var(--blue);}
+  .field-item.locked{opacity:0.7;}
+  .field-slug{font-size:13px;font-weight:500;color:var(--text);flex:1;}
+  .field-type-badge{font-size:10px;padding:2px 7px;border-radius:4px;background:var(--surface);color:var(--muted);border:1px solid var(--border);}
+  .tag-icons{display:flex;gap:4px;}
+  .tag-icon{width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+  .tag-gl{background:rgba(192,0,0,0.2);color:#FF6B6B;border:1px solid rgba(192,0,0,0.4);}
+  .tag-pc{background:rgba(46,117,182,0.2);color:#5CB8E8;border:1px solid rgba(46,117,182,0.4);}
+  .tag-au{background:rgba(227,108,9,0.2);color:#FFB347;border:1px solid rgba(227,108,9,0.4);}
+  .tag-re{background:rgba(55,86,35,0.2);color:#7ED957;border:1px solid rgba(55,86,35,0.4);}
+
+  /* Right detail */
+  .right{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  .detail-header{padding:20px 24px;border-bottom:1px solid var(--border);}
+  .dh-top{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+  .dh-slug{font-size:18px;font-weight:700;font-family:'Courier New',monospace;color:var(--text);}
+  .dh-type{font-size:12px;color:var(--muted);padding:3px 10px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);}
+  .dh-value{font-size:13px;color:var(--muted);}
+  .dh-value span{color:var(--text);}
+
+  .detail-body{flex:1;overflow-y:auto;padding:20px 24px;}
+  .tags-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
+  .tag-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;}
+  .tag-card.active-tag{border-color:var(--red);}
+  .tag-card.active-tag-blue{border-color:var(--blue);}
+  .tag-card.inactive-tag{opacity:0.5;}
+  .tc-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .tc-name{font-size:13px;font-weight:700;font-family:'Courier New',monospace;}
+  .tc-name.gl{color:#FF6B6B;}
+  .tc-name.pc{color:#5CB8E8;}
+  .tc-name.au{color:#FFB347;}
+  .tc-name.re{color:#7ED957;}
+  .tc-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;}
+  .tc-active{background:rgba(192,0,0,0.2);color:#FF6B6B;}
+  .tc-inactive{background:var(--surface);color:var(--muted);border:1px solid var(--border);}
+  .tc-pending{background:rgba(227,108,9,0.2);color:#FFB347;}
+  .tc-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px;}
+  .tc-row:last-child{border-bottom:none;}
+  .tc-key{color:var(--muted);}
+  .tc-val{color:var(--text);font-weight:500;text-align:right;max-width:180px;word-break:break-all;}
+
+  .section-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;}
+
+  .enforcement-flow{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:20px;}
+  .ef-step{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);}
+  .ef-step:last-child{border-bottom:none;}
+  .ef-num{width:22px;height:22px;border-radius:50%;background:var(--navy);border:1px solid var(--blue);color:var(--blue);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .ef-label{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;}
+  .ef-detail{font-size:11px;color:var(--muted);}
+  .ef-pass{color:var(--green);}
+  .ef-fail{color:var(--red);}
+
+  .audit-list{display:flex;flex-direction:column;gap:6px;}
+  .audit-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);font-size:12px;}
+  .audit-event{font-family:'Courier New',monospace;font-size:11px;color:#5CB8E8;width:160px;flex-shrink:0;}
+  .audit-detail{color:var(--text);flex:1;}
+  .audit-time{color:var(--muted);flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="breadcrumb">Developer Tools › <span>Field Tag Inspector</span></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="search-bar">
+    <svg width="14" height="14" fill="none" stroke="var(--muted)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    <input placeholder="Search records or fields..." />
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- Left: record + fields -->
+  <div class="left">
+    <div class="panel-header">Inspecting Record</div>
+    <div class="record-card">
+      <div class="record-type">Journal Entry</div>
+      <div class="record-ref">JE-202603-000001</div>
+      <div style="margin-top:8px;"><span class="record-status"><span class="record-status-dot"></span>Posted</span></div>
+    </div>
+
+    <div class="panel-header" style="margin-top:4px;">Fields</div>
+    <div class="field-list">
+
+      <div class="field-item active locked">
+        <div>
+          <div class="field-slug">transaction_date</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">2026-03-15</div>
+        </div>
+        <div class="tag-icons">
+          <div class="tag-icon tag-gl">GL</div>
+          <div class="tag-icon tag-pc">PC</div>
+        </div>
+      </div>
+
+      <div class="field-item locked">
+        <div>
+          <div class="field-slug">posting_status</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">posted</div>
+        </div>
+        <div class="tag-icons"><div class="tag-icon tag-gl">GL</div></div>
+      </div>
+
+      <div class="field-item locked">
+        <div>
+          <div class="field-slug">debit_total</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">$2,500.00</div>
+        </div>
+        <div class="tag-icons"><div class="tag-icon tag-gl">GL</div></div>
+      </div>
+
+      <div class="field-item locked">
+        <div>
+          <div class="field-slug">credit_total</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">$2,500.00</div>
+        </div>
+        <div class="tag-icons"><div class="tag-icon tag-gl">GL</div></div>
+      </div>
+
+      <div class="field-item">
+        <div>
+          <div class="field-slug">description</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">March rent payment</div>
+        </div>
+        <div class="tag-icons"><div class="tag-icon tag-au">AU</div></div>
+      </div>
+
+      <div class="field-item">
+        <div>
+          <div class="field-slug">entry_ref</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">JE-202603-000001</div>
+        </div>
+        <div class="tag-icons"><div class="tag-icon tag-gl">GL</div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Right: detail -->
+  <div class="right">
+    <div class="detail-header">
+      <div class="dh-top">
+        <div class="dh-slug">transaction_date</div>
+        <div class="dh-type">date</div>
+        <div style="display:flex;gap:6px;margin-left:8px;">
+          <div class="tag-icon tag-gl" style="width:24px;height:24px;font-size:11px;">GL</div>
+          <div class="tag-icon tag-pc" style="width:24px;height:24px;font-size:11px;">PC</div>
+        </div>
+      </div>
+      <div class="dh-value">Current value: <span>2026-03-15</span> · Record status: <span style="color:#FF6B6B;">LOCKED — all writes rejected</span></div>
+    </div>
+
+    <div class="detail-body">
+      <div class="section-title" style="margin-bottom:14px;">Active System Tags</div>
+      <div class="tags-grid">
+
+        <div class="tag-card active-tag">
+          <div class="tc-header">
+            <div class="tc-name gl">#gl-locked</div>
+            <span class="tc-status tc-active">ACTIVE</span>
+          </div>
+          <div class="tc-row"><span class="tc-key">Applied at</span><span class="tc-val">2026-03-18 09:41:22Z</span></div>
+          <div class="tc-row"><span class="tc-key">Applied by event</span><span class="tc-val" style="font-family:monospace;font-size:11px;">posting_status:posted</span></div>
+          <div class="tc-row"><span class="tc-key">Applied by user</span><span class="tc-val">R. Chen (Controller)</span></div>
+          <div class="tc-row"><span class="tc-key">Effect</span><span class="tc-val" style="color:#FF6B6B;">PATCH → 403 rejected</span></div>
+        </div>
+
+        <div class="tag-card active-tag-blue">
+          <div class="tc-header">
+            <div class="tc-name pc">#period-controlled</div>
+            <span class="tc-status" style="background:rgba(46,117,182,0.2);color:#5CB8E8;">ACTIVE</span>
+          </div>
+          <div class="tc-row"><span class="tc-key">Applied at</span><span class="tc-val">Definition time</span></div>
+          <div class="tc-row"><span class="tc-key">Applied by event</span><span class="tc-val" style="font-family:monospace;font-size:11px;">definition_time</span></div>
+          <div class="tc-row"><span class="tc-key">Applied by user</span><span class="tc-val">System</span></div>
+          <div class="tc-row"><span class="tc-key">Effect</span><span class="tc-val" style="color:#5CB8E8;">Must be in open period</span></div>
+        </div>
+
+        <div class="tag-card inactive-tag">
+          <div class="tc-header">
+            <div class="tc-name au">#audit-required</div>
+            <span class="tc-status tc-inactive">NOT APPLIED</span>
+          </div>
+          <div class="tc-row"><span class="tc-key">Status</span><span class="tc-val">Not declared for this field</span></div>
+        </div>
+
+        <div class="tag-card inactive-tag">
+          <div class="tc-header">
+            <div class="tc-name re">#reconciled</div>
+            <span class="tc-status tc-inactive">NOT APPLIED</span>
+          </div>
+          <div class="tc-row"><span class="tc-key">Status</span><span class="tc-val">Record not yet reconciled</span></div>
+        </div>
+
+      </div>
+
+      <div class="section-title">Pre-Write Gate Enforcement Flow</div>
+      <div class="enforcement-flow">
+        <div class="ef-step">
+          <div class="ef-num">1</div>
+          <div><div class="ef-label">Request received</div><div class="ef-detail">PATCH /journal-entries/uuid — body contains transaction_date</div></div>
+        </div>
+        <div class="ef-step">
+          <div class="ef-num">2</div>
+          <div><div class="ef-label">Pre-write gate queries field_tags</div><div class="ef-detail">SELECT * FROM field_tags WHERE tenant_id=X AND record_type='journal_entry' AND record_id=uuid AND field_slug='transaction_date' AND is_active=true</div></div>
+        </div>
+        <div class="ef-step">
+          <div class="ef-num">3</div>
+          <div><div class="ef-label ef-fail">Tag found: gl-locked</div><div class="ef-detail ef-fail">Return 403 GL_FIELD_LOCKED immediately. Transaction never opens. No validators run.</div></div>
+        </div>
+      </div>
+
+      <div class="section-title">Audit Log — Tag Events</div>
+      <div class="audit-list">
+        <div class="audit-row">
+          <div class="audit-event">TAG_APPLIED</div>
+          <div class="audit-detail">gl-locked applied to transaction_date via posting_status:posted</div>
+          <div class="audit-time">Mar 18, 09:41</div>
+        </div>
+        <div class="audit-row">
+          <div class="audit-event">TAG_APPLIED</div>
+          <div class="audit-detail">gl-locked applied to posting_status via posting_status:posted</div>
+          <div class="audit-time">Mar 18, 09:41</div>
+        </div>
+        <div class="audit-row">
+          <div class="audit-event">WRITE_REJECTED</div>
+          <div class="audit-detail">PATCH on transaction_date rejected — gl-locked active</div>
+          <div class="audit-time">Mar 19, 11:02</div>
+        </div>
+        <div class="audit-row">
+          <div class="audit-event">TAG_QUERY</div>
+          <div class="audit-detail">field_tags queried by pre-write gate — 2 active tags returned</div>
+          <div class="audit-time">Mar 19, 11:02</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

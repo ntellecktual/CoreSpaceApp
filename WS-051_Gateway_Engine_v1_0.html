@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mission Control — CoreSpace</title>
+<style>
+  :root {
+    --navy: #1F3864; --blue: #2E75B6; --teal: #17375E;
+    --green: #375623; --amber: #E36C09; --red: #C00000;
+    --bg: #0F1923; --surface: #162230; --surface2: #1E2F42;
+    --border: #2A3F55; --text: #E8EFF7; --muted: #7A95B0;
+    --critical: #C00000; --high: #E36C09; --medium: #2E75B6; --low: #375623;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); height:100vh; display:flex; overflow:hidden; }
+
+  /* Sidebar */
+  .sidebar { width:64px; background:var(--navy); display:flex; flex-direction:column; align-items:center; padding:16px 0; gap:8px; flex-shrink:0; }
+  .sidebar .logo { width:36px; height:36px; background:var(--blue); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; color:#fff; margin-bottom:16px; }
+  .nav-item { width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--muted); transition:all 0.15s; position:relative; }
+  .nav-item:hover { background:var(--surface2); color:var(--text); }
+  .nav-item.active { background:var(--blue); color:#fff; }
+  .nav-item svg { width:20px; height:20px; }
+  .badge { position:absolute; top:4px; right:4px; background:var(--critical); color:#fff; border-radius:10px; font-size:10px; font-weight:700; padding:1px 5px; min-width:16px; text-align:center; }
+
+  /* Main layout */
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+  /* Top bar */
+  .topbar { height:56px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 20px; gap:16px; flex-shrink:0; }
+  .topbar h1 { font-size:16px; font-weight:600; color:var(--text); }
+  .topbar .subtitle { font-size:13px; color:var(--muted); }
+  .spacer { flex:1; }
+  .filter-pills { display:flex; gap:8px; }
+  .pill { padding:4px 12px; border-radius:20px; font-size:12px; font-weight:500; cursor:pointer; border:1px solid var(--border); color:var(--muted); transition:all 0.15s; }
+  .pill.active { background:var(--blue); color:#fff; border-color:var(--blue); }
+  .pill:hover:not(.active) { border-color:var(--blue); color:var(--text); }
+
+  /* Content area */
+  .content { flex:1; display:flex; overflow:hidden; }
+
+  /* Queue panel */
+  .queue-panel { width:380px; border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; flex-shrink:0; }
+  .queue-header { padding:16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+  .queue-header h2 { font-size:13px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; }
+  .queue-count { background:var(--surface2); color:var(--text); border-radius:10px; font-size:11px; font-weight:700; padding:2px 8px; }
+  .queue-list { flex:1; overflow-y:auto; padding:8px; }
+
+  /* Queue item */
+  .queue-item { padding:14px; border-radius:8px; cursor:pointer; border:1px solid transparent; transition:all 0.15s; margin-bottom:6px; }
+  .queue-item:hover { background:var(--surface2); border-color:var(--border); }
+  .queue-item.active { background:var(--surface2); border-color:var(--blue); }
+  .qi-top { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .severity-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .sev-critical { background:var(--critical); box-shadow:0 0 6px var(--critical); }
+  .sev-high { background:var(--high); box-shadow:0 0 6px var(--high); }
+  .sev-medium { background:var(--medium); }
+  .sev-low { background:var(--low); }
+  .qi-type { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.4px; }
+  .qi-time { margin-left:auto; font-size:11px; color:var(--muted); }
+  .qi-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px; }
+  .qi-sub { font-size:12px; color:var(--muted); }
+  .qi-meta { display:flex; gap:8px; margin-top:8px; }
+  .qi-tag { font-size:11px; padding:2px 8px; border-radius:4px; background:var(--surface); color:var(--muted); border:1px solid var(--border); }
+
+  /* Detail panel */
+  .detail-panel { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .detail-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:16px; }
+  .detail-icon { width:44px; height:44px; border-radius:10px; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .detail-icon svg { width:22px; height:22px; color:var(--blue); }
+  .detail-title { font-size:17px; font-weight:700; color:var(--text); margin-bottom:4px; }
+  .detail-ref { font-size:13px; color:var(--muted); }
+  .sev-badge { padding:3px 10px; border-radius:6px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .sev-high-badge { background:rgba(227,108,9,0.15); color:var(--high); border:1px solid rgba(227,108,9,0.3); }
+  .sev-critical-badge { background:rgba(192,0,0,0.15); color:var(--critical); border:1px solid rgba(192,0,0,0.3); }
+
+  /* Fields */
+  .detail-body { flex:1; overflow-y:auto; padding:24px; display:flex; gap:20px; }
+  .fields-col { flex:1; }
+  .context-col { width:260px; flex-shrink:0; }
+  .section-label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
+  .field-row { margin-bottom:16px; }
+  .field-label { font-size:11px; color:var(--muted); margin-bottom:4px; font-weight:500; }
+  .field-value { font-size:14px; color:var(--text); font-weight:500; padding:8px 12px; background:var(--surface2); border-radius:6px; border:1px solid var(--border); }
+  .field-value.editable { border-color:var(--blue); background:var(--surface); }
+  .field-value.flagged { border-color:var(--amber); }
+  .confidence-bar { height:4px; border-radius:2px; background:var(--border); margin-top:6px; }
+  .confidence-fill { height:100%; border-radius:2px; }
+  .conf-high { background:var(--green); }
+  .conf-med { background:var(--amber); }
+  .conf-low { background:var(--critical); }
+  .conf-label { font-size:10px; color:var(--muted); margin-top:3px; }
+
+  .context-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:12px; }
+  .context-card h4 { font-size:12px; font-weight:600; color:var(--muted); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.4px; }
+  .ctx-row { display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid var(--border); }
+  .ctx-row:last-child { border-bottom:none; }
+  .ctx-key { font-size:12px; color:var(--muted); }
+  .ctx-val { font-size:12px; font-weight:600; color:var(--text); }
+  .ctx-val.money { color:#5CB8E8; }
+
+  /* Action bar */
+  .action-bar { padding:16px 24px; border-top:1px solid var(--border); background:var(--surface); display:flex; align-items:center; gap:12px; }
+  .action-bar .note { font-size:12px; color:var(--muted); flex:1; }
+  .btn { padding:9px 20px; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s; }
+  .btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border); }
+  .btn-ghost:hover { color:var(--text); border-color:var(--text); }
+  .btn-danger { background:rgba(192,0,0,0.15); color:var(--critical); border:1px solid rgba(192,0,0,0.3); }
+  .btn-danger:hover { background:rgba(192,0,0,0.25); }
+  .btn-primary { background:var(--blue); color:#fff; }
+  .btn-primary:hover { background:#3988d4; }
+
+  .queue-item .qi-dot-row { display:flex; align-items:center; gap:6px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="logo">CS</div>
+  <div class="nav-item" title="Home">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+  </div>
+  <div class="nav-item active" title="Mission Control">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    <span class="badge">7</span>
+  </div>
+  <div class="nav-item" title="Financial Operations">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+  </div>
+  <div class="nav-item" title="Gateways">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+  </div>
+  <div class="nav-item" title="Settings" style="margin-top:auto;">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+  </div>
+</nav>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h1>Mission Control</h1>
+      <div class="subtitle">Your decision queue — 7 items require action</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="filter-pills">
+      <div class="pill active">All (7)</div>
+      <div class="pill">Approvals (3)</div>
+      <div class="pill">Reviews (2)</div>
+      <div class="pill">Exceptions (2)</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Queue -->
+    <div class="queue-panel">
+      <div class="queue-header">
+        <h2>Queue</h2>
+        <span class="queue-count">7</span>
+      </div>
+      <div class="queue-list">
+
+        <!-- Item 1 — active -->
+        <div class="queue-item active">
+          <div class="qi-top">
+            <div class="qi-dot-row"><div class="severity-dot sev-high"></div><span class="qi-type">Approval Required</span></div>
+            <div class="qi-time">2h ago</div>
+          </div>
+          <div class="qi-title">AP Invoice — Office Depot</div>
+          <div class="qi-sub">AP-202603-000047 · $3,240.00</div>
+          <div class="qi-meta"><span class="qi-tag">Financial</span><span class="qi-tag">Payable</span></div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="queue-item">
+          <div class="qi-top">
+            <div class="qi-dot-row"><div class="severity-dot sev-critical"></div><span class="qi-type">Review Required</span></div>
+            <div class="qi-time">45m ago</div>
+          </div>
+          <div class="qi-title">OCR Confidence Below Threshold</div>
+          <div class="qi-sub">Ingestion #IR-20260319-0041 · 2 fields flagged</div>
+          <div class="qi-meta"><span class="qi-tag">Ingestion</span><span class="qi-tag">OCR</span></div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="queue-item">
+          <div class="qi-top">
+            <div class="qi-dot-row"><div class="severity-dot sev-high"></div><span class="qi-type">Approval Required</span></div>
+            <div class="qi-time">3h ago</div>
+          </div>
+          <div class="qi-title">Journal Entry — March Adjustments</div>
+          <div class="qi-sub">JE-202603-000023 · $18,500.00</div>
+          <div class="qi-meta"><span class="qi-tag">Financial</span><span class="qi-tag">GL</span></div>
+        </div>
+
+        <!-- Item 4 -->
+        <div class="queue-item">
+          <div class="qi-top">
+            <div class="qi-dot-row"><div class="severity-dot sev-medium"></div><span class="qi-type">Exception</span></div>
+            <div class="qi-time">5h ago</div>
+          </div>
+          <div class="qi-title">Reconciliation Exception</div>
+          <div class="qi-sub">RC-202603-000008 · $425.00 variance</div>
+          <div class="qi-meta"><span class="qi-tag">Reconciliation</span></div>
+        </div>
+
+        <!-- Item 5 -->
+        <div class="queue-item">
+          <div class="qi-top">
+            <div class="qi-dot-row"><div class="severity-dot sev-high"></div><span class="qi-type">Approval Required</span></div>
+            <div class="qi-time">6h ago</div>
+          </div>
+          <div class="qi-title">Period Close Request — March 2026</div>
+          <div class="qi-sub">Requested by: J. Morrison</div>
+          <div class="qi-meta"><span class="qi-tag">Period Close</span></div>
+        </div>
+
+        <!-- Item 6 -->
+        <div class="queue-item">
+          <div class="qi-top">
+            <div class="qi-dot-row"><div class="severity-dot sev-medium"></div><span class="qi-type">Review Required</span></div>
+            <div class="qi-time">8h ago</div>
+          </div>
+          <div class="qi-title">AP Invoice — Medical Supply Co.</div>
+          <div class="qi-sub">AP-202603-000051 · $892.00</div>
+          <div class="qi-meta"><span class="qi-tag">Financial</span><span class="qi-tag">Payable</span></div>
+        </div>
+
+        <!-- Item 7 -->
+        <div class="queue-item">
+          <div class="qi-top">
+            <div class="qi-dot-row"><div class="severity-dot sev-low"></div><span class="qi-type">Exception</span></div>
+            <div class="qi-time">1d ago</div>
+          </div>
+          <div class="qi-title">AR Aging Alert — 30 Days</div>
+          <div class="qi-sub">AR-202602-000012 · $12,000.00</div>
+          <div class="qi-meta"><span class="qi-tag">Financial</span><span class="qi-tag">AR</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Detail -->
+    <div class="detail-panel">
+      <div class="detail-header">
+        <div class="detail-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <div style="flex:1">
+          <div class="detail-title">AP Invoice — Office Depot</div>
+          <div class="detail-ref">AP-202603-000047 · Submitted by: R. Chen · 2 hours ago</div>
+        </div>
+        <span class="sev-badge sev-high-badge">High Priority</span>
+      </div>
+
+      <div class="detail-body">
+        <div class="fields-col">
+          <div class="section-label">Invoice Details</div>
+
+          <div class="field-row">
+            <div class="field-label">Vendor</div>
+            <div class="field-value">Office Depot — Vendor #VND-0041</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Invoice Number</div>
+            <div class="field-value">INV-ODC-2026-88341</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Invoice Date</div>
+            <div class="field-value">March 14, 2026</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Due Date</div>
+            <div class="field-value" style="color:var(--amber);">April 13, 2026 · Due in 25 days</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Amount Due</div>
+            <div class="field-value" style="font-size:18px; color:#5CB8E8; font-weight:700;">$3,240.00</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">Expense Account</div>
+            <div class="field-value">5040 — General Office Overhead</div>
+          </div>
+          <div class="field-row">
+            <div class="field-label">AP Account</div>
+            <div class="field-value">2010 — Accounts Payable</div>
+          </div>
+        </div>
+
+        <div class="context-col">
+          <div class="context-card">
+            <h4>Vendor History</h4>
+            <div class="ctx-row"><span class="ctx-key">Invoices (YTD)</span><span class="ctx-val">14</span></div>
+            <div class="ctx-row"><span class="ctx-key">Total Paid (YTD)</span><span class="ctx-val money">$28,450</span></div>
+            <div class="ctx-row"><span class="ctx-key">Outstanding</span><span class="ctx-val money">$3,240</span></div>
+            <div class="ctx-row"><span class="ctx-key">Payment Terms</span><span class="ctx-val">Net 30</span></div>
+            <div class="ctx-row"><span class="ctx-key">Last Invoice</span><span class="ctx-val">Feb 28</span></div>
+          </div>
+
+          <div class="context-card">
+            <h4>GL Impact Preview</h4>
+            <div class="ctx-row"><span class="ctx-key">Debit</span><span class="ctx-val">5040 Expenses</span></div>
+            <div class="ctx-row"><span class="ctx-key">Credit</span><span class="ctx-val">2010 AP</span></div>
+            <div class="ctx-row"><span class="ctx-key">Amount</span><span class="ctx-val money">$3,240.00</span></div>
+            <div class="ctx-row"><span class="ctx-key">Period</span><span class="ctx-val">March 2026</span></div>
+          </div>
+
+          <div class="context-card">
+            <h4>Routing Info</h4>
+            <div class="ctx-row"><span class="ctx-key">Routed via</span><span class="ctx-val">Role: Controller</span></div>
+            <div class="ctx-row"><span class="ctx-key">Escalation</span><span class="ctx-val">13 min remaining</span></div>
+            <div class="ctx-row"><span class="ctx-key">Chain</span><span class="ctx-val">FinancialApproval</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <span class="note">Approving will auto-post the GL entry. This action is logged and cannot be undone.</span>
+        <button class="btn btn-ghost">View Full Record</button>
+        <button class="btn btn-danger">Return for Correction</button>
+        <button class="btn btn-primary">Approve Invoice</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

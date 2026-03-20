@@ -25,6 +25,7 @@ import { SignalStudioPage } from './home/SignalStudioPage';
 import { OrbitalPage } from './home/OrbitalPage';
 import { BeboPage } from './home/BeboPage';
 import { CosmographPage } from './home/CosmographPage';
+import { FinancialPage } from './home/FinancialPage';
 import { ModulePageActions } from './home/types';
 import type { CommandPaletteItem } from '../types';
 import { useGuidedTour } from '../components/GuidedTour';
@@ -235,7 +236,7 @@ export function HomeScreen() {
     ? require('../../assets/cs_orbitaldarklogo.png')
     : require('../../assets/cs_orbitallightlogo.png');
   const tenantBrandedMode = page === 'enduser' && !tenantAccessOpen;
-  const moduleActionEnabled = (tenantAccessOpen && isSuperAdmin) || (!tenantAccessOpen && (page === 'admin' || page === 'signal' || page === 'orbital' || page === 'bebo' || page === 'cosmograph'));
+  const moduleActionEnabled = (tenantAccessOpen && isSuperAdmin) || (!tenantAccessOpen && (page === 'admin' || page === 'signal' || page === 'orbital' || page === 'bebo' || page === 'cosmograph' || page === 'financial'));
   const saveDraftLabel = moduleActions?.saveDraftLabel ?? 'Save Draft';
   const publishLabel = moduleActions?.publishLabel ?? 'Publish';
   const bottomActionStatus = (tenantAccessOpen && isSuperAdmin ? tenantNotice : moduleActionNotice) || '';
@@ -1365,6 +1366,7 @@ export function HomeScreen() {
                 {page === 'orbital' && <OrbitalPage guidedMode={guidedMode} onGuide={openGuide} registerActions={registerModuleActions} auditLog={auditLog} addNotification={addNotification} />}
                 {page === 'bebo' && <BeboPage guidedMode={guidedMode} onGuide={openGuide} />}
                 {page === 'cosmograph' && <CosmographPage guidedMode={guidedMode} onGuide={openGuide} registerActions={registerModuleActions} auditLog={auditLog} addNotification={addNotification} />}
+                {page === 'financial' && <FinancialPage guidedMode={guidedMode} onGuide={openGuide} registerActions={registerModuleActions} auditLog={auditLog} addNotification={addNotification} />}
               </>
             )}
           </View>

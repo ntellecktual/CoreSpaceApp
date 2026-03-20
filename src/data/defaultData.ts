@@ -1603,4 +1603,138 @@ export const defaultData: AppData = {
       ],
     },
   ],
+
+  // ─── Financial Operations Engine seed data ───────────────────────
+  glAccounts: [
+    { id: 'acct-1000', accountNumber: '1000', accountName: 'Operating Checking', accountType: 'asset', normalBalance: 'debit', isActive: true },
+    { id: 'acct-1100', accountNumber: '1100', accountName: 'Accounts Receivable — Trade', accountType: 'asset', normalBalance: 'debit', isActive: true },
+    { id: 'acct-1200', accountNumber: '1200', accountName: 'Inventory', accountType: 'asset', normalBalance: 'debit', isActive: true },
+    { id: 'acct-2000', accountNumber: '2000', accountName: 'Accounts Payable — Trade', accountType: 'liability', normalBalance: 'credit', isActive: true },
+    { id: 'acct-2100', accountNumber: '2100', accountName: 'Accrued Liabilities', accountType: 'liability', normalBalance: 'credit', isActive: true },
+    { id: 'acct-3000', accountNumber: '3000', accountName: 'Retained Earnings', accountType: 'equity', normalBalance: 'credit', isActive: true },
+    { id: 'acct-4000', accountNumber: '4000', accountName: 'Service Revenue', accountType: 'revenue', normalBalance: 'credit', isActive: true },
+    { id: 'acct-4100', accountNumber: '4100', accountName: 'Product Sales Revenue', accountType: 'revenue', normalBalance: 'credit', isActive: true },
+    { id: 'acct-5000', accountNumber: '5000', accountName: 'Cost of Services', accountType: 'expense', normalBalance: 'debit', isActive: true },
+    { id: 'acct-5100', accountNumber: '5100', accountName: 'Operating Expenses', accountType: 'expense', normalBalance: 'debit', isActive: true },
+  ],
+
+  accountingPeriods: [
+    { id: 'period-2026-01', periodName: 'January 2026',   periodStart: '2026-01-01', periodEnd: '2026-01-31', fiscalYear: 2026, status: 'closed', closeApproverRole: 'Platform Admin', closedAt: '2026-02-03T10:00:00Z', closedBy: 'user-admin' },
+    { id: 'period-2026-02', periodName: 'February 2026',  periodStart: '2026-02-01', periodEnd: '2026-02-28', fiscalYear: 2026, status: 'closed', closeApproverRole: 'Platform Admin', closedAt: '2026-03-02T09:15:00Z', closedBy: 'user-admin' },
+    { id: 'period-2026-03', periodName: 'March 2026',     periodStart: '2026-03-01', periodEnd: '2026-03-31', fiscalYear: 2026, status: 'open',   closeApproverRole: 'Platform Admin' },
+    { id: 'period-2026-04', periodName: 'April 2026',     periodStart: '2026-04-01', periodEnd: '2026-04-30', fiscalYear: 2026, status: 'open',   closeApproverRole: 'Platform Admin' },
+    { id: 'period-2026-05', periodName: 'May 2026',       periodStart: '2026-05-01', periodEnd: '2026-05-31', fiscalYear: 2026, status: 'open',   closeApproverRole: 'Platform Admin' },
+    { id: 'period-2026-06', periodName: 'June 2026',      periodStart: '2026-06-01', periodEnd: '2026-06-30', fiscalYear: 2026, status: 'open',   closeApproverRole: 'Platform Admin' },
+    { id: 'period-2026-07', periodName: 'July 2026',      periodStart: '2026-07-01', periodEnd: '2026-07-31', fiscalYear: 2026, status: 'open',   closeApproverRole: 'Platform Admin' },
+    { id: 'period-2026-08', periodName: 'August 2026',    periodStart: '2026-08-01', periodEnd: '2026-08-31', fiscalYear: 2026, status: 'open',   closeApproverRole: 'Platform Admin' },
+    { id: 'period-2026-09', periodName: 'September 2026', periodStart: '2026-09-01', periodEnd: '2026-09-30', fiscalYear: 2026, status: 'open',   closeApproverRole: 'Platform Admin' },
+    { id: 'period-2026-10', periodName: 'October 2026',   periodStart: '2026-10-01', periodEnd: '2026-10-31', fiscalYear: 2026, status: 'open',   closeApproverRole: 'Platform Admin' },
+    { id: 'period-2026-11', periodName: 'November 2026',  periodStart: '2026-11-01', periodEnd: '2026-11-30', fiscalYear: 2026, status: 'open',   closeApproverRole: 'Platform Admin' },
+    { id: 'period-2026-12', periodName: 'December 2026',  periodStart: '2026-12-01', periodEnd: '2026-12-31', fiscalYear: 2026, status: 'open',   closeApproverRole: 'Platform Admin' },
+  ],
+
+  journalEntries: [
+    {
+      id: 'je-001', entryRef: 'JE-202603-000001', transactionDate: '2026-03-05', description: 'Service revenue recognition — Q1 billing cycle',
+      postingStatus: 'posted', debitTotal: 15000, creditTotal: 15000, sourceType: 'ar_receipt', sourceRefId: 'ar-001',
+      periodId: 'period-2026-03', createdBy: 'user-admin', createdAt: '2026-03-05T09:00:00Z',
+      lines: [
+        { id: 'jl-001-1', entryId: 'je-001', accountId: 'acct-1100', debitAmount: 15000, creditAmount: 0, memo: 'AR — Q1 service billing', lineOrder: 1 },
+        { id: 'jl-001-2', entryId: 'je-001', accountId: 'acct-4000', debitAmount: 0, creditAmount: 15000, memo: 'Service Revenue — Q1', lineOrder: 2 },
+      ],
+    },
+    {
+      id: 'je-002', entryRef: 'JE-202603-000002', transactionDate: '2026-03-12', description: 'Operating expense accrual — tech infrastructure Q1',
+      postingStatus: 'pending_approval', debitTotal: 4800, creditTotal: 4800, sourceType: 'manual',
+      periodId: 'period-2026-03', createdBy: 'user-admin', createdAt: '2026-03-12T14:30:00Z',
+      lines: [
+        { id: 'jl-002-1', entryId: 'je-002', accountId: 'acct-5100', debitAmount: 4800, creditAmount: 0, memo: 'Tech support — March', lineOrder: 1 },
+        { id: 'jl-002-2', entryId: 'je-002', accountId: 'acct-2000', debitAmount: 0, creditAmount: 4800, memo: 'AP — TechSupport Pro invoice TS-20260312', lineOrder: 2 },
+      ],
+    },
+    {
+      id: 'je-003', entryRef: 'JE-202603-000003', transactionDate: '2026-03-18', description: 'Cost of services — case processing labor allocation',
+      postingStatus: 'draft', debitTotal: 8200, creditTotal: 8200, sourceType: 'manual',
+      periodId: 'period-2026-03', createdBy: 'user-admin', createdAt: '2026-03-18T11:00:00Z',
+      lines: [
+        { id: 'jl-003-1', entryId: 'je-003', accountId: 'acct-5000', debitAmount: 8200, creditAmount: 0, memo: 'Case processing — March cycle', lineOrder: 1 },
+        { id: 'jl-003-2', entryId: 'je-003', accountId: 'acct-1000', debitAmount: 0, creditAmount: 8200, memo: 'Cash disbursement — payroll allocation', lineOrder: 2 },
+      ],
+    },
+  ],
+
+  payables: [
+    {
+      id: 'ap-001', payableRef: 'AP-202603-000001', payableTo: 'Acme Office Supplies', counterpartyId: 'cp-001', externalRef: 'INV-2026-0847',
+      obligationDate: '2026-03-01', dueDate: '2026-03-31', amountDue: 2500, amountPaid: 0,
+      paymentStatus: 'outstanding', approvalStatus: 'pending_approval',
+      liabilityAccountId: 'acct-2000', expenseAccountId: 'acct-5100',
+      notes: 'Q1 office supplies and consumables order',
+      createdBy: 'user-admin', createdAt: '2026-03-01T09:00:00Z',
+    },
+    {
+      id: 'ap-002', payableRef: 'AP-202603-000002', payableTo: 'TechSupport Pro', counterpartyId: 'cp-002', externalRef: 'TS-20260312',
+      obligationDate: '2026-03-12', dueDate: '2026-04-11', amountDue: 4800, amountPaid: 0,
+      paymentStatus: 'outstanding', approvalStatus: 'approved', glEntryId: 'je-002',
+      liabilityAccountId: 'acct-2000', expenseAccountId: 'acct-5100',
+      notes: 'Monthly managed IT support — March 2026',
+      createdBy: 'user-admin', createdAt: '2026-03-12T14:30:00Z',
+    },
+    {
+      id: 'ap-003', payableRef: 'AP-202603-000003', payableTo: 'Compliance Shield LLC', externalRef: 'CS-Q1-2026',
+      obligationDate: '2026-03-15', dueDate: '2026-04-14', amountDue: 1200, amountPaid: 0,
+      paymentStatus: 'outstanding', approvalStatus: 'draft',
+      liabilityAccountId: 'acct-2000', expenseAccountId: 'acct-5100',
+      notes: 'DSCSA compliance software annual subscription — Q1 portion',
+      createdBy: 'user-admin', createdAt: '2026-03-15T10:00:00Z',
+    },
+  ],
+
+  receivables: [
+    {
+      id: 'ar-001', receivableRef: 'AR-202603-000001', receivableFrom: 'Alpha Client Corp', counterpartyId: 'cp-003',
+      sourceRecordId: 'record-q1-billing', invoicedAmount: 15000, receivedAmount: 15000,
+      receiptDate: '2026-03-05', receiptStatus: 'received', glEntryId: 'je-001',
+      arAccountId: 'acct-1100', revenueAccountId: 'acct-4000',
+      notes: 'Q1 service delivery — fully received',
+      createdBy: 'user-admin', createdAt: '2026-02-28T09:00:00Z',
+    },
+    {
+      id: 'ar-002', receivableRef: 'AR-202603-000002', receivableFrom: 'Beta Pharma Distribution',
+      invoicedAmount: 8500, receivedAmount: 0,
+      receiptStatus: 'pending',
+      arAccountId: 'acct-1100', revenueAccountId: 'acct-4000',
+      notes: 'DSCSA serialization consulting — March delivery',
+      createdBy: 'user-admin', createdAt: '2026-03-10T11:00:00Z',
+    },
+    {
+      id: 'ar-003', receivableRef: 'AR-202603-000003', receivableFrom: 'Grant: HHS Tech Modernization',
+      invoicedAmount: 25000, receivedAmount: 0,
+      receiptStatus: 'pending',
+      arAccountId: 'acct-1100', revenueAccountId: 'acct-4000',
+      notes: 'Federal grant disbursement — Phase 2 milestone',
+      createdBy: 'user-admin', createdAt: '2026-03-01T08:00:00Z',
+    },
+  ],
+
+  financialCounterparties: [
+    { id: 'cp-001', name: 'Acme Office Supplies', counterpartyType: 'vendor', defaultLiabilityAccountId: 'acct-2000', defaultExpenseAccountId: 'acct-5100', paymentMethod: 'check', isActive: true },
+    { id: 'cp-002', name: 'TechSupport Pro', counterpartyType: 'vendor', defaultLiabilityAccountId: 'acct-2000', defaultExpenseAccountId: 'acct-5100', paymentMethod: 'ach', isActive: true },
+    { id: 'cp-003', name: 'Alpha Client Corp', counterpartyType: 'customer', paymentMethod: 'wire', isActive: true },
+  ],
+
+  waterfalls: [
+    {
+      id: 'wf-001', waterfallRef: 'WF-202603-000001', receivableId: 'ar-001', sourceRecordId: 'record-q1-billing',
+      totalAmount: 15000, executionStatus: 'pending_approval',
+      description: 'Q1 service revenue distribution — attorney fee, expenses, and client net',
+      createdBy: 'user-admin', createdAt: '2026-03-06T10:00:00Z',
+      parties: [
+        { id: 'wp-001-1', waterfallId: 'wf-001', partyName: 'Attorney Fee', partyRole: 'attorney_fee', paymentAmount: 4950, paymentMethod: 'ach', paymentStatus: 'pending' },
+        { id: 'wp-001-2', waterfallId: 'wf-001', partyName: 'Case Expenses Reimbursement', partyRole: 'expenses', paymentAmount: 2050, paymentMethod: 'check', paymentStatus: 'pending' },
+        { id: 'wp-001-3', waterfallId: 'wf-001', partyName: 'Medical Lienholder — General Hospital', partyRole: 'lienholder', paymentAmount: 3000, paymentMethod: 'wire', paymentStatus: 'pending' },
+        { id: 'wp-001-4', waterfallId: 'wf-001', partyName: 'Client Net Proceeds', partyRole: 'client', paymentAmount: 5000, paymentMethod: 'ach', paymentStatus: 'pending' },
+      ],
+    },
+  ],
 };

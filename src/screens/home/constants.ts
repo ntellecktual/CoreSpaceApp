@@ -23,6 +23,7 @@ export const pages: { id: Page; label: string; desc: string }[] = [
   { id: 'cosmograph', label: 'Cosmograph', desc: 'Analyze' },
   { id: 'financial', label: 'Financial Ops', desc: 'Finance' },
   { id: 'ingestion', label: 'Ingestion', desc: 'Ingest' },
+  { id: 'workflow', label: 'Workflow Chains', desc: 'Automate' },
   { id: 'enduser', label: 'End User', desc: 'Operate' },
 ];
 

@@ -5,6 +5,8 @@ import { useAppState } from '../../context/AppStateContext';
 import { useUiTheme } from '../../context/UiThemeContext';
 import {
   AccountingPeriod,
+  ApInvoice,
+  ApInvoiceStatus,
   DistributionWaterfall,
   FinancialValidationError,
   GlAccount,
@@ -12,12 +14,13 @@ import {
   JournalLine,
   Payable,
   Receivable,
+  Vendor,
 } from '../../types';
 import { Card } from './components';
 import { GuidedPageProps } from './types';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-type FinTab = 'mission' | 'ledger' | 'payables' | 'receivables' | 'waterfalls' | 'reports';
+type FinTab = 'mission' | 'ledger' | 'payables' | 'receivables' | 'waterfalls' | 'reports' | 'vendors';
 type LedgerSubTab = 'accounts' | 'entries' | 'periods';
 type ReportType = 'trial_balance' | 'income_statement' | 'balance_sheet';
 
@@ -28,6 +31,7 @@ const FIN_TABS: { id: FinTab; label: string; icon: string }[] = [
   { id: 'receivables', label: 'Receivables', icon: '📥' },
   { id: 'waterfalls', label: 'Waterfalls', icon: '🌊' },
   { id: 'reports', label: 'Reports', icon: '📊' },
+  { id: 'vendors', label: 'Vendors & AP', icon: '🏢' },
 ];
 
 const ACCENT = '#F59E0B';
@@ -112,6 +116,8 @@ export function FinancialPage({}: GuidedPageProps) {
     approveWaterfall, addWaterfall,
     closeAccountingPeriod,
     confirmIngestionRecord, rejectIngestionRecord,
+    addVendor, updateVendor,
+    addApInvoice, submitApInvoiceForApproval, approveApInvoice, markApInvoicePaid,
   } = useAppState();
   const { styles } = useUiTheme();
 
@@ -325,6 +331,220 @@ export function FinancialPage({}: GuidedPageProps) {
           );
         })}
       </ScrollView>
+    );
+  }
+
+  // ── Vendor & AP state ──────────────────────────────────────────────────────
+  const [vndName, setVndName] = useState('');
+  const [vndCode, setVndCode] = useState('');
+  const [vndPayment, setVndPayment] = useState<'ach' | 'wire' | 'check'>('ach');
+  const [vndContact, setVndContact] = useState('');
+  const [vndExpenseAcct, setVndExpenseAcct] = useState('');
+  const [vndLiabAcct, setVndLiabAcct] = useState('');
+  const [vndErrors, setVndErrors] = useState<string | null>(null);
+
+  const [apiVendorId, setApiVendorId] = useState('');
+  const [apiInvoiceNum, setApiInvoiceNum] = useState('');
+  const [apiInvoiceDate, setApiInvoiceDate] = useState(new Date().toISOString().slice(0, 10));
+  const [apiDueDate, setApiDueDate] = useState('');
+  const [apiAmount, setApiAmount] = useState('');
+  const [apiExpense, setApiExpense] = useState('');
+  const [apiApAcct, setApiApAcct] = useState('');
+  const [apiNotes, setApiNotes] = useState('');
+  const [apiErrors, setApiErrors] = useState<string | null>(null);
+  const [apLastErrors, setApLastErrors] = useState<FinancialValidationError[]>([]);
+
+  const vendors = data.vendors ?? [];
+  const apInvoices = data.apInvoices ?? [];
+
+  function apInvoiceStatusColor(s: ApInvoiceStatus | 'outstanding' | 'partial' | 'paid' | 'disputed'): string {
+    if (s === 'approved' || s === 'paid') return SUCCESS;
+    if (s === 'pending_approval') return ACCENT;
+    if (s === 'outstanding' || s === 'partial') return ACCENT;
+    if (s === 'disputed') return DANGER;
+    return '#8878AE';
+  }
+
+  function handleAddVendor() {
+    if (!vndName.trim() || !vndCode.trim()) {
+      setVndErrors('Vendor name and code are required.');
+      return;
+    }
+    addVendor({
+      tenantId: 'tenant-a',
+      vendorName: vndName.trim(),
+      vendorCode: vndCode.trim().toUpperCase(),
+      paymentMethod: vndPayment,
+      contactName: vndContact.trim() || undefined,
+      defaultExpenseAccountId: vndExpenseAcct.trim() || undefined,
+      defaultLiabilityAccountId: vndLiabAcct.trim() || undefined,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      createdBy: currentUser?.id ?? 'user-admin',
+    });
+    setVndName(''); setVndCode(''); setVndContact(''); setVndExpenseAcct(''); setVndLiabAcct('');
+    setVndErrors(null);
+  }
+
+  function handleAddApInvoice() {
+    const amount = parseFloat(apiAmount);
+    if (!apiVendorId || !apiInvoiceNum.trim() || !amount || !apiDueDate) {
+      setApiErrors('Vendor, invoice number, amount, and due date are required.');
+      return;
+    }
+    const vendor = vendors.find((v) => v.id === apiVendorId);
+    addApInvoice({
+      tenantId: 'tenant-a',
+      vendorId: apiVendorId,
+      invoiceNumber: apiInvoiceNum.trim(),
+      invoiceDate: apiInvoiceDate,
+      dueDate: apiDueDate,
+      amountDue: amount,
+      amountPaid: 0,
+      invoiceStatus: 'draft',
+      apAccountId: apiApAcct.trim() || vendor?.defaultLiabilityAccountId || glAccounts.find((a) => a.accountNumber === '2100')?.id || '',
+      expenseAccountId: apiExpense.trim() || vendor?.defaultExpenseAccountId || '',
+      notes: apiNotes.trim() || undefined,
+      createdAt: new Date().toISOString(),
+      createdBy: currentUser?.id ?? 'user-admin',
+    });
+    setApiVendorId(''); setApiInvoiceNum(''); setApiAmount(''); setApiDueDate(''); setApiExpense(''); setApiApAcct(''); setApiNotes('');
+    setApiErrors(null);
+  }
+
+  function renderVendors() {
+    const inputStyle = {
+      backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(245,158,11,0.3)',
+      borderRadius: 8, padding: 10, color: '#fff' as const, fontSize: 14, marginBottom: 8,
+    };
+    return (
+      <View style={{ gap: 16 }}>
+        {/* Vendor list */}
+        <Card title={`🏢 Vendor Registry (${vendors.length})`}>
+          {vendors.length === 0 && <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>No vendors yet.</Text>}
+          {vendors.map((v) => (
+            <View key={v.id} style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <View>
+                <Text style={{ color: '#fff', fontWeight: '600' }}>{v.vendorName} <Text style={{ color: INFO, fontSize: 11 }}>[{v.vendorCode}]</Text></Text>
+                <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>{v.paymentMethod.toUpperCase()}{v.contactName ? ` · ${v.contactName}` : ''}</Text>
+              </View>
+              <Pressable onPress={() => updateVendor(v.id, { isActive: !v.isActive })} style={{
+                paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6,
+                backgroundColor: v.isActive ? `${SUCCESS}22` : `${DANGER}22`,
+                borderWidth: 1, borderColor: v.isActive ? SUCCESS : DANGER,
+              }}>
+                <Text style={{ color: v.isActive ? SUCCESS : DANGER, fontSize: 12, fontWeight: '700' }}>{v.isActive ? 'Active' : 'Inactive'}</Text>
+              </Pressable>
+            </View>
+          ))}
+        </Card>
+
+        {/* Add vendor form */}
+        <Card title="➕ Add Vendor">
+          {vndErrors && <Text style={{ color: DANGER, fontSize: 12, marginBottom: 8 }}>{vndErrors}</Text>}
+          <TextInput placeholder="Vendor name *" placeholderTextColor="rgba(255,255,255,0.35)" value={vndName} onChangeText={setVndName} style={inputStyle} />
+          <TextInput placeholder="Vendor code * (e.g. GSC)" placeholderTextColor="rgba(255,255,255,0.35)" value={vndCode} onChangeText={setVndCode} style={inputStyle} />
+          <TextInput placeholder="Contact name" placeholderTextColor="rgba(255,255,255,0.35)" value={vndContact} onChangeText={setVndContact} style={inputStyle} />
+          <TextInput placeholder="Default expense account ID" placeholderTextColor="rgba(255,255,255,0.35)" value={vndExpenseAcct} onChangeText={setVndExpenseAcct} style={inputStyle} />
+          <TextInput placeholder="Default AP liability account ID" placeholderTextColor="rgba(255,255,255,0.35)" value={vndLiabAcct} onChangeText={setVndLiabAcct} style={inputStyle} />
+          <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 6 }}>Payment method:</Text>
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+            {(['ach', 'wire', 'check'] as const).map((m) => (
+              <Pressable key={m} onPress={() => setVndPayment(m)} style={{
+                paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6,
+                backgroundColor: vndPayment === m ? `${ACCENT}33` : 'rgba(255,255,255,0.05)',
+                borderWidth: 1, borderColor: vndPayment === m ? ACCENT : 'rgba(255,255,255,0.1)',
+              }}>
+                <Text style={{ color: vndPayment === m ? ACCENT : 'rgba(255,255,255,0.5)', fontSize: 13 }}>{m.toUpperCase()}</Text>
+              </Pressable>
+            ))}
+          </View>
+          <Pressable onPress={handleAddVendor} style={{ backgroundColor: `${ACCENT}22`, borderWidth: 1, borderColor: ACCENT, borderRadius: 8, padding: 10, alignItems: 'center' }}>
+            <Text style={{ color: ACCENT, fontWeight: '700' }}>+ Add Vendor</Text>
+          </Pressable>
+        </Card>
+
+        {/* AP Invoice list */}
+        <Card title={`📋 AP Invoices (${apInvoices.length})`}>
+          {apLastErrors.length > 0 && <ValidationErrors errors={apLastErrors} />}
+          {apInvoices.length === 0 && <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>No AP invoices yet.</Text>}
+          {apInvoices.map((inv) => {
+            const vendor = vendors.find((v) => v.id === inv.vendorId);
+            const statusColor = apInvoiceStatusColor(inv.invoiceStatus);
+            return (
+              <View key={inv.id} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', paddingVertical: 10 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: '#fff', fontWeight: '600' }}>{inv.invoiceRef}</Text>
+                    <Text style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12 }}>{vendor?.vendorName ?? inv.vendorId} · #{inv.invoiceNumber}</Text>
+                    <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>Due {fmtDate(inv.dueDate)}</Text>
+                  </View>
+                  <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                    <Text style={{ color: '#fff', fontWeight: '700' }}>{fmtCurrency(inv.amountDue)}</Text>
+                    <View style={{ borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: `${statusColor}22`, borderWidth: 1, borderColor: `${statusColor}55` }}>
+                      <Text style={{ color: statusColor, fontSize: 10, fontWeight: '700', textTransform: 'uppercase' }}>{inv.invoiceStatus.replace(/_/g, ' ')}</Text>
+                    </View>
+                  </View>
+                </View>
+                {/* Action row */}
+                <View style={{ flexDirection: 'row', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+                  {inv.invoiceStatus === 'draft' && (
+                    <Pressable onPress={() => submitApInvoiceForApproval(inv.id)} style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: `${ACCENT}22`, borderWidth: 1, borderColor: ACCENT }}>
+                      <Text style={{ color: ACCENT, fontSize: 12 }}>Submit for Approval</Text>
+                    </Pressable>
+                  )}
+                  {inv.invoiceStatus === 'pending_approval' && (
+                    <Pressable onPress={() => {
+                      const result = approveApInvoice(inv.id, currentUser?.id ?? 'user-admin');
+                      if (!result.ok && result.errors) setApLastErrors(result.errors);
+                      else setApLastErrors([]);
+                    }} style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: `${SUCCESS}22`, borderWidth: 1, borderColor: SUCCESS }}>
+                      <Text style={{ color: SUCCESS, fontSize: 12 }}>Approve + Post GL</Text>
+                    </Pressable>
+                  )}
+                  {inv.invoiceStatus === 'approved' && inv.paymentStatus !== 'paid' && (
+                    <Pressable onPress={() => markApInvoicePaid(inv.id, inv.amountDue - inv.amountPaid)} style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: `${INFO}22`, borderWidth: 1, borderColor: INFO }}>
+                      <Text style={{ color: INFO, fontSize: 12 }}>Mark Paid</Text>
+                    </Pressable>
+                  )}
+                  {inv.glEntryId && (
+                    <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.05)' }}>
+                      <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>GL: {inv.glEntryId.slice(0, 18)}…</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            );
+          })}
+        </Card>
+
+        {/* Add AP Invoice form */}
+        <Card title="Record AP Invoice">
+          {apiErrors && <Text style={{ color: DANGER, fontSize: 12, marginBottom: 8 }}>{apiErrors}</Text>}
+          <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 4 }}>Vendor *</Text>
+          <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+            {vendors.filter((v) => v.isActive).map((v) => (
+              <Pressable key={v.id} onPress={() => setApiVendorId(v.id)} style={{
+                paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6,
+                backgroundColor: apiVendorId === v.id ? `${ACCENT}33` : 'rgba(255,255,255,0.05)',
+                borderWidth: 1, borderColor: apiVendorId === v.id ? ACCENT : 'rgba(255,255,255,0.1)',
+              }}>
+                <Text style={{ color: apiVendorId === v.id ? ACCENT : 'rgba(255,255,255,0.6)', fontSize: 12 }}>{v.vendorName}</Text>
+              </Pressable>
+            ))}
+          </View>
+          <TextInput placeholder="Invoice number *" placeholderTextColor="rgba(255,255,255,0.35)" value={apiInvoiceNum} onChangeText={setApiInvoiceNum} style={inputStyle} />
+          <TextInput placeholder="Invoice date (YYYY-MM-DD) *" placeholderTextColor="rgba(255,255,255,0.35)" value={apiInvoiceDate} onChangeText={setApiInvoiceDate} style={inputStyle} />
+          <TextInput placeholder="Due date (YYYY-MM-DD) *" placeholderTextColor="rgba(255,255,255,0.35)" value={apiDueDate} onChangeText={setApiDueDate} style={inputStyle} />
+          <TextInput placeholder="Amount due *" placeholderTextColor="rgba(255,255,255,0.35)" value={apiAmount} onChangeText={setApiAmount} keyboardType="numeric" style={inputStyle} />
+          <TextInput placeholder="Expense account ID (overrides vendor default)" placeholderTextColor="rgba(255,255,255,0.35)" value={apiExpense} onChangeText={setApiExpense} style={inputStyle} />
+          <TextInput placeholder="AP account ID (overrides vendor default)" placeholderTextColor="rgba(255,255,255,0.35)" value={apiApAcct} onChangeText={setApiApAcct} style={inputStyle} />
+          <TextInput placeholder="Notes" placeholderTextColor="rgba(255,255,255,0.35)" value={apiNotes} onChangeText={setApiNotes} style={inputStyle} multiline numberOfLines={2} />
+          <Pressable onPress={handleAddApInvoice} style={{ backgroundColor: `${ACCENT}22`, borderWidth: 1, borderColor: ACCENT, borderRadius: 8, padding: 10, alignItems: 'center' }}>
+            <Text style={{ color: ACCENT, fontWeight: '700' }}>+ Record Invoice</Text>
+          </Pressable>
+        </Card>
+      </View>
     );
   }
 
@@ -947,6 +1167,7 @@ export function FinancialPage({}: GuidedPageProps) {
       {tab === 'receivables' && renderReceivables()}
       {tab === 'waterfalls' && renderWaterfalls()}
       {tab === 'reports' && renderReports()}
+      {tab === 'vendors' && renderVendors()}
     </ScrollView>
   );
 }

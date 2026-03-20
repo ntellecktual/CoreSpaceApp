@@ -22,12 +22,12 @@ function getContrastTextColor(hex: string) {
   return luminance > 0.56 ? '#111111' : '#FFFFFF';
 }
 
-export const Card = React.memo(function Card({ title, children, blurred = false }: { title: string; children: React.ReactNode; blurred?: boolean }) {
+export const Card = React.memo(function Card({ title, children, blurred = false }: { title?: string; children: React.ReactNode; blurred?: boolean }) {
   const { mode, styles } = useUiTheme();
 
   const content = (
     <View style={[styles.card, blurred && styles.moduleWidgetCard]}>
-      <Text style={styles.cardTitle}>{title}</Text>
+      {title ? <Text style={styles.cardTitle}>{title}</Text> : null}
       <View style={styles.cardBody}>{children}</View>
     </View>
   );

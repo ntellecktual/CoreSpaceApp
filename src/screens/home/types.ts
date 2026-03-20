@@ -1,6 +1,6 @@
 import type { AppNotification, AuditAction, AuditEntityType, AuditLogEntry } from '../../types';
 
-export type Page = 'architecture' | 'admin' | 'enduser' | 'signal' | 'orbital' | 'bebo' | 'cosmograph' | 'financial' | 'ingestion';
+export type Page = 'architecture' | 'admin' | 'enduser' | 'signal' | 'orbital' | 'bebo' | 'cosmograph' | 'financial' | 'ingestion' | 'workflow';
 
 export type AuditLogHandle = {
   entries: AuditLogEntry[];

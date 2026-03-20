@@ -38,6 +38,10 @@ import {
   SubSpaceDefinition,
   TenantBrandingProfile,
   UserPresence,
+  Vendor,
+  ApInvoice,
+  ApInvoiceStatus,
+  WorkflowChainDefinition,
   WorkspaceDefinition,
 } from '../types';
 
@@ -131,6 +135,16 @@ interface AppStateContextValue {
   applyFieldTag: (tag: Omit<FieldTagRecord, 'id'>) => FieldTagRecord;
   isFieldLocked: (recordType: string, recordId: string, fieldSlug: string) => { locked: boolean; tagName?: string; appliedByEvent?: string };
   updateUserPresence: (userId: string, updates: Partial<Omit<UserPresence, 'userId' | 'tenantId'>>) => void;
+  // ─── Vendors & AP Invoices (WS-049) ─────────────────────────
+  addVendor: (vendor: Omit<Vendor, 'id'>) => Vendor;
+  updateVendor: (id: string, updates: Partial<Omit<Vendor, 'id'>>) => { ok: boolean };
+  addApInvoice: (invoice: Omit<ApInvoice, 'id' | 'invoiceRef' | 'paymentStatus'>) => ApInvoice;
+  submitApInvoiceForApproval: (id: string) => { ok: boolean; reason?: string };
+  approveApInvoice: (id: string, approverId: string) => { ok: boolean; errors?: FinancialValidationError[] };
+  markApInvoicePaid: (id: string, amount: number) => { ok: boolean; reason?: string };
+  // ─── Workflow Chains (WS-049) ────────────────────────────────
+  addWorkflowChain: (chain: Omit<WorkflowChainDefinition, 'id'>) => WorkflowChainDefinition;
+  updateWorkflowChain: (id: string, updates: Partial<WorkflowChainDefinition>) => { ok: boolean };
 }
 
 const AppStateContext = createContext<AppStateContextValue | undefined>(undefined);
@@ -374,6 +388,9 @@ function normalizeData(parsed: Partial<AppData> & { activeRole?: string }): AppD
     ingestionRecords: parsed.ingestionRecords ?? (defaultData.ingestionRecords as IngestionRecord[]) ?? [],
     fieldTags: parsed.fieldTags ?? (defaultData.fieldTags as FieldTagRecord[]) ?? [],
     userPresence: parsed.userPresence ?? (defaultData.userPresence as UserPresence[]) ?? [],
+    vendors: parsed.vendors ?? (defaultData.vendors as Vendor[]) ?? [],
+    apInvoices: parsed.apInvoices ?? (defaultData.apInvoices as ApInvoice[]) ?? [],
+    workflowChains: parsed.workflowChains ?? (defaultData.workflowChains as WorkflowChainDefinition[]) ?? [],
   };
 }
 
@@ -1547,6 +1564,125 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
           return { ...current, userPresence: [...presence, { userId, tenantId: activeTenantId, activityStatus: 'active', lastSeenAt: new Date().toISOString(), connectionCount: 1, ...updates }] };
         });
       },
+
+      // ─── Vendor Management (WS-049) ────────────────────────────────────────
+      addVendor: (vendor) => {
+        const newVendor: Vendor = { ...vendor, id: `vnd-${Date.now()}` };
+        setTenantData((current) => ({ ...current, vendors: [...(current.vendors ?? []), newVendor] }));
+        return newVendor;
+      },
+      updateVendor: (id, updates) => {
+        let found = false;
+        setTenantData((current) => {
+          const next = (current.vendors ?? []).map((v) => {
+            if (v.id === id) { found = true; return { ...v, ...updates }; }
+            return v;
+          });
+          return { ...current, vendors: next };
+        });
+        return { ok: found };
+      },
+
+      // ─── AP Invoice Lifecycle (WS-049) ─────────────────────────────────────
+      addApInvoice: (invoice) => {
+        const now = new Date();
+        const seq = String(Math.floor(Math.random() * 900000) + 100000);
+        const ref = `API-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}-${seq}`;
+        const newInvoice: ApInvoice = {
+          ...invoice,
+          id: `api-${Date.now()}`,
+          invoiceRef: ref,
+          paymentStatus: 'outstanding',
+          amountPaid: 0,
+        };
+        setTenantData((current) => ({ ...current, apInvoices: [...(current.apInvoices ?? []), newInvoice] }));
+        return newInvoice;
+      },
+      submitApInvoiceForApproval: (id) => {
+        let reason: string | undefined;
+        setTenantData((current) => {
+          const invoice = (current.apInvoices ?? []).find((i) => i.id === id);
+          if (!invoice) { reason = 'Invoice not found'; return current; }
+          if (invoice.invoiceStatus !== 'draft') { reason = `Cannot submit — status is ${invoice.invoiceStatus}`; return current; }
+          return { ...current, apInvoices: (current.apInvoices ?? []).map((i) => i.id === id ? { ...i, invoiceStatus: 'pending_approval' as ApInvoiceStatus } : i) };
+        });
+        return reason ? { ok: false, reason } : { ok: true };
+      },
+      approveApInvoice: (id, approverId) => {
+        const errors: FinancialValidationError[] = [];
+        setTenantData((current) => {
+          const invoice = (current.apInvoices ?? []).find((i) => i.id === id);
+          if (!invoice || invoice.invoiceStatus !== 'pending_approval') return current;
+          // Find the most recent open accounting period, or fall back to empty string
+          const openPeriod = (current.accountingPeriods ?? []).find((p) => p.status === 'open');
+          const periodId = openPeriod?.id ?? '';
+          const now = new Date().toISOString();
+          const yyyymm = now.slice(0, 7).replace('-', '');
+          const seq = String(Math.floor(Math.random() * 900000) + 100000);
+          const entryId = `je-ap-${Date.now()}`;
+          // Auto-post GL: DEBIT expense account, CREDIT AP liability account
+          const glEntry: JournalEntry = {
+            id: entryId,
+            entryRef: `JE-${yyyymm}-${seq}`,
+            transactionDate: invoice.invoiceDate,
+            description: `AP Invoice ${invoice.invoiceRef}`,
+            postingStatus: 'posted',
+            sourceType: 'ap_payment',
+            sourceRefId: invoice.id,
+            periodId,
+            createdAt: now,
+            createdBy: approverId,
+            debitTotal: invoice.amountDue,
+            creditTotal: invoice.amountDue,
+            lines: [
+              { id: `jl-${entryId}-1`, entryId, accountId: invoice.expenseAccountId, debitAmount: invoice.amountDue, creditAmount: 0, memo: `Expense — ${invoice.invoiceRef}`, lineOrder: 1 },
+              { id: `jl-${entryId}-2`, entryId, accountId: invoice.apAccountId, debitAmount: 0, creditAmount: invoice.amountDue, memo: `AP Liability — ${invoice.invoiceRef}`, lineOrder: 2 },
+            ],
+          };
+          const updatedInvoices = (current.apInvoices ?? []).map((i) => i.id === id ? { ...i, invoiceStatus: 'approved' as ApInvoiceStatus, glEntryId: entryId } : i);
+          return { ...current, apInvoices: updatedInvoices, journalEntries: [...(current.journalEntries ?? []), glEntry] };
+        });
+        return errors.length ? { ok: false, errors } : { ok: true };
+      },
+      markApInvoicePaid: (id, amount) => {
+        let reason: string | undefined;
+        setTenantData((current) => {
+          const invoice = (current.apInvoices ?? []).find((i) => i.id === id);
+          if (!invoice) { reason = 'Invoice not found'; return current; }
+          if (invoice.invoiceStatus !== 'approved') { reason = `Cannot mark paid — status is ${invoice.invoiceStatus}`; return current; }
+          const newPaid = invoice.amountPaid + amount;
+          const isFullyPaid = newPaid >= invoice.amountDue;
+          return {
+            ...current,
+            apInvoices: (current.apInvoices ?? []).map((i) => i.id === id ? {
+              ...i,
+              amountPaid: newPaid,
+              paymentStatus: isFullyPaid ? 'paid' : 'partial',
+              invoiceStatus: isFullyPaid ? 'paid' as ApInvoiceStatus : 'approved' as ApInvoiceStatus,
+            } : i),
+          };
+        });
+        return reason ? { ok: false, reason } : { ok: true };
+      },
+
+      // ─── Workflow Chains (WS-049) ───────────────────────────────────────────
+      addWorkflowChain: (chain) => {
+        const newChain: WorkflowChainDefinition = { ...chain, id: `chain-${Date.now()}` };
+        setTenantData((current) => ({ ...current, workflowChains: [...(current.workflowChains ?? []), newChain] }));
+        return newChain;
+      },
+      updateWorkflowChain: (id, updates) => {
+        let found = false;
+        setTenantData((current) => {
+          const next = (current.workflowChains ?? []).map((c) => {
+            if (c.id === id) { found = true; return { ...c, ...updates }; }
+            return c;
+          });
+          return { ...current, workflowChains: next };
+        });
+        return { ok: found };
+      },
+
       signOut: () => {
         setSession(null);
       },

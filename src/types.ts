@@ -322,6 +322,10 @@ export interface AppData {
   ingestionRecords?: IngestionRecord[];
   fieldTags?: FieldTagRecord[];
   userPresence?: UserPresence[];
+  // ─── Vendors & AP (WS-049) ────────────────────────────────────────
+  vendors?: Vendor[];
+  apInvoices?: ApInvoice[];
+  workflowChains?: WorkflowChainDefinition[];
 }
 
 // ─── Orbital Integration Framework ──────────────────────────────────
@@ -941,10 +945,155 @@ export type FinancialValidationErrorCode =
   | 'GL_FIELD_LOCKED'
   | 'SEGREGATION_OF_DUTIES_VIOLATION'
   | 'WATERFALL_IMBALANCE'
-  | 'LINE_BOTH_SIDES';
+  | 'LINE_BOTH_SIDES'
+  | 'NEGATIVE_CLIENT_NET';
 
 export interface FinancialValidationError {
   errorCode: FinancialValidationErrorCode;
   message: string;
   detail?: Record<string, unknown>;
+}
+
+// ─── Automated Workflow Chains & Vendor Management (WS-049) ─────────────────
+// Logic lives in data, not code. A deployment configuration defines which
+// chain steps run, in what order, with what parameters. No chain step needs
+// to know about the full chain — only its trigger event and output action.
+// Any business can configure these primitives for their specific workflows.
+
+// ── Configurable waterfall party amount formulas ──────────────────────────────
+// pct_of_total:  amount = settlementAmount × pct (or pctField value from record)
+// pct_of_party:  amount = otherPartyAmount × pct (for co-counsel splits etc.)
+// fixed:         amount = fixedAmount (or amountField value from record)
+// remainder:     amount = total − sum of all other party amounts
+export type AmountCalcType = 'pct_of_total' | 'pct_of_party' | 'fixed' | 'remainder';
+
+export interface AmountCalculation {
+  type: AmountCalcType;
+  pct?: number;          // 0.0–1.0 fixed percentage
+  pctField?: string;     // field slug carrying the percentage dynamically
+  ofPartyRole?: string;  // for pct_of_party — which other party's amount to percentage
+  fixedAmount?: number;
+  amountField?: string;  // field slug carrying a dynamic fixed amount
+}
+
+// A single party definition inside a configurable waterfall template.
+// partyRole is any tenant-defined string — not locked to any industry.
+export interface WaterfallPartyDefinition {
+  partyRole: string;                     // "attorney_fee" | "client" | "lienholder" | any string
+  partyLabel: string;                    // human display label
+  amountCalculation: AmountCalculation;
+  paymentMethodSource?: string;          // 'config:ach' | 'field:{slug}'
+  required: boolean;
+}
+
+// ── Signal Studio financial action types ─────────────────────────────────────
+export type FinancialActionType =
+  | 'financial.create_payable'
+  | 'financial.create_receivable'
+  | 'financial.post_journal_entry'
+  | 'financial.create_waterfall'
+  | 'financial.request_period_close'
+  | 'financial.run_reconciliation_match'
+  | 'signal.push_alert'
+  | 'signal.update_field'
+  | 'signal.validate_and_route';
+
+// All action parameters stored as data — every key is optional because
+// different action types use different subsets. Fully extensible.
+export interface ChainActionParameters {
+  // financial.create_payable
+  fieldMapSource?: string;
+  payableToField?: string;
+  amountField?: string;
+  dueDateField?: string;
+  externalRefField?: string;
+  liabilityAccountId?: string;
+  expenseAccountId?: string;
+  // financial.create_waterfall
+  totalAmountSource?: string;
+  sourceRecordIdSource?: string;
+  partyDefinitions?: WaterfallPartyDefinition[];
+  // financial.post_journal_entry
+  entryLines?: Array<{ accountId: string; debitSource: string; creditSource: string; memo: string }>;
+  transactionDateSource?: string;
+  descriptionTemplate?: string;
+  sourceType?: JournalSourceType;
+  sourceRefField?: string;
+  // signal.push_alert
+  alertSeverity?: 'low' | 'medium' | 'high' | 'critical';
+  alertRoleTarget?: string;
+  alertMessageTemplate?: string;
+  // signal.validate_and_route
+  requiredFields?: string[];
+  onPassStatus?: string;
+  onFailRoute?: string;
+  [key: string]: unknown;
+}
+
+// One step in a workflow chain — trigger event + action + parameters
+export interface ChainStep {
+  id: string;
+  stepOrder: number;
+  triggerEvent: string;              // the event this step waits for
+  actionType: FinancialActionType;
+  parameters: ChainActionParameters;
+  isHumanJudgmentPoint: boolean;     // true = chain pauses, human must act
+  failureBehavior: 'dead_letter' | 'skip' | 'halt_chain';
+  description: string;
+}
+
+// A complete workflow chain stored as configuration — not code
+export interface WorkflowChainDefinition {
+  id: string;
+  tenantId: string;
+  name: string;
+  description: string;
+  chainType: 'ap_inbound' | 'ar_inbound' | 'period_close' | 'exception' | 'custom';
+  isActive: boolean;
+  steps: ChainStep[];
+  automationPct: number;   // (non-human steps / total steps) × 100
+  industry?: string;       // "legal_pi" etc. — demo labeling only, not logic
+  createdAt: string;
+  createdBy: string;
+}
+
+// ── Vendor Management ─────────────────────────────────────────────────────────
+export interface Vendor {
+  id: string;
+  tenantId: string;
+  vendorName: string;
+  vendorCode: string;
+  defaultExpenseAccountId?: string;
+  defaultLiabilityAccountId?: string;
+  paymentMethod: 'ach' | 'wire' | 'check';
+  paymentInstructions?: string;    // encrypted at rest, masked in API responses
+  taxId?: string;                  // encrypted, masked in API responses (#pii)
+  isActive: boolean;
+  contactName?: string;
+  contactEmail?: string;           // #pii
+  createdAt: string;
+  createdBy: string;
+}
+
+// ── AP Invoice (formal vendor invoice tracking, distinct from simple Payable) ─
+export type ApInvoiceStatus = 'draft' | 'pending_approval' | 'approved' | 'paid' | 'disputed';
+
+export interface ApInvoice {
+  id: string;
+  tenantId: string;
+  invoiceRef: string;              // auto: API-YYYYMM-######
+  vendorId: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  dueDate: string;
+  amountDue: number;
+  amountPaid: number;
+  paymentStatus: 'outstanding' | 'partial' | 'paid' | 'disputed';
+  invoiceStatus: ApInvoiceStatus;
+  glEntryId?: string;              // populated on approval — auto-GL DEBIT expense / CREDIT ap
+  apAccountId: string;
+  expenseAccountId: string;
+  notes?: string;
+  createdAt: string;
+  createdBy: string;
 }

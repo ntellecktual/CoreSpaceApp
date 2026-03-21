@@ -24,7 +24,7 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/cs_planetlogo.png"
+      "favicon": "./assets/splash-icon.png"
     }
   }
 }

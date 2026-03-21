@@ -1314,6 +1314,14 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             const updatedRec = { ...selectedDrawerRecord, subSpaceId: targetSubSpaceId } as RuntimeRecord;
             setSelectedDrawerRecord(updatedRec);
             auditLog?.logEntry({ action: 'update', entityType: 'record', entityId: recordId, entityName: selectedDrawerRecord.title || recordId, after: { detail: `Moved to SubSpace: ${targetSs?.name ?? targetSubSpaceId}` } });
+            addNotification?.({
+              type: 'system',
+              title: 'Pipeline Stage Advanced',
+              body: `"${selectedDrawerRecord.title}" moved to ${targetSs?.name ?? 'next stage'} in the pipeline.`,
+              severity: 'info',
+              sourceEntityType: 'record',
+              sourceEntityId: recordId,
+            });
             if (addNotification) flowEngine.onRecordUpdated(updatedRec, addNotification);
           }
         }}
@@ -1326,6 +1334,14 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             const updatedRec = { ...selectedDrawerRecord, status: newStatus } as RuntimeRecord;
             setSelectedDrawerRecord(updatedRec);
             auditLog?.logEntry({ action: 'transition', entityType: 'record', entityId: id, entityName: updatedRec.title || id, after: { detail: `Status: ${selectedDrawerRecord.status} → ${newStatus}` } });
+            addNotification?.({
+              type: 'system',
+              title: 'Lifecycle Transition',
+              body: `"${updatedRec.title}" transitioned from ${selectedDrawerRecord.status} → ${newStatus}.`,
+              severity: 'info',
+              sourceEntityType: 'record',
+              sourceEntityId: id,
+            });
             if (addNotification) flowEngine.onLifecycleTransition(updatedRec, addNotification);
           }
         }}

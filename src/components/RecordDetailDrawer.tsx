@@ -57,6 +57,21 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
     return Object.entries(record.data).filter(([, v]) => v !== undefined && v !== '');
   }, [record]);
 
+  /* Section card wrapper for consistent modular sections */
+  const SectionCard = useMemo(() => {
+    return function SectionCardInner({ icon, title, children }: { icon: string; title: string; children: React.ReactNode }) {
+      return (
+        <View style={{ gap: 8, borderRadius: 12, borderWidth: 1, borderColor: border, backgroundColor: sectionBg, padding: 14 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Text style={{ fontSize: 13 }}>{icon}</Text>
+            <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: dimText }}>{title}</Text>
+          </View>
+          {children}
+        </View>
+      );
+    };
+  }, [border, sectionBg, dimText]);
+
   /* Compute valid next lifecycle stages from current status */
   const validNextStages = useMemo(() => {
     if (!record || !lifecycleStages?.length || !lifecycleTransitions?.length) return [];
@@ -135,7 +150,6 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
       >
         <View
           {...(Platform.OS === 'web' ? { onClick: (e: any) => e.stopPropagation() } as any : {})}
-          onStartShouldSetResponder={() => true}
           style={{
             width: '90%',
             maxWidth: 480,
@@ -174,12 +188,15 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
             </View>
             <Pressable
               onPress={handleClose}
+              {...(Platform.OS === 'web' ? { onClick: handleClose } as any : {})}
               style={{
                 paddingHorizontal: 12,
                 paddingVertical: 6,
                 borderRadius: 8,
                 backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
               }}
+              accessibilityRole="button"
+              accessibilityLabel="Close drawer"
             >
               <Text style={{ fontSize: 14, fontWeight: '600', color: dimText }}>✕</Text>
             </Pressable>
@@ -356,10 +373,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
 
             {/* Tags */}
             {record.tags.length > 0 && (
-              <View style={{ gap: 6 }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: dimText }}>
-                  Tags
-                </Text>
+              <SectionCard icon="🏷️" title="Tags">
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                   {record.tags.map((tag) => (
                     <View
@@ -375,15 +389,12 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                     </View>
                   ))}
                 </View>
-              </View>
+              </SectionCard>
             )}
 
             {/* Data Fields */}
             {dataEntries.length > 0 && (
-              <View style={{ gap: 8 }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: dimText }}>
-                  Record Data
-                </Text>
+              <SectionCard icon="📋" title="Record Data">
                 <View
                   style={{
                     borderRadius: 12,
@@ -417,15 +428,12 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                     );
                   })}
                 </View>
-              </View>
+              </SectionCard>
             )}
 
             {/* Builder Fields (empty state) */}
             {fields && fields.length > 0 && dataEntries.length === 0 && (
-              <View style={{ gap: 8 }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: dimText }}>
-                  Fields
-                </Text>
+              <SectionCard icon="📝" title="Fields">
                 <View
                   style={{
                     borderRadius: 12,
@@ -458,14 +466,11 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                     </View>
                   ))}
                 </View>
-              </View>
+              </SectionCard>
             )}
 
             {/* Metadata */}
-            <View style={{ gap: 6 }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: dimText }}>
-                Metadata
-              </Text>
+            <SectionCard icon="🔎" title="Metadata">
               <View
                 style={{
                   borderRadius: 12,
@@ -499,14 +504,11 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                   </View>
                 ))}
               </View>
-            </View>
+            </SectionCard>
 
             {/* Quick Actions */}
             {onTransition && validNextStages.length > 0 && (
-              <View style={{ gap: 8, marginTop: 4 }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: dimText }}>
-                  Quick Actions
-                </Text>
+              <SectionCard icon="⚡" title="Quick Actions">
                 <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                   {validNextStages.map((stage) => (
                     <Pressable
@@ -533,7 +535,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                     </Pressable>
                   ))}
                 </View>
-              </View>
+              </SectionCard>
             )}
 
             {/* ── SubSpace Pipeline ── */}
@@ -542,10 +544,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
               const currentIdx = ordered.findIndex((ss) => ss.id === record.subSpaceId);
               const nextSs = currentIdx >= 0 && currentIdx < ordered.length - 1 ? ordered[currentIdx + 1] : null;
               return (
-                <View style={{ gap: 10, marginTop: 4 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', color: dimText }}>
-                    SubSpace Pipeline
-                  </Text>
+                <SectionCard icon="🔗" title="SubSpace Pipeline">
                   {/* Pipeline strip */}
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6, alignItems: 'center' }}>
                     {ordered.map((ss, idx) => {
@@ -625,7 +624,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                       </View>
                     </View>
                   )}
-                </View>
+                </SectionCard>
               );
             })()}
           </ScrollView>

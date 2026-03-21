@@ -497,6 +497,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
   const scrollRef = useRef<ScrollView>(null);
   const lastScrollYRef = useRef(0);
   const [navVisible, setNavVisible] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isMobile = width < 768;
   const [anchors, setAnchors] = useState<Record<NavKey, number>>({ home: 0, problem: 0, how: 0, industries: 0, investors: 0, pricing: 0, about: 0, blog: 0, careers: 0 });
   const revealRef = useScrollReveal();
 
@@ -666,6 +668,19 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
         } as any}
       >
         <BrandLogo width={navLogoWidth} height={navLogoHeight} />
+        {isMobile ? (
+          /* ── Mobile hamburger button ── */
+          <Pressable
+            onPress={() => setMobileMenuOpen((prev) => !prev)}
+            style={{ padding: 8, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.08)' }}
+            accessibilityRole="button"
+            accessibilityLabel={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          >
+            <Text style={{ fontSize: 22, color: '#FFFFFF', fontWeight: '800', lineHeight: 24 }}>
+              {mobileMenuOpen ? '✕' : '☰'}
+            </Text>
+          </Pressable>
+        ) : (
         <View style={[styles.landingTopMenu, { flexWrap: 'wrap', gap: 2, alignItems: 'center' }]}>
           {NAV_ITEMS.map((item) => {
             const isActive = activeTab === item.key;
@@ -698,7 +713,44 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
             <Text style={[styles.landingTopMenuText, { fontSize: navMenuFontSize, color: '#FFFFFF', fontWeight: '800' }]}>Login</Text>
           </Pressable>
         </View>
+        )}
       </View>
+
+      {/* ── Mobile dropdown menu ── */}
+      {isMobile && mobileMenuOpen && (
+        <View style={{
+          backgroundColor: 'rgba(7,8,12,0.96)',
+          backdropFilter: 'blur(18px)',
+          paddingHorizontal: 20,
+          paddingVertical: 12,
+          gap: 4,
+          borderBottom: '1px solid rgba(139,92,246,0.12)',
+        } as any}>
+          {NAV_ITEMS.map((item) => {
+            const isActive = activeTab === item.key;
+            return (
+              <Pressable
+                key={item.key}
+                style={{ paddingVertical: 10, paddingHorizontal: 8, borderRadius: 8, backgroundColor: isActive ? 'rgba(139,92,246,0.18)' : 'transparent' } as any}
+                onPress={() => { goToSection(item.key); setMobileMenuOpen(false); }}
+              >
+                <Text style={{
+                  fontSize: 15,
+                  color: isActive ? '#FFFFFF' : 'rgba(235,223,255,0.70)',
+                  fontWeight: isActive ? '700' : '500',
+                } as any}>{item.label}</Text>
+              </Pressable>
+            );
+          })}
+          <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 6 }} />
+          <Pressable
+            style={{ paddingVertical: 10, paddingHorizontal: 8, borderRadius: 10, backgroundColor: '#8C5BF5', alignItems: 'center' } as any}
+            onPress={() => { setMobileMenuOpen(false); onContinue(); }}
+          >
+            <Text style={{ fontSize: 15, color: '#FFFFFF', fontWeight: '700' }}>Login</Text>
+          </Pressable>
+        </View>
+      )}
     </View>
 
     {/* Preload planet logo so it's cached before the user scrolls to it */}

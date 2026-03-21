@@ -44,6 +44,19 @@ const DEMO_STEPS: Array<{ id: Page; icon: string; label: string; tip: string }> 
   { id: 'enduser',    icon: '▣', label: 'End User',       tip: 'Live operational runtime — what your team sees' },
 ];
 
+const NAV_ICONS: Record<string, string> = {
+  bebo: '✦',
+  admin: '◈',
+  signal: '⚡',
+  orbital: '🔗',
+  cosmograph: '⬡',
+  financial: '💰',
+  ingestion: '📥',
+  workflow: '⛓',
+  enduser: '▣',
+  architecture: '📄',
+};
+
 const tenantTitleOptions = [
   'Operations Coordinator',
   'Case Specialist',
@@ -642,204 +655,101 @@ export function HomeScreen() {
                 />
               )}
             </View>
-            {!isSidebarCollapsed && <Text style={styles.dashboardSubBrand}>Build, manage, and automate — no code required</Text>}
           </View>
 
           {!isSidebarCollapsed && (
             <>
-              <Pressable
-                style={[styles.dashboardCreateButton, tenantBrandedMode && { backgroundColor: tenantAccentResolved }]}
-                onPress={() => { setTenantAccessOpen(false); setPage('admin'); }}
-              >
-                <Text style={styles.dashboardCreateButtonText}>Create</Text>
-              </Pressable>
-
               <View style={styles.dashboardNavSection} nativeID="tour-nav-panel">
-                {pages.map((item) => (
-                  item.id === 'bebo' ? (
+                {pages.map((item) => {
+                  const isEndUser = item.id === 'enduser';
+                  const isActive = page === item.id;
+                  return (
                     <React.Fragment key={item.id}>
-                      <Text style={styles.dashboardSectionLabel}>AI</Text>
-                      <Pressable
-                        nativeID="tour-nav-bebo"
-                        onPress={() => {
-                          setTenantAccessOpen(false);
-                          setPage(item.id);
-                        }}
-                        style={[
-                          styles.dashboardNavItem,
-                          page === item.id && styles.dashboardNavItemActive,
-                        ]}
-                        accessibilityRole="button"
-                        accessibilityState={{ selected: page === item.id }}
-                        accessibilityLabel={`${item.label} page`}
-                      >
-                        <View style={styles.dashboardNavItemRow}>
-                          <Image source={beboNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Bebo Ai icon" />
-                          <View>
-                            <Text
-                              style={[
-                                styles.dashboardNavItemText,
-                                page === item.id && styles.dashboardNavItemTextActive,
-                              ]}
-                            >
-                              {item.label}
-                            </Text>
-                            <Text style={styles.dashboardNavItemDesc}>{item.desc}</Text>
-                          </View>
-                        </View>
-                      </Pressable>
-                    </React.Fragment>
-                  ) : item.id === 'enduser' && isSuperAdmin ? (
-                    <React.Fragment key={item.id}>
-                      <Text style={[styles.dashboardSectionLabel, { marginTop: 12 }]}>Operate</Text>
-                      <View style={styles.dashboardTenantNavGroup}>
-                      <Pressable
-                        nativeID="tour-nav-enduser"
-                        onPress={() => {
-                          setTenantAccessOpen(false);
-                          setPage('enduser');
-                          setEndUserTenantMenuOpen((current) => !current);
-                        }}
-                        style={[
-                          styles.dashboardNavItem,
-                          page === 'enduser' && styles.dashboardNavItemActive,
-                          tenantBrandedMode && page === 'enduser' && {
-                            backgroundColor: tenantAccentResolved,
-                          },
-                        ]}
-                        accessibilityRole="button"
-                        accessibilityState={{ expanded: endUserTenantMenuOpen, selected: page === 'enduser' }}
-                        accessibilityLabel="End user tenant selector"
-                      >
-                        <View style={styles.dashboardNavItemRow}>
-                          <BrandLogo width={136} height={34} logoUri={activeTenantBranding.logoUri} />
-                          <Text
+                      {isEndUser && <View style={styles.dashboardNavDivider} />}
+                      {isEndUser && isSuperAdmin ? (
+                        <View style={styles.dashboardTenantNavGroup}>
+                          <Pressable
+                            nativeID="tour-nav-enduser"
+                            onPress={() => {
+                              setTenantAccessOpen(false);
+                              setPage('enduser');
+                              setEndUserTenantMenuOpen((current) => !current);
+                            }}
                             style={[
-                              styles.dashboardTenantChevron,
-                              tenantBrandedMode && page === 'enduser' && { color: tenantAccentTextColor },
+                              styles.dashboardNavItem,
+                              isActive && styles.dashboardNavItemActive,
+                              tenantBrandedMode && isActive && { backgroundColor: tenantAccentResolved },
                             ]}
+                            accessibilityRole="button"
+                            accessibilityState={{ expanded: endUserTenantMenuOpen, selected: isActive }}
+                            accessibilityLabel="End user tenant selector"
                           >
-                            {endUserTenantMenuOpen ? '▾' : '▸'}
-                          </Text>
-                        </View>
-                      </Pressable>
-
-                      {endUserTenantMenuOpen && (
-                        <View style={styles.dashboardTenantNavList}>
-                          {tenants.map((tenant) => {
-                            const tenantAccent = normalizeHex(tenant.branding.brandColors[2], '#8C5BF5');
-                            const tenantAccentText = getContrastTextColor(tenantAccent);
-                            const selectedTenant = activeTenantId === tenant.id && page === 'enduser';
-
-                            return (
-                              <Pressable
-                                key={`tenant-enduser-${tenant.id}`}
-                                onPress={() => {
-                                  setTenantAccessOpen(false);
-                                  handleSwitchTenant(tenant.id);
-                                  setPage('enduser');
-                                }}
-                                style={[
-                                  styles.dashboardTenantNavItem,
-                                  selectedTenant && styles.dashboardTenantNavItemActive,
-                                  selectedTenant && {
-                                    backgroundColor: tenantAccent,
-                                    borderColor: tenantAccent,
-                                  },
-                                ]}
-                                accessibilityRole="button"
-                                accessibilityState={{ selected: selectedTenant }}
-                                accessibilityLabel={`Open ${tenant.name} end user view`}
-                              >
-                                <View style={styles.dashboardTenantNavItemRow}>
-                                  <BrandLogo width={112} height={28} logoUri={tenant.branding.logoUri} />
-                                  <Text
-                                    style={[
-                                      styles.dashboardTenantNavItemText,
-                                      selectedTenant && { color: tenantAccentText },
-                                    ]}
+                            <View style={styles.dashboardNavItemRow}>
+                              <Text style={styles.dashboardNavIcon}>▣</Text>
+                              <Text style={[styles.dashboardNavItemText, isActive && styles.dashboardNavItemTextActive, tenantBrandedMode && isActive && { color: tenantAccentTextColor }]}>
+                                {activeTenantName}
+                              </Text>
+                              <Text style={[styles.dashboardTenantChevron, tenantBrandedMode && isActive && { color: tenantAccentTextColor }]}>
+                                {endUserTenantMenuOpen ? '▾' : '▸'}
+                              </Text>
+                            </View>
+                          </Pressable>
+                          {endUserTenantMenuOpen && (
+                            <View style={styles.dashboardTenantNavList}>
+                              {tenants.map((tenant) => {
+                                const tenantAccent = normalizeHex(tenant.branding.brandColors[2], '#8C5BF5');
+                                const tenantAccentText = getContrastTextColor(tenantAccent);
+                                const selectedTenant = activeTenantId === tenant.id && isActive;
+                                return (
+                                  <Pressable
+                                    key={`tenant-enduser-${tenant.id}`}
+                                    onPress={() => { setTenantAccessOpen(false); handleSwitchTenant(tenant.id); setPage('enduser'); }}
+                                    style={[styles.dashboardTenantNavItem, selectedTenant && styles.dashboardTenantNavItemActive, selectedTenant && { backgroundColor: tenantAccent, borderColor: tenantAccent }]}
+                                    accessibilityRole="button"
+                                    accessibilityState={{ selected: selectedTenant }}
+                                    accessibilityLabel={`Open ${tenant.name} end user view`}
                                   >
-                                    {tenant.name}
-                                  </Text>
-                                </View>
-                              </Pressable>
-                            );
-                          })}
+                                    <Text style={[styles.dashboardTenantNavItemText, selectedTenant && { color: tenantAccentText }]}>{tenant.name}</Text>
+                                  </Pressable>
+                                );
+                              })}
+                            </View>
+                          )}
                         </View>
-                      )}
-                    </View>
-                    </React.Fragment>
-                  ) : item.id === 'enduser' ? (
-                    <React.Fragment key={item.id}>
-                      <Text style={[styles.dashboardSectionLabel, { marginTop: 12 }]}>Operate</Text>
-                      <Pressable
-                      nativeID="tour-nav-enduser"
-                      onPress={() => {
-                        setTenantAccessOpen(false);
-                        setPage(item.id);
-                      }}
-                      style={[
-                        styles.dashboardNavItem,
-                        page === item.id && styles.dashboardNavItemActive,
-                        tenantBrandedMode && page === item.id && {
-                          backgroundColor: tenantAccentResolved,
-                        },
-                      ]}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected: page === item.id }}
-                      accessibilityLabel={`${item.label} page`}
-                    >
-                      <View style={styles.dashboardNavItemRow}>
-                        <Text
-                          style={[
-                            styles.dashboardNavItemText,
-                            page === item.id && styles.dashboardNavItemTextActive,
-                            tenantBrandedMode && page === item.id && { color: tenantAccentTextColor },
-                          ]}
+                      ) : isEndUser ? (
+                        <Pressable
+                          nativeID="tour-nav-enduser"
+                          onPress={() => { setTenantAccessOpen(false); setPage('enduser'); }}
+                          style={[styles.dashboardNavItem, isActive && styles.dashboardNavItemActive, tenantBrandedMode && isActive && { backgroundColor: tenantAccentResolved }]}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected: isActive }}
+                          accessibilityLabel="End User page"
                         >
-                          {item.label}
-                        </Text>
-                      </View>
-                    </Pressable>
-                    </React.Fragment>
-                  ) : (
-                    <React.Fragment key={item.id}>
-                      <Text style={[styles.dashboardSectionLabel, { marginTop: 12 }]}>{item.desc}</Text>
-                      <Pressable
-                        nativeID={`tour-nav-${item.id}`}
-                        onPress={() => {
-                          setTenantAccessOpen(false);
-                          setPage(item.id);
-                        }}
-                        style={[
-                          styles.dashboardNavItem,
-                          page === item.id && styles.dashboardNavItemActive,
-                        ]}
-                        accessibilityRole="button"
-                        accessibilityState={{ selected: page === item.id }}
-                        accessibilityLabel={`${item.label} page`}
-                      >
-                        <View style={styles.dashboardNavItemRow}>
-                          {item.id === 'admin' && <Image source={workspaceNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Workspace icon" />}
-                          {item.id === 'signal' && <Image source={signalNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Signal Studio icon" />}
-                          {item.id === 'orbital' && <Image source={orbitalNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Orbital icon" />}
-                          {item.id === 'cosmograph' && <Image source={cosmoNavIcon} style={styles.dashboardNavItemIcon} accessibilityRole="image" accessibilityLabel="Cosmograph icon" />}
-                          <View>
-                            <Text
-                              style={[
-                                styles.dashboardNavItemText,
-                                page === item.id && styles.dashboardNavItemTextActive,
-                              ]}
-                            >
+                          <View style={styles.dashboardNavItemRow}>
+                            <Text style={styles.dashboardNavIcon}>▣</Text>
+                            <Text style={[styles.dashboardNavItemText, isActive && styles.dashboardNavItemTextActive, tenantBrandedMode && isActive && { color: tenantAccentTextColor }]}>End User</Text>
+                          </View>
+                        </Pressable>
+                      ) : (
+                        <Pressable
+                          nativeID={`tour-nav-${item.id}`}
+                          onPress={() => { setTenantAccessOpen(false); setPage(item.id); }}
+                          style={[styles.dashboardNavItem, isActive && styles.dashboardNavItemActive]}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected: isActive }}
+                          accessibilityLabel={`${item.label} page`}
+                        >
+                          <View style={styles.dashboardNavItemRow}>
+                            <Text style={styles.dashboardNavIcon}>{NAV_ICONS[item.id] ?? '•'}</Text>
+                            <Text style={[styles.dashboardNavItemText, isActive && styles.dashboardNavItemTextActive]}>
                               {item.id === 'admin' ? 'Workspace' : item.label}
                             </Text>
-                            <Text style={styles.dashboardNavItemDesc}>{item.desc}</Text>
                           </View>
-                        </View>
-                      </Pressable>
+                        </Pressable>
+                      )}
                     </React.Fragment>
-                  )
-                ))}
+                  );
+                })}
               </View>
 
               <View style={styles.dashboardSidebarFooter}>

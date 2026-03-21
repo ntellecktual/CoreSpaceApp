@@ -46,10 +46,9 @@ const nightStyleObject = {
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
     paddingHorizontal: 14,
-    paddingTop: 14,
-    paddingBottom: 14,
-    gap: 8,
-    overflow: 'hidden',
+    paddingTop: 12,
+    paddingBottom: 10,
+    gap: 6,
   },
   dashboardSidebarSmooth: {
     transitionProperty: 'width',
@@ -122,7 +121,18 @@ const nightStyleObject = {
     fontWeight: '700',
   },
   dashboardNavSection: {
-    gap: 6,
+    gap: 2,
+  },
+  dashboardNavIcon: {
+    fontSize: 14,
+    width: 22,
+    textAlign: 'center',
+    color: 'rgba(214,204,235,0.70)',
+  },
+  dashboardNavDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    marginVertical: 4,
   },
   dashboardSectionLabel: {
     color: '#8878AE',
@@ -132,21 +142,21 @@ const nightStyleObject = {
     paddingHorizontal: 6,
   },
   dashboardNavItem: {
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    minHeight: 42,
-    paddingVertical: 7,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    minHeight: 30,
+    paddingVertical: 4,
     backgroundColor: 'transparent',
     justifyContent: 'center',
   },
   dashboardNavItemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   dashboardNavItemIcon: {
-    width: 32,
-    height: 32,
+    width: 24,
+    height: 24,
     resizeMode: 'contain',
   },
   dashboardNavItemActive: {
@@ -157,22 +167,22 @@ const nightStyleObject = {
   },
   dashboardTenantChevron: {
     color: '#F3EAFF',
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: '800',
     marginLeft: 'auto',
   },
   dashboardTenantNavList: {
-    gap: 6,
+    gap: 3,
     paddingLeft: 8,
   },
   dashboardTenantNavItem: {
-    borderRadius: 10,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(253,156,253,0.3)',
     backgroundColor: 'rgba(32,21,53,0.65)',
-    paddingHorizontal: 10,
-    minHeight: 42,
-    paddingVertical: 8,
+    paddingHorizontal: 8,
+    minHeight: 28,
+    paddingVertical: 4,
     justifyContent: 'center',
   },
   dashboardTenantNavItemActive: {
@@ -187,13 +197,11 @@ const nightStyleObject = {
   dashboardTenantNavItemText: {
     color: '#DCCFF5',
     fontSize: 12,
-    fontWeight: '700',
-    flex: 1,
-    textAlign: 'right',
+    fontWeight: '600',
   },
   dashboardNavItemText: {
     color: '#D6CCEB',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
   },
   dashboardNavItemDesc: {
@@ -208,12 +216,12 @@ const nightStyleObject = {
     fontWeight: '700',
   },
   dashboardRoleItem: {
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: 'rgba(253,156,253,0.22)',
-    paddingHorizontal: 9,
-    minHeight: 34,
-    paddingVertical: 6,
+    paddingHorizontal: 8,
+    minHeight: 26,
+    paddingVertical: 3,
     backgroundColor: 'rgba(37,26,60,0.8)',
     justifyContent: 'center',
   },
@@ -223,7 +231,7 @@ const nightStyleObject = {
   },
   dashboardRoleItemText: {
     color: '#DCCFF5',
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '600',
   },
   dashboardRoleItemTextActive: {
@@ -231,20 +239,20 @@ const nightStyleObject = {
   },
   dashboardSidebarFooter: {
     marginTop: 'auto',
-    gap: 8,
+    gap: 4,
   },
   dashboardSettingsMenu: {
-    gap: 8,
+    gap: 3,
     paddingLeft: 8,
   },
   dashboardSidebarAction: {
-    borderRadius: 10,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(253,156,253,0.24)',
     backgroundColor: 'rgba(29,20,48,0.88)',
-    paddingHorizontal: 10,
-    minHeight: 38,
-    paddingVertical: 8,
+    paddingHorizontal: 8,
+    minHeight: 30,
+    paddingVertical: 4,
     justifyContent: 'center',
   },
   dashboardSidebarActionActive: {
@@ -253,8 +261,8 @@ const nightStyleObject = {
   },
   dashboardSidebarActionText: {
     color: '#E4DAFA',
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
   },
   dashboardSidebarActionTextActive: {
     color: '#FFFFFF',
@@ -2086,6 +2094,12 @@ const dayOverrides = {
   },
   dashboardSectionLabel: {
     color: '#5C477F',
+  },
+  dashboardNavIcon: {
+    color: 'rgba(74,58,105,0.60)',
+  },
+  dashboardNavDivider: {
+    backgroundColor: 'rgba(102,74,154,0.14)',
   },
   dashboardNavItemText: {
     color: '#2E2148',

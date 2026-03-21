@@ -359,86 +359,32 @@
 .guided-tour-body[data-section="finish"] .guided-tour-tip { border-left-color: #22D3EE; }
 
 /* ═══════════════════════════════════════════════════════════════
-   Section brand image icons
-   CSS background-image replaces the emoji icons.
-   Images in assets/ alongside this CSS file.
-   Day/Night swap via data-theme on the tour modal element.
-   ═══════════════════════════════════════════════════════════════ */
+  Section emoji icon sizing
+  ═══════════════════════════════════════════════════════════════ */
 
 /* Chip icon — sized as an image badge */
 .guided-tour-section-chip-icon {
   display: inline-block;
   width: 16px;
   height: 16px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+  line-height: 16px;
+  text-align: center;
   flex-shrink: 0;
-  font-size: 0; /* hide any leftover text */
+  font-size: 13px;
 }
 
 /* Section icon — larger, centred in the coloured badge */
 .guided-tour-section-icon {
-  background-size: 62%;
-  background-repeat: no-repeat;
-  background-position: center;
+  line-height: 1;
 }
 
-/* Hero logo — large centred image */
+/* Hero logo — large centred icon */
 .guided-tour-hero-logo {
   display: block;
-  width: 78px;
-  height: 78px;
-  margin: 0 auto 10px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  font-size: 0;
+  margin: 0 auto 6px;
+  font-size: 40px;
+  line-height: 1;
 }
-
-/* ── Chip icons – Night/Dark (default) ─────────────────────────── */
-.guided-tour-section-chip[data-chip-section="intro"]     .guided-tour-section-chip-icon { background-image: url('./cs_thirdlogo.png'); }
-.guided-tour-section-chip[data-chip-section="ai"]        .guided-tour-section-chip-icon { background-image: url('./cs_bebodarklogo.png'); }
-.guided-tour-section-chip[data-chip-section="design"]    .guided-tour-section-chip-icon { background-image: url('./cs_wsdarklogo.png'); }
-.guided-tour-section-chip[data-chip-section="automate"]  .guided-tour-section-chip-icon { background-image: url('./cs_ssdarklogo.png'); }
-.guided-tour-section-chip[data-chip-section="integrate"] .guided-tour-section-chip-icon { background-image: url('./cs_orbitaldarklogo.png'); }
-.guided-tour-section-chip[data-chip-section="analyze"]   .guided-tour-section-chip-icon { background-image: url('./13.png'); }
-.guided-tour-section-chip[data-chip-section="operate"]   .guided-tour-section-chip-icon { background-image: url('./soc2.png'); }
-.guided-tour-section-chip[data-chip-section="finish"]    .guided-tour-section-chip-icon { background-image: url('./cs_thirdlogo.png'); }
-
-/* ── Chip icons – Day/Light override ──────────────────────────── */
-.guided-tour-modal[data-theme="day"] .guided-tour-section-chip[data-chip-section="intro"]     .guided-tour-section-chip-icon { background-image: url('./cs_main2logo.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-section-chip[data-chip-section="ai"]        .guided-tour-section-chip-icon { background-image: url('./cs_bebolightlogo.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-section-chip[data-chip-section="design"]    .guided-tour-section-chip-icon { background-image: url('./cs_wslightlogo.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-section-chip[data-chip-section="automate"]  .guided-tour-section-chip-icon { background-image: url('./cs_sslightlogo.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-section-chip[data-chip-section="integrate"] .guided-tour-section-chip-icon { background-image: url('./cs_orbitallightlogo.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-section-chip[data-chip-section="analyze"]   .guided-tour-section-chip-icon { background-image: url('./14.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-section-chip[data-chip-section="operate"]   .guided-tour-section-chip-icon { background-image: url('./soc2.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-section-chip[data-chip-section="finish"]    .guided-tour-section-chip-icon { background-image: url('./cs_main2logo.png'); }
-
-/* ── Section header icons – Night/Dark ─────────────────────────── */
-.guided-tour-body[data-section="intro"]     .guided-tour-section-icon { background-image: url('./cs_thirdlogo.png'); }
-.guided-tour-body[data-section="ai"]        .guided-tour-section-icon { background-image: url('./cs_bebodarklogo.png'); }
-.guided-tour-body[data-section="design"]    .guided-tour-section-icon { background-image: url('./cs_wsdarklogo.png'); }
-.guided-tour-body[data-section="automate"]  .guided-tour-section-icon { background-image: url('./cs_ssdarklogo.png'); }
-.guided-tour-body[data-section="integrate"] .guided-tour-section-icon { background-image: url('./cs_orbitaldarklogo.png'); }
-.guided-tour-body[data-section="analyze"]   .guided-tour-section-icon { background-image: url('./13.png'); }
-.guided-tour-body[data-section="operate"]   .guided-tour-section-icon { background-image: url('./soc2.png'); }
-.guided-tour-body[data-section="finish"]    .guided-tour-section-icon { background-image: url('./cs_thirdlogo.png'); }
-
-/* ── Section header icons – Day/Light override ──────────────────── */
-.guided-tour-modal[data-theme="day"] .guided-tour-body[data-section="intro"]     .guided-tour-section-icon { background-image: url('./cs_main2logo.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-body[data-section="ai"]        .guided-tour-section-icon { background-image: url('./cs_bebolightlogo.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-body[data-section="design"]    .guided-tour-section-icon { background-image: url('./cs_wslightlogo.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-body[data-section="automate"]  .guided-tour-section-icon { background-image: url('./cs_sslightlogo.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-body[data-section="integrate"] .guided-tour-section-icon { background-image: url('./cs_orbitallightlogo.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-body[data-section="analyze"]   .guided-tour-section-icon { background-image: url('./14.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-body[data-section="operate"]   .guided-tour-section-icon { background-image: url('./soc2.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-body[data-section="finish"]    .guided-tour-section-icon { background-image: url('./cs_main2logo.png'); }
-
-/* ── Hero logo ──────────────────────────────────────────────────── */
-.guided-tour-hero-logo                              { background-image: url('./cs_thirdlogo.png'); }
-.guided-tour-modal[data-theme="day"] .guided-tour-hero-logo { background-image: url('./cs_main2logo.png'); }
 
 
 /* ═══════════════════════════════════════════════════════════════

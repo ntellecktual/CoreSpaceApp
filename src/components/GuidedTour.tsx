@@ -17,11 +17,11 @@ type SectionConfig = { label: string; icon: string; color: string; bg: string };
 
 const SECTION_CONFIG: Record<TourSection, SectionConfig> = {
   intro:     { label: 'Welcome',   icon: '✦', color: '#E878F6', bg: 'rgba(232,120,246,0.13)' },
-  ai:        { label: 'AI',        icon: '◎', color: '#A78BFA', bg: 'rgba(167,139,250,0.13)' },
-  design:    { label: 'Design',    icon: '⬡', color: '#60A5FA', bg: 'rgba(96,165,250,0.13)' },
+  ai:        { label: 'AI',        icon: '✦', color: '#A78BFA', bg: 'rgba(167,139,250,0.13)' },
+  design:    { label: 'Design',    icon: '◈', color: '#60A5FA', bg: 'rgba(96,165,250,0.13)' },
   automate:  { label: 'Automate',  icon: '⚡', color: '#34D399', bg: 'rgba(52,211,153,0.13)' },
-  integrate: { label: 'Integrate', icon: '⊕', color: '#FBBF24', bg: 'rgba(251,191,36,0.13)' },
-  analyze:   { label: 'Analyze',   icon: '◈', color: '#F87171', bg: 'rgba(248,113,113,0.13)' },
+  integrate: { label: 'Integrate', icon: '🔗', color: '#FBBF24', bg: 'rgba(251,191,36,0.13)' },
+  analyze:   { label: 'Analyze',   icon: '⬡', color: '#F87171', bg: 'rgba(248,113,113,0.13)' },
   operate:   { label: 'Operate',   icon: '▣', color: '#C084FC', bg: 'rgba(192,132,252,0.13)' },
   finish:    { label: 'Done',      icon: '✓', color: '#22D3EE', bg: 'rgba(34,211,238,0.13)' },
 };
@@ -173,7 +173,7 @@ export const GuidedTourProvider: React.FC<GuidedTourProviderProps> = ({ steps, c
                     aria-current={isActive ? 'step' : undefined}
                     title={`Jump to ${cfg.label}`}
                   >
-                    <span className="guided-tour-section-chip-icon" />
+                    <span className="guided-tour-section-chip-icon">{cfg.icon}</span>
                     {cfg.label}
                   </button>
                 );
@@ -191,7 +191,7 @@ export const GuidedTourProvider: React.FC<GuidedTourProviderProps> = ({ steps, c
               {isWelcome ? (
                 /* Hero layout for welcome step */
                 <div className="guided-tour-hero">
-                  <span className="guided-tour-hero-logo" />
+                  <span className="guided-tour-hero-logo">{SECTION_CONFIG.intro.icon}</span>
                   <h2 className="guided-tour-title guided-tour-title-center">{step.title}</h2>
                   <p className="guided-tour-hero-tagline">CoreSpace Platform Walkthrough</p>
                   <p className="guided-tour-content guided-tour-content-center">{step.content}</p>
@@ -206,7 +206,7 @@ export const GuidedTourProvider: React.FC<GuidedTourProviderProps> = ({ steps, c
                 /* Standard step layout */
                 <>
                   <div className="guided-tour-section-header">
-                    <div className="guided-tour-section-icon" />
+                    <div className="guided-tour-section-icon">{sectionCfg.icon}</div>
                     <div className="guided-tour-section-meta">
                       <span className="guided-tour-section-label">
                         {sectionCfg.label}

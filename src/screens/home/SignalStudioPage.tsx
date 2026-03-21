@@ -362,8 +362,8 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
               </View>
             )}
 
-            <Pressable disabled={!canPublishFlow} style={[styles.secondaryButton, !canPublishFlow && styles.buttonDisabled]} onPress={() => { applyWarehouseServiceFlowPack(); auditLog?.logEntry({ action: 'import', entityType: 'flow', entityId: 'dscsa-flow-pack', entityName: 'DSCSA Supply Chain Flow Pack', after: { flows: 5 } }); addNotification?.({ type: 'system', title: 'Flow Pack Imported', body: 'DSCSA Supply Chain Flow Pack loaded with 5 automation flows.', severity: 'success' }); }}>
-              <Text style={styles.secondaryButtonText}>Load DSCSA Supply Chain Flow Pack</Text>
+            <Pressable disabled={!canPublishFlow} style={[styles.secondaryButton, !canPublishFlow && styles.buttonDisabled]} onPress={() => { applyWarehouseServiceFlowPack(); auditLog?.logEntry({ action: 'import', entityType: 'flow', entityId: 'sample-flow-pack', entityName: 'Sample Supply Chain Flow Pack', after: { flows: 5 } }); addNotification?.({ type: 'system', title: 'Flow Pack Imported', body: 'Sample Supply Chain Flow Pack loaded with 5 automation flows.', severity: 'success' }); }}>
+              <Text style={styles.secondaryButtonText}>Load Sample Flow Pack</Text>
             </Pressable>
             <LabeledInput label="Flow name" helperText="Give this automation a short name." value={name} onChangeText={setName} placeholder="Example: Auto Triage on Risk" />
             <LabeledInput label="When this happens" helperText="The event that starts this automation." value={signal} onChangeText={setSignal} placeholder="Example: Unit enters risk watchlist" />
@@ -406,9 +406,9 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                   <Pressable
                     disabled={!canPublishFlow}
                     style={[{ backgroundColor: '#8C5BF5', borderRadius: 8, paddingVertical: 9, paddingHorizontal: 16, alignItems: 'center' }, !canPublishFlow && { opacity: 0.4 }]}
-                    onPress={() => { applyWarehouseServiceFlowPack(); auditLog?.logEntry({ action: 'import', entityType: 'flow', entityId: 'dscsa-flow-pack', entityName: 'DSCSA Supply Chain Flow Pack', after: { flows: 5 } }); addNotification?.({ type: 'system', title: 'Flow Pack Imported', body: 'DSCSA Supply Chain Flow Pack loaded with 5 automation flows.', severity: 'success' }); }}
+                    onPress={() => { applyWarehouseServiceFlowPack(); auditLog?.logEntry({ action: 'import', entityType: 'flow', entityId: 'sample-flow-pack', entityName: 'Sample Supply Chain Flow Pack', after: { flows: 5 } }); addNotification?.({ type: 'system', title: 'Flow Pack Imported', body: 'Sample Supply Chain Flow Pack loaded with 5 automation flows.', severity: 'success' }); }}
                   >
-                    <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 12 }}>📥 Load DSCSA Flow Pack</Text>
+                    <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 12 }}>📥 Load Sample Flow Pack</Text>
                   </Pressable>
                   <Pressable
                     style={{ backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)', borderRadius: 8, paddingVertical: 9, paddingHorizontal: 16, alignItems: 'center', borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.10)' }}

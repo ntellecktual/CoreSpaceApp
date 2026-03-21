@@ -50,8 +50,10 @@ export function useClientIntake() {
 
     const ref = caseRef.trim();
 
+    const collectionLabel = shellConfig.collectionLabel ?? 'Collection';
+
     if (!ref) {
-      setIntakeMessage('Batch reference ID is required.');
+      setIntakeMessage(`${collectionLabel} reference ID is required.`);
       return;
     }
 
@@ -66,15 +68,14 @@ export function useClientIntake() {
     const activePersona = shellConfig.personas.find((persona) => persona.id === selectedPersonaId);
     const personaTags = activePersona?.defaultTags ?? [];
 
-    const productName = profileValues.productName?.trim();
-    const lotNumber = profileValues.lotNumber?.trim();
-    const cartonSerial = profileValues.cartonSerial?.trim();
-    const derivedPrimary = productName || shellConfig.subjectSingular;
-    const derivedSecondary = lotNumber
-      ? `Lot ${lotNumber}`
-      : cartonSerial
-        ? `Carton ${cartonSerial}`
-        : 'Batch Intake';
+    // Derive display name from first two intake field values (industry-agnostic)
+    const fieldValues = shellConfig.intakeFields.map((f) => profileValues[f.id]?.trim()).filter(Boolean);
+    const derivedPrimary = fieldValues[0] || shellConfig.subjectSingular;
+    const derivedSecondary = fieldValues[1]
+      ? `${shellConfig.intakeFields[1]?.label ?? ''} ${fieldValues[1]}`.trim()
+      : fieldValues.length > 0
+        ? `${collectionLabel} Intake`
+        : `New ${collectionLabel}`;
 
     const profileTags = shellConfig.intakeFields
       .map((field) => {
@@ -86,7 +87,7 @@ export function useClientIntake() {
       })
       .filter((tag): tag is string => !!tag);
 
-    const batchIdentityTag = `Batch:${compact(`${derivedPrimary}${derivedSecondary}`)}`;
+    const identityTag = `${collectionLabel}:${compact(`${derivedPrimary}${derivedSecondary}`)}`;
     const created = addClient({
       id: '',
       firstName: derivedPrimary,
@@ -96,14 +97,14 @@ export function useClientIntake() {
       caseRef: ref,
       personaId: activePersona?.id,
       profileData: profileValues,
-      tags: [batchIdentityTag, `CaseRef:${compact(ref)}`, ...personaTags, ...profileTags],
+      tags: [identityTag, `CaseRef:${compact(ref)}`, ...personaTags, ...profileTags],
       createdAt: todayFormatted(),
     });
 
     setSelectedClientId(created.id);
     setCaseRef('');
     setProfileValues({});
-    setIntakeMessage(`${shellConfig.subjectSingular} batch intake saved. Record is ready for workspace management.`);
+    setIntakeMessage(`${shellConfig.subjectSingular} intake saved. Record is ready for workspace management.`);
   };
 
   return {

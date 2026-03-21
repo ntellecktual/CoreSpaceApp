@@ -370,13 +370,8 @@ function TenantOnboardingGuide({ mode, styles }: { mode: 'day' | 'night'; styles
   );
 }
 
-/* ── Workspace step mapping ─────────────────────────────── */
-const workspaceStepTitles: Record<string, string> = {
-  'ws-manufacturer-serialization': 'MANUFACTURER',
-  'ws-distributor-verification': 'DISTRIBUTOR',
-  'ws-pharmacy-dispense': 'PHARMACY',
-  'ws-network-traceability': 'SUPPLY CHAIN',
-};
+/* ── Workspace step mapping (fallback only — workspace.name is preferred) ── */
+const workspaceStepTitles: Record<string, string> = {};
 
 /* ───────────────────────────────────────────────────────────
    END USER PAGE — single-screen, zero-scroll, modal-driven
@@ -514,12 +509,12 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
       const rec = selectedRecords.find((r) => r.id === id);
       updateRecord(id, { status: targetStage });
       if (rec) {
-        auditLog?.logEntry({ action: 'transition', entityType: 'record', entityId: id, entityName: rec.title || id, after: { detail: `Batch move → ${targetStage}` } });
+        auditLog?.logEntry({ action: 'transition', entityType: 'record', entityId: id, entityName: rec.title || id, after: { detail: `Bulk move → ${targetStage}` } });
         const updatedRec = { ...rec, status: targetStage };
         if (addNotification) flowEngine.onLifecycleTransition(updatedRec, addNotification);
       }
     });
-    addNotification?.({ type: 'system', title: 'Batch Move Complete', body: `${ids.length} record${ids.length > 1 ? 's' : ''} moved to "${targetStage}".`, severity: 'success' });
+    addNotification?.({ type: 'system', title: 'Bulk Move Complete', body: `${ids.length} record${ids.length > 1 ? 's' : ''} moved to "${targetStage}".`, severity: 'success' });
     showToast(`${ids.length} record${ids.length > 1 ? 's' : ''} moved to ${targetStage}`, 'success');
     setIsSaving(true);
     setTimeout(() => setIsSaving(false), 1200);
@@ -608,6 +603,12 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const subjectSingular = shellConfig.subjectSingular;
   const subjectPlural = shellConfig.subjectPlural;
   const subSpaceLabel = shellConfig.subSpaceLabel;
+  const collectionLabel = shellConfig.collectionLabel ?? 'Collection';
+  const collectionLabelPlural = shellConfig.collectionLabelPlural ?? 'Collections';
+  const functionLabel = shellConfig.functionLabel ?? 'Function';
+  const functionLabelPlural = shellConfig.functionLabelPlural ?? 'Functions';
+  const objectLabel = shellConfig.objectLabel ?? 'Registry';
+  const objectLabelPlural = shellConfig.objectLabelPlural ?? 'Registries';
   const accentColor = accentPalette?.accent ? normalizeHex(accentPalette.accent, '#8C5BF5') : '#8C5BF5';
   const baseSurface = mode === 'day' ? '#FFFFFF' : '#1A1230';
   const accentTextColor = getContrastTextColor(accentColor);
@@ -717,11 +718,17 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
     );
   };
 
-  /* ── Batch helpers ── */
-  const getBatchTitle = (c: (typeof clients)[number]) => {
-    if (c.profileData?.region || c.profileData?.contractTier) return `${c.firstName} ${c.lastName}`;
-    if (c.profileData?.deviceModel || c.profileData?.workOrderNumber) return `${c.profileData?.deviceModel?.trim() || c.firstName} • ${c.profileData?.workOrderNumber?.trim() || c.lastName}`;
-    return `${c.profileData?.productName?.trim() || 'Product'} • Lot ${c.profileData?.lotNumber?.trim() || '—'} • ${c.profileData?.cartonSerial?.trim() || '—'}`;
+  /* ── Item title helper (industry-agnostic) ── */
+  const getItemTitle = (c: (typeof clients)[number]) => {
+    // Build title from profileData intake fields dynamically
+    const fieldValues = shellConfig.intakeFields
+      .map((f) => c.profileData?.[f.id]?.trim())
+      .filter(Boolean);
+    if (fieldValues.length >= 2) return `${fieldValues[0]} • ${fieldValues[1]}`;
+    if (fieldValues.length === 1) return fieldValues[0]!;
+    // Fallback to firstName/lastName or subjectSingular
+    if (c.firstName && c.lastName) return `${c.firstName} ${c.lastName}`;
+    return c.caseRef || shellConfig.subjectSingular;
   };
 
   /* ── Walkthrough state ── */
@@ -852,7 +859,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                 const sel = selectedClientId === c.id;
                 return (
                   <Pressable key={c.id} onPress={() => setSelectedClientId(c.id)} style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: sel ? accentSoft : 'rgba(255,255,255,0.06)', alignItems: 'center' as any, justifyContent: 'center' as any, borderWidth: sel ? 1 : 0, borderColor: accentColor }}>
-                    <Text style={{ fontSize: 11, fontWeight: '700', color: sel ? '#FFF' : dimColor }}>{(getBatchTitle(c))[0]}</Text>
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: sel ? '#FFF' : dimColor }}>{(getItemTitle(c))[0]}</Text>
                   </Pressable>
                 );
               })}
@@ -917,23 +924,23 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             </View>
           )}
 
-          {/* Batch selector (compact) */}
-          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#E878F6' }}>BATCHES</Text>
+          {/* Item selector (compact) */}
+          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#E878F6' }}>{collectionLabelPlural.toUpperCase()}</Text>
           <ScrollView nativeID="eu-batch-list" style={{ maxHeight: isCompact ? 80 : 140 }} showsVerticalScrollIndicator={false}>
-            {clients.length === 0 && <Text style={{ fontSize: 11, color: dimColor }}>No batches yet</Text>}
+            {clients.length === 0 && <Text style={{ fontSize: 11, color: dimColor }}>No {collectionLabelPlural.toLowerCase()} yet</Text>}
             {clients.map((c) => {
               const sel = selectedClientId === c.id;
               return (
                 <Pressable key={c.id} onPress={() => setSelectedClientId(c.id)}
                   style={{ paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, marginBottom: 3, backgroundColor: sel ? accentSoft : 'transparent', borderWidth: sel ? 1 : 0, borderColor: sel ? accentColor : 'transparent' }}>
-                  <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? '#FFFFFF' : dimColor }} numberOfLines={1}>{getBatchTitle(c)}</Text>
+                  <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? '#FFFFFF' : dimColor }} numberOfLines={1}>{getItemTitle(c)}</Text>
                 </Pressable>
               );
             })}
           </ScrollView>
 
           <Pressable nativeID="eu-new-batch" onPress={() => setIntakeModalOpen(true)} style={{ paddingVertical: 7, paddingHorizontal: 10, borderRadius: 10, backgroundColor: accentColor, alignItems: 'center' as any }}>
-            <Text style={{ fontSize: 11, fontWeight: '700', color: accentTextColor }}>+ New Batch</Text>
+            <Text style={{ fontSize: 11, fontWeight: '700', color: accentTextColor }}>+ New {collectionLabel}</Text>
           </Pressable>
 
           <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.06)', marginVertical: 4 }} />
@@ -997,7 +1004,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 6 }}>
             <Breadcrumb
               items={[
-                ...(selectedClient ? [{ label: getBatchTitle(selectedClient), key: 'client' }] : [{ label: 'All Batches', key: 'client' }]),
+                ...(selectedClient ? [{ label: getItemTitle(selectedClient), key: 'client' }] : [{ label: `All ${collectionLabelPlural}`, key: 'client' }]),
                 ...(workspace ? [{ label: workspaceStepTitles[workspace.id] ?? workspace.name, key: 'workspace' }] : []),
                 ...(selectedSubSpace ? [{ label: selectedSubSpace.name, key: 'subspace' }] : []),
               ]}
@@ -1376,7 +1383,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             </View>
             <ScrollView style={{ padding: 20 }} contentContainerStyle={{ gap: 12, paddingBottom: 20 }}>
               {!canIntakeClient && <Text style={styles.notice}>{deniedMessage('client.intake')}</Text>}
-              <LabeledInput label="Batch Reference ID *" value={caseRef} onChangeText={setCaseRef} placeholder="DSCSA-XY1234" autoCapitalize="characters" />
+              <LabeledInput label={`${collectionLabel} Reference ID *`} value={caseRef} onChangeText={setCaseRef} placeholder={`REF-001`} autoCapitalize="characters" />
               {shellConfig.personas.length > 0 && (
                 <View style={{ gap: 6 }}>
                   <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>Persona</Text>
@@ -1402,7 +1409,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                   placeholder={field.type === 'select' ? `Options: ${field.options?.join(', ')}` : field.type === 'date' ? 'MM-DD-YYYY' : `Enter ${field.label.toLowerCase()}`}
                 />
               ))}
-              <Pressable disabled={!canIntakeClient} onPress={() => { createClient(); showToast('Batch created', 'success'); auditLog?.logEntry({ action: 'create', entityType: 'client', entityId: caseRef || 'new', entityName: caseRef || 'New Batch', after: { detail: 'Client intake created' } }); setIntakeModalOpen(false); }}
+              <Pressable disabled={!canIntakeClient} onPress={() => { createClient(); showToast(`${collectionLabel} created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'client', entityId: caseRef || 'new', entityName: caseRef || `New ${collectionLabel}`, after: { detail: 'Client intake created' } }); setIntakeModalOpen(false); }}
                 style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: canIntakeClient ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any }}>
                 <Text style={{ fontSize: 13, fontWeight: '700', color: canIntakeClient ? accentTextColor : dimColor }}>Create {subjectSingular}</Text>
               </Pressable>
@@ -1893,7 +1900,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                 background: 'rgba(232, 120, 246, 0.12)', border: '1px solid rgba(232, 120, 246, 0.25)',
                 borderRadius: 6, padding: '3px 10px', marginBottom: 8,
               }}>
-                DSCSA Walkthrough
+                Guided Walkthrough
               </span>
 
               <span style={{ display: 'block', fontSize: 12, color: 'rgba(241, 232, 255, 0.5)', marginBottom: 4 }}>

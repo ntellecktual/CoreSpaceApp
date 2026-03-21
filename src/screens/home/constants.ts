@@ -44,20 +44,20 @@ export const architectureSteps: GuideStep[] = [
 
 export const endUserSteps: GuideStep[] = [
   {
-    title: 'Step 1: Select a Product Batch',
-    detail: 'Every drug product batch is tracked as its own record — complete with NDC code, lot number, serial ranges, and expiration. Select one to see its full journey.',
+    title: 'Step 1: Select a Collection Item',
+    detail: 'Each item in your collection is tracked as its own record — complete with all the intake fields you configured. Select one to see its full journey.',
   },
   {
-    title: 'Step 2: Navigate the Supply Chain',
-    detail: 'Switch between Manufacturer, Distributor, Pharmacy, and Supply Chain workspaces to follow the product through each stage of the DSCSA pipeline.',
+    title: 'Step 2: Navigate Workspaces',
+    detail: 'Switch between your published workspaces to follow items through each stage of your operational pipeline.',
   },
   {
     title: 'Step 3: Drill Into SubSpaces',
-    detail: 'Each workspace is subdivided into specialized work areas — Unit Serialization, Carton Aggregation, EPCIS Upload, Verification, Dispense Logging, and more.',
+    detail: 'Each workspace is subdivided into specialized work areas. Click a SubSpace to see its records, fields, and lifecycle progress.',
   },
   {
     title: 'Step 4: View & Edit Records',
-    detail: 'Click any record to open the detail drawer. View serial numbers, verification results, and dispense logs. Edit inline and save — changes are instant.',
+    detail: 'Click any record to open the detail drawer. View all field data, lifecycle status, and tags. Edit inline and save — changes are instant.',
   },
 ];
 // ── DSCSA Spotlight Walkthrough — end-to-end demo with overlay highlighting ──

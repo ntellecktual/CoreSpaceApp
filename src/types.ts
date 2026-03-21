@@ -37,6 +37,7 @@ export interface SubSpaceDefinition {
   defaultCreateFormId?: string;
   defaultEditFormId?: string;
   builderFields?: SubSpaceBuilderField[];
+  pipelineOrder?: number; // Position in the pipeline flow (0-based). Undefined = not in pipeline.
 }
 
 export interface WorkspaceDefinition {
@@ -55,6 +56,7 @@ export interface WorkspaceDefinition {
   publisher?: IntegrationPublisher;
   schemaLocked?: boolean;
   published?: boolean;
+  pipelineEnabled?: boolean; // When true, subSpaces have a defined order-of-operations flow.
 }
 
 // ─── Business Architecture ──────────────────────────────────────────

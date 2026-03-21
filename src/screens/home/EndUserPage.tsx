@@ -969,13 +969,20 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#E878F6' }}>SUBSPACES</Text>
           <ScrollView nativeID="eu-subspace-list" style={{ maxHeight: isCompact ? 100 : 160 }} showsVerticalScrollIndicator={false}>
             {visibleSubSpaces.length === 0 && <Text style={{ fontSize: 11, color: dimColor }}>No {subSpaceLabel.toLowerCase()} visible</Text>}
-            {visibleSubSpaces.map((ss) => {
+            {visibleSubSpaces.map((ss, ssIdx) => {
               const sel = selectedSubSpaceId === ss.id;
               const cnt = recordCountBySubSpace[ss.id] ?? 0;
               return (
                 <Pressable key={ss.id} onPress={() => setSelectedSubSpaceId(ss.id)}
                   style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, marginBottom: 2, backgroundColor: sel ? accentSoft : 'transparent', borderWidth: sel ? 1 : 0, borderColor: sel ? accentColor : 'transparent' }}>
-                  <Text style={{ fontSize: 11, fontWeight: sel ? '700' : '500', color: sel ? '#FFFFFF' : dimColor }} numberOfLines={1}>{ss.name}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1 }}>
+                    {workspace?.pipelineEnabled && (
+                      <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: sel ? accentColor : 'rgba(140,91,245,0.22)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                        <Text style={{ fontSize: 8, fontWeight: '800', color: sel ? accentTextColor : '#C4B5FD' }}>{ssIdx + 1}</Text>
+                      </View>
+                    )}
+                    <Text style={{ fontSize: 11, fontWeight: sel ? '700' : '500', color: sel ? '#FFFFFF' : dimColor, flex: 1 }} numberOfLines={1}>{ss.name}</Text>
+                  </View>
                   <View style={{ minWidth: 22, height: 18, borderRadius: 9, backgroundColor: sel ? accentColor : 'rgba(255,255,255,0.08)', alignItems: 'center' as any, justifyContent: 'center' as any, paddingHorizontal: 5 }}>
                     <Text style={{ fontSize: 9, fontWeight: '700', color: sel ? accentTextColor : dimColor }}>{cnt}</Text>
                   </View>
@@ -1067,6 +1074,39 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     <Text style={{ fontSize: 9, color: dimColor }}>{rec.status} • {formatDate(rec.date)}</Text>
                   </Pressable>
                 ))}
+              </ScrollView>
+            </View>
+          )}
+
+          {/* ── Pipeline Flow Strip (when pipeline enabled) ── */}
+          {!selectedSubSpaceId && workspace?.pipelineEnabled && visibleSubSpaces.length > 1 && (
+            <View style={{ paddingHorizontal: 12, paddingTop: 10, paddingBottom: 2 }}>
+              <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#8C5BF5', marginBottom: 6 }}>PIPELINE FLOW</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', gap: 0, paddingBottom: 4 }}>
+                {visibleSubSpaces.map((ss, idx) => {
+                  const cnt = recordCountBySubSpace[ss.id] ?? 0;
+                  const isLast = idx === visibleSubSpaces.length - 1;
+                  return (
+                    <React.Fragment key={`pf-${ss.id}`}>
+                      <Pressable
+                        onPress={() => setSelectedSubSpaceId(ss.id)}
+                        style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 10, backgroundColor: 'rgba(140,91,245,0.12)', borderWidth: 1, borderColor: 'rgba(140,91,245,0.28)', gap: 6 }}
+                        {...(Platform.OS === 'web' ? { dataSet: { scaleIn: '' } } : {})}
+                      >
+                        <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: 'rgba(140,91,245,0.30)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                          <Text style={{ fontSize: 9, fontWeight: '800', color: '#E0D4FF' }}>{idx + 1}</Text>
+                        </View>
+                        <Text style={{ fontSize: 11, fontWeight: '700', color: '#E0D4FF' }} numberOfLines={1}>{ss.name}</Text>
+                        <View style={{ paddingHorizontal: 5, paddingVertical: 1, borderRadius: 8, backgroundColor: 'rgba(140,91,245,0.22)' }}>
+                          <Text style={{ fontSize: 9, fontWeight: '700', color: '#C4B5FD' }}>{cnt}</Text>
+                        </View>
+                      </Pressable>
+                      {!isLast && (
+                        <Text style={{ fontSize: 18, color: '#8C5BF5', fontWeight: '800', marginHorizontal: 4 }}>→</Text>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
               </ScrollView>
             </View>
           )}

@@ -208,6 +208,7 @@ export const defaultData: AppData = {
       countBadgesEnabled: true,
       countStrategy: 'perSubSpace',
       published: true,
+      pipelineEnabled: true,
       builderFields: [
         { id: 'wf-demo-lot', label: 'Lot Number', type: 'text', required: true },
         { id: 'wf-demo-exp', label: 'Expiration Date', type: 'date', required: true },
@@ -221,6 +222,7 @@ export const defaultData: AppData = {
           bindMode: 'relatedEntityView',
           displayType: 'card',
           visibilityRule: 'always',
+          pipelineOrder: 0,
           showCount: true,
           countMode: 'direct',
           builderFields: [
@@ -236,6 +238,7 @@ export const defaultData: AppData = {
           bindMode: 'relatedEntityView',
           displayType: 'list',
           visibilityRule: 'always',
+          pipelineOrder: 1,
           showCount: true,
           countMode: 'direct',
           builderFields: [
@@ -249,6 +252,7 @@ export const defaultData: AppData = {
           bindMode: 'relatedEntityView',
           displayType: 'list',
           visibilityRule: 'always',
+          pipelineOrder: 2,
           showCount: true,
           countMode: 'direct',
           builderFields: [
@@ -262,6 +266,7 @@ export const defaultData: AppData = {
           bindMode: 'sameEntityView',
           displayType: 'card',
           visibilityRule: 'always',
+          pipelineOrder: 3,
           showCount: false,
           countMode: 'direct',
           builderFields: [
@@ -281,6 +286,7 @@ export const defaultData: AppData = {
       countBadgesEnabled: true,
       countStrategy: 'perSubSpace',
       published: true,
+      pipelineEnabled: true,
       builderFields: [
         { id: 'wf-manufacturing-site', label: 'Manufacturing Site', type: 'text', required: true, tags: ['Scope:Workspace'] },
       ],
@@ -293,6 +299,7 @@ export const defaultData: AppData = {
           relationship: 'SerializedUnit.BatchId = SerializedBatch.Id',
           displayType: 'grid',
           visibilityRule: 'always',
+          pipelineOrder: 0,
           showCount: true,
           countMode: 'direct',
           builderFields: [
@@ -310,6 +317,7 @@ export const defaultData: AppData = {
           relationship: 'CartonAggregation.BatchId = SerializedBatch.Id',
           displayType: 'grid',
           visibilityRule: 'always',
+          pipelineOrder: 1,
           showCount: true,
           countMode: 'direct',
           builderFields: [
@@ -327,6 +335,7 @@ export const defaultData: AppData = {
           relationship: 'ComplianceSubmission.BatchId = SerializedBatch.Id',
           displayType: 'grid',
           visibilityRule: 'always',
+          pipelineOrder: 2,
           showCount: true,
           countMode: 'direct',
           builderFields: [

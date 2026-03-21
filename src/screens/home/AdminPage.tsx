@@ -200,6 +200,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     toggleWorkspaceFieldRequired,
     toggleBuilderFieldRequired,
     updateSelectedSubSpace,
+    togglePipelineEnabled,
+    reorderSubSpace,
   } = useAdminWorkspace();
   const insights = useAdminEnterpriseInsights(workspace);
   const { activeTenantId, data, isSuperAdmin, tenants, copyActiveDataToAllTenants, getFormForSubSpace, upsertBusinessFunction, deleteBusinessFunction, upsertBusinessObject, deleteBusinessObject } = useAppState();
@@ -1356,9 +1358,60 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     </View>
                   </View>
 
-                  {!!workspace && (workspace.subSpaces ?? []).map((subSpace) => (
+                  {/* ── Pipeline Mode Toggle ── */}
+                  {!!workspace && (workspace.subSpaces ?? []).length >= 2 && (
+                    <View style={[styles.listCard, { gap: 6 }]}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <View style={{ gap: 2, flex: 1 }}>
+                          <Text style={[styles.listTitle, styles.builderStudioTextPrimary]}>Pipeline Flow Mode</Text>
+                          <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Enable to define an order-of-operations for SubSpaces. Data flows from step 1 through to the final step.</Text>
+                        </View>
+                        <Pressable
+                          onPress={togglePipelineEnabled}
+                          disabled={!canManageSubSpace}
+                          style={[styles.pill, workspace.pipelineEnabled && styles.pillActive, { minWidth: 54, alignItems: 'center' as any }]}
+                          accessibilityRole="switch"
+                          accessibilityState={{ checked: !!workspace.pipelineEnabled }}
+                          accessibilityLabel="Toggle pipeline flow mode"
+                        >
+                          <Text style={[styles.pillText, workspace.pipelineEnabled && styles.pillTextActive]}>{workspace.pipelineEnabled ? 'ON' : 'OFF'}</Text>
+                        </Pressable>
+                      </View>
+                      {workspace.pipelineEnabled && (
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, alignItems: 'center', gap: 4, paddingTop: 4 }}>
+                          {(workspace.subSpaces ?? []).map((ss, idx) => (
+                            <React.Fragment key={`pipe-badge-${ss.id}`}>
+                              {idx > 0 && <Text style={{ fontSize: 13, color: '#8C5BF5', fontWeight: '800' }}> → </Text>}
+                              <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: selectedSubSpaceId === ss.id ? 'rgba(140,91,245,0.38)' : 'rgba(140,91,245,0.12)', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : 'rgba(140,91,245,0.20)' }}>
+                                <Text style={{ fontSize: 10, fontWeight: '700', color: selectedSubSpaceId === ss.id ? '#FFFFFF' : '#C4B5FD' }}>{idx + 1}. {ss.name}</Text>
+                              </View>
+                            </React.Fragment>
+                          ))}
+                        </View>
+                      )}
+                    </View>
+                  )}
+
+                  {!!workspace && (workspace.subSpaces ?? []).map((subSpace, ssIdx) => (
                     <View key={subSpace.id} style={styles.listCard}>
-                      <Text style={[styles.listTitle, styles.builderStudioTextPrimary]}>{subSpace.name}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        {workspace.pipelineEnabled && (
+                          <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: 'rgba(140,91,245,0.22)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                            <Text style={{ fontSize: 10, fontWeight: '800', color: '#C4B5FD' }}>{ssIdx + 1}</Text>
+                          </View>
+                        )}
+                        <Text style={[styles.listTitle, styles.builderStudioTextPrimary, { flex: 1 }]}>{subSpace.name}</Text>
+                        {workspace.pipelineEnabled && (
+                          <View style={{ flexDirection: 'row', gap: 2 }}>
+                            <Pressable disabled={ssIdx === 0} onPress={() => reorderSubSpace(subSpace.id, -1)} style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, backgroundColor: ssIdx === 0 ? 'rgba(255,255,255,0.04)' : 'rgba(140,91,245,0.18)' }}>
+                              <Text style={{ fontSize: 12, color: ssIdx === 0 ? 'rgba(255,255,255,0.20)' : '#C4B5FD', fontWeight: '800' }}>▲</Text>
+                            </Pressable>
+                            <Pressable disabled={ssIdx === (workspace.subSpaces ?? []).length - 1} onPress={() => reorderSubSpace(subSpace.id, 1)} style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, backgroundColor: ssIdx === (workspace.subSpaces ?? []).length - 1 ? 'rgba(255,255,255,0.04)' : 'rgba(140,91,245,0.18)' }}>
+                              <Text style={{ fontSize: 12, color: ssIdx === (workspace.subSpaces ?? []).length - 1 ? 'rgba(255,255,255,0.20)' : '#C4B5FD', fontWeight: '800' }}>▼</Text>
+                            </Pressable>
+                          </View>
+                        )}
+                      </View>
                       <View style={styles.builderActionRow}>
                         <Pressable style={[styles.pill, selectedSubSpaceId === subSpace.id && styles.pillActive]} onPress={() => setSelectedSubSpaceId(subSpace.id)}>
                           <Text style={[styles.pillText, selectedSubSpaceId === subSpace.id && styles.pillTextActive]}>Select</Text>
@@ -1433,12 +1486,17 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                   )}
 
                   <View style={styles.separator} />
-                  <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Operational lanes around your core entity</Text>
-                  <View style={styles.inlineRow}>
-                    {(workspace.subSpaces ?? []).map((subSpace) => (
-                      <Pressable key={`preview-${subSpace.id}`} style={[styles.pill, selectedSubSpaceId === subSpace.id && styles.pillActive]} onPress={() => setSelectedSubSpaceId(subSpace.id)}>
-                        <Text style={[styles.pillText, selectedSubSpaceId === subSpace.id && styles.pillTextActive]}>{subSpace.name}</Text>
-                      </Pressable>
+                  <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>{workspace.pipelineEnabled ? 'Pipeline flow — data progresses left to right' : 'Operational lanes around your core entity'}</Text>
+                  <View style={[styles.inlineRow, workspace.pipelineEnabled && { flexWrap: 'nowrap' as any }]}>
+                    {(workspace.subSpaces ?? []).map((subSpace, idx) => (
+                      <React.Fragment key={`preview-${subSpace.id}`}>
+                        {workspace.pipelineEnabled && idx > 0 && (
+                          <Text style={{ fontSize: 16, color: '#8C5BF5', fontWeight: '800', marginHorizontal: 2 }}>→</Text>
+                        )}
+                        <Pressable style={[styles.pill, selectedSubSpaceId === subSpace.id && styles.pillActive, workspace.pipelineEnabled && { borderColor: 'rgba(140,91,245,0.35)' }]} onPress={() => setSelectedSubSpaceId(subSpace.id)}>
+                          <Text style={[styles.pillText, selectedSubSpaceId === subSpace.id && styles.pillTextActive]}>{workspace.pipelineEnabled ? `${idx + 1}. ` : ''}{subSpace.name}</Text>
+                        </Pressable>
+                      </React.Fragment>
                     ))}
                   </View>
 

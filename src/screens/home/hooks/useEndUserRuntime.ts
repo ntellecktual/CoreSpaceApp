@@ -98,7 +98,7 @@ export function useEndUserRuntime(selectedClientId: string) {
     if (!workspace) {
       return [];
     }
-    return workspace.subSpaces.filter((subSpace) => {
+    const filtered = workspace.subSpaces.filter((subSpace) => {
       if (subSpace.visibilityRule === 'always') {
         return true;
       }
@@ -109,6 +109,10 @@ export function useEndUserRuntime(selectedClientId: string) {
           record.subSpaceId === subSpace.id,
       );
     });
+    if (workspace.pipelineEnabled) {
+      filtered.sort((a, b) => (a.pipelineOrder ?? 0) - (b.pipelineOrder ?? 0));
+    }
+    return filtered;
   }, [workspace, data.records, selectedClientId]);
 
   const [selectedSubSpaceId, setSelectedSubSpaceId] = useState(visibleSubSpaces[0]?.id ?? workspace?.subSpaces[0]?.id ?? '');

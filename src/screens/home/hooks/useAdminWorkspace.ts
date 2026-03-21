@@ -914,8 +914,9 @@ export function useAdminWorkspace() {
       ...baseWorkspace,
       countBadgesEnabled: true,
       countStrategy: 'perSubSpace',
+      pipelineEnabled: true,
       builderFields: nextWorkspaceFields,
-      subSpaces: nextSubSpaces,
+      subSpaces: nextSubSpaces.map((ss, idx) => ({ ...ss, pipelineOrder: ss.pipelineOrder ?? idx })),
     });
 
     if (isNewWorkspace) {
@@ -1140,8 +1141,9 @@ export function useAdminWorkspace() {
       ...baseWorkspace,
       countBadgesEnabled: true,
       countStrategy: 'perSubSpace',
+      pipelineEnabled: true,
       builderFields: nextWorkspaceFields,
-      subSpaces: nextSubSpaces,
+      subSpaces: nextSubSpaces.map((ss, idx) => ({ ...ss, pipelineOrder: ss.pipelineOrder ?? idx })),
     });
 
     if (isNewWorkspace) {
@@ -1301,6 +1303,36 @@ export function useAdminWorkspace() {
     setNotice('WRVAS template applied: Dock Log, Serial Capture, Inspection, Diagnostics, Cost Eval, Repair, Retest, Config, Kitting, QA, Packing, and Shipping lanes are ready. 5 Signal Studio flows created.' + (addedNewSubSpaces ? ' Demo data seeded with Dell Laptop, HP Printer (BER), and Cisco Server (retest fail) work orders.' : ''));
   };
 
+  /* ── Pipeline mode toggle ── */
+  const togglePipelineEnabled = () => {
+    if (!workspace) return;
+    const next = !workspace.pipelineEnabled;
+    upsertWorkspace({ ...workspace, pipelineEnabled: next });
+    if (next) {
+      // Assign pipelineOrder to each SubSpace based on current array position
+      workspace.subSpaces.forEach((ss, idx) => {
+        updateSubSpace(workspace.id, { ...ss, pipelineOrder: idx });
+      });
+    }
+    setNotice(next ? 'Pipeline mode enabled — SubSpaces are now an ordered flow.' : 'Pipeline mode disabled — SubSpaces display as independent lanes.');
+  };
+
+  /* ── Reorder SubSpaces (pipeline) ── */
+  const reorderSubSpace = (subSpaceId: string, direction: -1 | 1) => {
+    if (!workspace) return;
+    const subs = [...workspace.subSpaces];
+    const idx = subs.findIndex((s) => s.id === subSpaceId);
+    if (idx < 0) return;
+    const targetIdx = idx + direction;
+    if (targetIdx < 0 || targetIdx >= subs.length) return;
+    // Swap
+    [subs[idx], subs[targetIdx]] = [subs[targetIdx], subs[idx]];
+    // Re-assign pipeline orders
+    const reordered = subs.map((s, i) => ({ ...s, pipelineOrder: i }));
+    upsertWorkspace({ ...workspace, subSpaces: reordered });
+    setNotice('SubSpace order updated.');
+  };
+
   return {
     workspaces: data.workspaces,
     workspace,
@@ -1348,5 +1380,7 @@ export function useAdminWorkspace() {
     toggleBuilderFieldRequired,
     toggleWorkspaceFieldRequired,
     updateSelectedSubSpace,
+    togglePipelineEnabled,
+    reorderSubSpace,
   };
 }

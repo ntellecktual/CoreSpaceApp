@@ -138,6 +138,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const [draggedFieldType, setDraggedFieldType] = useState<SubSpaceBuilderFieldType | null>(null);
   const [wsDragFromIndex, setWsDragFromIndex] = useState<number | null>(null);
   const [wsDragOverIndex, setWsDragOverIndex] = useState<number | null>(null);
+  const [wizardStep, setWizardStep] = useState<1 | 2 | 3 | 4>(1);
+  const [wizardActiveFieldType, setWizardActiveFieldType] = useState<SubSpaceBuilderFieldType>('text');
   const [shellPane, setShellPane] = useState<'labels' | 'intake' | 'personas' | 'lifecycle'>('labels');
   const [rolePane, setRolePane] = useState<'roles' | 'templates' | 'diff' | 'permissions' | 'scope'>('roles');
   const [walkthroughIndex, setWalkthroughIndex] = useState(0);
@@ -641,6 +643,13 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   }, [isCreatingWorkspace]);
 
   useEffect(() => {
+    if (hasWorkspace && wizardStep === 1) {
+      setWizardStep(2);
+      setWorkspacePane('subspaces');
+    }
+  }, [hasWorkspace, wizardStep]);
+
+  useEffect(() => {
     const saveDraftLabel =
       adminTab === 'workspace'
         ? 'Save Workspace Design'
@@ -794,834 +803,689 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
           </View>
 
       {adminTab === 'workspace' && <Card title="" blurred>
-        {isCreatingWorkspace && showCreateModeBanner && (
-          <View style={styles.builderCreateModeBanner}>
-            <View style={styles.builderCreateModeBannerRow}>
-              <Text style={styles.builderCreateModeBannerText}>You are in Create Mode</Text>
-              <Pressable style={styles.builderCreateModeBannerClose} onPress={() => setShowCreateModeBanner(false)}>
-                <Text style={styles.builderCreateModeBannerCloseText}>Dismiss</Text>
-              </Pressable>
-            </View>
-          </View>
-        )}
-
-        <View style={styles.builderHeaderRow}>
-          <View style={styles.builderHeaderMeta}>
-            <Text style={styles.bodyText}>Start with the core entity your team tracks, then branch into SubSpaces for each operational lane. The preview on the right shows what end users will see.</Text>
-            <Text style={styles.metaText}>Tip: Keep names short and team-friendly. Rename anything later without breaking your setup.</Text>
-          </View>
-          <Pressable style={styles.secondaryButton} onPress={() => setWorkspaceBuilderPanelOpen((current) => !current)}>
-            <Text style={styles.secondaryButtonText}>{workspaceBuilderPanelOpen ? 'Collapse Builder' : 'Open Builder'}</Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.builderStepRail}>
-          {builderStepRail.map((step, index) => {
-            const isCurrent = builderStep === step.key;
-            const isComplete = step.complete;
-
+        {/* ── WORKSPACE WIZARD STEP RAIL ── */}
+        <View style={{
+          flexDirection: 'row',
+          marginBottom: 18,
+          borderRadius: 12,
+          overflow: 'hidden',
+          borderWidth: 1,
+          borderColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(102,74,154,0.12)',
+        }}>
+          {([
+            { step: 1 as const, icon: '🏷️', label: 'Name' },
+            { step: 2 as const, icon: '📂', label: 'Sections' },
+            { step: 3 as const, icon: '📝', label: 'Fields' },
+            { step: 4 as const, icon: '🚀', label: 'Launch' },
+          ]).map(({ step, icon, label }, idx) => {
+            const isActive = wizardStep === step;
+            const isDone = (step === 1 && isWorkspaceStepComplete) || (step === 2 && isSubSpacesStepComplete) || (step === 3 && isFieldsStepComplete);
             return (
               <Pressable
-                key={`builder-step-${step.key}`}
-                style={[
-                  styles.builderStepItem,
-                  isCurrent && styles.builderStepItemCurrent,
-                  isComplete && styles.builderStepItemComplete,
-                ]}
-                onPress={() => goToBuilderStep(step.key)}
+                key={step}
+                onPress={() => { setWizardStep(step); setWorkspacePane(step <= 1 ? 'workspace' : 'subspaces'); }}
+                style={{
+                  flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+                  paddingVertical: 11, paddingHorizontal: 8, gap: 5,
+                  backgroundColor: isActive
+                    ? 'rgba(140,91,245,0.20)'
+                    : isDone
+                      ? mode === 'night' ? 'rgba(34,197,94,0.08)' : 'rgba(34,197,94,0.06)'
+                      : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                  borderRightWidth: idx < 3 ? 1 : 0,
+                  borderRightColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(102,74,154,0.10)',
+                }}
               >
-                <View
-                  style={[
-                    styles.builderStepBullet,
-                    styles.builderStepBulletPending,
-                    isComplete && styles.builderStepBulletComplete,
-                    isCurrent && styles.builderStepBulletCurrent,
-                  ]}
-                />
-                <Text style={[styles.builderStepText, isCurrent && styles.builderStepTextCurrent, isComplete && styles.builderStepTextComplete]}>
-                  {index + 1}. {step.label}
-                </Text>
+                <Text style={{ fontSize: 13 }}>{isDone && !isActive ? '✅' : icon}</Text>
+                <Text style={{
+                  fontSize: 12, fontWeight: isActive ? '800' : '600',
+                  color: isActive ? '#A78BFA' : isDone ? '#22C55E' : mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)',
+                }}>{label}</Text>
               </Pressable>
             );
           })}
         </View>
 
         <View style={styles.builderLayout}>
-          {workspaceBuilderPanelOpen && (
-            <View style={styles.builderConfigPane}>
-              <View style={styles.inlineRow}>
-                <Pressable style={[styles.pill, workspacePane === 'workspace' && styles.pillActive]} onPress={() => setWorkspacePane('workspace')}>
-                  <Text style={[styles.pillText, workspacePane === 'workspace' && styles.pillTextActive]}>1. Configure Workspace</Text>
-                </Pressable>
-                <Pressable style={[styles.pill, workspacePane === 'subspaces' && styles.pillActive]} onPress={() => setWorkspacePane('subspaces')}>
-                  <Text style={[styles.pillText, workspacePane === 'subspaces' && styles.pillTextActive]}>2. SubSpace Lanes & Fields</Text>
-                </Pressable>
-              </View>
+          {/* ── LEFT: WIZARD STEPS ── */}
+          <View style={[styles.builderConfigPane, { gap: 16 }]}>
 
-              {workspacePane === 'workspace' && (
-                <>
-                  {!canManageWorkspace && <Text style={styles.notice}>{deniedMessage('workspace.manage')}</Text>}
+            {/* STEP 1 — NAME YOUR WORKSPACE */}
+            {wizardStep === 1 && (
+              <>
+                {!canManageWorkspace && (
+                  <View style={{ backgroundColor: 'rgba(239,68,68,0.08)', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: 'rgba(239,68,68,0.22)' }}>
+                    <Text style={[styles.metaText, { color: '#EF4444' }]}>{deniedMessage('workspace.manage')}</Text>
+                  </View>
+                )}
 
-                  {/* ── Empty-state hero: first visit, no workspaces ── */}
-                  {workspaces.length === 0 && canManageWorkspace && (
+                {/* Empty-state hero — no workspaces yet */}
+                {workspaces.length === 0 && canManageWorkspace && !isCreatingWorkspace && (
+                  <View style={{ gap: 16 }}>
                     <View style={{
-                      backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.07)' : 'rgba(140,91,245,0.05)',
-                      borderRadius: 14,
-                      padding: 24,
-                      marginBottom: 16,
-                      borderWidth: 1,
-                      borderColor: 'rgba(140,91,245,0.22)',
-                      gap: 16,
+                      backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.09)' : 'rgba(140,91,245,0.05)',
+                      borderRadius: 16, padding: 24, borderWidth: 1,
+                      borderColor: mode === 'night' ? 'rgba(140,91,245,0.22)' : 'rgba(140,91,245,0.16)',
+                      alignItems: 'center' as any, gap: 10,
                     }}>
-                      <View style={{ alignItems: 'center', gap: 8 }}>
-                        <Text style={{ fontSize: 36 }}>🏗️</Text>
-                        <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontSize: 18, fontWeight: '800', textAlign: 'center' }}>
-                          Build your first workspace
-                        </Text>
-                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)', fontSize: 13, textAlign: 'center', maxWidth: 480, lineHeight: 20 }}>
-                          Load a pre-built template to get up and running in seconds — complete with SubSpaces, records, Signal flows, and business architecture. Or start from scratch.
-                        </Text>
-                      </View>
-                      <View style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap' as any }}>
-                        {/* DSCSA template card */}
-                        <Pressable
-                          nativeID="wt-load-template"
-                          style={{
-                            flex: 1, minWidth: 220,
-                            backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.14)' : 'rgba(140,91,245,0.08)',
-                            borderRadius: 12, padding: 16, gap: 10,
-                            borderWidth: 1, borderColor: 'rgba(140,91,245,0.30)',
-                          }}
-                          onPress={() => {
-                            applyDscsaSerializationTemplate();
-                            auditLog?.logEntry({ action: 'import', entityType: 'workspace', entityId: 'template', entityName: 'DSCSA Serialization Template', after: { template: 'DSCSA', subSpaces: 8, records: 17, flows: 5 } });
-                            addNotification?.({ type: 'system', title: 'Template Imported', body: 'DSCSA Serialization Template loaded with 8 subspaces, 17 records, and 5 flows.', severity: 'success' });
-                          }}
-                        >
-                          <Text style={{ fontSize: 28 }}>💊</Text>
-                          <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '700', fontSize: 14 }}>DSCSA Pharma Serialization</Text>
-                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.50)', fontSize: 11, lineHeight: 17 }}>8 SubSpaces · 17 sample records · 5 automation flows · Full supply chain architecture</Text>
-                          <View style={{ backgroundColor: '#8C5BF5', borderRadius: 8, paddingVertical: 9, alignItems: 'center' }}>
-                            <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 12 }}>Load Template →</Text>
-                          </View>
-                        </Pressable>
-                        {/* WRVAS template card */}
-                        <Pressable
-                          nativeID="wt-load-wrvas-template"
-                          style={{
-                            flex: 1, minWidth: 220,
-                            backgroundColor: mode === 'night' ? 'rgba(59,130,246,0.10)' : 'rgba(59,130,246,0.06)',
-                            borderRadius: 12, padding: 16, gap: 10,
-                            borderWidth: 1, borderColor: 'rgba(59,130,246,0.28)',
-                          }}
-                          onPress={() => {
-                            applyWrvasTemplate();
-                            auditLog?.logEntry({ action: 'import', entityType: 'workspace', entityId: 'template', entityName: 'WRVAS Service Template', after: { template: 'WRVAS', subSpaces: 12, records: 22, flows: 5 } });
-                            addNotification?.({ type: 'system', title: 'Template Imported', body: 'WRVAS Service Template loaded with 12 subspaces, 22 records, and 5 flows.', severity: 'success' });
-                          }}
-                        >
-                          <Text style={{ fontSize: 28 }}>🖥️</Text>
-                          <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '700', fontSize: 14 }}>WRVAS Service Operations</Text>
-                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.50)', fontSize: 11, lineHeight: 17 }}>12 SubSpaces · 22 sample records · 5 automation flows · IT device service architecture</Text>
-                          <View style={{ backgroundColor: '#3B82F6', borderRadius: 8, paddingVertical: 9, alignItems: 'center' }}>
-                            <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 12 }}>Load Template →</Text>
-                          </View>
-                        </Pressable>
-                      </View>
-                      <Pressable onPress={beginCreateWorkspace} style={{ alignSelf: 'center' }}>
-                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)', fontSize: 12, textDecorationLine: 'underline' }}>Or start from scratch →</Text>
+                      <Text style={{ fontSize: 44 }}>🏗️</Text>
+                      <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontSize: 20, fontWeight: '800', textAlign: 'center' }}>Build your first workspace</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 13, textAlign: 'center', lineHeight: 20 }}>
+                        A workspace is like a dashboard for one job — it holds your data, sections, and fields.{'\n'}Start with a ready-made template or create your own from scratch.
+                      </Text>
+                    </View>
+
+                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.42)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Ready-made templates</Text>
+                    <View style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap' as any }}>
+                      <Pressable
+                        nativeID="wt-load-template"
+                        style={{ flex: 1, minWidth: 200, backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.12)' : 'rgba(140,91,245,0.06)', borderRadius: 14, padding: 18, gap: 10, borderWidth: 1, borderColor: 'rgba(140,91,245,0.28)' }}
+                        onPress={() => {
+                          applyDscsaSerializationTemplate();
+                          setWizardStep(4);
+                          auditLog?.logEntry({ action: 'import', entityType: 'workspace', entityId: 'template', entityName: 'DSCSA Serialization Template', after: { template: 'DSCSA', subSpaces: 8, records: 17, flows: 5 } });
+                          addNotification?.({ type: 'system', title: 'Template Loaded!', body: 'DSCSA workspace ready — 8 sections, 17 sample records.', severity: 'success' });
+                        }}
+                      >
+                        <Text style={{ fontSize: 32 }}>💊</Text>
+                        <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '700', fontSize: 14 }}>DSCSA Pharma Serialization</Text>
+                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.48)', fontSize: 11, lineHeight: 17 }}>8 sections · 17 sample records · 5 automation flows · Full pharma supply chain</Text>
+                        <View style={{ backgroundColor: '#8C5BF5', borderRadius: 10, paddingVertical: 10, alignItems: 'center' as any }}>
+                          <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Use This Template →</Text>
+                        </View>
+                      </Pressable>
+                      <Pressable
+                        nativeID="wt-load-wrvas-template"
+                        style={{ flex: 1, minWidth: 200, backgroundColor: mode === 'night' ? 'rgba(59,130,246,0.10)' : 'rgba(59,130,246,0.05)', borderRadius: 14, padding: 18, gap: 10, borderWidth: 1, borderColor: 'rgba(59,130,246,0.26)' }}
+                        onPress={() => {
+                          applyWrvasTemplate();
+                          setWizardStep(4);
+                          auditLog?.logEntry({ action: 'import', entityType: 'workspace', entityId: 'template', entityName: 'WRVAS Service Template', after: { template: 'WRVAS', subSpaces: 12, records: 22, flows: 5 } });
+                          addNotification?.({ type: 'system', title: 'Template Loaded!', body: 'WRVAS workspace ready — 12 sections, 22 sample records.', severity: 'success' });
+                        }}
+                      >
+                        <Text style={{ fontSize: 32 }}>🖥️</Text>
+                        <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '700', fontSize: 14 }}>WRVAS Service Operations</Text>
+                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.48)', fontSize: 11, lineHeight: 17 }}>12 sections · 22 sample records · 5 automation flows · IT device service</Text>
+                        <View style={{ backgroundColor: '#3B82F6', borderRadius: 10, paddingVertical: 10, alignItems: 'center' as any }}>
+                          <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Use This Template →</Text>
+                        </View>
                       </Pressable>
                     </View>
-                  )}
 
-                  <View style={[styles.builderFormSection, useCompactBuilderSections && styles.builderFormSectionCompact]}>
-                    <View
-                      style={[
-                        styles.builderFormSectionHeader,
-                        !useCompactBuilderSections && styles.builderFormSectionHeaderRail,
-                        useCompactBuilderSections && styles.builderFormSectionHeaderCompact,
-                      ]}
-                    >
-                      <Text style={styles.builderFormSectionTitle}>Workspace Library</Text>
-                      <Text style={styles.builderFormSectionText}>Choose an existing workspace or start a new one.</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                      <View style={{ flex: 1, height: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.32)' : 'rgba(0,0,0,0.32)', fontSize: 12 }}>or build from scratch</Text>
+                      <View style={{ flex: 1, height: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
                     </View>
-                    <View style={styles.builderFormSectionBody}>
-                      <View style={styles.builderActionRow}>
-                        <Pressable
-                          disabled={!canManageWorkspace}
-                          style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                          onPress={beginCreateWorkspace}
-                        >
-                          <Text style={styles.secondaryButtonText}>Create New Workspace</Text>
-                        </Pressable>
-                        <Pressable
-                          nativeID="wt-load-template"
-                          disabled={!canManageWorkspace}
-                          style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                          onPress={() => { applyDscsaSerializationTemplate(); auditLog?.logEntry({ action: 'import', entityType: 'workspace', entityId: workspace?.id ?? 'template', entityName: 'DSCSA Serialization Template', after: { template: 'DSCSA', subSpaces: 8, records: 17, flows: 5 } }); addNotification?.({ type: 'system', title: 'Template Imported', body: 'DSCSA Serialization Template loaded with 8 subspaces, 17 records, and 5 flows.', severity: 'success' }); }}
-                        >
-                          <Text style={styles.secondaryButtonText}>Load DSCSA Serialization Template</Text>
-                        </Pressable>
-                        <Pressable
-                          nativeID="wt-load-wrvas-template"
-                          disabled={!canManageWorkspace}
-                          style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                          onPress={() => { applyWrvasTemplate(); auditLog?.logEntry({ action: 'import', entityType: 'workspace', entityId: workspace?.id ?? 'template', entityName: 'WRVAS Service Template', after: { template: 'WRVAS', subSpaces: 12, records: 22, flows: 5 } }); addNotification?.({ type: 'system', title: 'Template Imported', body: 'WRVAS Service Template loaded with 12 subspaces, 22 records, and 5 flows.', severity: 'success' }); }}
-                        >
-                          <Text style={styles.secondaryButtonText}>Load WRVAS Service Template</Text>
-                        </Pressable>
-                        {isSuperAdmin && tenants.length > 1 && (
+                    <Pressable style={[styles.primaryButton, { paddingVertical: 14 }]} onPress={beginCreateWorkspace}>
+                      <Text style={[styles.primaryButtonText, { fontSize: 15, fontWeight: '700' }]}>+ Create My Own Workspace</Text>
+                    </Pressable>
+                  </View>
+                )}
+
+                {/* Creating from scratch — name form */}
+                {isCreatingWorkspace && canManageWorkspace && (
+                  <View style={{ gap: 14 }}>
+                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.10)' : 'rgba(140,91,245,0.06)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(140,91,245,0.22)' : 'rgba(140,91,245,0.18)' }}>
+                      <Text style={{ color: mode === 'night' ? '#A78BFA' : '#6F4BCF', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Creating a new workspace</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.58)' : 'rgba(0,0,0,0.50)', fontSize: 12, lineHeight: 18 }}>
+                        Think of a workspace like one team's dashboard — "Customer Requests", "Inventory Tracker", "Employee Onboarding". Keep the name short and clear.
+                      </Text>
+                    </View>
+
+                    <View style={{ gap: 6 }}>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.70)', fontSize: 14, fontWeight: '700' }}>What's this workspace called? <Text style={{ color: '#EF4444' }}>*</Text></Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)', fontSize: 12 }}>e.g. "Order Tracker", "Patient Records", "Inventory Management"</Text>
+                      <LabeledInput label="" value={workspaceName} onChangeText={(v) => { setWorkspaceName(v); setRoute(v.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')); }} placeholder="My Workspace Name" />
+                    </View>
+
+                    <View style={{ gap: 6 }}>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.70)', fontSize: 14, fontWeight: '700' }}>Each row in this workspace is a... <Text style={{ color: '#EF4444' }}>*</Text></Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)', fontSize: 12 }}>One word for what you're tracking — e.g. "Order", "Patient", "Item", "Employee", "Case"</Text>
+                      <LabeledInput label="" value={rootEntity} onChangeText={setRootEntity} placeholder="e.g. Order" />
+                    </View>
+
+                    <View style={{ gap: 6 }}>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.32)', fontSize: 11, fontWeight: '600' }}>Quick fill examples:</Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, gap: 6 }}>
+                        {[
+                          { name: 'Order Tracker', entity: 'Order' },
+                          { name: 'Customer Requests', entity: 'Request' },
+                          { name: 'Employee Onboarding', entity: 'Employee' },
+                          { name: 'Inventory Management', entity: 'Item' },
+                          { name: 'Project Tracker', entity: 'Project' },
+                          { name: 'Support Tickets', entity: 'Ticket' },
+                          { name: 'Client Cases', entity: 'Case' },
+                          { name: 'Maintenance Logs', entity: 'Log' },
+                        ].map((ex) => (
                           <Pressable
-                            nativeID="wt-seed-all-tenants"
-                            style={[styles.secondaryButton, { borderColor: '#8C5BF5' }]}
-                            onPress={() => {
-                              const result = copyActiveDataToAllTenants();
-                              if (result.ok) {
-                                addNotification?.({ type: 'system', title: 'All Tenants Seeded', body: `Current workspace data copied to ${result.count} other tenant${result.count === 1 ? '' : 's'}.`, severity: 'success' });
-                                auditLog?.logEntry({ action: 'import', entityType: 'workspace', entityId: 'all-tenants', entityName: 'Seed All Tenants', after: { detail: `Copied active tenant data to ${result.count} tenants` } });
-                              } else {
-                                addNotification?.({ type: 'system', title: 'Seed Failed', body: result.reason ?? 'Unable to seed tenants.', severity: 'warning' });
-                              }
-                            }}
+                            key={ex.name}
+                            style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.10)' : 'rgba(140,91,245,0.07)', borderWidth: 1, borderColor: mode === 'night' ? 'rgba(140,91,245,0.25)' : 'rgba(140,91,245,0.20)' }}
+                            onPress={() => { setWorkspaceName(ex.name); setRootEntity(ex.entity); setRoute(ex.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')); }}
                           >
-                            <Text style={[styles.secondaryButtonText, { color: '#8C5BF5' }]}>⬆ Seed Current Data → All Tenants</Text>
-                          </Pressable>
-                        )}
-                      </View>
-                      <View style={styles.builderActionRow}>
-                        {workspaces.map((item) => (
-                          <Pressable key={item.id} style={[styles.pill, selectedWorkspaceId === item.id && styles.pillActive]} onPress={() => setSelectedWorkspaceId(item.id)}>
-                            <Text style={[styles.pillText, selectedWorkspaceId === item.id && styles.pillTextActive]}>{item.name}</Text>
+                            <Text style={{ fontSize: 11, color: mode === 'night' ? '#A78BFA' : '#6F4BCF', fontWeight: '600' }}>{ex.name}</Text>
                           </Pressable>
                         ))}
                       </View>
                     </View>
+
+                    <Pressable
+                      nativeID="wt-create-workspace"
+                      disabled={!canManageWorkspace || !workspaceName.trim() || !rootEntity.trim()}
+                      style={[styles.primaryButton, { paddingVertical: 14 }, (!workspaceName.trim() || !rootEntity.trim()) && styles.buttonDisabled]}
+                      onPress={() => {
+                        if (!route.trim()) setRoute(workspaceName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+                        saveWorkspace();
+                        auditLog?.logEntry({ action: 'create', entityType: 'workspace', entityId: workspace?.id ?? '', entityName: workspaceName.trim() || 'Untitled Workspace', after: { name: workspaceName.trim(), rootEntity: rootEntity.trim(), route: route.trim() } });
+                        addNotification?.({ type: 'system', title: 'Workspace Created!', body: `"${workspaceName.trim()}" is ready. Now add sections.`, severity: 'success' });
+                        setWizardStep(2);
+                        setWorkspacePane('subspaces');
+                      }}
+                    >
+                      <Text style={[styles.primaryButtonText, { fontSize: 15 }]}>Create Workspace & Continue →</Text>
+                    </Pressable>
                   </View>
+                )}
 
-                  {isCreatingWorkspace ? (
-                    <View style={[styles.builderFormSection, useCompactBuilderSections && styles.builderFormSectionCompact]}>
-                      <View
-                        style={[
-                          styles.builderFormSectionHeader,
-                          !useCompactBuilderSections && styles.builderFormSectionHeaderRail,
-                          useCompactBuilderSections && styles.builderFormSectionHeaderCompact,
-                        ]}
-                      >
-                        <Text style={styles.builderFormSectionTitle}>Create Workspace</Text>
-                        <Text style={styles.builderFormSectionText}>You are making a new workspace. Think of it like one dashboard for one team job.</Text>
+                {/* Workspace picker — workspaces already exist */}
+                {workspaces.length > 0 && canManageWorkspace && !isCreatingWorkspace && (
+                  <View style={{ gap: 14 }}>
+                    <View style={{ gap: 8 }}>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.70)' : 'rgba(0,0,0,0.65)', fontSize: 13, fontWeight: '700' }}>Choose a workspace to edit</Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, gap: 8 }}>
+                        {workspaces.map((ws) => (
+                          <Pressable
+                            key={ws.id}
+                            style={{ paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1.5, backgroundColor: selectedWorkspaceId === ws.id ? 'rgba(140,91,245,0.18)' : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', borderColor: selectedWorkspaceId === ws.id ? '#8C5BF5' : mode === 'night' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.10)' }}
+                            onPress={() => { setSelectedWorkspaceId(ws.id); setWizardStep(2); setWorkspacePane('subspaces'); }}
+                          >
+                            <Text style={{ fontSize: 13, fontWeight: '700', color: selectedWorkspaceId === ws.id ? '#A78BFA' : mode === 'night' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.68)' }}>{ws.name}</Text>
+                            <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', marginTop: 2 }}>{ws.subSpaces.length} section{ws.subSpaces.length !== 1 ? 's' : ''}</Text>
+                          </Pressable>
+                        ))}
                       </View>
-                      <View style={styles.builderFormSectionBody}>
-                        <LabeledInput label="Workspace Name" helperText="Name your dashboard so your team knows what this workspace is for." value={workspaceName} onChangeText={setWorkspaceName} placeholder="Example: Manufacturer Tracking" />
-                        <LabeledInput label="Root Entity" helperText="What is the main thing you want to track in this workspace?" value={rootEntity} onChangeText={setRootEntity} placeholder="Example: Batch" />
-                        <LabeledInput label="Route" helperText="This becomes part of the page link. Use lowercase words with dashes." value={route} onChangeText={setRoute} placeholder="Example: manufacturer-tracking" />
+                    </View>
 
-                        <Pressable nativeID="wt-create-workspace" disabled={!canManageWorkspace} style={[styles.primaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={() => { saveWorkspace(); auditLog?.logEntry({ action: 'create', entityType: 'workspace', entityId: workspace?.id ?? '', entityName: workspaceName.trim() || 'Untitled Workspace', after: { name: workspaceName.trim(), rootEntity: rootEntity.trim(), route: route.trim() } }); addNotification?.({ type: 'system', title: 'Workspace Created', body: `Workspace "${workspaceName.trim() || 'Untitled Workspace'}" has been created.`, severity: 'success' }); }}>
-                          <Text style={styles.primaryButtonText}>Create Workspace</Text>
+                    {hasWorkspace && (
+                      <View style={{ gap: 10, borderTopWidth: 1, borderTopColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)', paddingTop: 14 }}>
+                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.60)', fontSize: 13, fontWeight: '700' }}>Edit "{workspace?.name}"</Text>
+                        <LabeledInput label="Workspace Name" value={workspaceName} onChangeText={setWorkspaceName} placeholder="Workspace Name" />
+                        <LabeledInput label="Each row is a..." helperText="e.g. Order, Patient, Item" value={rootEntity} onChangeText={setRootEntity} placeholder="e.g. Order" />
+                        <View style={{ flexDirection: 'row', gap: 8 }}>
+                          <Pressable style={[styles.primaryButton, { flex: 1 }]} onPress={() => { saveWorkspace(); addNotification?.({ type: 'system', title: 'Saved!', body: 'Workspace updated.', severity: 'success' }); setWizardStep(2); setWorkspacePane('subspaces'); }}>
+                            <Text style={styles.primaryButtonText}>Save & Continue →</Text>
+                          </Pressable>
+                          <Pressable style={[styles.secondaryButton, { borderColor: 'rgba(239,68,68,0.30)', backgroundColor: 'rgba(239,68,68,0.06)' }]} onPress={() => { if (workspace) { removeWorkspace(workspace.id); addNotification?.({ type: 'system', title: 'Workspace Deleted', body: `"${workspace.name}" removed.`, severity: 'warning' }); } }}>
+                            <Text style={[styles.secondaryButtonText, { color: '#EF4444' }]}>Delete</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    )}
+
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                      <View style={{ flex: 1, height: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)' }} />
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.28)', fontSize: 11 }}>or</Text>
+                      <View style={{ flex: 1, height: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)' }} />
+                    </View>
+                    <Pressable style={[styles.secondaryButton, { paddingVertical: 12 }]} onPress={beginCreateWorkspace}>
+                      <Text style={[styles.secondaryButtonText, { textAlign: 'center' }]}>+ Create Another Workspace</Text>
+                    </Pressable>
+
+                    {/* Templates when workspace exists */}
+                    <View style={{ gap: 6, borderTopWidth: 1, borderTopColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', paddingTop: 12 }}>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.33)' : 'rgba(0,0,0,0.33)', fontSize: 11, fontWeight: '600' }}>Load a template instead</Text>
+                      <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' as any }}>
+                        <Pressable nativeID="wt-load-template" style={[styles.secondaryButton, { flex: 1 }]} onPress={() => { applyDscsaSerializationTemplate(); setWizardStep(4); addNotification?.({ type: 'system', title: 'Template Loaded!', body: 'DSCSA workspace loaded.', severity: 'success' }); }}>
+                          <Text style={styles.secondaryButtonText}>💊 DSCSA Template</Text>
+                        </Pressable>
+                        <Pressable nativeID="wt-load-wrvas-template" style={[styles.secondaryButton, { flex: 1 }]} onPress={() => { applyWrvasTemplate(); setWizardStep(4); addNotification?.({ type: 'system', title: 'Template Loaded!', body: 'WRVAS workspace loaded.', severity: 'success' }); }}>
+                          <Text style={styles.secondaryButtonText}>🖥️ WRVAS Template</Text>
                         </Pressable>
                       </View>
-                    </View>
-                  ) : hasWorkspace ? (
-                    <View style={[styles.builderFormSection, useCompactBuilderSections && styles.builderFormSectionCompact]}>
-                      <View
-                        style={[
-                          styles.builderFormSectionHeader,
-                          !useCompactBuilderSections && styles.builderFormSectionHeaderRail,
-                          useCompactBuilderSections && styles.builderFormSectionHeaderCompact,
-                        ]}
-                      >
-                        <Text style={styles.builderFormSectionTitle}>Edit Workspace</Text>
-                        <Text style={styles.builderFormSectionText}>Update the name, tracked item, or page link for this workspace.</Text>
-                      </View>
-                      <View style={styles.builderFormSectionBody}>
-                        <LabeledInput label="Workspace Name" helperText="Give this workspace a clear name your team will recognize." value={workspaceName} onChangeText={setWorkspaceName} placeholder="Example: Manufacturer Tracking" />
-                        <LabeledInput label="Root Entity" helperText="Main thing tracked here (for example: Batch or Shipment)." value={rootEntity} onChangeText={setRootEntity} placeholder="Example: Batch" />
-                        <LabeledInput label="Route" helperText="Page link text. Keep it short, lowercase, and use dashes." value={route} onChangeText={setRoute} placeholder="Example: manufacturer-tracking" />
-                        <View style={styles.builderActionRow}>
-                          <Pressable disabled={!canManageWorkspace} style={[styles.primaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={() => { saveWorkspace(); auditLog?.logEntry({ action: 'update', entityType: 'workspace', entityId: workspace?.id ?? '', entityName: workspaceName.trim() || workspace?.name || 'Workspace', after: { name: workspaceName.trim(), rootEntity: rootEntity.trim(), route: route.trim() } }); addNotification?.({ type: 'system', title: 'Workspace Saved', body: `Workspace "${workspaceName.trim() || workspace?.name || 'Workspace'}" has been updated.`, severity: 'success' }); }}>
-                            <Text style={styles.primaryButtonText}>Save Workspace</Text>
-                          </Pressable>
-                          <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={() => { if (workspace) { auditLog?.logEntry({ action: 'delete', entityType: 'workspace', entityId: workspace.id, entityName: workspace.name }); addNotification?.({ type: 'system', title: 'Workspace Deleted', body: `Workspace "${workspace.name}" has been deleted.`, severity: 'warning' }); removeWorkspace(workspace.id); } }}>
-                            <Text style={styles.secondaryButtonText}>Delete Workspace</Text>
-                          </Pressable>
-                        </View>
-                      </View>
-                    </View>
-                  ) : (
-                    <Text style={styles.metaText}>Click Create New Workspace to make your first dashboard.</Text>
-                  )}
-
-                  {!!workspace && (
-                    <>
-                      <View style={styles.separator} />
-                      <View style={[styles.builderFormSection, useCompactBuilderSections && styles.builderFormSectionCompact]}>
-                        <View
-                          style={[
-                            styles.builderFormSectionHeader,
-                            !useCompactBuilderSections && styles.builderFormSectionHeaderRail,
-                            useCompactBuilderSections && styles.builderFormSectionHeaderCompact,
-                          ]}
-                        >
-                          <Text style={styles.builderFormSectionTitle}>Workspace Core Fields</Text>
-                          <Text style={styles.builderFormSectionText}>Drag to reorder. These fields apply at the workspace level.</Text>
-                        </View>
-                        <View style={styles.builderFormSectionBody}>
-                          {/* Add field input + grouped palette */}
-                          <LabeledInput
-                            label="New Workspace Field Name"
-                            helperText="Example: Planned Build Quantity"
-                            value={newBuilderFieldLabel}
-                            onChangeText={setNewBuilderFieldLabel}
-                            placeholder="Type the field name before adding"
-                          />
-                          {(['Core', 'Choice', 'Contact', 'Files'] as const).map((groupName) => {
-                            const groupItems = fieldPalette.filter((item) => item.group === groupName);
-                            if (groupItems.length === 0) return null;
-                            return (
-                              <View key={`ws-group-${groupName}`} style={{ gap: 4 }}>
-                                <Text style={[styles.metaText, styles.builderStudioTextSecondary, { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }]}>{groupName}</Text>
-                                <View style={styles.builderActionRow}>
-                                  {groupItems.map((paletteItem) => (
-                                    <Pressable
-                                      key={`workspace-palette-${paletteItem.type}`}
-                                      disabled={!canManageWorkspace || !workspace}
-                                      style={[styles.secondaryButton, (!canManageWorkspace || !workspace) && styles.buttonDisabled, { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 }]}
-                                      onPress={() => addBuilderFieldToWorkspace(paletteItem.type)}
-                                    >
-                                      <Text style={styles.secondaryButtonText}>{fieldTypeIcons[paletteItem.type]} {paletteItem.label}</Text>
-                                    </Pressable>
-                                  ))}
-                                </View>
-                              </View>
-                            );
-                          })}
-
-                          {/* Drag-and-drop field list */}
-                          {workspaceBuilderFields.length === 0 ? (
-                            <View style={[styles.builderDropZone, { alignItems: 'center', paddingVertical: 24 }]}>
-                              <Text style={[styles.metaText, styles.builderStudioTextSecondary, { fontSize: 13 }]}>No workspace core fields yet</Text>
-                              <Text style={[styles.metaText, styles.builderStudioTextSecondary, { fontSize: 11 }]}>Click a field type above to add your first field</Text>
-                            </View>
-                          ) : isWeb ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                              {visualWsFields.map((field, visualIndex) => {
-                                const originalIndex = workspaceBuilderFields.findIndex((f) => f.id === field.id);
-                                return (
-                                  <div
-                                    key={field.id}
-                                    draggable={canManageWorkspace}
-                                    onDragStart={(e) => {
-                                      e.dataTransfer.setData('text/plain', field.id);
-                                      e.dataTransfer.effectAllowed = 'move';
-                                      setWsDragFromIndex(originalIndex);
-                                    }}
-                                    onDragOver={(e) => {
-                                      e.preventDefault();
-                                      e.dataTransfer.dropEffect = 'move';
-                                      if (wsDragFromIndex !== null) {
-                                        setWsDragOverIndex(visualIndex);
-                                      }
-                                    }}
-                                    onDrop={(e) => {
-                                      e.preventDefault();
-                                      if (wsDragFromIndex !== null && wsDragOverIndex !== null && wsDragFromIndex !== wsDragOverIndex) {
-                                        reorderBuilderFieldInWorkspace(wsDragFromIndex, wsDragOverIndex);
-                                      }
-                                      setWsDragFromIndex(null);
-                                      setWsDragOverIndex(null);
-                                    }}
-                                    onDragEnd={() => {
-                                      setWsDragFromIndex(null);
-                                      setWsDragOverIndex(null);
-                                    }}
-                                    style={{
-                                      display: 'flex',
-                                      flexDirection: 'row',
-                                      flexWrap: 'wrap',
-                                      alignItems: 'center',
-                                      gap: 10,
-                                      padding: 10,
-                                      marginBottom: 6,
-                                      borderRadius: 12,
-                                      border: '1px solid rgba(255,255,255,0.10)',
-                                      background: draggedWsFieldId === field.id
-                                        ? 'rgba(167,139,250,0.12)'
-                                        : 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
-                                      backdropFilter: 'blur(14px)',
-                                      opacity: draggedWsFieldId === field.id ? 0.45 : 1,
-                                      transition: 'transform 200ms ease, opacity 180ms ease, box-shadow 180ms ease',
-                                      transform: draggedWsFieldId === field.id ? 'scale(0.97)' : 'scale(1)',
-                                      boxShadow: (wsDragOverIndex === visualIndex && draggedWsFieldId && draggedWsFieldId !== field.id)
-                                        ? '0 0 0 2px #A78BFA, 0 4px 16px rgba(167,139,250,0.25)'
-                                        : 'none',
-                                      cursor: canManageWorkspace ? 'grab' : 'default',
-                                    }}
-                                  >
-                                    {/* Drag handle */}
-                                    <span style={{ width: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#C4B5FD', userSelect: 'none' }}>⠿</span>
-
-                                    {/* Type badge */}
-                                    <span style={{
-                                      width: 32, height: 32, borderRadius: 8,
-                                      background: 'rgba(167,139,250,0.18)',
-                                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                      fontSize: 14, flexShrink: 0,
-                                    }}>{fieldTypeIcons[field.type] ?? '?'}</span>
-
-                                    {/* Field info */}
-                                    <View style={{ flex: 1, gap: 1 }}>
-                                      <Text style={[styles.listTitle, styles.builderStudioTextPrimary, { fontSize: 13, fontWeight: '700' }]}>{field.label}</Text>
-                                      <Text style={[styles.metaText, styles.builderStudioTextSecondary, { fontSize: 11 }]}>{field.type}{field.required ? ' • Required' : ''}</Text>
-                                    </View>
-
-                                    {/* Actions */}
-                                    <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
-                                      <Pressable
-                                        disabled={!canManageWorkspace}
-                                        style={[
-                                          {
-                                            paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6,
-                                            borderWidth: 1, borderColor: field.required ? 'rgba(167,139,250,0.5)' : 'rgba(255,255,255,0.12)',
-                                            backgroundColor: field.required ? 'rgba(167,139,250,0.18)' : 'transparent',
-                                          },
-                                          !canManageWorkspace && styles.buttonDisabled,
-                                        ]}
-                                        onPress={() => toggleWorkspaceFieldRequired(field.id)}
-                                      >
-                                        <Text style={[styles.secondaryButtonText, { fontSize: 10, fontWeight: '700' }]}>{field.required ? '★ Required' : '☆ Optional'}</Text>
-                                      </Pressable>
-                                      <Pressable
-                                        style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(167,139,250,0.35)', backgroundColor: signalHintFieldId === field.id ? 'rgba(167,139,250,0.18)' : 'transparent' }}
-                                        onPress={() => setSignalHintFieldId(signalHintFieldId === field.id ? null : field.id)}
-                                      >
-                                        <Text style={[styles.secondaryButtonText, { fontSize: 10, color: '#A78BFA' }]}>⚡ Signal</Text>
-                                      </Pressable>
-                                      <Pressable
-                                        disabled={!canManageWorkspace}
-                                        style={[
-                                          { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(239,68,68,0.3)', backgroundColor: 'rgba(239,68,68,0.08)' },
-                                          !canManageWorkspace && styles.buttonDisabled,
-                                        ]}
-                                        onPress={() => removeBuilderFieldFromWorkspace(field.id)}
-                                      >
-                                        <Text style={[styles.secondaryButtonText, { fontSize: 10, color: '#EF4444' }]}>✕</Text>
-                                      </Pressable>
-                                    </View>
-                                    {signalHintFieldId === field.id && (
-                                      <div style={{ width: '100%', padding: '8px 12px 10px', marginTop: 4, borderRadius: 8, background: 'rgba(167,139,250,0.09)', border: '1px solid rgba(167,139,250,0.22)', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                        <span style={{ fontSize: 12, fontWeight: 700, color: '#A78BFA' }}>⚡ Signal Studio Suggestion</span>
-                                        <span style={{ fontSize: 12, color: '#C4B5FD', lineHeight: 1.5 }}>{buildSignalSuggestion(field.label, field.type)}</span>
-                                        <span style={{ fontSize: 11, color: 'rgba(196,181,253,0.6)' }}>Navigate to Signal Studio → Build Flow to create this automation.</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            <View style={{ gap: 6 }}>
-                              {workspaceBuilderFields.map((field, index) => (
-                                <React.Fragment key={field.id}>
-                                <View style={[styles.builderPreviewFieldRow, { flexDirection: 'row', alignItems: 'center', gap: 10 }]}>
-                                  <View style={{ width: 24, alignItems: 'center', justifyContent: 'center' }}>
-                                    <Text style={[styles.builderStudioTextSecondary, { fontSize: 16, lineHeight: 20 }]}>⠿</Text>
-                                  </View>
-                                  <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(167,139,250,0.18)', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Text style={{ fontSize: 14 }}>{fieldTypeIcons[field.type] ?? '?'}</Text>
-                                  </View>
-                                  <View style={{ flex: 1, gap: 1 }}>
-                                    <Text style={[styles.listTitle, styles.builderStudioTextPrimary, { fontSize: 13, fontWeight: '700' }]}>{field.label}</Text>
-                                    <Text style={[styles.metaText, styles.builderStudioTextSecondary, { fontSize: 11 }]}>{field.type}{field.required ? ' • Required' : ''}</Text>
-                                  </View>
-                                  <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
-                                    <Pressable disabled={!canManageWorkspace} style={[{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: field.required ? 'rgba(167,139,250,0.5)' : 'rgba(255,255,255,0.12)', backgroundColor: field.required ? 'rgba(167,139,250,0.18)' : 'transparent' }, !canManageWorkspace && styles.buttonDisabled]} onPress={() => toggleWorkspaceFieldRequired(field.id)}>
-                                      <Text style={[styles.secondaryButtonText, { fontSize: 10, fontWeight: '700' }]}>{field.required ? '★ Required' : '☆ Optional'}</Text>
-                                    </Pressable>
-                                    <Pressable style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(167,139,250,0.35)', backgroundColor: signalHintFieldId === field.id ? 'rgba(167,139,250,0.18)' : 'transparent' }} onPress={() => setSignalHintFieldId(signalHintFieldId === field.id ? null : field.id)}>
-                                      <Text style={{ fontSize: 10, color: '#A78BFA', fontWeight: '700' }}>⚡</Text>
-                                    </Pressable>
-                                    <Pressable disabled={!canManageWorkspace || index === 0} style={[styles.secondaryButton, { paddingHorizontal: 6, paddingVertical: 4 }, (!canManageWorkspace || index === 0) && styles.buttonDisabled]} onPress={() => moveBuilderFieldInWorkspace(field.id, 'up')}>
-                                      <Text style={styles.secondaryButtonText}>↑</Text>
-                                    </Pressable>
-                                    <Pressable disabled={!canManageWorkspace || index === workspaceBuilderFields.length - 1} style={[styles.secondaryButton, { paddingHorizontal: 6, paddingVertical: 4 }, (!canManageWorkspace || index === workspaceBuilderFields.length - 1) && styles.buttonDisabled]} onPress={() => moveBuilderFieldInWorkspace(field.id, 'down')}>
-                                      <Text style={styles.secondaryButtonText}>↓</Text>
-                                    </Pressable>
-                                    <Pressable disabled={!canManageWorkspace} style={[{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(239,68,68,0.3)', backgroundColor: 'rgba(239,68,68,0.08)' }, !canManageWorkspace && styles.buttonDisabled]} onPress={() => removeBuilderFieldFromWorkspace(field.id)}>
-                                      <Text style={[styles.secondaryButtonText, { fontSize: 10, color: '#EF4444' }]}>✕</Text>
-                                    </Pressable>
-                                  </View>
-                                </View>
-                                {signalHintFieldId === field.id && (
-                                  <View style={{ marginTop: 4, marginBottom: 4, padding: 10, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(167,139,250,0.25)', backgroundColor: 'rgba(167,139,250,0.08)', gap: 4 }}>
-                                    <Text style={{ fontSize: 12, fontWeight: '700', color: '#A78BFA' }}>⚡ Signal Studio Suggestion</Text>
-                                    <Text style={{ fontSize: 11, color: '#C4B5FD', lineHeight: 17 }}>{buildSignalSuggestion(field.label, field.type)}</Text>
-                                    <Text style={{ fontSize: 10, color: 'rgba(196,181,253,0.55)' }}>Go to Signal Studio → Build Flow to create this automation.</Text>
-                                  </View>
-                                )}
-                                </React.Fragment>
-                              ))}
-                            </View>
-                          )}
-
-                          {/* Field count summary */}
-                          {workspaceBuilderFields.length > 0 && (
-                            <Text style={[styles.metaText, styles.builderStudioTextSecondary, { fontSize: 10, textAlign: 'right' }]}>
-                              {workspaceBuilderFields.length} field{workspaceBuilderFields.length !== 1 ? 's' : ''} • {workspaceBuilderFields.filter((f) => f.required).length} required
-                            </Text>
-                          )}
-                        </View>
-                      </View>
-                    </>
-                  )}
-                </>
-              )}
-
-              {workspacePane === 'subspaces' && (
-                <>
-                  {!canManageSubSpace && <Text style={styles.notice}>{deniedMessage('subspace.manage')}</Text>}
-                  <View style={[styles.builderFormSection, useCompactBuilderSections && styles.builderFormSectionCompact]}>
-                    <View
-                      style={[
-                        styles.builderFormSectionHeader,
-                        !useCompactBuilderSections && styles.builderFormSectionHeaderRail,
-                        useCompactBuilderSections && styles.builderFormSectionHeaderCompact,
-                      ]}
-                    >
-                      <Text style={styles.builderFormSectionTitle}>SubSpace Lanes</Text>
-                      <Text style={styles.builderFormSectionText}>Create lanes that branch from your core entity and define operational context.</Text>
-                    </View>
-                    <View style={styles.builderFormSectionBody}>
-                      <LabeledInput label="New SubSpace Name" helperText="Operational lane around your core entity (example: Unit Serialization, Serial Verification, Dispense Logging)" value={newSubSpaceName} onChangeText={setNewSubSpaceName} placeholder="Example: Unit Serialization" />
-                      <LabeledInput label="Source Entity" helperText="Data source for this lane (example: Serialized Unit, Verification Event, Dispense Event)" value={newSubSpaceEntity} onChangeText={setNewSubSpaceEntity} placeholder="Example: Serialized Unit" />
-                      <Pressable nativeID="wt-add-subspace" disabled={!canManageSubSpace || !hasWorkspace} style={[styles.primaryButton, (!canManageSubSpace || !hasWorkspace) && styles.buttonDisabled]} onPress={() => { createSubSpace(); if (newSubSpaceName.trim()) { auditLog?.logEntry({ action: 'create', entityType: 'subspace', entityId: '', entityName: newSubSpaceName.trim(), after: { workspace: workspace?.name, sourceEntity: newSubSpaceEntity.trim() } }); addNotification?.({ type: 'system', title: 'SubSpace Created', body: `SubSpace "${newSubSpaceName.trim()}" added to workspace.`, severity: 'success' }); } }}>
-                        <Text style={styles.primaryButtonText}>Add SubSpace</Text>
-                      </Pressable>
-                    </View>
-                  </View>
-
-                  <View style={styles.separator} />
-                  <View nativeID="wt-field-palette" style={[styles.builderFormSection, useCompactBuilderSections && styles.builderFormSectionCompact]}>
-                    <View
-                      style={[
-                        styles.builderFormSectionHeader,
-                        !useCompactBuilderSections && styles.builderFormSectionHeaderRail,
-                        useCompactBuilderSections && styles.builderFormSectionHeaderCompact,
-                      ]}
-                    >
-                      <Text style={styles.builderFormSectionTitle}>Field Type Palette</Text>
-                      <Text style={styles.builderFormSectionText}>Drag to the selected lane in preview on web, or click to add instantly.</Text>
-                    </View>
-                    <View style={styles.builderFormSectionBody}>
-                      <LabeledInput
-                        label="New Field Name"
-                        helperText="Example: Carton Serial Number"
-                        value={newBuilderFieldLabel}
-                        onChangeText={setNewBuilderFieldLabel}
-                        placeholder="Type the field name before adding"
-                      />
-                  {(['Core', 'Choice', 'Contact', 'Files'] as const).map((groupName) => {
-                    const groupItems = fieldPalette.filter((item) => item.group === groupName);
-                    if (groupItems.length === 0) {
-                      return null;
-                    }
-                    return (
-                      <View key={`group-${groupName}`} style={styles.listCard}>
-                        <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>{groupName} Fields</Text>
-                        <View style={styles.builderActionRow}>
-                          {groupItems.map((paletteItem) => (
-                            <Pressable
-                              key={`palette-${paletteItem.type}`}
-                              disabled={!canManageSubSpace || !selectedSubSpace}
-                              style={[styles.secondaryButton, (!canManageSubSpace || !selectedSubSpace) && styles.buttonDisabled]}
-                              onPress={() => addBuilderFieldToSubSpace(paletteItem.type)}
-                              onPressIn={() => setDraggedFieldType(paletteItem.type)}
-                              {...(isWeb
-                                ? ({
-                                    draggable: true,
-                                    onDragStart: (event: any) => {
-                                      const dataTransfer = event?.nativeEvent?.dataTransfer ?? event?.dataTransfer;
-                                      if (dataTransfer) {
-                                        dataTransfer.setData('application/x-corespace-field-type', paletteItem.type);
-                                        dataTransfer.effectAllowed = 'copy';
-                                      }
-                                      setDraggedFieldType(paletteItem.type);
-                                    },
-                                  } as any)
-                                : {})}
-                            >
-                              <Text style={styles.secondaryButtonText}>+ {paletteItem.label}</Text>
-                            </Pressable>
-                          ))}
-                        </View>
-                      </View>
-                    );
-                  })}
-                    </View>
-                  </View>
-
-                  {/* ── Pipeline Mode Toggle ── */}
-                  {!!workspace && (workspace.subSpaces ?? []).length >= 2 && (
-                    <View style={[styles.listCard, { gap: 6 }]}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <View style={{ gap: 2, flex: 1 }}>
-                          <Text style={[styles.listTitle, styles.builderStudioTextPrimary]}>Pipeline Flow Mode</Text>
-                          <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Enable to define an order-of-operations for SubSpaces. Data flows from step 1 through to the final step.</Text>
-                        </View>
-                        <Pressable
-                          onPress={togglePipelineEnabled}
-                          disabled={!canManageSubSpace}
-                          style={[styles.pill, workspace.pipelineEnabled && styles.pillActive, { minWidth: 54, alignItems: 'center' as any }]}
-                          accessibilityRole="switch"
-                          accessibilityState={{ checked: !!workspace.pipelineEnabled }}
-                          accessibilityLabel="Toggle pipeline flow mode"
-                        >
-                          <Text style={[styles.pillText, workspace.pipelineEnabled && styles.pillTextActive]}>{workspace.pipelineEnabled ? 'ON' : 'OFF'}</Text>
+                      {isSuperAdmin && tenants.length > 1 && (
+                        <Pressable nativeID="wt-seed-all-tenants" style={[styles.secondaryButton, { borderColor: '#8C5BF5' }]} onPress={() => { const r = copyActiveDataToAllTenants(); if (r.ok) addNotification?.({ type: 'system', title: 'All Tenants Seeded', body: `Data copied to ${r.count} tenant${r.count === 1 ? '' : 's'}.`, severity: 'success' }); else addNotification?.({ type: 'system', title: 'Seed Failed', body: r.reason ?? 'Unable to seed.', severity: 'warning' }); }}>
+                          <Text style={[styles.secondaryButtonText, { color: '#8C5BF5' }]}>⬆ Seed Data → All Tenants</Text>
                         </Pressable>
-                      </View>
-                      {workspace.pipelineEnabled && (
-                        <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, alignItems: 'center', gap: 4, paddingTop: 4 }}>
-                          {(workspace.subSpaces ?? []).map((ss, idx) => (
-                            <React.Fragment key={`pipe-badge-${ss.id}`}>
-                              {idx > 0 && <Text style={{ fontSize: 13, color: '#8C5BF5', fontWeight: '800' }}> → </Text>}
-                              <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: selectedSubSpaceId === ss.id ? 'rgba(140,91,245,0.38)' : 'rgba(140,91,245,0.12)', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : 'rgba(140,91,245,0.20)' }}>
-                                <Text style={{ fontSize: 10, fontWeight: '700', color: selectedSubSpaceId === ss.id ? '#FFFFFF' : '#C4B5FD' }}>{idx + 1}. {ss.name}</Text>
-                              </View>
-                            </React.Fragment>
-                          ))}
-                        </View>
                       )}
                     </View>
-                  )}
+                  </View>
+                )}
+              </>
+            )}
 
-                  {!!workspace && (workspace.subSpaces ?? []).map((subSpace, ssIdx) => (
-                    <View key={subSpace.id} style={styles.listCard}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                        {workspace.pipelineEnabled && (
-                          <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: 'rgba(140,91,245,0.22)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
-                            <Text style={{ fontSize: 10, fontWeight: '800', color: '#C4B5FD' }}>{ssIdx + 1}</Text>
-                          </View>
-                        )}
-                        <Text style={[styles.listTitle, styles.builderStudioTextPrimary, { flex: 1 }]}>{subSpace.name}</Text>
-                        {workspace.pipelineEnabled && (
-                          <View style={{ flexDirection: 'row', gap: 2 }}>
-                            <Pressable disabled={ssIdx === 0} onPress={() => reorderSubSpace(subSpace.id, -1)} style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, backgroundColor: ssIdx === 0 ? 'rgba(255,255,255,0.04)' : 'rgba(140,91,245,0.18)' }}>
-                              <Text style={{ fontSize: 12, color: ssIdx === 0 ? 'rgba(255,255,255,0.20)' : '#C4B5FD', fontWeight: '800' }}>▲</Text>
-                            </Pressable>
-                            <Pressable disabled={ssIdx === (workspace.subSpaces ?? []).length - 1} onPress={() => reorderSubSpace(subSpace.id, 1)} style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, backgroundColor: ssIdx === (workspace.subSpaces ?? []).length - 1 ? 'rgba(255,255,255,0.04)' : 'rgba(140,91,245,0.18)' }}>
-                              <Text style={{ fontSize: 12, color: ssIdx === (workspace.subSpaces ?? []).length - 1 ? 'rgba(255,255,255,0.20)' : '#C4B5FD', fontWeight: '800' }}>▼</Text>
-                            </Pressable>
-                          </View>
-                        )}
+            {/* STEP 2 — ADD SECTIONS */}
+            {wizardStep === 2 && (
+              <>
+                {!hasWorkspace ? (
+                  <View style={{ backgroundColor: 'rgba(245,158,11,0.10)', borderRadius: 10, padding: 14, borderWidth: 1, borderColor: 'rgba(245,158,11,0.25)', gap: 10 }}>
+                    <Text style={{ color: '#F59E0B', fontWeight: '700', fontSize: 13 }}>⚠ Create a workspace first</Text>
+                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 12 }}>Go to Step 1 to name your workspace before adding sections.</Text>
+                    <Pressable style={[styles.secondaryButton, { alignSelf: 'flex-start' as any }]} onPress={() => { setWizardStep(1); setWorkspacePane('workspace'); }}>
+                      <Text style={styles.secondaryButtonText}>← Go to Step 1</Text>
+                    </Pressable>
+                  </View>
+                ) : (
+                  <>
+                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.08)' : 'rgba(140,91,245,0.05)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(140,91,245,0.18)' : 'rgba(140,91,245,0.13)' }}>
+                      <Text style={{ color: mode === 'night' ? '#A78BFA' : '#6F4BCF', fontSize: 12, fontWeight: '700', marginBottom: 4 }}>📂 SECTIONS in "{workspace?.name}"</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.48)', fontSize: 12, lineHeight: 18 }}>
+                        Sections are like tabs — each holds a different category of data. Example: "Details", "Documents", "Tasks", "Contacts".
+                      </Text>
+                    </View>
+
+                    {/* Existing sections list */}
+                    {workspaceSubSpaces.length > 0 && (
+                      <View style={{ gap: 6 }}>
+                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Your sections ({workspaceSubSpaces.length})</Text>
+                        <View style={{ gap: 4 }}>
+                          {workspaceSubSpaces.map((ss, ssIdx) => (
+                            <View key={ss.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.10)' : 'rgba(140,91,245,0.06)', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : mode === 'night' ? 'rgba(140,91,245,0.20)' : 'rgba(140,91,245,0.14)' }}>
+                              <View style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(140,91,245,0.20)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                                <Text style={{ fontSize: 12, color: '#A78BFA', fontWeight: '800' }}>{ssIdx + 1}</Text>
+                              </View>
+                              <View style={{ flex: 1 }}>
+                                <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '700', fontSize: 13 }}>{ss.name}</Text>
+                                <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', fontSize: 11, marginTop: 1 }}>{(ss.builderFields ?? []).length} field{(ss.builderFields ?? []).length !== 1 ? 's' : ''}</Text>
+                              </View>
+                              <Pressable
+                                style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: selectedSubSpaceId === ss.id ? 'rgba(140,91,245,0.28)' : 'transparent', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : 'rgba(140,91,245,0.25)' }}
+                                onPress={() => { setSelectedSubSpaceId(ss.id); setWizardStep(3); setWorkspacePane('subspaces'); }}
+                              >
+                                <Text style={{ fontSize: 11, fontWeight: '700', color: '#A78BFA' }}>Add Fields →</Text>
+                              </Pressable>
+                              <Pressable
+                                disabled={!canManageSubSpace}
+                                style={{ width: 28, height: 28, borderRadius: 7, alignItems: 'center' as any, justifyContent: 'center' as any, backgroundColor: 'rgba(239,68,68,0.08)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.22)' }}
+                                onPress={() => { removeSubSpace(ss.id); addNotification?.({ type: 'system', title: 'Section Removed', body: `"${ss.name}" deleted.`, severity: 'warning' }); }}
+                              >
+                                <Text style={{ fontSize: 13, color: '#EF4444', fontWeight: '700' }}>✕</Text>
+                              </Pressable>
+                            </View>
+                          ))}
+                        </View>
                       </View>
-                      <View style={styles.builderActionRow}>
-                        <Pressable style={[styles.pill, selectedSubSpaceId === subSpace.id && styles.pillActive]} onPress={() => setSelectedSubSpaceId(subSpace.id)}>
-                          <Text style={[styles.pillText, selectedSubSpaceId === subSpace.id && styles.pillTextActive]}>Select</Text>
-                        </Pressable>
-                        <Pressable disabled={!canManageSubSpace} style={[styles.secondaryButton, !canManageSubSpace && styles.buttonDisabled]} onPress={() => cycleDisplay(subSpace)}>
-                          <Text style={styles.secondaryButtonText}>Display: {subSpace.displayType}</Text>
-                        </Pressable>
-                        <Pressable disabled={!canManageSubSpace} style={[styles.secondaryButton, !canManageSubSpace && styles.buttonDisabled]} onPress={() => toggleVisibility(subSpace)}>
-                          <Text style={styles.secondaryButtonText}>Visibility: {subSpace.visibilityRule}</Text>
-                        </Pressable>
-                        <Pressable disabled={!canManageSubSpace} style={[styles.secondaryButton, !canManageSubSpace && styles.buttonDisabled]} onPress={() => { auditLog?.logEntry({ action: 'delete', entityType: 'subspace', entityId: subSpace.id, entityName: subSpace.name }); addNotification?.({ type: 'system', title: 'SubSpace Deleted', body: `SubSpace "${subSpace.name}" has been removed.`, severity: 'warning' }); removeSubSpace(subSpace.id); }}>
-                          <Text style={styles.secondaryButtonText}>Delete SubSpace</Text>
+                    )}
+
+                    {/* Add new section */}
+                    <View style={{ gap: 8 }}>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.68)' : 'rgba(0,0,0,0.62)', fontSize: 13, fontWeight: '700' }}>+ Add a section</Text>
+                      <View style={{ flexDirection: 'row', gap: 8 }}>
+                        <View style={{ flex: 1 }}>
+                          <LabeledInput label="" value={newSubSpaceName} onChangeText={(v) => { setNewSubSpaceName(v); setNewSubSpaceEntity(v); }} placeholder="Section name (e.g. Details, Tasks, Documents)" />
+                        </View>
+                        <Pressable
+                          nativeID="wt-add-subspace"
+                          disabled={!canManageSubSpace || !hasWorkspace || !newSubSpaceName.trim()}
+                          style={{ paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10, backgroundColor: newSubSpaceName.trim() ? '#8C5BF5' : 'rgba(140,91,245,0.20)', justifyContent: 'center' as any, alignItems: 'center' as any, opacity: !canManageSubSpace || !hasWorkspace ? 0.4 : 1 }}
+                          onPress={() => {
+                            if (!newSubSpaceName.trim()) return;
+                            const name = newSubSpaceName.trim();
+                            createSubSpace();
+                            auditLog?.logEntry({ action: 'create', entityType: 'subspace', entityId: '', entityName: name, after: { workspace: workspace?.name } });
+                            addNotification?.({ type: 'system', title: 'Section Added', body: `"${name}" added.`, severity: 'success' });
+                            setNewSubSpaceName(''); setNewSubSpaceEntity('');
+                          }}
+                        >
+                          <Text style={{ color: '#FFF', fontWeight: '800', fontSize: 22, lineHeight: 24 }}>+</Text>
                         </Pressable>
                       </View>
                     </View>
-                  ))}
-                </>
-              )}
-            </View>
-          )}
 
+                    {/* Quick suggestion chips */}
+                    <View style={{ gap: 6 }}>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.33)' : 'rgba(0,0,0,0.32)', fontSize: 11, fontWeight: '600' }}>Quick add:</Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, gap: 6 }}>
+                        {['Details', 'Documents', 'Tasks', 'Notes', 'Contacts', 'Timeline', 'Approvals', 'Status Updates', 'Inventory', 'History', 'Issues', 'Checklist']
+                          .filter((s) => !workspaceSubSpaces.some((ss) => ss.name.toLowerCase() === s.toLowerCase()))
+                          .map((suggestion) => (
+                            <Pressable
+                              key={suggestion}
+                              disabled={!canManageSubSpace || !hasWorkspace}
+                              style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.11)' : 'rgba(0,0,0,0.09)' }}
+                              onPress={() => { setNewSubSpaceName(suggestion); setNewSubSpaceEntity(suggestion); }}
+                            >
+                              <Text style={{ fontSize: 12, color: mode === 'night' ? 'rgba(255,255,255,0.62)' : 'rgba(0,0,0,0.56)', fontWeight: '600' }}>+ {suggestion}</Text>
+                            </Pressable>
+                          ))}
+                      </View>
+                    </View>
+
+                    {/* Pipeline toggle */}
+                    {workspaceSubSpaces.length >= 2 && (
+                      <View style={[styles.listCard, { gap: 6 }]}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <View style={{ gap: 2, flex: 1 }}>
+                            <Text style={[styles.listTitle, styles.builderStudioTextPrimary]}>Pipeline Mode</Text>
+                            <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Turn on to make sections flow in order — step 1 → 2 → 3 → done.</Text>
+                          </View>
+                          <Pressable onPress={togglePipelineEnabled} disabled={!canManageSubSpace} style={[styles.pill, workspace?.pipelineEnabled && styles.pillActive, { minWidth: 54, alignItems: 'center' as any }]} accessibilityRole="switch" accessibilityState={{ checked: !!workspace?.pipelineEnabled }}>
+                            <Text style={[styles.pillText, workspace?.pipelineEnabled && styles.pillTextActive]}>{workspace?.pipelineEnabled ? 'ON' : 'OFF'}</Text>
+                          </Pressable>
+                        </View>
+                        {workspace?.pipelineEnabled && (
+                          <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, alignItems: 'center', gap: 4, paddingTop: 4 }}>
+                            {(workspace.subSpaces ?? []).map((ss, idx) => (
+                              <React.Fragment key={`pipe-${ss.id}`}>
+                                {idx > 0 && <Text style={{ fontSize: 12, color: '#8C5BF5', fontWeight: '800' }}>→</Text>}
+                                <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: selectedSubSpaceId === ss.id ? 'rgba(140,91,245,0.36)' : 'rgba(140,91,245,0.12)', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : 'rgba(140,91,245,0.22)' }}>
+                                  <Text style={{ fontSize: 10, fontWeight: '700', color: selectedSubSpaceId === ss.id ? '#FFFFFF' : '#C4B5FD' }}>{idx + 1}. {ss.name}</Text>
+                                </View>
+                              </React.Fragment>
+                            ))}
+                          </View>
+                        )}
+                      </View>
+                    )}
+
+                    {/* Navigation row */}
+                    <View style={{ flexDirection: 'row', gap: 8, marginTop: 4 }}>
+                      <Pressable style={[styles.secondaryButton, { flex: 1 }]} onPress={() => { setWizardStep(1); setWorkspacePane('workspace'); }}>
+                        <Text style={[styles.secondaryButtonText, { textAlign: 'center' }]}>← Back</Text>
+                      </Pressable>
+                      <Pressable
+                        disabled={!isSubSpacesStepComplete}
+                        style={[styles.primaryButton, { flex: 2 }, !isSubSpacesStepComplete && styles.buttonDisabled]}
+                        onPress={() => { if (workspace?.subSpaces?.[0]) setSelectedSubSpaceId(workspace.subSpaces[0].id); setWizardStep(3); setWorkspacePane('subspaces'); }}
+                      >
+                        <Text style={[styles.primaryButtonText, { textAlign: 'center' }]}>Continue to Fields →</Text>
+                      </Pressable>
+                    </View>
+                    {!isSubSpacesStepComplete && <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.32)' : 'rgba(0,0,0,0.32)', fontSize: 11, textAlign: 'center' }}>Add at least one section to continue</Text>}
+                  </>
+                )}
+              </>
+            )}
+
+            {/* STEP 3 — ADD FIELDS */}
+            {wizardStep === 3 && (
+              <>
+                {!hasWorkspace || !isSubSpacesStepComplete ? (
+                  <View style={{ backgroundColor: 'rgba(245,158,11,0.10)', borderRadius: 10, padding: 14, borderWidth: 1, borderColor: 'rgba(245,158,11,0.25)', gap: 8 }}>
+                    <Text style={{ color: '#F59E0B', fontWeight: '700', fontSize: 13 }}>⚠ Add sections first</Text>
+                    <Pressable style={[styles.secondaryButton, { alignSelf: 'flex-start' as any }]} onPress={() => { setWizardStep(isSubSpacesStepComplete ? 1 : 2); }}>
+                      <Text style={styles.secondaryButtonText}>← Go back</Text>
+                    </Pressable>
+                  </View>
+                ) : (
+                  <>
+                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(59,130,246,0.08)' : 'rgba(59,130,246,0.05)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(59,130,246,0.18)' : 'rgba(59,130,246,0.13)' }}>
+                      <Text style={{ color: mode === 'night' ? '#60A5FA' : '#2563EB', fontSize: 12, fontWeight: '700', marginBottom: 4 }}>📝 FIELDS — what data you collect</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.48)', fontSize: 12, lineHeight: 18 }}>
+                        Fields are the form questions on each record. Pick a section, type the field name, choose a type, and tap Add.
+                      </Text>
+                    </View>
+
+                    {/* Section picker tabs */}
+                    <View style={{ gap: 6 }}>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Select section to add fields to:</Text>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: 'row', gap: 6 }}>
+                        {workspaceSubSpaces.map((ss) => (
+                          <Pressable
+                            key={ss.id}
+                            style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : mode === 'night' ? 'rgba(255,255,255,0.11)' : 'rgba(0,0,0,0.09)' }}
+                            onPress={() => setSelectedSubSpaceId(ss.id)}
+                          >
+                            <Text style={{ fontSize: 12, fontWeight: '700', color: selectedSubSpaceId === ss.id ? '#FFFFFF' : mode === 'night' ? 'rgba(255,255,255,0.62)' : 'rgba(0,0,0,0.56)' }}>
+                              {ss.name}{(ss.builderFields ?? []).length > 0 ? ` (${(ss.builderFields ?? []).length})` : ''}
+                            </Text>
+                          </Pressable>
+                        ))}
+                      </ScrollView>
+                    </View>
+
+                    {selectedSubSpace && (
+                      <>
+                        {/* Field name input */}
+                        <View style={{ gap: 6 }}>
+                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.68)' : 'rgba(0,0,0,0.62)', fontSize: 13, fontWeight: '700' }}>Add a field to "{selectedSubSpace.name}"</Text>
+                          <View nativeID="wt-field-palette"><LabeledInput label="" value={newBuilderFieldLabel} onChangeText={setNewBuilderFieldLabel} placeholder='Field name (e.g. "Customer Name", "Due Date", "Status")' /></View>
+                        </View>
+
+                        {/* Field type grid */}
+                        <View style={{ gap: 6 }}>
+                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Field type:</Text>
+                          <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, gap: 6 }}>
+                            {([
+                              { type: 'text' as const, icon: 'Aa', label: 'Short Text', desc: 'Names, IDs' },
+                              { type: 'number' as const, icon: '#', label: 'Number', desc: 'Quantities' },
+                              { type: 'date' as const, icon: '📅', label: 'Date', desc: 'Deadlines' },
+                              { type: 'select' as const, icon: '▾', label: 'Dropdown', desc: 'Choose option' },
+                              { type: 'checkbox' as const, icon: '☑', label: 'Yes / No', desc: 'Toggle' },
+                              { type: 'longText' as const, icon: '¶', label: 'Paragraph', desc: 'Long notes' },
+                              { type: 'email' as const, icon: '@', label: 'Email', desc: 'Email addr' },
+                              { type: 'phone' as const, icon: '☎', label: 'Phone', desc: 'Phone no.' },
+                              { type: 'attachment' as const, icon: '📎', label: 'File', desc: 'Upload' },
+                              { type: 'datetime' as const, icon: '🕐', label: 'Date & Time', desc: 'Timestamp' },
+                            ] as Array<{ type: SubSpaceBuilderFieldType; icon: string; label: string; desc: string }>).map(({ type, icon, label, desc }) => (
+                              <Pressable
+                                key={type}
+                                style={{ width: 86, paddingHorizontal: 6, paddingVertical: 9, borderRadius: 10, gap: 3, alignItems: 'center' as any, borderWidth: 1.5, backgroundColor: wizardActiveFieldType === type ? 'rgba(140,91,245,0.22)' : mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: wizardActiveFieldType === type ? '#8C5BF5' : mode === 'night' ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.09)' }}
+                                onPress={() => setWizardActiveFieldType(type)}
+                              >
+                                <Text style={{ fontSize: 17, lineHeight: 21 }}>{icon}</Text>
+                                <Text style={{ fontSize: 10, fontWeight: '700', textAlign: 'center' as any, color: wizardActiveFieldType === type ? '#A78BFA' : mode === 'night' ? 'rgba(255,255,255,0.68)' : 'rgba(0,0,0,0.62)' }}>{label}</Text>
+                                <Text style={{ fontSize: 9, textAlign: 'center' as any, color: mode === 'night' ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.28)' }}>{desc}</Text>
+                              </Pressable>
+                            ))}
+                          </View>
+                        </View>
+
+                        {/* Add field button */}
+                        <Pressable
+                          disabled={!canManageSubSpace || !newBuilderFieldLabel.trim()}
+                          style={{ backgroundColor: newBuilderFieldLabel.trim() ? '#8C5BF5' : 'rgba(140,91,245,0.18)', borderRadius: 10, paddingVertical: 12, alignItems: 'center' as any, opacity: !canManageSubSpace ? 0.4 : 1 }}
+                          onPress={() => {
+                            if (!newBuilderFieldLabel.trim()) return;
+                            addBuilderFieldToSubSpace(wizardActiveFieldType);
+                          }}
+                        >
+                          <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 14 }}>
+                            + Add "{newBuilderFieldLabel.trim() || 'Field'}" as {wizardActiveFieldType}
+                          </Text>
+                        </Pressable>
+
+                        {/* Existing fields in selected section */}
+                        {(selectedSubSpace.builderFields ?? []).length > 0 && (
+                          <View style={{ gap: 4 }}>
+                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Fields in "{selectedSubSpace.name}"</Text>
+                            {(selectedSubSpace.builderFields ?? []).map((field) => (
+                              <View key={field.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)' }}>
+                                <View style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: 'rgba(140,91,245,0.15)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                                  <Text style={{ fontSize: 13 }}>{fieldTypeIcons[field.type] ?? '?'}</Text>
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                  <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '700', fontSize: 13 }}>{field.label}</Text>
+                                  <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', fontSize: 11 }}>{field.type}{field.required ? ' · Required' : ' · Optional'}</Text>
+                                </View>
+                                <Pressable
+                                  disabled={!canManageSubSpace}
+                                  style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 7, borderWidth: 1, borderColor: field.required ? 'rgba(167,139,250,0.45)' : 'rgba(255,255,255,0.12)', backgroundColor: field.required ? 'rgba(167,139,250,0.15)' : 'transparent' }}
+                                  onPress={() => toggleBuilderFieldRequired(field.id)}
+                                >
+                                  <Text style={{ fontSize: 10, fontWeight: '700', color: field.required ? '#A78BFA' : mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.38)' }}>{field.required ? '★ Required' : '☆ Optional'}</Text>
+                                </Pressable>
+                                <Pressable
+                                  disabled={!canManageSubSpace}
+                                  style={{ width: 28, height: 28, borderRadius: 7, alignItems: 'center' as any, justifyContent: 'center' as any, backgroundColor: 'rgba(239,68,68,0.08)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.22)' }}
+                                  onPress={() => removeBuilderFieldFromSubSpace(field.id)}
+                                >
+                                  <Text style={{ fontSize: 12, color: '#EF4444', fontWeight: '700' }}>✕</Text>
+                                </Pressable>
+                              </View>
+                            ))}
+                          </View>
+                        )}
+                      </>
+                    )}
+
+                    {/* Navigation */}
+                    <View style={{ flexDirection: 'row', gap: 8, marginTop: 4 }}>
+                      <Pressable style={[styles.secondaryButton, { flex: 1 }]} onPress={() => { setWizardStep(2); setWorkspacePane('subspaces'); }}>
+                        <Text style={[styles.secondaryButtonText, { textAlign: 'center' }]}>← Back</Text>
+                      </Pressable>
+                      <Pressable style={[styles.primaryButton, { flex: 2 }]} onPress={() => setWizardStep(4)}>
+                        <Text style={[styles.primaryButtonText, { textAlign: 'center' }]}>Review & Launch →</Text>
+                      </Pressable>
+                    </View>
+                  </>
+                )}
+              </>
+            )}
+
+            {/* STEP 4 — REVIEW & LAUNCH */}
+            {wizardStep === 4 && (
+              <>
+                {hasWorkspace ? (
+                  <>
+                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(34,197,94,0.10)' : 'rgba(34,197,94,0.07)', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(34,197,94,0.24)' : 'rgba(34,197,94,0.18)', alignItems: 'center' as any, gap: 10 }}>
+                      <Text style={{ fontSize: 40 }}>🎉</Text>
+                      <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontSize: 18, fontWeight: '800', textAlign: 'center' }}>{workspace?.name} is ready!</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.52)' : 'rgba(0,0,0,0.48)', fontSize: 12, textAlign: 'center', lineHeight: 18 }}>Review everything below, then publish so your team can see it in the End User view.</Text>
+                    </View>
+
+                    {/* Summary */}
+                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderRadius: 12, padding: 16, gap: 12, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)' }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                        <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(140,91,245,0.20)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                          <Text style={{ fontSize: 18 }}>🏗️</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '800', fontSize: 16 }}>{workspace?.name}</Text>
+                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.42)' : 'rgba(0,0,0,0.42)', fontSize: 12 }}>Tracking: {workspace?.rootEntity} · Route: /{workspace?.route}</Text>
+                        </View>
+                      </View>
+
+                      <View style={{ gap: 4 }}>
+                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>{workspaceSubSpaces.length} Section{workspaceSubSpaces.length !== 1 ? 's' : ''} · {totalBuilderFields} Field{totalBuilderFields !== 1 ? 's' : ''}</Text>
+                        {workspaceSubSpaces.map((ss) => (
+                          <View key={ss.id} style={{ flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: 'rgba(140,91,245,0.07)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}>
+                            <Text style={{ color: '#A78BFA', fontWeight: '700', fontSize: 12, flex: 1 }}>{ss.name}</Text>
+                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', fontSize: 11 }}>{(ss.builderFields ?? []).length} field{(ss.builderFields ?? []).length !== 1 ? 's' : ''}</Text>
+                            {(ss.builderFields ?? []).filter((f) => f.required).length > 0 && <Text style={{ color: '#22C55E', fontSize: 10, fontWeight: '600' }}>{(ss.builderFields ?? []).filter((f) => f.required).length} req</Text>}
+                            <Pressable onPress={() => { setSelectedSubSpaceId(ss.id); setWizardStep(3); }}>
+                              <Text style={{ fontSize: 11, color: '#A78BFA', fontWeight: '600' }}>Edit</Text>
+                            </Pressable>
+                          </View>
+                        ))}
+                        {workspaceSubSpaces.length === 0 && (
+                          <View style={{ padding: 10, backgroundColor: 'rgba(245,158,11,0.10)', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(245,158,11,0.22)' }}>
+                            <Text style={{ color: '#F59E0B', fontSize: 12, fontWeight: '600' }}>⚠ No sections yet — add at least one.</Text>
+                            <Pressable style={{ marginTop: 4 }} onPress={() => { setWizardStep(2); }}>
+                              <Text style={{ color: '#F59E0B', fontSize: 12, textDecorationLine: 'underline' }}>Add sections →</Text>
+                            </Pressable>
+                          </View>
+                        )}
+                        {totalBuilderFields === 0 && workspaceSubSpaces.length > 0 && (
+                          <View style={{ padding: 10, backgroundColor: 'rgba(245,158,11,0.10)', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(245,158,11,0.22)' }}>
+                            <Text style={{ color: '#F59E0B', fontSize: 12, fontWeight: '600' }}>⚠ No fields yet — sections need fields so users can fill in data.</Text>
+                            <Pressable style={{ marginTop: 4 }} onPress={() => { setWizardStep(3); }}>
+                              <Text style={{ color: '#F59E0B', fontSize: 12, textDecorationLine: 'underline' }}>Add fields →</Text>
+                            </Pressable>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+
+                    {/* Publish */}
+                    <Pressable
+                      nativeID="wt-create-workspace"
+                      disabled={!canManageWorkspace}
+                      style={[{ backgroundColor: '#22C55E', borderRadius: 12, paddingVertical: 16, alignItems: 'center' as any }, !canManageWorkspace && styles.buttonDisabled, Platform.OS === 'web' ? { boxShadow: '0 4px 18px rgba(34,197,94,0.34)' } as any : {}]}
+                      onPress={() => { saveWorkspace(); publishWorkspace(); auditLog?.logEntry({ action: 'publish', entityType: 'workspace', entityId: workspace?.id ?? '', entityName: workspace?.name ?? '', after: { published: true } }); addNotification?.({ type: 'system', title: '🚀 Workspace Published!', body: `"${workspace?.name}" is now live in the End User view.`, severity: 'success' }); }}
+                    >
+                      <Text style={{ color: '#FFF', fontWeight: '800', fontSize: 16 }}>🚀 Publish to End User</Text>
+                    </Pressable>
+                    <Pressable style={[styles.secondaryButton, { paddingVertical: 11 }]} onPress={() => { saveWorkspace(); addNotification?.({ type: 'system', title: 'Draft Saved', body: `"${workspace?.name}" saved.`, severity: 'info' }); }}>
+                      <Text style={[styles.secondaryButtonText, { textAlign: 'center' }]}>Save as Draft (publish later)</Text>
+                    </Pressable>
+
+                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.08)' : 'rgba(140,91,245,0.05)', borderRadius: 10, padding: 12, gap: 5, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(140,91,245,0.20)' : 'rgba(140,91,245,0.13)' }}>
+                      <Text style={{ color: mode === 'night' ? '#A78BFA' : '#6F4BCF', fontWeight: '700', fontSize: 12 }}>What happens after publishing?</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.52)' : 'rgba(0,0,0,0.48)', fontSize: 12, lineHeight: 18 }}>{'→ Your workspace appears in End User (sidebar nav).\n→ Team members can create records, fill in fields, and track status.\n→ You can keep editing — changes publish in real time.'}</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.38)' : 'rgba(0,0,0,0.36)', fontSize: 11, marginTop: 3 }}>Next: Set up lifecycle stages via Language & Intake → Lifecycle Stages</Text>
+                    </View>
+                  </>
+                ) : (
+                  <View style={{ gap: 14, alignItems: 'center' as any }}>
+                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.48)', fontSize: 13, textAlign: 'center' }}>Complete steps 1–3 to build your workspace first.</Text>
+                    <Pressable style={styles.primaryButton} onPress={() => { setWizardStep(1); setWorkspacePane('workspace'); }}>
+                      <Text style={[styles.primaryButtonText, { textAlign: 'center' }]}>Start from Step 1</Text>
+                    </Pressable>
+                  </View>
+                )}
+              </>
+            )}
+
+          </View>
+
+          {/* ── RIGHT: LIVE PREVIEW PANE ── */}
           <View style={styles.builderPreviewPane}>
             <View style={styles.builderPreviewCard}>
-              <Text style={[styles.sectionEyebrow, styles.builderStudioTextSecondary]}>Live Builder Canvas</Text>
-              <Text style={[styles.listTitle, styles.builderStudioTextPrimary]}>End User Dashboard Preview</Text>
+              <Text style={[styles.sectionEyebrow, styles.builderStudioTextSecondary]}>Live Preview</Text>
+              <Text style={[styles.listTitle, styles.builderStudioTextPrimary]}>End User Dashboard</Text>
               {!workspace ? (
-                <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Create your first workspace to start preview.</Text>
+                <View style={{ gap: 8, paddingTop: 8 }}>
+                  <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Your workspace will appear here as you build it.</Text>
+                  <View style={{ height: 130, borderRadius: 12, borderWidth: 2, borderColor: mode === 'night' ? 'rgba(140,91,245,0.14)' : 'rgba(140,91,245,0.12)', alignItems: 'center' as any, justifyContent: 'center' as any, gap: 6 }}>
+                    <Text style={{ fontSize: 28, opacity: 0.3 }}>🏗️</Text>
+                    <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.22)', textAlign: 'center' }}>Start building to see preview</Text>
+                  </View>
+                </View>
               ) : (
                 <>
                   <View style={styles.builderPreviewHeroCard}>
                     <Text style={styles.builderPreviewHeroTitle}>{resolvedWorkspaceName}</Text>
-                    <Text style={styles.builderPreviewHeroSubtitle}>Core Entity: {resolvedRootEntity}</Text>
-                    <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Route: {route || workspace.route}</Text>
-                    <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Auto-save is on. Changes save as you type.</Text>
+                    <Text style={styles.builderPreviewHeroSubtitle}>Tracking: {resolvedRootEntity}</Text>
+                    {!!workspace.route && <Text style={[styles.metaText, styles.builderStudioTextSecondary, { fontSize: 10 }]}>/{workspace.route}</Text>}
                   </View>
 
                   <View style={styles.builderPreviewStatsRow}>
                     <View style={styles.builderPreviewStatCard}>
                       <Text style={styles.builderPreviewStatValue}>{workspaceSubSpaces.length}</Text>
-                      <Text style={styles.builderPreviewStatLabel}>Operational SubSpaces</Text>
-                    </View>
-                    <View style={styles.builderPreviewStatCard}>
-                      <Text style={styles.builderPreviewStatValue}>{workspaceBuilderFields.length}</Text>
-                      <Text style={styles.builderPreviewStatLabel}>Workspace Core Fields</Text>
+                      <Text style={styles.builderPreviewStatLabel}>Sections</Text>
                     </View>
                     <View style={styles.builderPreviewStatCard}>
                       <Text style={styles.builderPreviewStatValue}>{totalBuilderFields}</Text>
-                      <Text style={styles.builderPreviewStatLabel}>Tracked Data Fields</Text>
+                      <Text style={styles.builderPreviewStatLabel}>Fields</Text>
                     </View>
                     <View style={styles.builderPreviewStatCard}>
                       <Text style={styles.builderPreviewStatValue}>{totalRequiredBuilderFields}</Text>
-                      <Text style={styles.builderPreviewStatLabel}>Required Data Controls</Text>
+                      <Text style={styles.builderPreviewStatLabel}>Required</Text>
                     </View>
                   </View>
 
                   <View style={styles.separator} />
-                  <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Workspace core fields</Text>
-                  {workspaceBuilderFields.length === 0 ? (
-                    <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>No workspace-level fields configured yet.</Text>
-                  ) : (
-                    workspaceBuilderFields.map((field) => (
-                      <View key={`preview-workspace-field-${field.id}`} style={[styles.builderPreviewFieldRow, { flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
-                        <View style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(167,139,250,0.14)', alignItems: 'center', justifyContent: 'center' }}>
-                          <Text style={{ fontSize: 13 }}>{fieldTypeIcons[field.type] ?? '?'}</Text>
-                        </View>
-                        <View style={[styles.builderPreviewFieldMeta, { flex: 1 }]}>
-                          <Text style={[styles.listTitle, styles.builderStudioTextPrimary, { fontSize: 12, fontWeight: '700' }]}>{field.label}</Text>
-                          <Text style={[styles.metaText, styles.builderStudioTextSecondary, { fontSize: 10 }]}>{field.type}{field.required ? ' • Required' : ''}</Text>
-                        </View>
-                      </View>
-                    ))
-                  )}
-
-                  <View style={styles.separator} />
-                  <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>{workspace.pipelineEnabled ? 'Pipeline flow — data progresses left to right' : 'Operational lanes around your core entity'}</Text>
-                  <View style={[styles.inlineRow, workspace.pipelineEnabled && { flexWrap: 'nowrap' as any }]}>
-                    {(workspace.subSpaces ?? []).map((subSpace, idx) => (
-                      <React.Fragment key={`preview-${subSpace.id}`}>
-                        {workspace.pipelineEnabled && idx > 0 && (
-                          <Text style={{ fontSize: 16, color: '#8C5BF5', fontWeight: '800', marginHorizontal: 2 }}>→</Text>
-                        )}
-                        <Pressable style={[styles.pill, selectedSubSpaceId === subSpace.id && styles.pillActive, workspace.pipelineEnabled && { borderColor: 'rgba(140,91,245,0.35)' }]} onPress={() => setSelectedSubSpaceId(subSpace.id)}>
-                          <Text style={[styles.pillText, selectedSubSpaceId === subSpace.id && styles.pillTextActive]}>{workspace.pipelineEnabled ? `${idx + 1}. ` : ''}{subSpace.name}</Text>
+                  <Text style={[styles.metaText, styles.builderStudioTextSecondary, { fontSize: 11 }]}>{workspace.pipelineEnabled ? 'Pipeline flow →' : 'Sections'}</Text>
+                  <View style={[styles.inlineRow, { flexWrap: 'wrap' as any }]}>
+                    {(workspace.subSpaces ?? []).map((ss, idx) => (
+                      <React.Fragment key={`prev-${ss.id}`}>
+                        {workspace.pipelineEnabled && idx > 0 && <Text style={{ fontSize: 14, color: '#8C5BF5', fontWeight: '800' }}>→</Text>}
+                        <Pressable style={[styles.pill, selectedSubSpaceId === ss.id && styles.pillActive]} onPress={() => setSelectedSubSpaceId(ss.id)}>
+                          <Text style={[styles.pillText, selectedSubSpaceId === ss.id && styles.pillTextActive]}>{workspace.pipelineEnabled ? `${idx + 1}. ` : ''}{ss.name}</Text>
                         </Pressable>
                       </React.Fragment>
                     ))}
                   </View>
 
-                  {selectedSubSpace ? (
+                  {selectedSubSpace && (
                     <View style={styles.listCard}>
-                      <Text style={[styles.listTitle, styles.builderStudioTextPrimary]}>{selectedSubSpace.name} lane</Text>
-                      <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>This lane branches from the core entity. Form Builder fields here generate the Details form for this SubSpace.</Text>
-                      <LabeledInput
-                        label="SubSpace Name"
-                        helperText="Auto-saves"
-                        value={selectedSubSpace.name}
-                        onChangeText={(value) => updateSelectedSubSpace(selectedSubSpace.id, { name: value })}
-                        placeholder="Example: Unit Serialization"
-                      />
-                      <LabeledInput
-                        label="Source Entity"
-                        helperText="Auto-saves"
-                        value={selectedSubSpace.sourceEntity}
-                        onChangeText={(value) => updateSelectedSubSpace(selectedSubSpace.id, { sourceEntity: value })}
-                        placeholder="Example: Serialized Unit"
-                      />
-                      <LabeledInput
-                        label="Relationship Rule"
-                        helperText="Auto-saves"
-                        value={selectedSubSpace.relationship ?? ''}
-                        onChangeText={(value) => updateSelectedSubSpace(selectedSubSpace.id, { relationship: value })}
-                        placeholder="Example: SerializedUnit.BatchId = SerializedBatch.Id"
-                      />
-                      <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Drop zone for fields:</Text>
-                      <View
-                        style={[styles.builderDropZone, (!canManageSubSpace || !selectedSubSpace) && styles.buttonDisabled]}
-                        {...(isWeb
-                          ? ({
-                              onDragOver: (event: any) => {
-                                event.preventDefault();
-                              },
-                              onDrop: (event: any) => {
-                                event.preventDefault();
-                                const dataTransfer = event?.nativeEvent?.dataTransfer ?? event?.dataTransfer;
-                                const droppedType = dataTransfer?.getData?.('application/x-corespace-field-type');
-                                tryAddDroppedField(droppedType || draggedFieldType);
-                                setDraggedFieldType(null);
-                              },
-                            } as any)
-                          : {})}
-                      >
-                        <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Drop field here to add to {selectedSubSpace.name}</Text>
-                        {!!draggedFieldType && (
-                          <View style={styles.inlineRow}>
-                            <Pressable
-                              disabled={!canManageSubSpace}
-                              style={[styles.secondaryButton, !canManageSubSpace && styles.buttonDisabled]}
-                              onPress={() => {
-                                tryAddDroppedField(draggedFieldType);
-                                setDraggedFieldType(null);
-                              }}
-                            >
-                              <Text style={styles.secondaryButtonText}>Add Selected: {draggedFieldType}</Text>
-                            </Pressable>
-                            <Pressable style={styles.secondaryButton} onPress={() => setDraggedFieldType(null)}>
-                              <Text style={styles.secondaryButtonText}>Clear</Text>
-                            </Pressable>
-                          </View>
-                        )}
-                      </View>
-
-                      <View style={styles.separator} />
-                      <Text style={[styles.listTitle, styles.builderStudioTextPrimary]}>Subspace Details Form (Preview)</Text>
-                      <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>This is the generated form layout end users see for this SubSpace.</Text>
+                      <Text style={[styles.listTitle, styles.builderStudioTextPrimary]}>{selectedSubSpace.name}</Text>
                       {(selectedSubSpace.builderFields ?? []).length === 0 ? (
-                        <View style={styles.builderDetailsFormPanel}>
-                          <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Add Form Builder fields to generate the Details form preview.</Text>
-                        </View>
+                        <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>No fields yet — add some in Step 3.</Text>
                       ) : (
                         <View style={[styles.builderDetailsFormPanel, useTwoColumnDetailsForm && styles.builderDetailsFormPanelWide]}>
                           {(selectedSubSpace.builderFields ?? []).map((field) => (
-                            <View
-                              key={`details-form-${field.id}`}
-                              style={[
-                                styles.builderDetailsFormRow,
-                                useTwoColumnDetailsForm && field.type !== 'longText' && styles.builderDetailsFormRowHalf,
-                              ]}
-                            >
-                              <Text style={styles.builderDetailsFormLabel}>
-                                {field.label}
-                                {field.required ? ' *' : ''}
-                              </Text>
+                            <View key={`pf-${field.id}`} style={[styles.builderDetailsFormRow, useTwoColumnDetailsForm && field.type !== 'longText' && styles.builderDetailsFormRowHalf]}>
+                              <Text style={styles.builderDetailsFormLabel}>{field.label}{field.required ? ' *' : ''}</Text>
                               <View style={[styles.builderDetailsFormInput, field.type === 'longText' && styles.builderDetailsFormInputMulti]}>
                                 <Text style={styles.builderDetailsFormInputText}>{getDetailsFieldPlaceholder(field.type)}</Text>
                               </View>
-                              <Text style={styles.builderDetailsFormType}>Type: {field.type}</Text>
                             </View>
                           ))}
                         </View>
                       )}
-
-                      {(selectedSubSpace.builderFields ?? []).length === 0 ? (
-                        <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>No data fields yet. Add fields to define what end users must capture in this lane.</Text>
-                      ) : (
-                        (selectedSubSpace.builderFields ?? []).map((field, fieldIndex) => (
-                          <View key={field.id} style={styles.builderPreviewFieldRow}>
-                            <View style={styles.builderPreviewFieldMeta}>
-                              <Text style={[styles.listTitle, styles.builderStudioTextPrimary]}>{field.label}</Text>
-                              <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Type: {field.type} • Required: {field.required ? 'Yes' : 'No'}</Text>
-                            </View>
-                            <View style={styles.inlineRow}>
-                              <Pressable disabled={!canManageSubSpace || fieldIndex === 0} style={[styles.secondaryButton, (!canManageSubSpace || fieldIndex === 0) && styles.buttonDisabled]} onPress={() => moveBuilderFieldInSubSpace(field.id, 'up')}>
-                                <Text style={styles.secondaryButtonText}>▲</Text>
-                              </Pressable>
-                              <Pressable disabled={!canManageSubSpace || fieldIndex === (selectedSubSpace.builderFields ?? []).length - 1} style={[styles.secondaryButton, (!canManageSubSpace || fieldIndex === (selectedSubSpace.builderFields ?? []).length - 1) && styles.buttonDisabled]} onPress={() => moveBuilderFieldInSubSpace(field.id, 'down')}>
-                                <Text style={styles.secondaryButtonText}>▼</Text>
-                              </Pressable>
-                              <Pressable disabled={!canManageSubSpace} style={[styles.secondaryButton, !canManageSubSpace && styles.buttonDisabled]} onPress={() => toggleBuilderFieldRequired(field.id)}>
-                                <Text style={styles.secondaryButtonText}>Required: {field.required ? 'Yes' : 'No'}</Text>
-                              </Pressable>
-                              <Pressable disabled={!canManageSubSpace} style={[styles.secondaryButton, !canManageSubSpace && styles.buttonDisabled]} onPress={() => removeBuilderFieldFromSubSpace(field.id)}>
-                                <Text style={styles.secondaryButtonText}>Remove Field</Text>
-                              </Pressable>
-                            </View>
-                          </View>
-                        ))
-                      )}
                     </View>
-                  ) : (
-                    <Text style={styles.metaText}>Select a SubSpace to view and assign fields.</Text>
                   )}
                 </>
               )}

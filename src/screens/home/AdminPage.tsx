@@ -181,6 +181,10 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     setNewSubSpaceEntity,
     newBuilderFieldLabel,
     setNewBuilderFieldLabel,
+    newBuilderDropdownOptions,
+    setNewBuilderDropdownOptions,
+    newBuilderDropdownOptionInput,
+    setNewBuilderDropdownOptionInput,
     selectedSubSpaceId,
     setSelectedSubSpaceId,
     selectedSubSpace,
@@ -473,10 +477,10 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
       return 'Enter a number';
     }
     if (fieldType === 'date') {
-      return 'Select a date';
+      return 'MM / DD / YYYY';
     }
     if (fieldType === 'datetime') {
-      return 'Select date and time';
+      return 'MM / DD / YYYY  ·  HH:MM AM/PM';
     }
     if (fieldType === 'select') {
       return 'Choose an option';
@@ -1357,6 +1361,95 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                           </View>
                         </View>
 
+                        {/* Dropdown options entry — shown when 'select' type is active */}
+                        {wizardActiveFieldType === 'select' && (
+                          <View style={{ gap: 8 }}>
+                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.48)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase' as any, letterSpacing: 1 }}>
+                              Dropdown Options {newBuilderDropdownOptions.length > 0 ? `(${newBuilderDropdownOptions.length})` : ''}
+                            </Text>
+                            <View style={{ flexDirection: 'row', gap: 6 }}>
+                              <TextInput
+                                value={newBuilderDropdownOptionInput}
+                                onChangeText={setNewBuilderDropdownOptionInput}
+                                placeholder="Type an option..."
+                                placeholderTextColor={mode === 'night' ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)'}
+                                style={{ flex: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8, color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontSize: 13, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)' } as any}
+                                onSubmitEditing={() => {
+                                  const val = newBuilderDropdownOptionInput.trim();
+                                  if (val && !newBuilderDropdownOptions.includes(val)) {
+                                    setNewBuilderDropdownOptions([...newBuilderDropdownOptions, val]);
+                                  }
+                                  setNewBuilderDropdownOptionInput('');
+                                }}
+                              />
+                              <Pressable
+                                style={{ backgroundColor: acRgba(0.18), borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8, justifyContent: 'center' as any }}
+                                onPress={() => {
+                                  const val = newBuilderDropdownOptionInput.trim();
+                                  if (val && !newBuilderDropdownOptions.includes(val)) {
+                                    setNewBuilderDropdownOptions([...newBuilderDropdownOptions, val]);
+                                  }
+                                  setNewBuilderDropdownOptionInput('');
+                                }}
+                              >
+                                <Text style={{ color: '#A78BFA', fontWeight: '700', fontSize: 13 }}>+ Add</Text>
+                              </Pressable>
+                            </View>
+                            {newBuilderDropdownOptions.length > 0 && (
+                              <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, gap: 6 }}>
+                                {newBuilderDropdownOptions.map((opt) => (
+                                  <Pressable
+                                    key={opt}
+                                    onPress={() => setNewBuilderDropdownOptions(newBuilderDropdownOptions.filter((o) => o !== opt))}
+                                    style={{ flexDirection: 'row', alignItems: 'center' as any, gap: 4, backgroundColor: acRgba(0.14), borderRadius: 20, paddingVertical: 4, paddingHorizontal: 10, borderWidth: 1, borderColor: acRgba(0.28) }}
+                                  >
+                                    <Text style={{ color: '#A78BFA', fontSize: 12, fontWeight: '600' }}>{opt}</Text>
+                                    <Text style={{ color: 'rgba(167,139,250,0.6)', fontSize: 11 }}>✕</Text>
+                                  </Pressable>
+                                ))}
+                              </View>
+                            )}
+                            {newBuilderDropdownOptions.length === 0 && (
+                              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)', fontSize: 11, fontStyle: 'italic' as any }}>Add at least one option, then click "Add Field" below.</Text>
+                            )}
+                          </View>
+                        )}
+
+                        {/* Date / DateTime sub-field hint */}
+                        {(wizardActiveFieldType === 'date' || wizardActiveFieldType === 'datetime') && (
+                          <View style={{ backgroundColor: acRgba(0.08), borderRadius: 10, padding: 10, gap: 6, borderWidth: 1, borderColor: acRgba(0.18) }}>
+                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)', fontSize: 10, fontWeight: '700', textTransform: 'uppercase' as any, letterSpacing: 1 }}>
+                              {wizardActiveFieldType === 'datetime' ? 'Date & Time — Split Entry' : 'Date — Split Entry'}
+                            </Text>
+                            <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' as any }}>
+                              {(['MM', 'DD', 'YYYY'] as const).map((seg, i) => (
+                                <React.Fragment key={seg}>
+                                  <View style={{ flex: seg === 'YYYY' ? 2 : 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingVertical: 7, alignItems: 'center' as any, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+                                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)', fontSize: 11 }}>{seg}</Text>
+                                  </View>
+                                  {i < 2 && <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)', fontSize: 13 }}>/</Text>}
+                                </React.Fragment>
+                              ))}
+                              {wizardActiveFieldType === 'datetime' && (
+                                <>
+                                  <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', fontSize: 13, marginHorizontal: 2 }}>·</Text>
+                                  {(['HH', 'MM'] as const).map((seg, i) => (
+                                    <React.Fragment key={`t-${seg}`}>
+                                      <View style={{ flex: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingVertical: 7, alignItems: 'center' as any, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+                                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)', fontSize: 11 }}>{seg}</Text>
+                                      </View>
+                                      {i < 1 && <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)', fontSize: 13 }}>:</Text>}
+                                    </React.Fragment>
+                                  ))}
+                                  <View style={{ flex: 1.3, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingVertical: 7, alignItems: 'center' as any, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+                                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)', fontSize: 11 }}>AM/PM</Text>
+                                  </View>
+                                </>
+                              )}
+                            </View>
+                          </View>
+                        )}
+
                         {/* Add field button */}
                         <Pressable
                           disabled={!canManageSubSpace || !newBuilderFieldLabel.trim()}
@@ -1367,7 +1460,11 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                           }}
                         >
                           <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 14 }}>
-                            + Add "{newBuilderFieldLabel.trim() || 'Field'}" as {wizardActiveFieldType}
+                            + Add "{newBuilderFieldLabel.trim() || 'Field'}" as {
+                              wizardActiveFieldType === 'datetime' ? 'Date & Time' :
+                              wizardActiveFieldType === 'select' ? `Dropdown${newBuilderDropdownOptions.length > 0 ? ` (${newBuilderDropdownOptions.length} options)` : ''}` :
+                              wizardActiveFieldType
+                            }
                           </Text>
                         </Pressable>
 

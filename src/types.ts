@@ -21,6 +21,7 @@ export interface SubSpaceBuilderField {
   label: string;
   type: SubSpaceBuilderFieldType;
   required: boolean;
+  options?: string[];
   tags?: string[];
 }
 

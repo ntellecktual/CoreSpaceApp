@@ -416,6 +416,8 @@ export function useAdminWorkspace() {
   const [newSubSpaceEntity, setNewSubSpaceEntity] = useState('');
   const [selectedSubSpaceId, setSelectedSubSpaceId] = useState('');
   const [newBuilderFieldLabel, setNewBuilderFieldLabel] = useState('');
+  const [newBuilderDropdownOptions, setNewBuilderDropdownOptions] = useState<string[]>([]);
+  const [newBuilderDropdownOptionInput, setNewBuilderDropdownOptionInput] = useState('');
   const [notice, setNotice] = useState('');
 
   useEffect(() => {
@@ -592,6 +594,7 @@ export function useAdminWorkspace() {
       label: newBuilderFieldLabel.trim() || `${titleCase(paletteEntry.label)} ${nextIndex}`,
       type: fieldType,
       required: !!paletteEntry.required,
+      ...(newBuilderDropdownOptions.length > 0 ? { options: newBuilderDropdownOptions } : {}),
       tags: [
         `Workspace:${workspaceToken}`,
         'Scope:Workspace',
@@ -606,6 +609,8 @@ export function useAdminWorkspace() {
     });
 
     setNewBuilderFieldLabel('');
+    setNewBuilderDropdownOptions([]);
+    setNewBuilderDropdownOptionInput('');
     setNotice(`${paletteEntry.label} added to workspace core fields.`);
   };
 
@@ -768,6 +773,7 @@ export function useAdminWorkspace() {
       label: newBuilderFieldLabel.trim() || `${titleCase(paletteEntry.label)} ${nextIndex}`,
       type: fieldType,
       required: !!paletteEntry.required,
+      ...(newBuilderDropdownOptions.length > 0 ? { options: newBuilderDropdownOptions } : {}),
       tags: [
         `Workspace:${workspaceToken}`,
         `SubSpace:${subSpaceToken}`,
@@ -781,6 +787,8 @@ export function useAdminWorkspace() {
       builderFields: [...(selectedSubSpace.builderFields ?? []), nextField],
     });
     setNewBuilderFieldLabel('');
+    setNewBuilderDropdownOptions([]);
+    setNewBuilderDropdownOptionInput('');
     setNotice(`${paletteEntry.label} added to ${selectedSubSpace.name}.`);
   };
 
@@ -1762,6 +1770,10 @@ export function useAdminWorkspace() {
     setNewSubSpaceEntity,
     newBuilderFieldLabel,
     setNewBuilderFieldLabel,
+    newBuilderDropdownOptions,
+    setNewBuilderDropdownOptions,
+    newBuilderDropdownOptionInput,
+    setNewBuilderDropdownOptionInput,
     selectedSubSpaceId,
     setSelectedSubSpaceId,
     selectedSubSpace,

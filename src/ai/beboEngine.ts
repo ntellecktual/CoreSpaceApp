@@ -286,7 +286,7 @@ const PHARMA_STATUS = ['Serialized', 'Shipped to Distributor', 'Received by Dist
 const PHARMA_MFR = ['Pfizer', 'AstraZeneca', 'Merck', 'Abbott', 'Novartis', 'GSK', 'Sanofi', 'Eli Lilly'];
 
 function generatePharmaData(count = 20) {
-  const headers = ['Lot Number', 'NDC', 'Product Name', 'Expiry Date', 'Carton Serial', 'Status', 'Qty Units', 'Manufacturer'];
+  const headers = ['Lot Number', 'NDC Product Code', 'Product Name', 'Expiration Date', 'Carton Serial', 'Status', 'Qty Units', 'Manufacturer'];
   const rows: string[][] = Array.from({ length: count }, (_, i) => {
     const idx = i % PHARMA_PRODUCTS.length;
     return [
@@ -315,7 +315,7 @@ const DEAL_STAGES = ['New Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed
 const LEAD_SOURCES = ['Inbound', 'Outbound', 'Referral', 'LinkedIn', 'Conference', 'SEO'];
 
 function generateSalesData(count = 20) {
-  const headers = ['Company', 'Contact', 'Title', 'Email', 'Deal Value', 'Stage', 'Close Date', 'Owner', 'Source'];
+  const headers = ['Company', 'Contact', 'Title', 'Email', 'Deal Value', 'Stage', 'Close Date', 'Owner', 'Lead Source'];
   const rows: string[][] = Array.from({ length: count }, (_, i) => {
     const co = COMPANIES[i % COMPANIES.length];
     const val = (Math.floor(Math.random() * 200 + 10)) * 1000;
@@ -341,7 +341,7 @@ const INSURERS = ['Blue Cross Blue Shield', 'Aetna', 'UnitedHealth', 'Cigna', 'H
 const DOCTORS = ['Dr. Chen', 'Dr. Patel', 'Dr. Williams', 'Dr. Nguyen', 'Dr. Anderson', 'Dr. Martinez'];
 
 function generateHealthcareData(count = 20) {
-  const headers = ['Patient ID', 'Patient Name', 'DOB', 'Insurance', 'Last Visit', 'Next Appointment', 'Primary Diagnosis', 'Provider'];
+  const headers = ['Patient ID', 'Patient Name', 'DOB', 'Insurance', 'Last Visit', 'Appointment Date', 'Primary Diagnosis', 'Provider'];
   const rows: string[][] = Array.from({ length: count }, (_, i) => [
     `PAT-${String(1000 + i).padStart(4, '0')}`,
     `${pick(['Eleanor', 'Marcus', 'Diana', 'James', 'Sophia', 'Robert', 'Amelia', 'Carlos', 'Natalie', 'Kevin'])} ${pick(['Johnson', 'Williams', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor'])}`,
@@ -509,12 +509,95 @@ export function buildPharmaPayload(): ScenarioApplyPayload {
     mkIntegration('int-bebo-qb-pharma', 'tpl-quickbooks', fmtDate(-20)),
     mkIntegration('int-bebo-http-pharma', 'tpl-custom-http', fmtDate(-10)),
   ];
-  const records: RuntimeRecord[] = Array.from({ length: 12 }, (_, i) => mkRecord(
-    `rec-pharma-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-mfr', 'ss-unit-serial',
-    `${PHARMA_PRODUCTS[i % PHARMA_PRODUCTS.length]} — LOT-${10000 + i}`,
-    pick(PHARMA_STATUS), undefined, fmtDate(-i * 3), ['Product:Pharma'],
-    { 'NDC Product Code': PHARMA_NDCS[i % PHARMA_NDCS.length], 'Lot Number': `LOT-${10000 + i}` },
+  const unitRecords: RuntimeRecord[] = Array.from({ length: 12 }, (_, i) => {
+    const product = PHARMA_PRODUCTS[i % PHARMA_PRODUCTS.length];
+    const ndc = PHARMA_NDCS[i % PHARMA_NDCS.length];
+    const lot = `LOT-${10000 + i}`;
+    const expiry = fmtDate(180 + Math.floor(Math.random() * 720));
+    return mkRecord(
+      `rec-pharma-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-mfr', 'ss-unit-serial',
+      `${product} — ${lot}`,
+      pick(PHARMA_STATUS), undefined, fmtDate(-i * 3), ['Product:Pharma'],
+      {
+        'Unit Serial Number': `SN-${String(10000 + Math.floor(Math.random() * 89999))}`,
+        'NDC Product Code': ndc,
+        'Lot Number': lot,
+        'Expiration Date': expiry,
+      },
+    );
+  });
+  const cartonRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const ctnSn = `CTN-${String(10000 + Math.floor(Math.random() * 89999))}-${String.fromCharCode(65 + i)}`;
+    const aggDate = fmtDate(-Math.floor(Math.random() * 30));
+    return mkRecord(
+      `rec-pharma-ctn-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-mfr', 'ss-carton-agg',
+      `${ctnSn} — Aggregation`, 'Aggregated',
+      undefined, aggDate, ['Product:Pharma'], {
+        'Carton Serial Number': ctnSn,
+        'Units per Box': (Math.floor(Math.random() * 5) + 1) * 100,
+        'Aggregation Date': aggDate,
+      },
+    );
+  });
+  const epcisRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => {
+    const subDate = fmtDate(-Math.floor(Math.random() * 14));
+    return mkRecord(
+      `rec-pharma-epcis-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-mfr', 'ss-epcis',
+      `EPCIS-${20000 + i}`, pick(['Submitted', 'Accepted', 'Failed', 'Pending']),
+      undefined, subDate, ['Type:Compliance'], {
+        'Submission ID': `EPCIS-${20000 + i}`,
+        'Submission Date': subDate,
+        'Upload Status': pick(['Submitted', 'Accepted', 'Failed', 'Pending']),
+      },
+    );
+  });
+  const scanRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => {
+    const recvTime = fmtDate(-Math.floor(Math.random() * 7));
+    return mkRecord(
+      `rec-pharma-scan-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-dist', 'ss-inbound-scan',
+      `SCAN-${30000 + i}`, 'Received',
+      undefined, recvTime, ['Type:Scan'], {
+        'Scan Event ID': `SCAN-${30000 + i}`,
+        'Scanned Carton Serial': `CTN-${String(10000 + Math.floor(Math.random() * 89999))}-${String.fromCharCode(65 + i)}`,
+        'Received Time': recvTime,
+      },
+    );
+  });
+  const verifyRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => {
+    const matched = Math.floor(Math.random() * 500 + 100);
+    const mismatch = Math.floor(Math.random() * 3);
+    return mkRecord(
+      `rec-pharma-verify-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-dist', 'ss-serial-verify',
+      `Verification Batch ${i + 1}`, mismatch > 0 ? 'Mismatch' : 'Verified',
+      undefined, fmtDate(-Math.floor(Math.random() * 7)), ['Type:Verification'], {
+        'Verification Result': mismatch > 0 ? 'Mismatch' : 'Match',
+        'Matched Serial Count': matched,
+        'Mismatch Count': mismatch,
+      },
+    );
+  });
+  const rxRecvRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => mkRecord(
+    `rec-pharma-rxrecv-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-rx', 'ss-rx-recv',
+    `RX-RECV-${40000 + i}`, 'Verified',
+    undefined, fmtDate(-Math.floor(Math.random() * 14)), ['Type:Receiving'], {
+      'Receiving Event ID': `RX-RECV-${40000 + i}`,
+      'Received Carton Serial': `CTN-${String(10000 + Math.floor(Math.random() * 89999))}-${String.fromCharCode(65 + i)}`,
+      'Verification Result': pick(['Match', 'Match', 'Match', 'Mismatch']),
+    },
   ));
+  const dispRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => {
+    const dispDate = fmtDate(-Math.floor(Math.random() * 7));
+    return mkRecord(
+      `rec-pharma-disp-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-rx', 'ss-dispense',
+      `Dispense — ${PHARMA_PRODUCTS[i % PHARMA_PRODUCTS.length]}`, 'Dispensed',
+      undefined, dispDate, ['Type:Dispense'], {
+        'Dispensed Unit Serial': `SN-${String(50000 + Math.floor(Math.random() * 49999))}`,
+        'Dispense Date': dispDate,
+        'Rx Reference': `RX-${String(100000 + Math.floor(Math.random() * 99999))}`,
+      },
+    );
+  });
+  const records = [...unitRecords, ...cartonRecords, ...epcisRecords, ...scanRecords, ...verifyRecords, ...rxRecvRecords, ...dispRecords];
   return {
     shellConfig: mkShellConfig('Serialized Batch', 'Serialized Batches', 'Supply Chain Workspace', 'Traceability SubSpace', ['Serialized', 'Shipped to Distributor', 'Received by Distributor', 'Shipped to Pharmacy', 'Received by Pharmacy', 'Dispensed']),
     workspaces: [wsMfr, wsDist, wsRx], flows, integrations, records,
@@ -525,7 +608,7 @@ export function buildSalesPayload(): ScenarioApplyPayload {
   const wsPipeline = mkWorkspace('ws-bebo-sales', 'Sales Pipeline', 'Account', '💰', [
     mkSubSpace('ss-leads', 'Leads', 'Lead', 'board', [
       mkField('f-co', 'Company', 'text', true),
-      mkField('f-contact', 'Contact Name', 'text', true),
+      mkField('f-contact', 'Contact', 'text', true),
       mkField('f-source', 'Lead Source', 'select', false),
       mkField('f-score', 'Lead Score', 'number', false),
     ]),
@@ -551,12 +634,56 @@ export function buildSalesPayload(): ScenarioApplyPayload {
     mkIntegration('int-bebo-qb-sales', 'tpl-quickbooks', fmtDate(-30)),
     mkIntegration('int-bebo-http-sales', 'tpl-custom-http', fmtDate(-15)),
   ];
-  const records: RuntimeRecord[] = COMPANIES.slice(0, 12).map((co, i) => mkRecord(
-    `rec-sales-${i}`, `client-sales-${i}`, 'ws-bebo-sales', 'ss-leads',
-    `${co} — ${pick(DEAL_STAGES)}`, pick(DEAL_STAGES),
-    Math.floor(Math.random() * 200 + 10) * 1000, fmtDate(Math.floor(Math.random() * 60)),
-    ['Type:Lead'], { Company: co, 'Lead Source': pick(LEAD_SOURCES) },
-  ));
+  const contactFirsts = ['John', 'Maria', 'Chris', 'Kim', 'David', 'Emma', 'Raj', 'Zoe'];
+  const contactLasts = ['Smith', 'Garcia', 'Johnson', 'Williams', 'Brown', 'Davis', 'Patel', 'Nguyen'];
+  const leadRecords: RuntimeRecord[] = COMPANIES.slice(0, 12).map((co, i) => {
+    const contact = `${pick(contactFirsts)} ${pick(contactLasts)}`;
+    const source = pick(LEAD_SOURCES);
+    const score = Math.floor(Math.random() * 80 + 20);
+    const stage = pick(DEAL_STAGES);
+    return mkRecord(
+      `rec-sales-${i}`, `client-sales-${i}`, 'ws-bebo-sales', 'ss-leads',
+      `${co} — ${stage}`, stage,
+      Math.floor(Math.random() * 200 + 10) * 1000, fmtDate(Math.floor(Math.random() * 60)),
+      ['Type:Lead'], {
+        'Company': co,
+        'Contact': contact,
+        'Lead Source': source,
+        'Lead Score': score,
+      },
+    );
+  });
+  const oppRecords: RuntimeRecord[] = COMPANIES.slice(0, 6).map((co, i) => {
+    const value = Math.floor(Math.random() * 200 + 10) * 1000;
+    const stage = pick(['Proposal', 'Negotiation', 'Closed Won']);
+    const closeDate = fmtDate(Math.floor(Math.random() * 90) + 7);
+    return mkRecord(
+      `rec-sales-opp-${i}`, `client-sales-${i}`, 'ws-bebo-sales', 'ss-opps',
+      `${co} — $${value.toLocaleString()}`, stage,
+      value, closeDate, ['Type:Deal'], {
+        'Deal Name': `${co} Enterprise License`,
+        'Deal Value': value,
+        'Close Date': closeDate,
+        'Stage': stage,
+      },
+    );
+  });
+  const actTypes = ['Call', 'Email', 'Meeting', 'Demo', 'Proposal Sent', 'Follow-Up'];
+  const actSubjects = ['Intro call with VP Sales', 'Follow-up on proposal', 'Product demo', 'Contract review discussion', 'Quarterly business review', 'Renewal negotiation'];
+  const actRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const actType = pick(actTypes);
+    const actDate = fmtDate(-Math.floor(Math.random() * 14));
+    return mkRecord(
+      `rec-sales-act-${i}`, `client-sales-${i}`, 'ws-bebo-sales', 'ss-activities',
+      `${actType} — ${COMPANIES[i]}`, 'Completed',
+      undefined, actDate, ['Type:Activity'], {
+        'Activity Type': actType,
+        'Subject': pick(actSubjects),
+        'Activity Date': actDate,
+      },
+    );
+  });
+  const records = [...leadRecords, ...oppRecords, ...actRecords];
   return {
     shellConfig: mkShellConfig('Account', 'Accounts', 'Sales Workspace', 'Pipeline Stage', ['New Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost']),
     workspaces: [wsPipeline], flows, integrations, records,
@@ -566,7 +693,7 @@ export function buildSalesPayload(): ScenarioApplyPayload {
 export function buildHealthcarePayload(): ScenarioApplyPayload {
   const wsPatients = mkWorkspace('ws-bebo-health', 'Patient Care', 'Patient', '🏥', [
     mkSubSpace('ss-appts', 'Appointments', 'Appointment', 'board', [
-      mkField('f-dr', 'Doctor', 'text', true),
+      mkField('f-dr', 'Provider', 'text', true),
       mkField('f-appt-date', 'Appointment Date', 'datetime', true),
       mkField('f-appt-type', 'Visit Type', 'select', false),
       mkField('f-notes', 'Notes', 'longText', false),
@@ -592,12 +719,58 @@ export function buildHealthcarePayload(): ScenarioApplyPayload {
     mkIntegration('int-bebo-ds-health', 'tpl-docusign', fmtDate(-60)),
     mkIntegration('int-bebo-http-health', 'tpl-custom-http', fmtDate(-25)),
   ];
-  const records: RuntimeRecord[] = Array.from({ length: 10 }, (_, i) => mkRecord(
-    `rec-health-${i}`, `client-health-${i}`, 'ws-bebo-health', 'ss-appts',
-    `PAT-${String(1000 + i)} — ${pick(DOCTORS)}`, pick(['Scheduled', 'Completed', 'No-Show', 'Cancelled']),
-    undefined, fmtDate(Math.floor(Math.random() * 30) - 5), ['Type:Appointment'],
-    { Doctor: pick(DOCTORS) },
-  ));
+  const visitTypes = ['Annual Physical', 'Follow-Up', 'Urgent Care', 'Specialist Consult', 'Lab Review', 'Telehealth'];
+  const apptRecords: RuntimeRecord[] = Array.from({ length: 10 }, (_, i) => {
+    const provider = pick(DOCTORS);
+    const apptDate = fmtDate(Math.floor(Math.random() * 30) - 5);
+    const vType = pick(visitTypes);
+    const notes = pick(['BP 120/80, weight stable', 'Follow-up on lab results', 'Renewed medication', 'Referred to specialist', 'Discuss treatment options', 'Annual wellness exam']);
+    return mkRecord(
+      `rec-health-${i}`, `client-health-${i}`, 'ws-bebo-health', 'ss-appts',
+      `PAT-${String(1000 + i)} — ${provider}`, pick(['Scheduled', 'Completed', 'No-Show', 'Cancelled']),
+      undefined, apptDate, ['Type:Appointment'], {
+        'Provider': provider,
+        'Appointment Date': apptDate,
+        'Visit Type': vType,
+        'Notes': notes,
+      },
+    );
+  });
+  const medications = ['Lisinopril 10mg', 'Metformin 500mg', 'Atorvastatin 20mg', 'Omeprazole 20mg', 'Sertraline 50mg', 'Amlodipine 5mg'];
+  const rxRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const med = pick(medications);
+    const dosage = pick(['1 tablet daily', '2 tablets daily', '1 tablet twice daily', 'As needed']);
+    const startD = fmtDate(-Math.floor(Math.random() * 90));
+    const endD = fmtDate(Math.floor(Math.random() * 180) + 30);
+    return mkRecord(
+      `rec-health-rx-${i}`, `client-health-${i}`, 'ws-bebo-health', 'ss-rx',
+      `${med} — PAT-${String(1000 + i)}`, 'Active',
+      undefined, startD, ['Type:Prescription'], {
+        'Medication': med,
+        'Dosage': dosage,
+        'Start Date': startD,
+        'End Date': endD,
+      },
+    );
+  });
+  const testNames = ['CBC', 'Comprehensive Metabolic Panel', 'Lipid Panel', 'Hemoglobin A1c', 'Thyroid Panel', 'Urinalysis'];
+  const labRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const testName = pick(testNames);
+    const result = pick(['Normal', 'Slightly Elevated', 'Within Range', 'Borderline High', 'Low', 'Critical']);
+    const labDate = fmtDate(-Math.floor(Math.random() * 30));
+    const flag = result === 'Critical' ? 'Critical' : result === 'Slightly Elevated' || result === 'Borderline High' ? 'Abnormal' : 'Normal';
+    return mkRecord(
+      `rec-health-lab-${i}`, `client-health-${i}`, 'ws-bebo-health', 'ss-labs',
+      `${testName} — PAT-${String(1000 + i)}`, 'Completed',
+      undefined, labDate, ['Type:Lab'], {
+        'Test Name': testName,
+        'Result': result,
+        'Date': labDate,
+        'Flag': flag,
+      },
+    );
+  });
+  const records = [...apptRecords, ...rxRecords, ...labRecords];
   return {
     shellConfig: mkShellConfig('Patient', 'Patients', 'Clinical Workspace', 'Care Area', ['Registered', 'Scheduled', 'In Progress', 'Completed', 'Follow-Up', 'Discharged']),
     workspaces: [wsPatients], flows, integrations, records,
@@ -631,12 +804,45 @@ export function buildLogisticsPayload(): ScenarioApplyPayload {
     mkIntegration('int-bebo-http-log', 'tpl-custom-http', fmtDate(-20)),
     mkIntegration('int-bebo-qb-log', 'tpl-quickbooks', fmtDate(-40)),
   ];
-  const records: RuntimeRecord[] = Array.from({ length: 10 }, (_, i) => mkRecord(
-    `rec-logistics-${i}`, `client-logistics-${i}`, 'ws-bebo-logistics', 'ss-outbound',
-    `ORD-${20000 + i} — ${pick(CARRIERS)}`, pick(SHIP_STATUS),
-    undefined, fmtDate(-i), ['Type:Shipment'],
-    { Carrier: pick(CARRIERS), Warehouse: pick(WAREHOUSES) },
+  const suppliers = ['Global Parts Ltd', 'Pacific Components', 'Midwest Supply Co', 'Eastern Materials', 'Summit Industrial', 'Tri-State Wholesale'];
+  const outboundRecords: RuntimeRecord[] = Array.from({ length: 10 }, (_, i) => {
+    const carrier = pick(CARRIERS);
+    const warehouse = pick(WAREHOUSES);
+    const shipDate = fmtDate(-i);
+    const tracking = `TRK-${String(300000 + Math.floor(Math.random() * 99999))}`;
+    return mkRecord(
+      `rec-logistics-${i}`, `client-logistics-${i}`, 'ws-bebo-logistics', 'ss-outbound',
+      `ORD-${20000 + i} — ${carrier}`, pick(SHIP_STATUS),
+      undefined, shipDate, ['Type:Shipment'], {
+        'Tracking Number': tracking,
+        'Carrier': carrier,
+        'Ship Date': shipDate,
+      },
+    );
+  });
+  const receivingRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const expDate = fmtDate(Math.floor(Math.random() * 14) + 1);
+    return mkRecord(
+      `rec-logistics-recv-${i}`, `client-logistics-${i}`, 'ws-bebo-logistics', 'ss-receiving',
+      `PO-${40000 + i} — ${pick(suppliers)}`, pick(['Pending', 'In Transit', 'Received']),
+      undefined, expDate, ['Type:Receiving'], {
+        'PO Number': `PO-${40000 + i}`,
+        'Supplier': pick(suppliers),
+        'Expected Date': expDate,
+        'SKU Count': Math.floor(Math.random() * 50 + 5),
+      },
+    );
+  });
+  const pickRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => mkRecord(
+    `rec-logistics-pick-${i}`, `client-logistics-${i}`, 'ws-bebo-logistics', 'ss-pick-pack',
+    `ORD-${20000 + i} — Pick Request`, pick(['Queued', 'Picking', 'Packed', 'Ready']),
+    undefined, fmtDate(-Math.floor(Math.random() * 3)), ['Type:PickPack'], {
+      'Order ID': `ORD-${20000 + i}`,
+      'Priority': pick(['Standard', 'Expedite', 'Rush', 'Same-Day']),
+      'Items Count': Math.floor(Math.random() * 20 + 1),
+    },
   ));
+  const records = [...outboundRecords, ...receivingRecords, ...pickRecords];
   return {
     shellConfig: mkShellConfig('Shipment', 'Shipments', 'Logistics Workspace', 'Operations Lane', ['Ordered', 'Received', 'Picking', 'Packed', 'Shipped', 'Delivered', 'Returned']),
     workspaces: [wsFulfillment], flows, integrations, records,
@@ -647,7 +853,7 @@ export function buildLegalPayload(): ScenarioApplyPayload {
   const wsCases = mkWorkspace('ws-bebo-legal', 'Case Management', 'Case', '⚖️', [
     mkSubSpace('ss-active-cases', 'Active Cases', 'Case', 'grid', [
       mkField('f-case-no', 'Case Number', 'text', true),
-      mkField('f-client', 'Client', 'text', true),
+      mkField('f-client', 'Client Name', 'text', true),
       mkField('f-matter', 'Matter Type', 'select', true),
       mkField('f-attorney', 'Assigned Attorney', 'text', true),
     ]),
@@ -671,12 +877,57 @@ export function buildLegalPayload(): ScenarioApplyPayload {
     mkIntegration('int-bebo-ds-legal', 'tpl-docusign', fmtDate(-90)),
     mkIntegration('int-bebo-qb-legal', 'tpl-quickbooks', fmtDate(-60)),
   ];
-  const records: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) => mkRecord(
-    `rec-legal-${i}`, `client-legal-${i}`, 'ws-bebo-legal', 'ss-active-cases',
-    `CASE-2026-${1000 + i} — ${pick(MATTER_TYPES)}`, pick(CASE_STATUS),
-    Math.floor(Math.random() * 50 + 10) * 1000, fmtDate(-i * 7),
-    ['Type:Case'], { 'Assigned Attorney': pick(ATTORNEYS) },
-  ));
+  const legalAdj = ['Greenfield', 'Mountain View', 'Sunrise', 'Pacific', 'Atlantic', 'Northern', 'Western', 'Capital'];
+  const legalOrgs = ['LLC', 'Corp.', 'Industries', 'Holdings', 'Group', 'Partners', 'Ventures', 'Associates'];
+  const caseRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) => {
+    const clientName = `${pick(legalAdj)} ${pick(legalOrgs)}`;
+    const matter = pick(MATTER_TYPES);
+    const attorney = pick(ATTORNEYS);
+    const status = pick(CASE_STATUS);
+    return mkRecord(
+      `rec-legal-${i}`, `client-legal-${i}`, 'ws-bebo-legal', 'ss-active-cases',
+      `CASE-2026-${1000 + i} — ${matter}`, status,
+      Math.floor(Math.random() * 50 + 10) * 1000, fmtDate(-i * 7),
+      ['Type:Case'], {
+        'Case Number': `CASE-2026-${1000 + i}`,
+        'Client Name': clientName,
+        'Matter Type': matter,
+        'Assigned Attorney': attorney,
+      },
+    );
+  });
+  const courtEventTypes = ['Court Hearing', 'Filing Deadline', 'Deposition', 'Mediation', 'Trial Start', 'Motion Deadline'];
+  const courts = ['Southern District NY', 'Central District CA', 'Northern District IL', 'Eastern District PA', 'District of Columbia'];
+  const deadlineRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const evType = pick(courtEventTypes);
+    const dt = fmtDate(Math.floor(Math.random() * 60) + 1);
+    return mkRecord(
+      `rec-legal-dl-${i}`, `client-legal-${i}`, 'ws-bebo-legal', 'ss-deadlines',
+      `${evType} — CASE-2026-${1000 + i}`, pick(CASE_STATUS),
+      undefined, dt, ['Type:Deadline'], {
+        'Event Type': evType,
+        'Date': dt,
+        'Court': pick(courts),
+      },
+    );
+  });
+  const billingDescs = ['Client meeting re strategy', 'Draft motion for summary judgment', 'Document review and analysis', 'Prepare deposition questions', 'Court appearance', 'Settlement negotiation call', 'Legal research — precedent review'];
+  const billingRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const hours = Math.floor(Math.random() * 8 + 1);
+    const rate = pick([250, 350, 450, 550, 650]);
+    const dt = fmtDate(-Math.floor(Math.random() * 30));
+    return mkRecord(
+      `rec-legal-bill-${i}`, `client-legal-${i}`, 'ws-bebo-legal', 'ss-billing',
+      `${hours}h @ $${rate}/hr — CASE-2026-${1000 + i}`, 'Logged',
+      hours * rate, dt, ['Type:Billing'], {
+        'Date': dt,
+        'Hours': hours,
+        'Hourly Rate': rate,
+        'Description': pick(billingDescs),
+      },
+    );
+  });
+  const records = [...caseRecords, ...deadlineRecords, ...billingRecords];
   return {
     shellConfig: mkShellConfig('Case', 'Cases', 'Legal Workspace', 'Practice Area', ['Intake', 'Engagement', 'Discovery', 'Litigation', 'Settlement', 'Closed', 'Archived']),
     workspaces: [wsCases], flows, integrations, records,
@@ -713,12 +964,54 @@ export function buildInsurancePayload(): ScenarioApplyPayload {
     mkIntegration('int-bebo-qb-ins', 'tpl-quickbooks', fmtDate(-90)),
     mkIntegration('int-bebo-http-ins', 'tpl-custom-http', fmtDate(-30)),
   ];
-  const records: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) => mkRecord(
-    `rec-ins-${i}`, `client-ins-${i}`, 'ws-bebo-insurance', 'ss-active-pols',
-    `POL-2026${String(10000 + i)} — ${pick(COV_TYPES)}`, pick(INS_STATUS),
-    Math.floor(Math.random() * 50 + 5) * 1000, fmtDate(Math.floor(Math.random() * 365)),
-    ['Type:Policy'], { 'Coverage Type': pick(COV_TYPES) },
-  ));
+  const insPrefixes = ['Sunrise', 'Northland', 'Pacific', 'Prairie', 'Valley', 'Metro', 'Coastal', 'Highland'];
+  const insSuffixes = ['LLC', 'Corp', 'Holdings', 'Inc', 'Group', 'Association'];
+  const insAgents = ['Alex Johnson', 'Maria Santos', 'Kevin Wu', 'Rachel Green', 'Tyler Morris'];
+  const policyRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) => {
+    const covType = pick(COV_TYPES);
+    const insured = `${pick(insPrefixes)} ${pick(insSuffixes)}`;
+    const premium = Math.floor(Math.random() * 50 + 5) * 1000;
+    const effDate = fmtDate(-Math.floor(Math.random() * 365));
+    return mkRecord(
+      `rec-ins-${i}`, `client-ins-${i}`, 'ws-bebo-insurance', 'ss-active-pols',
+      `POL-2026${String(10000 + i)} — ${covType}`, pick(INS_STATUS),
+      premium, effDate, ['Type:Policy'], {
+        'Policy Number': `POL-2026${String(10000 + i)}`,
+        'Insured Name': insured,
+        'Coverage Type': covType,
+        'Annual Premium': premium,
+        'Effective Date': effDate,
+      },
+    );
+  });
+  const claimRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const estAmt = Math.floor(Math.random() * 80 + 5) * 1000;
+    const lossDate = fmtDate(-Math.floor(Math.random() * 60));
+    return mkRecord(
+      `rec-ins-claim-${i}`, `client-ins-${i}`, 'ws-bebo-insurance', 'ss-claims',
+      `CLM-2026${String(50000 + i)} — ${pick(COV_TYPES)}`, pick(['Open', 'Under Review', 'Approved', 'Denied']),
+      estAmt, lossDate, ['Type:Claim'], {
+        'Claim Number': `CLM-2026${String(50000 + i)}`,
+        'Claimant': `${pick(insPrefixes)} ${pick(insSuffixes)}`,
+        'Date of Loss': lossDate,
+        'Estimated Amount': estAmt,
+      },
+    );
+  });
+  const renewalRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const renDate = fmtDate(Math.floor(Math.random() * 60) + 7);
+    const propPrem = Math.floor(Math.random() * 50 + 5) * 1000;
+    return mkRecord(
+      `rec-ins-ren-${i}`, `client-ins-${i + 4}`, 'ws-bebo-insurance', 'ss-renewals',
+      `Renewal — POL-2026${String(10000 + i + 4)}`, 'Renewal Pending',
+      propPrem, renDate, ['Type:Renewal'], {
+        'Policy Number': `POL-2026${String(10000 + i + 4)}`,
+        'Renewal Date': renDate,
+        'Proposed Premium': propPrem,
+      },
+    );
+  });
+  const records = [...policyRecords, ...claimRecords, ...renewalRecords];
   return {
     shellConfig: mkShellConfig('Policy', 'Policies', 'Insurance Workspace', 'Service Line', ['Application', 'Underwriting', 'Bound', 'Active', 'Renewal Pending', 'Lapsed', 'Cancelled']),
     workspaces: [wsPolicies], flows, integrations, records,

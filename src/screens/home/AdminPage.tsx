@@ -138,6 +138,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const [draggedFieldType, setDraggedFieldType] = useState<SubSpaceBuilderFieldType | null>(null);
   const [wsDragFromIndex, setWsDragFromIndex] = useState<number | null>(null);
   const [wsDragOverIndex, setWsDragOverIndex] = useState<number | null>(null);
+  const [ssDragFromIndex, setSsDragFromIndex] = useState<number | null>(null);
+  const [ssDragOverIndex, setSsDragOverIndex] = useState<number | null>(null);
   const [wizardStep, setWizardStep] = useState<1 | 2 | 3 | 4>(1);
   const [wizardActiveFieldType, setWizardActiveFieldType] = useState<SubSpaceBuilderFieldType>('text');
   const [shellPane, setShellPane] = useState<'labels' | 'intake' | 'personas' | 'lifecycle'>('labels');
@@ -205,6 +207,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     updateSelectedSubSpace,
     togglePipelineEnabled,
     reorderSubSpace,
+    moveSubSpaceToIndex,
   } = useAdminWorkspace();
   const insights = useAdminEnterpriseInsights(workspace);
   const { activeTenantId, data, isSuperAdmin, currentUser, tenants, copyActiveDataToAllTenants, getFormForSubSpace, upsertBusinessFunction, deleteBusinessFunction, upsertBusinessObject, deleteBusinessObject } = useAppState();
@@ -1094,7 +1097,27 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Your sections ({workspaceSubSpaces.length})</Text>
                         <View style={{ gap: 4 }}>
                           {workspaceSubSpaces.map((ss, ssIdx) => (
-                            <View key={ss.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.10)' : 'rgba(140,91,245,0.06)', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : mode === 'night' ? 'rgba(140,91,245,0.20)' : 'rgba(140,91,245,0.14)' }}>
+                            <View
+                              key={ss.id}
+                              draggable
+                              onDragStart={(e: any) => { e.dataTransfer.effectAllowed = 'move'; setSsDragFromIndex(ssIdx); }}
+                              onDragOver={(e: any) => { e.preventDefault(); setSsDragOverIndex(ssIdx); }}
+                              onDragEnd={() => {
+                                if (ssDragFromIndex !== null && ssDragOverIndex !== null && ssDragFromIndex !== ssDragOverIndex) {
+                                  moveSubSpaceToIndex(ssDragFromIndex, ssDragOverIndex);
+                                }
+                                setSsDragFromIndex(null); setSsDragOverIndex(null);
+                              }}
+                              style={{
+                                flexDirection: 'row', alignItems: 'center', gap: 10,
+                                backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.10)' : 'rgba(140,91,245,0.06)',
+                                borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1,
+                                borderColor: ssDragOverIndex === ssIdx ? '#8C5BF5' : selectedSubSpaceId === ss.id ? '#8C5BF5' : mode === 'night' ? 'rgba(140,91,245,0.20)' : 'rgba(140,91,245,0.14)',
+                                opacity: ssDragFromIndex === ssIdx ? 0.45 : 1,
+                                cursor: 'grab',
+                              }}
+                            >
+                              <Text style={{ fontSize: 16, opacity: 0.5, userSelect: 'none' } as any}>⠿</Text>
                               <View style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(140,91,245,0.20)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
                                 <Text style={{ fontSize: 12, color: '#A78BFA', fontWeight: '800' }}>{ssIdx + 1}</Text>
                               </View>
@@ -1528,7 +1551,23 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     {(workspace.subSpaces ?? []).map((ss, idx) => (
                       <React.Fragment key={`prev-${ss.id}`}>
                         {workspace.pipelineEnabled && idx > 0 && <Text style={{ fontSize: 14, color: '#8C5BF5', fontWeight: '800' }}>→</Text>}
-                        <Pressable style={[styles.pill, selectedSubSpaceId === ss.id && styles.pillActive]} onPress={() => setSelectedSubSpaceId(ss.id)}>
+                        <Pressable
+                          draggable
+                          onDragStart={(e: any) => { e.dataTransfer.effectAllowed = 'move'; setSsDragFromIndex(idx); }}
+                          onDragOver={(e: any) => { e.preventDefault(); setSsDragOverIndex(idx); }}
+                          onDragEnd={() => {
+                            if (ssDragFromIndex !== null && ssDragOverIndex !== null && ssDragFromIndex !== ssDragOverIndex) {
+                              moveSubSpaceToIndex(ssDragFromIndex, ssDragOverIndex);
+                            }
+                            setSsDragFromIndex(null); setSsDragOverIndex(null);
+                          }}
+                          style={[styles.pill, selectedSubSpaceId === ss.id && styles.pillActive, {
+                            opacity: ssDragFromIndex === idx ? 0.45 : 1,
+                            borderStyle: ssDragOverIndex === idx ? 'dashed' : 'solid',
+                            cursor: 'grab',
+                          } as any]}
+                          onPress={() => setSelectedSubSpaceId(ss.id)}
+                        >
                           <Text style={[styles.pillText, selectedSubSpaceId === ss.id && styles.pillTextActive]}>{workspace.pipelineEnabled ? `${idx + 1}. ` : ''}{ss.name}</Text>
                         </Pressable>
                       </React.Fragment>

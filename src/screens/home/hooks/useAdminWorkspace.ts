@@ -1347,6 +1347,17 @@ export function useAdminWorkspace() {
     setNotice('SubSpace order updated.');
   };
 
+  const moveSubSpaceToIndex = (fromIndex: number, toIndex: number) => {
+    if (!workspace) return;
+    if (fromIndex === toIndex) return;
+    const subs = [...workspace.subSpaces];
+    const [moved] = subs.splice(fromIndex, 1);
+    subs.splice(toIndex, 0, moved);
+    const reordered = subs.map((s, i) => ({ ...s, pipelineOrder: i }));
+    upsertWorkspace({ ...workspace, subSpaces: reordered });
+    setNotice('SubSpace order updated.');
+  };
+
   return {
     workspaces: data.workspaces,
     workspace,
@@ -1397,5 +1408,6 @@ export function useAdminWorkspace() {
     updateSelectedSubSpace,
     togglePipelineEnabled,
     reorderSubSpace,
+    moveSubSpaceToIndex,
   };
 }

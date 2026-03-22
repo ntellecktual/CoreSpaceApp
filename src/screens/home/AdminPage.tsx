@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Platform, ScrollView, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { InteractivePressable as Pressable } from '../../components/InteractivePressable';
 import { AiChatPanel } from '../../components/AiChatPanel';
 import { AuditLogViewer } from '../../components/NotificationAudit';
@@ -199,6 +199,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     reorderBuilderFieldInWorkspace,
     removeBuilderFieldFromSubSpace,
     moveBuilderFieldInSubSpace,
+    renameBuilderFieldInSubSpace,
     toggleWorkspaceFieldRequired,
     toggleBuilderFieldRequired,
     updateSelectedSubSpace,
@@ -207,6 +208,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   } = useAdminWorkspace();
   const insights = useAdminEnterpriseInsights(workspace);
   const { activeTenantId, data, isSuperAdmin, tenants, copyActiveDataToAllTenants, getFormForSubSpace, upsertBusinessFunction, deleteBusinessFunction, upsertBusinessObject, deleteBusinessObject } = useAppState();
+  const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
+  const [editingFieldLabel, setEditingFieldLabel] = useState('');
   const [editingFunctionId, setEditingFunctionId] = useState<string | null>(null);
   const [editingObjectKey, setEditingObjectKey] = useState<string | null>(null);
   const [newFnName, setNewFnName] = useState('');
@@ -1288,30 +1291,83 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         {/* Existing fields in selected section */}
                         {(selectedSubSpace.builderFields ?? []).length > 0 && (
                           <View style={{ gap: 4 }}>
-                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Fields in "{selectedSubSpace.name}"</Text>
-                            {(selectedSubSpace.builderFields ?? []).map((field) => (
-                              <View key={field.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)' }}>
-                                <View style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: 'rgba(140,91,245,0.15)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
-                                  <Text style={{ fontSize: 13 }}>{fieldTypeIcons[field.type] ?? '?'}</Text>
+                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Fields in "{selectedSubSpace.name}" — tap name to rename, use arrows to reorder</Text>
+                            {(selectedSubSpace.builderFields ?? []).map((field, fieldIdx, allFields) => (
+                              <View key={field.id} style={{ backgroundColor: editingFieldId === field.id ? (mode === 'night' ? 'rgba(140,91,245,0.14)' : 'rgba(140,91,245,0.08)') : (mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'), borderRadius: 10, borderWidth: 1, borderColor: editingFieldId === field.id ? '#8C5BF5' : (mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'), overflow: 'hidden' as any }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 10, paddingVertical: 8 }}>
+                                  {/* Move up/down */}
+                                  <View style={{ gap: 2 }}>
+                                    <Pressable
+                                      disabled={!canManageSubSpace || fieldIdx === 0}
+                                      style={{ width: 22, height: 20, borderRadius: 5, alignItems: 'center' as any, justifyContent: 'center' as any, backgroundColor: fieldIdx === 0 ? 'transparent' : 'rgba(140,91,245,0.14)', borderWidth: 1, borderColor: fieldIdx === 0 ? 'transparent' : 'rgba(140,91,245,0.26)' }}
+                                      onPress={() => moveBuilderFieldInSubSpace(field.id, 'up')}
+                                    >
+                                      <Text style={{ fontSize: 10, color: fieldIdx === 0 ? 'transparent' : '#A78BFA', lineHeight: 12 }}>▲</Text>
+                                    </Pressable>
+                                    <Pressable
+                                      disabled={!canManageSubSpace || fieldIdx === allFields.length - 1}
+                                      style={{ width: 22, height: 20, borderRadius: 5, alignItems: 'center' as any, justifyContent: 'center' as any, backgroundColor: fieldIdx === allFields.length - 1 ? 'transparent' : 'rgba(140,91,245,0.14)', borderWidth: 1, borderColor: fieldIdx === allFields.length - 1 ? 'transparent' : 'rgba(140,91,245,0.26)' }}
+                                      onPress={() => moveBuilderFieldInSubSpace(field.id, 'down')}
+                                    >
+                                      <Text style={{ fontSize: 10, color: fieldIdx === allFields.length - 1 ? 'transparent' : '#A78BFA', lineHeight: 12 }}>▼</Text>
+                                    </Pressable>
+                                  </View>
+                                  {/* Type icon */}
+                                  <View style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: 'rgba(140,91,245,0.15)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                                    <Text style={{ fontSize: 13 }}>{fieldTypeIcons[field.type] ?? '?'}</Text>
+                                  </View>
+                                  {/* Label — tap to edit inline */}
+                                  <Pressable
+                                    style={{ flex: 1 }}
+                                    onPress={() => { if (editingFieldId === field.id) { setEditingFieldId(null); } else { setEditingFieldId(field.id); setEditingFieldLabel(field.label); } }}
+                                  >
+                                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.42)', fontSize: 9, fontWeight: '600', textTransform: 'uppercase' as any }}>{field.type} · tap to rename</Text>
+                                    <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '700', fontSize: 13 }}>{field.label}</Text>
+                                  </Pressable>
+                                  {/* Required toggle */}
+                                  <Pressable
+                                    disabled={!canManageSubSpace}
+                                    style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 7, borderWidth: 1, borderColor: field.required ? 'rgba(167,139,250,0.45)' : (mode === 'night' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'), backgroundColor: field.required ? 'rgba(167,139,250,0.15)' : 'transparent' }}
+                                    onPress={() => toggleBuilderFieldRequired(field.id)}
+                                  >
+                                    <Text style={{ fontSize: 10, fontWeight: '700', color: field.required ? '#A78BFA' : (mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.38)') }}>{field.required ? '★ Req' : '☆ Opt'}</Text>
+                                  </Pressable>
+                                  {/* Delete */}
+                                  <Pressable
+                                    disabled={!canManageSubSpace}
+                                    style={{ width: 28, height: 28, borderRadius: 7, alignItems: 'center' as any, justifyContent: 'center' as any, backgroundColor: 'rgba(239,68,68,0.08)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.22)' }}
+                                    onPress={() => { removeBuilderFieldFromSubSpace(field.id); if (editingFieldId === field.id) setEditingFieldId(null); }}
+                                  >
+                                    <Text style={{ fontSize: 12, color: '#EF4444', fontWeight: '700' }}>✕</Text>
+                                  </Pressable>
                                 </View>
-                                <View style={{ flex: 1 }}>
-                                  <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '700', fontSize: 13 }}>{field.label}</Text>
-                                  <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', fontSize: 11 }}>{field.type}{field.required ? ' · Required' : ' · Optional'}</Text>
-                                </View>
-                                <Pressable
-                                  disabled={!canManageSubSpace}
-                                  style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 7, borderWidth: 1, borderColor: field.required ? 'rgba(167,139,250,0.45)' : 'rgba(255,255,255,0.12)', backgroundColor: field.required ? 'rgba(167,139,250,0.15)' : 'transparent' }}
-                                  onPress={() => toggleBuilderFieldRequired(field.id)}
-                                >
-                                  <Text style={{ fontSize: 10, fontWeight: '700', color: field.required ? '#A78BFA' : mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.38)' }}>{field.required ? '★ Required' : '☆ Optional'}</Text>
-                                </Pressable>
-                                <Pressable
-                                  disabled={!canManageSubSpace}
-                                  style={{ width: 28, height: 28, borderRadius: 7, alignItems: 'center' as any, justifyContent: 'center' as any, backgroundColor: 'rgba(239,68,68,0.08)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.22)' }}
-                                  onPress={() => removeBuilderFieldFromSubSpace(field.id)}
-                                >
-                                  <Text style={{ fontSize: 12, color: '#EF4444', fontWeight: '700' }}>✕</Text>
-                                </Pressable>
+                                {/* Inline rename panel — shown when this field is being edited */}
+                                {editingFieldId === field.id && (
+                                  <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 10, paddingBottom: 10, paddingTop: 2 }}>
+                                    <TextInput
+                                      value={editingFieldLabel}
+                                      onChangeText={setEditingFieldLabel}
+                                      placeholder="New field name"
+                                      placeholderTextColor={mode === 'night' ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)'}
+                                      autoFocus
+                                      style={{ flex: 1, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.30)' : 'rgba(255,255,255,0.85)', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(140,91,245,0.45)', paddingHorizontal: 10, paddingVertical: 7, color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontSize: 13, fontWeight: '600' }}
+                                      onSubmitEditing={() => { renameBuilderFieldInSubSpace(field.id, editingFieldLabel); setEditingFieldId(null); }}
+                                    />
+                                    <Pressable
+                                      disabled={!editingFieldLabel.trim()}
+                                      style={{ paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8, backgroundColor: editingFieldLabel.trim() ? '#8C5BF5' : 'rgba(140,91,245,0.20)', justifyContent: 'center' as any }}
+                                      onPress={() => { renameBuilderFieldInSubSpace(field.id, editingFieldLabel); setEditingFieldId(null); }}
+                                    >
+                                      <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 12 }}>Save</Text>
+                                    </Pressable>
+                                    <Pressable
+                                      style={{ paddingHorizontal: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.14)', justifyContent: 'center' as any }}
+                                      onPress={() => setEditingFieldId(null)}
+                                    >
+                                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.48)', fontSize: 12 }}>Cancel</Text>
+                                    </Pressable>
+                                  </View>
+                                )}
                               </View>
                             ))}
                           </View>

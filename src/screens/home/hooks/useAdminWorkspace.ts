@@ -786,6 +786,20 @@ export function useAdminWorkspace() {
     setNotice('Field requirement updated.');
   };
 
+  const renameBuilderFieldInSubSpace = (fieldId: string, newLabel: string) => {
+    if (!can('subspace.manage', workspace?.id)) {
+      setNotice(deniedMessage('subspace.manage'));
+      return;
+    }
+    if (!workspace || !selectedSubSpace || !newLabel.trim()) return;
+    updateSubSpace(workspace.id, {
+      ...selectedSubSpace,
+      builderFields: (selectedSubSpace.builderFields ?? []).map((item) =>
+        item.id === fieldId ? { ...item, label: newLabel.trim() } : item
+      ),
+    });
+  };
+
   const beginCreateWorkspace = () => {
     if (!can('workspace.manage')) {
       setNotice(deniedMessage('workspace.manage'));
@@ -1374,6 +1388,7 @@ export function useAdminWorkspace() {
     addBuilderFieldToWorkspace,
     removeBuilderFieldFromSubSpace,
     moveBuilderFieldInSubSpace,
+    renameBuilderFieldInSubSpace,
     removeBuilderFieldFromWorkspace,
     moveBuilderFieldInWorkspace,
     reorderBuilderFieldInWorkspace,

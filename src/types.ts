@@ -86,7 +86,7 @@ export interface BusinessFunction {
 export interface FormFieldDefinition {
   id: string;
   label: string;
-  type: 'text' | 'number' | 'date' | 'select';
+  type: 'text' | 'number' | 'date' | 'datetime' | 'select';
   required: boolean;
   options?: string[];
 }

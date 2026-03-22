@@ -244,10 +244,11 @@ export function useEndUserRuntime(selectedClientId: string) {
       subSpaceId: selectedSubSpace.id,
       fields: allBuilderFields.map((bf) => {
         // Map the richer SubSpaceBuilderFieldType to the narrower FormFieldDefinition type
-        type FType = 'text' | 'number' | 'date' | 'select';
+        type FType = 'text' | 'number' | 'date' | 'datetime' | 'select';
         let fType: FType = 'text';
         if (bf.type === 'number') fType = 'number';
-        else if (bf.type === 'date' || bf.type === 'datetime') fType = 'date';
+        else if (bf.type === 'date') fType = 'date';
+        else if (bf.type === 'datetime') fType = 'datetime';
         else if (bf.type === 'select') fType = 'select';
         else if (bf.type === 'checkbox') { fType = 'select'; }
         return {

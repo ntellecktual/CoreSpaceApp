@@ -159,6 +159,68 @@ function applyBarcodeToFields(
 
 function withAlpha(hex: string, a: string) { return `${hex}${a}`; }
 
+/* ── QR Code data encoder ─────────────────────────────── */
+function buildQrData(entry: PharmaBarcodeEntry): string {
+  return `DSCSA|NDC:${entry.ndc}|LOT:${entry.lot}|EXP:${entry.expiration}|SN:${entry.serial}|PROD:${entry.productName}|MFR:${entry.manufacturer}|FORM:${entry.dosageForm}`;
+}
+
+/* ── Composite Date / Date-Time field picker ─────────────── */
+function CompositeFieldInput({
+  fieldType, value, onChange, label, dimColor,
+}: {
+  fieldType: 'date' | 'datetime';
+  value: string;
+  onChange: (v: string) => void;
+  label: string;
+  required?: boolean;
+  dimColor: string;
+}) {
+  const isDatetime = fieldType === 'datetime';
+  const parseParts = (val: string) => {
+    if (isDatetime) {
+      const m = val.match(/^(\d{1,2})-(\d{1,2})-(\d{2,4})\s+(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+      return m
+        ? { mm: m[1], dd: m[2], yyyy: m[3], hh: m[4], min: m[5], ampm: m[6].toUpperCase() }
+        : { mm: '', dd: '', yyyy: '', hh: '', min: '', ampm: 'AM' };
+    }
+    const m = val.match(/^(\d{1,2})-(\d{1,2})-(\d{2,4})$/);
+    return m
+      ? { mm: m[1], dd: m[2], yyyy: m[3], hh: '', min: '', ampm: 'AM' }
+      : { mm: '', dd: '', yyyy: '', hh: '', min: '', ampm: 'AM' };
+  };
+  const { mm, dd, yyyy, hh, min, ampm } = parseParts(value);
+  const write = (nMm: string, nDd: string, nYyyy: string, nHh: string, nMin: string, nAmpm: string) =>
+    onChange(isDatetime ? `${nMm}-${nDd}-${nYyyy} ${nHh}:${nMin} ${nAmpm}` : `${nMm}-${nDd}-${nYyyy}`);
+  const inp: any = {
+    fontSize: 14, color: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)',
+    borderRadius: 8, paddingHorizontal: 6, paddingVertical: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)', textAlign: 'center',
+  };
+  return (
+    <View style={{ gap: 4 }}>
+      <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>{label}</Text>
+      <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center' as any, flexWrap: 'wrap' as any }}>
+        <TextInput style={{ ...inp, width: 42 }} value={mm} onChangeText={(v) => write(v, dd, yyyy, hh, min, ampm)} placeholder="MM" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={2} />
+        <Text style={{ color: dimColor, fontSize: 16 }}>/</Text>
+        <TextInput style={{ ...inp, width: 42 }} value={dd} onChangeText={(v) => write(mm, v, yyyy, hh, min, ampm)} placeholder="DD" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={2} />
+        <Text style={{ color: dimColor, fontSize: 16 }}>/</Text>
+        <TextInput style={{ ...inp, width: 60 }} value={yyyy} onChangeText={(v) => write(mm, dd, v, hh, min, ampm)} placeholder="YYYY" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={4} />
+        {isDatetime && (
+          <>
+            <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, paddingHorizontal: 2 }}>·</Text>
+            <TextInput style={{ ...inp, width: 42 }} value={hh} onChangeText={(v) => write(mm, dd, yyyy, v, min, ampm)} placeholder="HH" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={2} />
+            <Text style={{ color: dimColor, fontSize: 16 }}>:</Text>
+            <TextInput style={{ ...inp, width: 42 }} value={min} onChangeText={(v) => write(mm, dd, yyyy, hh, v, ampm)} placeholder="MM" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={2} />
+            <Pressable onPress={() => write(mm, dd, yyyy, hh, min, ampm === 'AM' ? 'PM' : 'AM')} style={{ paddingHorizontal: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.06)' }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#FFFFFF' }}>{ampm || 'AM'}</Text>
+            </Pressable>
+          </>
+        )}
+      </View>
+    </View>
+  );
+}
+
 function getContrastTextColor(hex: string) {
   const raw = hex.replace('#', '');
   const n = raw.length === 3 ? raw.split('').map((c) => c + c).join('') : raw;
@@ -447,6 +509,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const [barcodeInput, setBarcodeInput] = useLocalState('');
   const [barcodeApplied, setBarcodeApplied] = useLocalState(false);
   const [barcodeDatasetResult, setBarcodeDatasetResult] = useLocalState<PharmaBarcodeEntry | null>(null);
+  const [qrCodeData, setQrCodeData] = useLocalState<string>('');
 
   /* ── Hooks ── */
   const {
@@ -565,26 +628,28 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   /* ── NEW: Inject UX animations (once) ── */
   React.useEffect(() => { injectUxAnimations(); }, []);
 
-  /* ── Auto-fill received date/time when create modal opens ── */
+  /* ── Auto-fill date / datetime fields when create modal opens ── */
   React.useEffect(() => {
     if (!createModalOpen || !activeForm) return;
-    const now = new Date();
-    const mm  = String(now.getMonth() + 1).padStart(2, '0');
-    const dd  = String(now.getDate()).padStart(2, '0');
-    const yyyy = now.getFullYear();
-    const hh  = String(now.getHours()).padStart(2, '0');
-    const min = String(now.getMinutes()).padStart(2, '0');
-    const ss  = String(now.getSeconds()).padStart(2, '0');
+    const now  = new Date();
+    const mm   = String(now.getMonth() + 1).padStart(2, '0');
+    const dd   = String(now.getDate()).padStart(2, '0');
+    const yyyy = String(now.getFullYear());
+    const rawH = now.getHours();
+    const hh12 = String(rawH % 12 || 12).padStart(2, '0');
+    const min  = String(now.getMinutes()).padStart(2, '0');
+    const ampm = rawH >= 12 ? 'PM' : 'AM';
     const dateStr     = `${mm}-${dd}-${yyyy}`;
-    const dateTimeStr = `${mm}-${dd}-${yyyy} ${hh}:${min}:${ss}`;
+    const dateTimeStr = `${mm}-${dd}-${yyyy} ${hh12}:${min} ${ampm}`;
     activeForm.fields.forEach((field) => {
-      const lbl = field.label.toLowerCase();
-      if ((lbl.includes('received') || lbl.includes('receipt')) && !formValues[field.id]) {
-        const isDateTime = lbl.includes('time') || lbl.includes('date/time') || lbl.includes('datetime');
-        setField(field.id, isDateTime ? dateTimeStr : dateStr);
+      if (formValues[field.id]) return;
+      if (field.type === 'datetime') {
+        setField(field.id, dateTimeStr);
+      } else if (field.type === 'date') {
+        const lbl = field.label.toLowerCase();
+        if (lbl.includes('received') || lbl.includes('receipt')) setField(field.id, dateStr);
       }
     });
-  // Run only when the modal opens (createModalOpen flips to true) or the active subspace changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createModalOpen, activeForm]);
 
@@ -1641,21 +1706,21 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
       </Modal>
 
       {/* ═══════════════ CREATE RECORD MODAL ═══════════════ */}
-      <Modal transparent visible={createModalOpen} animationType="fade" onRequestClose={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setFdaSelectedDrug(null); }}>
-        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setFdaSelectedDrug(null); }}>
+      <Modal transparent visible={createModalOpen} animationType="fade" onRequestClose={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); }}>
+        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); }}>
           <Pressable onPress={() => {}} style={{ width: 520, maxWidth: '94%' as any, maxHeight: '88%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any }}>
             {/* ── Modal Header ── */}
             <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12 }}>
                 <Text style={{ fontSize: 16, fontWeight: '800', color: '#FFFFFF' }}>Create Record</Text>
-                <Pressable onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setFdaSelectedDrug(null); }} style={{ padding: 6 }}>
+                <Pressable onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); }} style={{ padding: 6 }}>
                   <Text style={{ fontSize: 14, color: dimColor }}>✕</Text>
                 </Pressable>
               </View>
               {/* ── Tab Bar ── */}
               <View style={{ flexDirection: 'row', gap: 4, marginBottom: -1 }}>
                 {(['form', 'import', 'scan'] as const).map((tab) => {
-                  const labels: Record<typeof tab, string> = { form: '📋 Form', import: '📥 Import CSV/JSON', scan: '🔲 Scan Barcode' };
+                  const labels: Record<typeof tab, string> = { form: '📋 Form', import: '📥 Import CSV/JSON', scan: '🔲 QR Code' };
                   const active = createTab === tab;
                   return (
                     <Pressable key={tab} onPress={() => setCreateTab(tab)} style={{ paddingHorizontal: 12, paddingVertical: 8, borderTopLeftRadius: 8, borderTopRightRadius: 8, backgroundColor: active ? 'rgba(255,255,255,0.07)' : 'transparent', borderBottomWidth: active ? 2 : 0, borderBottomColor: accentColor }}>
@@ -1729,16 +1794,28 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                   </View>
                 )}
                 {activeForm?.fields.map((field) => (
-                  <LabeledInput
-                    key={`cf-${field.id}`}
-                    label={`${field.label}${field.required ? ' *' : ''}`}
-                    value={formValues[field.id] ?? ''}
-                    onChangeText={(v) => setField(field.id, v)}
-                    placeholder={field.options ? `Options: ${field.options.join(', ')}` : field.type === 'date' ? 'MM-DD-YYYY' : `Enter ${field.label.toLowerCase()}`}
-                  />
+                  field.type === 'date' || field.type === 'datetime' ? (
+                    <CompositeFieldInput
+                      key={`cf-${field.id}`}
+                      fieldType={field.type}
+                      label={`${field.label}${field.required ? ' *' : ''}`}
+                      value={formValues[field.id] ?? ''}
+                      onChange={(v) => setField(field.id, v)}
+                      required={field.required}
+                      dimColor={dimColor}
+                    />
+                  ) : (
+                    <LabeledInput
+                      key={`cf-${field.id}`}
+                      label={`${field.label}${field.required ? ' *' : ''}`}
+                      value={formValues[field.id] ?? ''}
+                      onChangeText={(v) => setField(field.id, v)}
+                      placeholder={field.options ? `Options: ${field.options.join(', ')}` : `Enter ${field.label.toLowerCase()}`}
+                    />
+                  )
                 ))}
                 {activeForm && (
-                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setFdaSelectedDrug(null); setBarcodeDatasetResult(null); }}
+                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setFdaSelectedDrug(null); setBarcodeDatasetResult(null); setQrCodeData(''); }}
                     style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any }}>
                     <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient) ? accentTextColor : dimColor }}>Create Entry</Text>
                   </Pressable>
@@ -1871,71 +1948,99 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
               </ScrollView>
             )}
 
-            {/* ══ SCAN BARCODE TAB ══ */}
+            {/* ══ QR CODE TAB ══ */}
             {createTab === 'scan' && (
               <ScrollView style={{ padding: 20 }} contentContainerStyle={{ gap: 14, paddingBottom: 20 }}>
                 {!selectedClient && <Text style={styles.notice}>Select a {shellConfig.subjectSingular.toLowerCase()} first.</Text>}
-                <Text style={{ fontSize: 12, color: dimColor, lineHeight: 18 }}>
-                  Scan or type a GS1-128 barcode (DSCSA, shipping, retail). The system cross-references
-                  the DSCSA pharmaceutical database to auto-fill NDC, Lot, Expiration, Serial, and
-                  product details. Any other code maps to the first matching field.
-                </Text>
-                {/* ── Sample barcodes (pharma workspaces) ── */}
+                {/* ── DSCSA product cards ── */}
                 {isPharmWorkspace && (
-                  <View style={{ gap: 6 }}>
-                    <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase' as any, color: accentColor }}>DSCSA Sample Barcodes</Text>
+                  <View style={{ gap: 8 }}>
+                    <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase' as any, color: accentColor }}>DSCSA Pharmaceutical Products</Text>
+                    <Text style={{ fontSize: 11, color: dimColor, lineHeight: 16 }}>Select a product to generate its QR code and auto-fill form fields, simulating a physical label scan.</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                       <View style={{ flexDirection: 'row', gap: 6, paddingVertical: 2 }}>
-                        {PHARMA_BARCODE_DATASET.map((entry) => (
-                          <Pressable key={entry.serial} onPress={() => { setBarcodeInput(entry.barcode); setBarcodeApplied(false); setBarcodeDatasetResult(null); }}
-                            style={{ paddingHorizontal: 10, paddingVertical: 7, borderRadius: 8, backgroundColor: accentSoft, borderWidth: 1, borderColor: accentColor, maxWidth: 140 }}>
-                            <Text style={{ fontSize: 10, fontWeight: '700', color: accentColor }} numberOfLines={1}>{entry.productName}</Text>
-                            <Text style={{ fontSize: 9, color: dimColor }}>NDC: {entry.ndc}</Text>
-                          </Pressable>
-                        ))}
+                        {PHARMA_BARCODE_DATASET.map((entry) => {
+                          const isSelected = barcodeDatasetResult?.serial === entry.serial;
+                          return (
+                            <Pressable key={entry.serial}
+                              onPress={() => {
+                                if (!activeForm) return;
+                                const qd = buildQrData(entry);
+                                setQrCodeData(qd);
+                                setBarcodeDatasetResult(entry);
+                                applyDatasetEntryToFields(entry, activeForm.fields as any, setField);
+                                setBarcodeApplied(true);
+                                setBarcodeInput(qd);
+                                showToast(`QR loaded: ${entry.productName}`, 'success');
+                              }}
+                              style={{ paddingHorizontal: 10, paddingVertical: 8, borderRadius: 10, backgroundColor: isSelected ? accentSoft : 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: isSelected ? accentColor : 'rgba(255,255,255,0.12)', maxWidth: 140, gap: 2 }}>
+                              <Text style={{ fontSize: 10, fontWeight: '700', color: isSelected ? accentColor : '#FFFFFF' }} numberOfLines={2}>{entry.productName}</Text>
+                              <Text style={{ fontSize: 9, color: dimColor }}>NDC: {entry.ndc}</Text>
+                            </Pressable>
+                          );
+                        })}
                       </View>
                     </ScrollView>
                   </View>
                 )}
-                {/* Scan input */}
+                {/* ── QR Code visualization ── */}
+                {qrCodeData ? (
+                  <View style={{ alignItems: 'center' as any, gap: 8, padding: 16, borderRadius: 14, backgroundColor: '#FFFFFF', alignSelf: 'center' as any }}>
+                    <Image
+                      source={{ uri: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrCodeData)}` }}
+                      style={{ width: 200, height: 200 }}
+                      resizeMode="contain"
+                    />
+                    {barcodeDatasetResult && (
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: '#111111', textAlign: 'center' as any }}>{barcodeDatasetResult.productName}</Text>
+                    )}
+                  </View>
+                ) : (
+                  <View style={{ alignItems: 'center' as any, padding: 30, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(255,255,255,0.03)' }}>
+                    <Text style={{ fontSize: 28 }}>🔲</Text>
+                    <Text style={{ fontSize: 12, color: dimColor, marginTop: 6, textAlign: 'center' as any }}>Select a product above or enter a QR code string to generate</Text>
+                  </View>
+                )}
+                {/* ── Manual QR entry ── */}
                 <View style={{ gap: 4 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>Barcode / QR Code</Text>
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>Manual QR Code Entry</Text>
                   <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
                     <TextInput
-                      style={{ flex: 1, fontSize: 14, fontFamily: 'monospace', color: '#FFFFFF', borderWidth: 1, borderColor: barcodeApplied ? '#86EFAC' : 'rgba(255,255,255,0.18)', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: 'rgba(255,255,255,0.04)' }}
+                      style={{ flex: 1, fontSize: 13, color: '#FFFFFF', borderWidth: 1, borderColor: barcodeApplied ? '#86EFAC' : 'rgba(255,255,255,0.18)', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: 'rgba(255,255,255,0.04)' }}
                       value={barcodeInput}
-                      onChangeText={(v) => { setBarcodeInput(v); setBarcodeApplied(false); setBarcodeDatasetResult(null); }}
+                      onChangeText={(v) => { setBarcodeInput(v); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(v); }}
                       onSubmitEditing={() => {
                         if (barcodeInput.trim() && activeForm) {
-                          const match = lookupBarcodeDataset(barcodeInput.trim());
+                          const qd = barcodeInput.trim();
+                          setQrCodeData(qd);
+                          const match = lookupBarcodeDataset(qd);
                           if (match) { applyDatasetEntryToFields(match, activeForm.fields as any, setField); setBarcodeDatasetResult(match); showToast('Product loaded from DSCSA database', 'success'); }
-                          else { applyBarcodeToFields(barcodeInput.trim(), activeForm.fields as any, setField); setBarcodeDatasetResult(null); showToast('Barcode mapped to form fields', 'success'); }
+                          else { applyBarcodeToFields(qd, activeForm.fields as any, setField); setBarcodeDatasetResult(null); showToast('QR code mapped to form fields', 'success'); }
                           setBarcodeApplied(true);
                         }
                       }}
-                      placeholder="Scan or paste barcode here — press Enter to map"
+                      placeholder="Paste QR code data or DSCSA identifier..."
                       placeholderTextColor={dimColor}
-                      autoFocus
                       returnKeyType="done"
                     />
                     <Pressable
                       onPress={() => {
                         if (barcodeInput.trim() && activeForm) {
-                          const match = lookupBarcodeDataset(barcodeInput.trim());
+                          const qd = barcodeInput.trim();
+                          setQrCodeData(qd);
+                          const match = lookupBarcodeDataset(qd);
                           if (match) { applyDatasetEntryToFields(match, activeForm.fields as any, setField); setBarcodeDatasetResult(match); showToast('Product loaded from DSCSA database', 'success'); }
-                          else { applyBarcodeToFields(barcodeInput.trim(), activeForm.fields as any, setField); setBarcodeDatasetResult(null); showToast('Barcode mapped to form fields', 'success'); }
+                          else { applyBarcodeToFields(qd, activeForm.fields as any, setField); setBarcodeDatasetResult(null); showToast('QR code mapped to form fields', 'success'); }
                           setBarcodeApplied(true);
                         }
                       }}
                       style={{ paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: accentColor }}>
-                      <Text style={{ fontSize: 13, fontWeight: '700', color: accentTextColor }}>Map</Text>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: accentTextColor }}>Scan</Text>
                     </Pressable>
                   </View>
-                  {barcodeApplied && (
-                    <Text style={{ fontSize: 11, color: '#86EFAC' }}>✓ Fields populated — review below then submit</Text>
-                  )}
+                  {barcodeApplied && <Text style={{ fontSize: 11, color: '#86EFAC' }}>✓ Fields populated — review below then submit</Text>}
                 </View>
-                {/* Database lookup result banner */}
+                {/* ── Result banner ── */}
                 {barcodeApplied && barcodeDatasetResult && (
                   <View style={{ borderRadius: 10, borderWidth: 1, borderColor: 'rgba(96,165,250,0.35)', backgroundColor: 'rgba(96,165,250,0.08)', padding: 12, gap: 4 }}>
                     <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase' as any, color: '#60A5FA' }}>✓ Product Found in DSCSA Database</Text>
@@ -1944,7 +2049,6 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     <Text style={{ fontSize: 10, color: dimColor }}>Lot: {barcodeDatasetResult.lot} · Exp: {barcodeDatasetResult.expiration} · Form: {barcodeDatasetResult.dosageForm}</Text>
                   </View>
                 )}
-                {/* Parsed field preview (GS1 / fallback) */}
                 {barcodeApplied && !barcodeDatasetResult && activeForm && (
                   <View style={{ gap: 8, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(134,239,172,0.2)', backgroundColor: 'rgba(134,239,172,0.04)', padding: 12 }}>
                     <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.5, color: '#86EFAC', textTransform: 'uppercase' as any }}>Mapped Fields</Text>
@@ -1956,15 +2060,27 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     ) : null)}
                   </View>
                 )}
-                {/* Editable form fields after scan */}
+                {/* ── Editable form fields ── */}
                 {activeForm?.fields.map((field) => (
-                  <LabeledInput
-                    key={`sc-${field.id}`}
-                    label={`${field.label}${field.required ? ' *' : ''}`}
-                    value={formValues[field.id] ?? ''}
-                    onChangeText={(v) => setField(field.id, v)}
-                    placeholder={field.type === 'date' ? 'MM-DD-YYYY' : `Enter ${field.label.toLowerCase()}`}
-                  />
+                  field.type === 'date' || field.type === 'datetime' ? (
+                    <CompositeFieldInput
+                      key={`sc-${field.id}`}
+                      fieldType={field.type}
+                      label={`${field.label}${field.required ? ' *' : ''}`}
+                      value={formValues[field.id] ?? ''}
+                      onChange={(v) => setField(field.id, v)}
+                      required={field.required}
+                      dimColor={dimColor}
+                    />
+                  ) : (
+                    <LabeledInput
+                      key={`sc-${field.id}`}
+                      label={`${field.label}${field.required ? ' *' : ''}`}
+                      value={formValues[field.id] ?? ''}
+                      onChangeText={(v) => setField(field.id, v)}
+                      placeholder={`Enter ${field.label.toLowerCase()}`}
+                    />
+                  )
                 ))}
                 {allowedLifecycleStageNames.length > 0 && (
                   <View style={{ gap: 6 }}>
@@ -1983,9 +2099,9 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                   </View>
                 )}
                 {activeForm && (
-                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setCreateTab('form'); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); }}
+                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setCreateTab('form'); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); }}
                     style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any }}>
-                    <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient) ? accentTextColor : dimColor }}>Create Entry from Scan</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient) ? accentTextColor : dimColor }}>Create Entry from QR</Text>
                   </Pressable>
                 )}
                 {!!message && <Text style={styles.notice}>{message}</Text>}

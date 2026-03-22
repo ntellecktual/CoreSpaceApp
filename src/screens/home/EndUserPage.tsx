@@ -608,6 +608,9 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const subSpaceLabelPlural = subSpaceLabel.trim().replace(/s$/i, '') + 's'; // e.g. 'Case SubSpace' → 'Case SubSpaces'
   const collectionLabel = shellConfig.collectionLabel ?? 'Collection';
   const collectionLabelPlural = shellConfig.collectionLabelPlural ?? 'Collections';
+  // Use subjectPlural (e.g. "Clients", "Patients") as the rail section noun — it's the most specific human term
+  const clientSectionLabel = shellConfig.subjectPlural ?? collectionLabelPlural;
+  const clientSectionLabelSingle = shellConfig.subjectSingular ?? collectionLabel;
   const functionLabel = shellConfig.functionLabel ?? 'Department';
   const functionLabelPlural = shellConfig.functionLabelPlural ?? 'Departments';
   const objectLabel = shellConfig.objectLabel ?? 'Registry';
@@ -618,6 +621,11 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const txtColor = getContrastTextColor(baseSurface);
   const dimColor = withAlpha(txtColor, 'AA');
   const accentSoft = withAlpha(accentColor, '33');
+  const acRgba = (a: number) => {
+    const hex = accentColor.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16); const g2 = parseInt(hex.slice(2, 4), 16); const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r},${g2},${b},${a})`;
+  };
   const subtleBg = mode === 'day' ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)';
   const subtleBorder = mode === 'day' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)';
   const isCompact = windowWidth < 900;
@@ -928,9 +936,9 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           )}
 
           {/* Item selector (compact) */}
-          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>{collectionLabelPlural.toUpperCase()}</Text>
+          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>{clientSectionLabel.toUpperCase()}</Text>
           <ScrollView nativeID="eu-batch-list" style={{ maxHeight: isCompact ? 80 : 140 }} showsVerticalScrollIndicator={false}>
-            {clients.length === 0 && <Text style={{ fontSize: 11, color: dimColor }}>No {collectionLabelPlural.toLowerCase()} yet</Text>}
+            {clients.length === 0 && <Text style={{ fontSize: 11, color: dimColor }}>No {clientSectionLabel.toLowerCase()} yet</Text>}
             {clients.map((c) => {
               const sel = selectedClientId === c.id;
               const initials = getItemTitle(c).split(' ').slice(0, 2).map((s: string) => s[0] ?? '').join('').toUpperCase().slice(0, 2);
@@ -947,7 +955,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           </ScrollView>
 
           <Pressable nativeID="eu-new-batch" onPress={() => setIntakeModalOpen(true)} style={{ paddingVertical: 7, paddingHorizontal: 10, borderRadius: 10, backgroundColor: accentColor, alignItems: 'center' as any }}>
-            <Text style={{ fontSize: 11, fontWeight: '700', color: accentTextColor }}>+ New {collectionLabel}</Text>
+            <Text style={{ fontSize: 11, fontWeight: '700', color: accentTextColor }}>+ New {clientSectionLabelSingle}</Text>
           </Pressable>
 
           <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.06)', marginVertical: 4 }} />
@@ -1009,13 +1017,29 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
 
           {/* Quick actions at bottom */}
           <View style={{ gap: 4, paddingTop: 4 }}>
+            {/* Inline recent activity strip — 1-2 most recent items for quick context */}
+            {mergedTimeline.length > 0 && (
+              <View style={{ paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, backgroundColor: mode === 'night' ? 'rgba(196,181,253,0.05)' : 'rgba(100,80,180,0.05)', borderLeftWidth: 2, borderLeftColor: `${accentColor}55` }}>
+                <Text style={{ fontSize: 9, fontWeight: '700', letterSpacing: 0.8, color: accentColor, marginBottom: 3 }}>RECENT ACTIVITY</Text>
+                {mergedTimeline.slice(0, 2).map((item) => (
+                  <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 2 }}>
+                    <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: accentColor }} />
+                    <Text style={{ fontSize: 9, color: dimColor, flex: 1 }} numberOfLines={1}>{item.title}</Text>
+                    {!!item.date && <Text style={{ fontSize: 8, color: `${dimColor}88` }}>{formatDate(item.date)}</Text>}
+                  </View>
+                ))}
+                <Pressable onPress={() => setTimelineModalOpen(true)} style={{ marginTop: 3 }}>
+                  <Text style={{ fontSize: 9, fontWeight: '700', color: accentColor }}>View all →</Text>
+                </Pressable>
+              </View>
+            )}
             {wsFlows.length > 0 && (
               <Pressable nativeID="eu-flow-button" onPress={() => setFlowsModalOpen(true)} style={{ paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(134,239,172,0.3)', backgroundColor: 'rgba(134,239,172,0.08)' }}>
                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#86EFAC' }}>⚡ {wsFlows.length} Signal Flow{wsFlows.length > 1 ? 's' : ''}</Text>
               </Pressable>
             )}
             <Pressable nativeID="eu-timeline-button" onPress={() => setTimelineModalOpen(true)} style={{ paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(196,181,253,0.3)', backgroundColor: 'rgba(196,181,253,0.06)' }}>
-              <Text style={{ fontSize: 10, fontWeight: '700', color: '#C4B5FD' }}>◷ Activity Timeline</Text>
+              <Text style={{ fontSize: 10, fontWeight: '700', color: '#C4B5FD' }}>◷ Full Activity Timeline</Text>
             </Pressable>
           </View>
           </>)}
@@ -1044,10 +1068,10 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             {...(Platform.OS === 'web' ? { dataSet: { animateStagger: '' } } : {})}
           >
             {[
-              { label: 'Records', value: totalRecords, color: txtColor },
-              { label: 'Stages', value: Object.keys(stageDistribution).length, color: mode === 'day' ? '#16A34A' : '#86EFAC' },
-              { label: 'SubSpaces', value: visibleSubSpaces.length, color: mode === 'day' ? '#7C3AED' : '#C4B5FD' },
-              { label: 'Exceptions', value: exceptionCount, color: exceptionCount > 0 ? '#EF4444' : (mode === 'day' ? '#16A34A' : '#86EFAC') },
+              { label: objectLabelPlural, value: totalRecords, color: txtColor },
+              { label: lifecycleStages.length > 0 ? 'Life Stages' : 'Stages', value: lifecycleStages.length > 0 ? lifecycleStages.length : Object.keys(stageDistribution).length, color: mode === 'day' ? '#16A34A' : '#86EFAC' },
+              { label: subSpaceLabelPlural, value: visibleSubSpaces.length, color: mode === 'day' ? '#7C3AED' : '#C4B5FD' },
+              { label: exceptionCount > 0 ? 'Alerts' : 'On Track', value: exceptionCount > 0 ? exceptionCount : allRecordsForWorkspace.filter((r) => r.status !== 'Exception Review').length, color: exceptionCount > 0 ? '#EF4444' : (mode === 'day' ? '#16A34A' : '#86EFAC') },
             ].map((kpi) => (
               <View key={kpi.label} style={{ flex: 1, minWidth: 80, alignItems: 'center' as any, padding: 8, borderRadius: 10, backgroundColor: mode === 'day' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)' }}
                 {...(Platform.OS === 'web' ? { dataSet: { kpiAnimate: '' } } : {})}
@@ -1076,6 +1100,37 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             )}
           </View>
 
+          {/* ── Workspace Banner (overview header) ── */}
+          {!selectedSubSpaceId && workspace && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12, paddingTop: 10, paddingBottom: 4 }}>
+              {workspace.icon ? (
+                <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: `${accentColor}22`, alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                  <Text style={{ fontSize: 22 }}>{workspace.icon}</Text>
+                </View>
+              ) : (
+                <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: `${accentColor}22`, alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                  <Text style={{ fontSize: 18, fontWeight: '800', color: accentColor }}>{(workspaceStepTitles[workspace.id] ?? workspace.name).slice(0, 2)}</Text>
+                </View>
+              )}
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 16, fontWeight: '800', color: txtColor }}>{workspaceStepTitles[workspace.id] ?? workspace.name}</Text>
+                {workspace.description ? (
+                  <Text style={{ fontSize: 11, color: dimColor, marginTop: 1 }} numberOfLines={2}>{workspace.description}</Text>
+                ) : workspace.rootEntity ? (
+                  <Text style={{ fontSize: 11, color: dimColor, marginTop: 1 }}>{workspace.rootEntity} workspace · {visibleSubSpaces.length} {subSpaceLabelPlural.toLowerCase()}</Text>
+                ) : null}
+              </View>
+              {selectedClient && (
+                <View style={{ alignItems: 'flex-end' as any }}>
+                  <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: accentColor, alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: accentTextColor }}>{getItemTitle(selectedClient).split(' ').slice(0, 2).map((s: string) => s[0] ?? '').join('').toUpperCase().slice(0, 2)}</Text>
+                  </View>
+                  <Text style={{ fontSize: 9, color: dimColor, marginTop: 2 }} numberOfLines={1}>{getItemTitle(selectedClient)}</Text>
+                </View>
+              )}
+            </View>
+          )}
+
           {/* ── Recently Viewed (overview only) ── */}
           {!selectedSubSpaceId && recentlyViewed.length > 0 && (
             <View style={{ paddingHorizontal: 12, paddingTop: 8 }}>
@@ -1097,7 +1152,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           {/* ── Pipeline Flow Strip (when pipeline enabled) ── */}
           {!selectedSubSpaceId && workspace?.pipelineEnabled && visibleSubSpaces.length > 1 && (
             <View style={{ paddingHorizontal: 12, paddingTop: 10, paddingBottom: 2 }}>
-              <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#8C5BF5', marginBottom: 6 }}>PIPELINE FLOW</Text>
+              <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor, marginBottom: 6 }}>PIPELINE FLOW</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', gap: 0, paddingBottom: 4 }}>
                 {visibleSubSpaces.map((ss, idx) => {
                   const cnt = recordCountBySubSpace[ss.id] ?? 0;
@@ -1106,19 +1161,19 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     <React.Fragment key={`pf-${ss.id}`}>
                       <Pressable
                         onPress={() => setSelectedSubSpaceId(ss.id)}
-                        style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 10, backgroundColor: 'rgba(140,91,245,0.12)', borderWidth: 1, borderColor: 'rgba(140,91,245,0.28)', gap: 6 }}
+                        style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 10, backgroundColor: acRgba(0.12), borderWidth: 1, borderColor: acRgba(0.28), gap: 6 }}
                         {...(Platform.OS === 'web' ? { dataSet: { scaleIn: '' } } : {})}
                       >
-                        <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: 'rgba(140,91,245,0.30)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                        <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: acRgba(0.30), alignItems: 'center' as any, justifyContent: 'center' as any }}>
                           <Text style={{ fontSize: 9, fontWeight: '800', color: '#E0D4FF' }}>{idx + 1}</Text>
                         </View>
-                        <Text style={{ fontSize: 11, fontWeight: '700', color: '#E0D4FF' }} numberOfLines={1}>{ss.name}</Text>
-                        <View style={{ paddingHorizontal: 5, paddingVertical: 1, borderRadius: 8, backgroundColor: 'rgba(140,91,245,0.22)' }}>
-                          <Text style={{ fontSize: 9, fontWeight: '700', color: '#C4B5FD' }}>{cnt}</Text>
+                        <Text style={{ fontSize: 11, fontWeight: '700', color: mode === 'night' ? '#E0D4FF' : txtColor }} numberOfLines={1}>{ss.name}</Text>
+                        <View style={{ paddingHorizontal: 5, paddingVertical: 1, borderRadius: 8, backgroundColor: acRgba(0.22) }}>
+                          <Text style={{ fontSize: 9, fontWeight: '700', color: mode === 'night' ? '#C4B5FD' : accentColor }}>{cnt}</Text>
                         </View>
                       </Pressable>
                       {!isLast && (
-                        <Text style={{ fontSize: 18, color: '#8C5BF5', fontWeight: '800', marginHorizontal: 4 }}>→</Text>
+                        <Text style={{ fontSize: 18, color: accentColor, fontWeight: '800', marginHorizontal: 4 }}>→</Text>
                       )}
                     </React.Fragment>
                   );
@@ -1136,17 +1191,65 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                 const cnt = recordCountBySubSpace[ss.id] ?? 0;
                 const ssRecs = allRecordsForWorkspace.filter((r) => r.subSpaceId === ss.id);
                 const latestStatus = ssRecs[ssRecs.length - 1]?.status ?? '—';
+                // Stage distribution for this subspace
+                const ssStages = ssRecs.reduce((acc, r) => { acc[r.status] = (acc[r.status] ?? 0) + 1; return acc; }, {} as Record<string, number>);
+                const ssStageEntries = Object.entries(ssStages).slice(0, 3);
+                // Icon: use ss.icon, or derive a sensible emoji from name
+                const ssIcon = (ss as any).icon ?? (() => {
+                  const n = ss.name.toLowerCase();
+                  if (/case|matter|claim/.test(n)) return '⚖️';
+                  if (/doc|file|form/.test(n)) return '📄';
+                  if (/dead|court|date|hear/.test(n)) return '📅';
+                  if (/bill|invoice|fee|pay/.test(n)) return '💰';
+                  if (/contact|client|person/.test(n)) return '👤';
+                  if (/task|todo|action/.test(n)) return '✅';
+                  if (/note|memo|log/.test(n)) return '📝';
+                  if (/drug|med|ndc|rx|pharma/.test(n)) return '💊';
+                  if (/ship|dispatch|deliver/.test(n)) return '🚚';
+                  if (/device|hardware|asset/.test(n)) return '🖥️';
+                  if (/qa|quality|inspect/.test(n)) return '🔍';
+                  return '📂';
+                })();
                 return (
                   <Pressable key={ss.id} onPress={() => setSelectedSubSpaceId(ss.id)}
-                    style={{ width: isCompact ? '100%' as any : '48%' as any, ...g(0.04), padding: 14, gap: 6 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: txtColor }}>{ss.name}</Text>
-                      <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12, backgroundColor: accentSoft }}>
-                        <Text style={{ fontSize: 11, fontWeight: '700', color: accentColor }}>{cnt}</Text>
+                    style={{ width: isCompact ? '100%' as any : '48%' as any, ...g(0.04), padding: 16, gap: 8 }}
+                    {...(Platform.OS === 'web' ? { dataSet: { scaleIn: '' } } : {})}>
+                    {/* Card header: icon + name + count badge */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                      <View style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: `${accentColor}22`, alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                        <Text style={{ fontSize: 22 }}>{ssIcon}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 14, fontWeight: '700', color: txtColor }}>{ss.name}</Text>
+                        {(ss as any).description ? (
+                          <Text style={{ fontSize: 10, color: dimColor, marginTop: 1 }} numberOfLines={1}>{(ss as any).description}</Text>
+                        ) : null}
+                      </View>
+                      <View style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 14, backgroundColor: cnt > 0 ? accentSoft : subtleBg, borderWidth: 1, borderColor: cnt > 0 ? accentColor : subtleBorder }}>
+                        <Text style={{ fontSize: 14, fontWeight: '800', color: cnt > 0 ? accentColor : dimColor }}>{cnt}</Text>
                       </View>
                     </View>
-                    {latestStatus !== '—' && chip(latestStatus)}
-                    <Text style={{ fontSize: 10, color: dimColor }}>{cnt === 0 ? 'No records yet' : `${cnt} record${cnt > 1 ? 's' : ''} • Latest: ${latestStatus}`}</Text>
+                    {/* Stage breakdown mini-bar */}
+                    {ssStageEntries.length > 0 ? (
+                      <View style={{ gap: 3 }}>
+                        {ssStageEntries.map(([stage, c]) => (
+                          <View key={`ssb-${stage}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                            <View style={{ flex: 1, height: 4, borderRadius: 2, backgroundColor: subtleBg }}>
+                              <View style={{ width: `${Math.round((c / cnt) * 100)}%` as any, height: 4, borderRadius: 2, backgroundColor: accentColor, opacity: 0.8 }} />
+                            </View>
+                            <Text style={{ fontSize: 9, color: dimColor, minWidth: 60 }} numberOfLines={1}>{stage}</Text>
+                            <Text style={{ fontSize: 9, fontWeight: '700', color: accentColor }}>{c}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    ) : (
+                      <Text style={{ fontSize: 10, color: dimColor }}>{cnt === 0 ? `No ${objectLabelPlural.toLowerCase()} yet` : `${cnt} ${cnt === 1 ? objectLabel : objectLabelPlural.toLowerCase()} · Latest: ${latestStatus}`}</Text>
+                    )}
+                    {/* CTA */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' as any }}>
+                      {latestStatus !== '—' && chip(latestStatus)}
+                      <Text style={{ fontSize: 10, fontWeight: '700', color: accentColor, marginLeft: 'auto' as any }}>Open →</Text>
+                    </View>
                   </Pressable>
                 );
               })}

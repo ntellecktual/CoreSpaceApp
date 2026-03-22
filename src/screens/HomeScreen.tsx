@@ -1769,7 +1769,7 @@ export function HomeScreen() {
             ) : (
               <>
                 {page === 'architecture' && <ArchitecturePage guidedMode={guidedMode} onGuide={openGuide} />}
-                {page === 'admin' && <AdminPage guidedMode={guidedMode} onGuide={openGuide} registerActions={registerModuleActions} auditLog={auditLog} addNotification={addNotification} />}
+                {page === 'admin' && <AdminPage guidedMode={guidedMode} onGuide={openGuide} registerActions={registerModuleActions} auditLog={auditLog} addNotification={addNotification} accentPalette={{ primary: tenantPrimaryResolved, secondary: tenantSecondaryResolved, accent: tenantAccentResolved }} />}
                 {page === 'enduser' && (
                   <EndUserPage
                     guidedMode={guidedMode}

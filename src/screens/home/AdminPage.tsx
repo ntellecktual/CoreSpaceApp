@@ -130,7 +130,7 @@ const adminWalkthroughSteps: AdminWalkthroughStep[] = [
   },
 ];
 
-export function AdminPage({ guidedMode, registerActions, auditLog, addNotification }: GuidedPageProps) {
+export function AdminPage({ guidedMode, registerActions, auditLog, addNotification, accentPalette }: GuidedPageProps) {
   const { styles, mode } = useUiTheme();
   const { width: windowWidth } = useWindowDimensions();
   const [adminTab, setAdminTab] = useState<'workspace' | 'shell' | 'role' | 'governance' | 'forms' | 'architecture'>('workspace');
@@ -211,13 +211,34 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   } = useAdminWorkspace();
   const insights = useAdminEnterpriseInsights(workspace);
   const { activeTenantId, data, isSuperAdmin, currentUser, tenants, copyActiveDataToAllTenants, getFormForSubSpace, upsertBusinessFunction, deleteBusinessFunction, upsertBusinessObject, deleteBusinessObject } = useAppState();
+
+  // ── Tenant accent helpers ───────────────────────────────────────────
+  const ac = accentPalette?.accent ?? '#8C5BF5';
+  const acSoft = `${ac}2E`;
+  const acMid = `${ac}40`;
+  const acText = (() => {
+    const hex = ac.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 160 ? '#000000' : '#FFFFFF';
+  })();
+  // rgba helpers for partial opacity
+  const acRgba = (a: number) => {
+    const hex = ac.replace('#', '');
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r},${g},${b},${a})`;
+  };
+  // ───────────────────────────────────────────────────────────────────
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
   const [editingFieldLabel, setEditingFieldLabel] = useState('');
   const [editingFunctionId, setEditingFunctionId] = useState<string | null>(null);
   const [editingObjectKey, setEditingObjectKey] = useState<string | null>(null);
   const [newFnName, setNewFnName] = useState('');
   const [newFnIcon, setNewFnIcon] = useState('');
-  const [newFnColor, setNewFnColor] = useState('#8C5BF5');
+  const [newFnColor, setNewFnColor] = useState(ac);
   const [newFnDesc, setNewFnDesc] = useState('');
   const [newObjName, setNewObjName] = useState('');
   const [newObjNamePlural, setNewObjNamePlural] = useState('');
@@ -770,7 +791,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             return (
               <View key={section.key} style={styles.adminNavSection}>
                 <Pressable
-                  style={[styles.adminNavSectionHeader, isSectionActive && styles.adminNavSectionHeaderActive]}
+                  style={[styles.adminNavSectionHeader, isSectionActive && styles.adminNavSectionHeaderActive, isSectionActive && { borderLeftColor: ac }]}
                   onPress={() => {
                     if (section.key === 'role' && !canManageWorkspace) return;
                     toggleAdminSection(section.key);
@@ -779,10 +800,10 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     }
                   }}
                 >
-                  <Text style={[styles.adminNavSectionHeaderLabel, section.key === 'role' && !canManageWorkspace && { opacity: 0.55 }]}>
+                  <Text style={[styles.adminNavSectionHeaderLabel, section.key === 'role' && !canManageWorkspace && { opacity: 0.55 }, isSectionActive && { color: ac }]}>
                     {section.key === 'role' && !canManageWorkspace ? '🔒 ' : ''}{section.label}
                   </Text>
-                  <Text style={styles.adminNavSectionChevron}>{isExpanded ? '▾' : '▸'}</Text>
+                  <Text style={[styles.adminNavSectionChevron, isSectionActive && { color: ac }]}>{isExpanded ? '▾' : '▸'}</Text>
                 </Pressable>
                 {isExpanded && (
                   <>
@@ -795,10 +816,10 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         <Pressable
                           key={item.label}
                           disabled={isLocked}
-                          style={[styles.adminNavItem, isActive && styles.adminNavItemActive, isLocked && styles.buttonDisabled]}
+                          style={[styles.adminNavItem, isActive && styles.adminNavItemActive, isActive && { borderLeftColor: ac, backgroundColor: acRgba(0.10) }, isLocked && styles.buttonDisabled]}
                           onPress={isLocked ? undefined : item.onPress}
                         >
-                          <Text style={[styles.adminNavItemLabel, isActive && styles.adminNavItemLabelActive, isLocked && { opacity: 0.4 }]}>
+                          <Text style={[styles.adminNavItemLabel, isActive && styles.adminNavItemLabelActive, isActive && { color: ac }, isLocked && { opacity: 0.4 }]}>
                             {isLocked ? '🔒 ' : ''}{item.label}
                           </Text>
                           {!!item.detail && !isLocked && <Text style={styles.adminNavItemDetail}>{item.detail}</Text>}
@@ -845,7 +866,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                   flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
                   paddingVertical: 11, paddingHorizontal: 8, gap: 5,
                   backgroundColor: isActive
-                    ? 'rgba(140,91,245,0.20)'
+                    ? acRgba(0.20)
                     : isDone
                       ? mode === 'night' ? 'rgba(34,197,94,0.08)' : 'rgba(34,197,94,0.06)'
                       : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
@@ -856,7 +877,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 <Text style={{ fontSize: 13 }}>{isDone && !isActive ? '✅' : icon}</Text>
                 <Text style={{
                   fontSize: 12, fontWeight: isActive ? '800' : '600',
-                  color: isActive ? '#A78BFA' : isDone ? '#22C55E' : mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)',
+                  color: isActive ? ac : isDone ? '#22C55E' : mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)',
                 }}>{label}</Text>
               </Pressable>
             );
@@ -907,7 +928,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         <Text style={{ fontSize: 32 }}>💊</Text>
                         <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '700', fontSize: 14 }}>DSCSA Pharma Serialization</Text>
                         <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.48)', fontSize: 11, lineHeight: 17 }}>8 sections · 17 sample records · 5 automation flows · Full pharma supply chain</Text>
-                        <View style={{ backgroundColor: '#8C5BF5', borderRadius: 10, paddingVertical: 10, alignItems: 'center' as any }}>
+                        <View style={{ backgroundColor: ac, borderRadius: 10, paddingVertical: 10, alignItems: 'center' as any }}>
                           <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Use This Template →</Text>
                         </View>
                       </Pressable>
@@ -1014,7 +1035,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         {workspaces.map((ws) => (
                           <Pressable
                             key={ws.id}
-                            style={{ paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1.5, backgroundColor: selectedWorkspaceId === ws.id ? 'rgba(140,91,245,0.18)' : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', borderColor: selectedWorkspaceId === ws.id ? '#8C5BF5' : mode === 'night' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.10)' }}
+                            style={{ paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1.5, backgroundColor: selectedWorkspaceId === ws.id ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', borderColor: selectedWorkspaceId === ws.id ? ac : mode === 'night' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.10)' }}
                             onPress={() => { setSelectedWorkspaceId(ws.id); setWizardStep(2); setWorkspacePane('subspaces'); }}
                           >
                             <Text style={{ fontSize: 13, fontWeight: '700', color: selectedWorkspaceId === ws.id ? '#A78BFA' : mode === 'night' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.68)' }}>{ws.name}</Text>
@@ -1061,8 +1082,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         </Pressable>
                       </View>
                       {isSuperAdmin && tenants.length > 1 && (
-                        <Pressable nativeID="wt-seed-all-tenants" style={[styles.secondaryButton, { borderColor: '#8C5BF5' }]} onPress={() => { const r = copyActiveDataToAllTenants(); if (r.ok) addNotification?.({ type: 'system', title: 'All Tenants Seeded', body: `Data copied to ${r.count} tenant${r.count === 1 ? '' : 's'}.`, severity: 'success' }); else addNotification?.({ type: 'system', title: 'Seed Failed', body: r.reason ?? 'Unable to seed.', severity: 'warning' }); }}>
-                          <Text style={[styles.secondaryButtonText, { color: '#8C5BF5' }]}>⬆ Seed Data → All Tenants</Text>
+                        <Pressable nativeID="wt-seed-all-tenants" style={[styles.secondaryButton, { borderColor: ac }]} onPress={() => { const r = copyActiveDataToAllTenants(); if (r.ok) addNotification?.({ type: 'system', title: 'All Tenants Seeded', body: `Data copied to ${r.count} tenant${r.count === 1 ? '' : 's'}.`, severity: 'success' }); else addNotification?.({ type: 'system', title: 'Seed Failed', body: r.reason ?? 'Unable to seed.', severity: 'warning' }); }}>
+                          <Text style={[styles.secondaryButtonText, { color: ac }]}>⬆ Seed Data → All Tenants</Text>
                         </Pressable>
                       )}
                     </View>
@@ -1112,12 +1133,12 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                 backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.10)' : 'rgba(140,91,245,0.06)',
                                 borderRadius: 10, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10,
                                 borderWidth: 1, borderStyle: 'solid',
-                                borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : mode === 'night' ? 'rgba(140,91,245,0.20)' : 'rgba(140,91,245,0.14)',
+                                borderColor: selectedSubSpaceId === ss.id ? ac : mode === 'night' ? acRgba(0.20) : acRgba(0.14),
                                 cursor: canManageSubSpace ? 'grab' : 'default',
                                 userSelect: 'none',
                                 position: 'relative',
                               }}
-                              whileDrag={{ scale: 1.02, boxShadow: '0 8px 32px rgba(140,91,245,0.30)', zIndex: 50, borderColor: '#8C5BF5' }}
+                              whileDrag={{ scale: 1.02, boxShadow: `0 8px 32px ${acRgba(0.30)}`, zIndex: 50, borderColor: ac }}
                               dragListener={canManageSubSpace}
                             >
                               {/* ⠿ drag handle */}
@@ -1132,7 +1153,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                 <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', fontSize: 11, marginTop: 1 }}>{(ss.builderFields ?? []).length} field{(ss.builderFields ?? []).length !== 1 ? 's' : ''}</Text>
                               </View>
                               <Pressable
-                                style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: selectedSubSpaceId === ss.id ? 'rgba(140,91,245,0.28)' : 'transparent', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : 'rgba(140,91,245,0.25)' }}
+                                style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: selectedSubSpaceId === ss.id ? acRgba(0.28) : 'transparent', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? ac : acRgba(0.25) }}
                                 onPress={() => { setSelectedSubSpaceId(ss.id); setWizardStep(3); setWorkspacePane('subspaces'); }}
                               >
                                 <Text style={{ fontSize: 11, fontWeight: '700', color: '#A78BFA' }}>Add Fields →</Text>
@@ -1160,7 +1181,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         <Pressable
                           nativeID="wt-add-subspace"
                           disabled={!canManageSubSpace || !hasWorkspace || !newSubSpaceName.trim()}
-                          style={{ paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10, backgroundColor: newSubSpaceName.trim() ? '#8C5BF5' : 'rgba(140,91,245,0.20)', justifyContent: 'center' as any, alignItems: 'center' as any, opacity: !canManageSubSpace || !hasWorkspace ? 0.4 : 1 }}
+                          style={{ paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10, backgroundColor: newSubSpaceName.trim() ? ac : acRgba(0.20), justifyContent: 'center' as any, alignItems: 'center' as any, opacity: !canManageSubSpace || !hasWorkspace ? 0.4 : 1 }}
                           onPress={() => {
                             if (!newSubSpaceName.trim()) return;
                             const name = newSubSpaceName.trim();
@@ -1210,8 +1231,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                           <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, alignItems: 'center', gap: 4, paddingTop: 4 }}>
                             {(workspace.subSpaces ?? []).map((ss, idx) => (
                               <React.Fragment key={`pipe-${ss.id}`}>
-                                {idx > 0 && <Text style={{ fontSize: 12, color: '#8C5BF5', fontWeight: '800' }}>→</Text>}
-                                <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: selectedSubSpaceId === ss.id ? 'rgba(140,91,245,0.36)' : 'rgba(140,91,245,0.12)', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : 'rgba(140,91,245,0.22)' }}>
+                                {idx > 0 && <Text style={{ fontSize: 12, color: ac, fontWeight: '800' }}>→</Text>}
+                                <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: selectedSubSpaceId === ss.id ? acRgba(0.36) : acRgba(0.12), borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? ac : acRgba(0.22) }}>
                                   <Text style={{ fontSize: 10, fontWeight: '700', color: selectedSubSpaceId === ss.id ? '#FFFFFF' : '#C4B5FD' }}>{idx + 1}. {ss.name}</Text>
                                 </View>
                               </React.Fragment>
@@ -1266,7 +1287,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         {workspaceSubSpaces.map((ss) => (
                           <Pressable
                             key={ss.id}
-                            style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : mode === 'night' ? 'rgba(255,255,255,0.11)' : 'rgba(0,0,0,0.09)' }}
+                            style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: selectedSubSpaceId === ss.id ? ac : mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? ac : mode === 'night' ? 'rgba(255,255,255,0.11)' : 'rgba(0,0,0,0.09)' }}
                             onPress={() => setSelectedSubSpaceId(ss.id)}
                           >
                             <Text style={{ fontSize: 12, fontWeight: '700', color: selectedSubSpaceId === ss.id ? '#FFFFFF' : mode === 'night' ? 'rgba(255,255,255,0.62)' : 'rgba(0,0,0,0.56)' }}>
@@ -1303,7 +1324,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                             ] as Array<{ type: SubSpaceBuilderFieldType; icon: string; label: string; desc: string }>).map(({ type, icon, label, desc }) => (
                               <Pressable
                                 key={type}
-                                style={{ width: 86, paddingHorizontal: 6, paddingVertical: 9, borderRadius: 10, gap: 3, alignItems: 'center' as any, borderWidth: 1.5, backgroundColor: wizardActiveFieldType === type ? 'rgba(140,91,245,0.22)' : mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: wizardActiveFieldType === type ? '#8C5BF5' : mode === 'night' ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.09)' }}
+                                style={{ width: 86, paddingHorizontal: 6, paddingVertical: 9, borderRadius: 10, gap: 3, alignItems: 'center' as any, borderWidth: 1.5, backgroundColor: wizardActiveFieldType === type ? acRgba(0.22) : mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: wizardActiveFieldType === type ? ac : mode === 'night' ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.09)' }}
                                 onPress={() => setWizardActiveFieldType(type)}
                               >
                                 <Text style={{ fontSize: 17, lineHeight: 21 }}>{icon}</Text>
@@ -1317,7 +1338,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         {/* Add field button */}
                         <Pressable
                           disabled={!canManageSubSpace || !newBuilderFieldLabel.trim()}
-                          style={{ backgroundColor: newBuilderFieldLabel.trim() ? '#8C5BF5' : 'rgba(140,91,245,0.18)', borderRadius: 10, paddingVertical: 12, alignItems: 'center' as any, opacity: !canManageSubSpace ? 0.4 : 1 }}
+                          style={{ backgroundColor: newBuilderFieldLabel.trim() ? ac : acRgba(0.18), borderRadius: 10, paddingVertical: 12, alignItems: 'center' as any, opacity: !canManageSubSpace ? 0.4 : 1 }}
                           onPress={() => {
                             if (!newBuilderFieldLabel.trim()) return;
                             addBuilderFieldToSubSpace(wizardActiveFieldType);
@@ -1333,7 +1354,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                           <View style={{ gap: 4 }}>
                             <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Fields in "{selectedSubSpace.name}" — tap name to rename, use arrows to reorder</Text>
                             {(selectedSubSpace.builderFields ?? []).map((field, fieldIdx, allFields) => (
-                              <View key={field.id} style={{ backgroundColor: editingFieldId === field.id ? (mode === 'night' ? 'rgba(140,91,245,0.14)' : 'rgba(140,91,245,0.08)') : (mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'), borderRadius: 10, borderWidth: 1, borderColor: editingFieldId === field.id ? '#8C5BF5' : (mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'), overflow: 'hidden' as any }}>
+                              <View key={field.id} style={{ backgroundColor: editingFieldId === field.id ? (mode === 'night' ? acRgba(0.14) : acRgba(0.08)) : (mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'), borderRadius: 10, borderWidth: 1, borderColor: editingFieldId === field.id ? ac : (mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'), overflow: 'hidden' as any }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 10, paddingVertical: 8 }}>
                                   {/* Move up/down */}
                                   <View style={{ gap: 2 }}>
@@ -1395,7 +1416,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                     />
                                     <Pressable
                                       disabled={!editingFieldLabel.trim()}
-                                      style={{ paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8, backgroundColor: editingFieldLabel.trim() ? '#8C5BF5' : 'rgba(140,91,245,0.20)', justifyContent: 'center' as any }}
+                                      style={{ paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8, backgroundColor: editingFieldLabel.trim() ? ac : acRgba(0.20), justifyContent: 'center' as any }}
                                       onPress={() => { renameBuilderFieldInSubSpace(field.id, editingFieldLabel); setEditingFieldId(null); }}
                                     >
                                       <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 12 }}>Save</Text>
@@ -1569,7 +1590,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         whileDrag={{ scale: 1.06, zIndex: 50 }}
                         dragListener={canManageSubSpace}
                       >
-                        {workspace.pipelineEnabled && idx > 0 && <Text style={{ fontSize: 14, color: '#8C5BF5', fontWeight: '800' }}>→</Text>}
+                        {workspace.pipelineEnabled && idx > 0 && <Text style={{ fontSize: 14, color: ac, fontWeight: '800' }}>→</Text>}
                         <Pressable
                           style={[styles.pill, selectedSubSpaceId === ss.id && styles.pillActive]}
                           onPress={() => setSelectedSubSpaceId(ss.id)}
@@ -1700,7 +1721,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <Text style={styles.listTitle}>{ws.name}</Text>
               {!hasAnyForms && <Text style={styles.metaText}>No forms in this workspace yet. Add builder fields to SubSpaces to auto-generate forms.</Text>}
               {formsInWs.map(({ subSpace: ss, form }) => (
-                <View key={ss.id} style={{ marginTop: 8, paddingLeft: 12, borderLeftWidth: 2, borderLeftColor: '#8C5BF540' }}>
+                <View key={ss.id} style={{ marginTop: 8, paddingLeft: 12, borderLeftWidth: 2, borderLeftColor: `${ac}40` }}>
                   <Text style={styles.metaText}>{ss.name}{form ? '' : ' — no form'}</Text>
                   {form && (
                     <>
@@ -1746,7 +1767,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             <View style={[styles.listCard, { gap: 4, paddingVertical: 12 }]}>
               <Text style={[styles.metaText, { fontWeight: '700', marginBottom: 4 }]}>The 6-Layer Architecture Hierarchy</Text>
               {[
-                { icon: '🏢', label: data.shellConfig.functionLabel ?? 'Department', desc: 'A major division of your business (e.g. Supply Chain, Finance, Service Ops)', color: '#8C5BF5' },
+                { icon: '🏢', label: data.shellConfig.functionLabel ?? 'Department', desc: 'A major division of your business (e.g. Supply Chain, Finance, Service Ops)', color: ac },
                 { icon: '📦', label: data.shellConfig.objectLabel ?? 'Object', desc: `What each ${data.shellConfig.functionLabel ?? 'Department'} manages (e.g. Drug Inventory, Device Inventory, Policy Book)`, color: '#3B82F6' },
                 { icon: '🗂️', label: data.shellConfig.collectionLabel ?? 'Batch', desc: `Groups or collections of ${data.shellConfig.objectLabelPlural ?? 'Objects'} (e.g. Lot XY-1234, Work Order WO-5001)`, color: '#10B981' },
                 { icon: '🔲', label: 'Workspace', desc: 'The processing area — each workspace handles one stage of the workflow', color: '#F59E0B' },
@@ -1772,7 +1793,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             <View style={[styles.listCard, { gap: 10 }]}>
               <Text style={[styles.metaText, { fontWeight: '700' }]}>How to build your architecture in 4 steps:</Text>
               {[
-                { step: '1', title: `Define ${data.shellConfig.functionLabelPlural ?? 'Departments'}`, detail: `Name the major areas of your business. Example: "Supply Chain & Regulatory", "Service Operations", "Finance"`, color: '#8C5BF5' },
+                { step: '1', title: `Define ${data.shellConfig.functionLabelPlural ?? 'Departments'}`, detail: `Name the major areas of your business. Example: "Supply Chain & Regulatory", "Service Operations", "Finance"`, color: ac },
                 { step: '2', title: `Add ${data.shellConfig.objectLabelPlural ?? 'Objects'}`, detail: `Under each ${data.shellConfig.functionLabel ?? 'Department'}, define what it tracks. Example: "Drug Inventory" under Supply Chain, "Device Inventory" under Service Ops`, color: '#3B82F6' },
                 { step: '3', title: 'Link Workspaces', detail: `Tap each ${data.shellConfig.objectLabel ?? 'Object'} to connect it to the workspaces that process it. This powers the End User navigation and filtering.`, color: '#10B981' },
                 { step: '4', title: 'Set Terminology (Optional)', detail: `Go to App Terminology to rename ${data.shellConfig.functionLabel ?? 'Department'}, ${data.shellConfig.objectLabel ?? 'Object'}, and ${data.shellConfig.collectionLabel ?? 'Batch'} to match your industry.`, color: '#F59E0B' },
@@ -1795,11 +1816,11 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <Text style={styles.metaText}>One click loads a complete business architecture with Departments, Objects, and terminology pre-configured for your industry.</Text>
               <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                 <Pressable
-                  style={[styles.secondaryButton, { borderColor: '#8C5BF5', flex: 1 }]}
+                  style={[styles.secondaryButton, { borderColor: ac, flex: 1 }]}
                   onPress={() => {
                     const dscsaWsId = data.workspaces.find(w => w.name?.toLowerCase().includes('dscsa') || w.name?.toLowerCase().includes('serialization'))?.id ?? '';
                     upsertBusinessFunction({
-                      id: 'bfn-supply-chain', name: 'Supply Chain & Regulatory', icon: '🔗', color: '#8C5BF5', order: 0,
+                      id: 'bfn-supply-chain', name: 'Supply Chain & Regulatory', icon: '🔗', color: ac, order: 0,
                       description: 'End-to-end pharmaceutical serialization from manufacturer to patient dispensing (DSCSA § 582)',
                       objects: [{
                         id: 'bobj-drug-inventory', functionId: 'bfn-supply-chain', name: 'Drug Inventory', namePlural: 'Drug Inventories',
@@ -1818,7 +1839,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     });
                   }}
                 >
-                  <Text style={[styles.secondaryButtonText, { color: '#8C5BF5' }]}>💊 Load DSCSA Pharma Example</Text>
+                  <Text style={[styles.secondaryButtonText, { color: ac }]}>💊 Load DSCSA Pharma Example</Text>
                 </Pressable>
                 <Pressable
                   style={[styles.secondaryButton, { borderColor: '#3B82F6', flex: 1 }]}
@@ -1859,7 +1880,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <Text style={[styles.listTitle, { fontSize: 14, marginBottom: 4 }]}>🏗️ Your Operations Map</Text>
               <View style={{ flexDirection: 'row', gap: 14, flexWrap: 'wrap' }}>
                 <Text style={styles.metaText}>
-                  <Text style={{ color: '#8C5BF5', fontWeight: '700' }}>{(data.businessFunctions ?? []).length}</Text>
+                  <Text style={{ color: ac, fontWeight: '700' }}>{(data.businessFunctions ?? []).length}</Text>
                   {` ${(data.businessFunctions?.length ?? 0) === 1 ? (data.shellConfig.functionLabel ?? 'Department') : (data.shellConfig.functionLabelPlural ?? 'Departments')}`}
                 </Text>
                 <Text style={styles.metaText}>
@@ -1881,17 +1902,17 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                 {!(data.businessFunctions ?? []).some(f => f.id === 'bfn-supply-chain') && (
                   <Pressable
-                    style={[styles.secondaryButton, { borderColor: '#8C5BF5' }]}
+                    style={[styles.secondaryButton, { borderColor: ac }]}
                     onPress={() => {
                       const dscsaWsId = data.workspaces.find(w => w.name?.toLowerCase().includes('dscsa') || w.name?.toLowerCase().includes('serialization'))?.id ?? '';
                       upsertBusinessFunction({
-                        id: 'bfn-supply-chain', name: 'Supply Chain & Regulatory', icon: '🔗', color: '#8C5BF5', order: 0,
+                        id: 'bfn-supply-chain', name: 'Supply Chain & Regulatory', icon: '🔗', color: ac, order: 0,
                         description: 'End-to-end pharmaceutical serialization from manufacturer to patient dispensing (DSCSA § 582)',
                         objects: [{ id: 'bobj-drug-inventory', functionId: 'bfn-supply-chain', name: 'Drug Inventory', namePlural: 'Drug Inventories', icon: '💊', description: 'Track serialized pharmaceutical batches across the DSCSA supply chain', workspaceIds: dscsaWsId ? [dscsaWsId] : [] }],
                       });
                     }}
                   >
-                    <Text style={[styles.secondaryButtonText, { color: '#8C5BF5' }]}>+ Add DSCSA Pharma Function</Text>
+                    <Text style={[styles.secondaryButtonText, { color: ac }]}>+ Add DSCSA Pharma Function</Text>
                   </Pressable>
                 )}
                 {!(data.businessFunctions ?? []).some(f => f.id === 'bfn-service-operations') && (
@@ -1918,7 +1939,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
           const isFnExpanded = expandedFnIds.has(fn.id);
           const isEditingFn = editingFunctionId === fn.id;
           return (
-            <View key={fn.id} style={[styles.listCard, { borderLeftWidth: 3, borderLeftColor: fn.color ?? '#8C5BF5' }]}>
+            <View key={fn.id} style={[styles.listCard, { borderLeftWidth: 3, borderLeftColor: fn.color ?? ac }]}>
               <View style={styles.inlineRow}>
                 <Pressable onPress={() => setExpandedFnIds((prev) => { const next = new Set(prev); isFnExpanded ? next.delete(fn.id) : next.add(fn.id); return next; })} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   {!!fn.icon && <Text style={{ fontSize: 18 }}>{fn.icon}</Text>}
@@ -1955,7 +1976,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               )}
 
               {isFnExpanded && (
-                <View style={{ marginTop: 8, paddingLeft: 12, borderLeftWidth: 2, borderLeftColor: '#8C5BF540' }}>
+                <View style={{ marginTop: 8, paddingLeft: 12, borderLeftWidth: 2, borderLeftColor: `${ac}40` }}>
                   {fn.objects.length === 0 && (
                     <Text style={styles.metaText}>No {(data.shellConfig.objectLabelPlural ?? 'Objects').toLowerCase()} yet. Add one below.</Text>
                   )}
@@ -2086,7 +2107,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 const id = `bfn-${newFnName.trim().toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
                 const order = (data.businessFunctions ?? []).length;
                 upsertBusinessFunction({ id, name: newFnName.trim(), icon: newFnIcon.trim() || undefined, color: newFnColor.trim() || '#8C5BF5', description: newFnDesc.trim() || undefined, order, objects: [] });
-                setNewFnName(''); setNewFnIcon(''); setNewFnColor('#8C5BF5'); setNewFnDesc('');
+                setNewFnName(''); setNewFnIcon(''); setNewFnColor(ac); setNewFnDesc('');
                 setEditingFunctionId(null);
               }}>
                 <Text style={styles.secondaryButtonText}>Add {data.shellConfig.functionLabel ?? 'Department'}</Text>
@@ -2098,7 +2119,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
           </View>
         ) : (
           <Pressable style={[styles.secondaryButton, { marginTop: 12, alignSelf: 'flex-start' }]} onPress={() => {
-            setNewFnName(''); setNewFnIcon(''); setNewFnColor('#8C5BF5'); setNewFnDesc('');
+            setNewFnName(''); setNewFnIcon(''); setNewFnColor(ac); setNewFnDesc('');
             setEditingFunctionId('__new__');
           }}>
             <Text style={styles.secondaryButtonText}>+ Add {data.shellConfig.functionLabel ?? 'Department'}</Text>
@@ -2696,7 +2717,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 <View style={[styles.listCard, { paddingVertical: 10, marginBottom: 4 }]}>
                   <View style={[styles.inlineRow, { gap: 6, alignItems: 'center', marginBottom: 6 }]}>
                     <Text style={[styles.listTitle, { fontSize: 13 }]}>Members assigned to "{selectedRole?.name}"</Text>
-                    {isEditingOwnRole && <Text style={{ fontSize: 11, color: '#8C5BF5', fontWeight: '700' }}>← your role</Text>}
+                    {isEditingOwnRole && <Text style={{ fontSize: 11, color: ac, fontWeight: '700' }}>← your role</Text>}
                   </View>
                   {membersInRole.length === 0 ? (
                     <Text style={styles.metaText}>No members currently assigned to this role.</Text>
@@ -2742,7 +2763,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 <View style={[styles.listCard, { paddingVertical: 10, marginBottom: 4 }]}>
                   <View style={[styles.inlineRow, { gap: 6, alignItems: 'center', marginBottom: 6 }]}>
                     <Text style={[styles.listTitle, { fontSize: 13 }]}>Members assigned to "{selectedRole?.name}"</Text>
-                    {isEditingOwnRole && <Text style={{ fontSize: 11, color: '#8C5BF5', fontWeight: '700' }}>← your role</Text>}
+                    {isEditingOwnRole && <Text style={{ fontSize: 11, color: ac, fontWeight: '700' }}>← your role</Text>}
                   </View>
                   {membersInRole.length === 0 ? (
                     <Text style={styles.metaText}>No members currently assigned to this role.</Text>
@@ -2944,9 +2965,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     style={{
                       width: 8, height: 8, borderRadius: 4,
                       background: i === walkthroughIndex
-                        ? 'linear-gradient(135deg, #8C5BF5, #E878F6)'
+                        ? `linear-gradient(135deg, ${ac}, ${accentPalette?.secondary ?? '#E878F6'})`
                         : completedWalkthroughStepIds.includes(adminWalkthroughSteps[i].id)
-                          ? 'rgba(140, 91, 245, 0.5)'
+                          ? acRgba(0.5)
                           : 'rgba(255, 255, 255, 0.12)',
                       cursor: 'pointer',
                     }}
@@ -2974,7 +2995,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     onClick={() => { toggleCurrentWalkthroughStep(); setWalkthroughOpen(false); }}
                     style={{
                       border: 'none', borderRadius: 8, padding: '8px 20px', fontSize: 12, fontWeight: 600,
-                      cursor: 'pointer', background: 'linear-gradient(135deg, #8C5BF5, #E878F6)', color: '#fff',
+                      cursor: 'pointer', background: `linear-gradient(135deg, ${ac}, ${accentPalette?.secondary ?? '#E878F6'})`, color: acText,
                     }}
                   >
                     Finish
@@ -2984,7 +3005,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     onClick={() => goToWalkthroughStep(walkthroughIndex + 1)}
                     style={{
                       border: 'none', borderRadius: 8, padding: '8px 20px', fontSize: 12, fontWeight: 600,
-                      cursor: 'pointer', background: 'linear-gradient(135deg, #8C5BF5, #E878F6)', color: '#fff',
+                      cursor: 'pointer', background: `linear-gradient(135deg, ${ac}, ${accentPalette?.secondary ?? '#E878F6'})`, color: acText,
                     }}
                   >
                     Next ({walkthroughIndex + 1}/{adminWalkthroughSteps.length})
@@ -3011,9 +3032,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
           onClick={() => setWalkthroughOpen(true)}
           style={{
             position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
-            background: 'linear-gradient(135deg, #8C5BF5, #E878F6)', color: '#fff',
+            background: `linear-gradient(135deg, ${ac}, ${accentPalette?.secondary ?? '#E878F6'})`, color: acText,
             borderRadius: 28, padding: '10px 20px', fontSize: 13, fontWeight: 600,
-            cursor: 'pointer', boxShadow: '0 4px 20px rgba(140, 91, 245, 0.35)',
+            cursor: 'pointer', boxShadow: `0 4px 20px ${acRgba(0.35)}`,
           }}
         >
           Resume Walkthrough ({walkthroughIndex + 1}/{adminWalkthroughSteps.length})

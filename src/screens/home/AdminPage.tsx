@@ -207,7 +207,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     reorderSubSpace,
   } = useAdminWorkspace();
   const insights = useAdminEnterpriseInsights(workspace);
-  const { activeTenantId, data, isSuperAdmin, tenants, copyActiveDataToAllTenants, getFormForSubSpace, upsertBusinessFunction, deleteBusinessFunction, upsertBusinessObject, deleteBusinessObject } = useAppState();
+  const { activeTenantId, data, isSuperAdmin, currentUser, tenants, copyActiveDataToAllTenants, getFormForSubSpace, upsertBusinessFunction, deleteBusinessFunction, upsertBusinessObject, deleteBusinessObject } = useAppState();
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
   const [editingFieldLabel, setEditingFieldLabel] = useState('');
   const [editingFunctionId, setEditingFunctionId] = useState<string | null>(null);
@@ -225,6 +225,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const canManageWorkspace = can('workspace.manage');
   const canManageSubSpace = can('subspace.manage');
+  const membersInRole = data.users.filter((u) => u.roleId === selectedRoleId);
+  const isEditingOwnRole = !!(currentUser && currentUser.roleId === selectedRoleId);
   const isWeb = Platform.OS === 'web';
   const resolvedWorkspaceName = workspaceName.trim() || workspace?.name || 'Untitled Workspace';
   const resolvedRootEntity = rootEntity.trim() || workspace?.rootEntity || 'Core record';
@@ -766,13 +768,16 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 <Pressable
                   style={[styles.adminNavSectionHeader, isSectionActive && styles.adminNavSectionHeaderActive]}
                   onPress={() => {
+                    if (section.key === 'role' && !canManageWorkspace) return;
                     toggleAdminSection(section.key);
                     if (!isSectionActive) {
                       section.items[0]?.onPress();
                     }
                   }}
                 >
-                  <Text style={styles.adminNavSectionHeaderLabel}>{section.label}</Text>
+                  <Text style={[styles.adminNavSectionHeaderLabel, section.key === 'role' && !canManageWorkspace && { opacity: 0.55 }]}>
+                    {section.key === 'role' && !canManageWorkspace ? '🔒 ' : ''}{section.label}
+                  </Text>
                   <Text style={styles.adminNavSectionChevron}>{isExpanded ? '▾' : '▸'}</Text>
                 </Pressable>
                 {isExpanded && (
@@ -780,14 +785,19 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     <Text style={styles.adminNavSectionDescription}>{section.description}</Text>
                     {section.items.map((item) => {
                       const isActive = activeNavItemKey === item.label;
+                      const isRoleSection = section.key === 'role';
+                      const isLocked = isRoleSection && !canManageWorkspace;
                       return (
                         <Pressable
                           key={item.label}
-                          style={[styles.adminNavItem, isActive && styles.adminNavItemActive]}
-                          onPress={item.onPress}
+                          disabled={isLocked}
+                          style={[styles.adminNavItem, isActive && styles.adminNavItemActive, isLocked && styles.buttonDisabled]}
+                          onPress={isLocked ? undefined : item.onPress}
                         >
-                          <Text style={[styles.adminNavItemLabel, isActive && styles.adminNavItemLabelActive]}>{item.label}</Text>
-                          {!!item.detail && <Text style={styles.adminNavItemDetail}>{item.detail}</Text>}
+                          <Text style={[styles.adminNavItemLabel, isActive && styles.adminNavItemLabelActive, isLocked && { opacity: 0.4 }]}>
+                            {isLocked ? '🔒 ' : ''}{item.label}
+                          </Text>
+                          {!!item.detail && !isLocked && <Text style={styles.adminNavItemDetail}>{item.detail}</Text>}
                         </Pressable>
                       );
                     })}
@@ -2360,7 +2370,31 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
 
       {adminTab === 'role' && <Card title="" blurred>
         <Text style={styles.bodyText}>Create roles and define exactly what each one can see and do. Assign permissions, scope access to specific workspaces, save permission snapshots as reusable templates, and audit changes between template versions.</Text>
-        {!canManageWorkspace && <Text style={styles.notice}>{deniedMessage('workspace.manage')}</Text>}
+
+        {/* ── RBAC status banner ── */}
+        <View style={[styles.inlineRow, { flexWrap: 'nowrap', alignItems: 'center', gap: 10, marginBottom: 4 }]}>
+          <View style={[
+            styles.listCard,
+            { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 12, marginBottom: 0 },
+            canManageWorkspace ? { borderColor: 'rgba(46,204,113,0.40)', backgroundColor: 'rgba(46,204,113,0.08)' } : { borderColor: 'rgba(231,76,60,0.40)', backgroundColor: 'rgba(231,76,60,0.08)' },
+          ]}>
+            <Text style={{ fontSize: 18 }}>{canManageWorkspace ? '🛡️' : '🔒'}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.listTitle, { fontSize: 13 }]}>
+                {currentUser ? currentUser.fullName : 'Anonymous'}
+                {isSuperAdmin ? '  ·  Super Admin' : canManageWorkspace ? '  ·  Admin' : '  ·  No admin access'}
+              </Text>
+              {currentUser && (
+                <Text style={[styles.metaText, { marginTop: 0 }]}>
+                  {currentUser.email}  ·  Role: {data.roles.find((r) => r.id === currentUser.roleId)?.name ?? 'Unassigned'}
+                </Text>
+              )}
+              {!canManageWorkspace && (
+                <Text style={[styles.notice, { marginTop: 2 }]}>You do not have permission to manage access &amp; permissions.</Text>
+              )}
+            </View>
+          </View>
+        </View>
 
         <View style={styles.inlineRow}>
           <Pressable style={[styles.pill, rolePane === 'roles' && styles.pillActive]} onPress={() => setRolePane('roles')}>
@@ -2611,6 +2645,31 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <>
                 <Text style={styles.metaText}>Permission Map</Text>
                 <Text style={styles.metaText}>Toggle individual permissions on or off for the selected role. Each permission controls a specific capability in the app.</Text>
+
+                {/* ── Who is in this role ── */}
+                <View style={[styles.listCard, { paddingVertical: 10, marginBottom: 4 }]}>
+                  <View style={[styles.inlineRow, { gap: 6, alignItems: 'center', marginBottom: 6 }]}>
+                    <Text style={[styles.listTitle, { fontSize: 13 }]}>Members assigned to "{selectedRole?.name}"</Text>
+                    {isEditingOwnRole && <Text style={{ fontSize: 11, color: '#8C5BF5', fontWeight: '700' }}>← your role</Text>}
+                  </View>
+                  {membersInRole.length === 0 ? (
+                    <Text style={styles.metaText}>No members currently assigned to this role.</Text>
+                  ) : (
+                    membersInRole.map((member) => (
+                      <View key={member.id} style={[styles.inlineRow, { gap: 8, alignItems: 'center', paddingVertical: 4 }]}>
+                        <Text style={{ fontSize: 15 }}>{member.isSuperAdmin ? '👑' : '👤'}</Text>
+                        <View style={{ flex: 1 }}>
+                          <Text style={[styles.listTitle, { fontSize: 12 }]}>
+                            {member.fullName}{member.id === currentUser?.id ? '  (you)' : ''}
+                          </Text>
+                          <Text style={[styles.metaText, { marginTop: 0 }]}>{member.email}</Text>
+                        </View>
+                        {member.isSuperAdmin && <Text style={{ fontSize: 11, color: '#E8C96A', fontWeight: '700' }}>Super Admin</Text>}
+                      </View>
+                    ))
+                  )}
+                </View>
+
                 {permissionCatalog.map((permission) => {
                   const enabled = permissions.includes(permission.action);
                   return (
@@ -2632,6 +2691,30 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <>
                 <Text style={styles.metaText}>Workspace Scope</Text>
                 <Text style={styles.metaText}>Limit which workspaces this role can access. Choose "All Workspaces" for unrestricted access, or "Selected Workspaces" to pick specific ones.</Text>
+
+                {/* ── Who is in this role ── */}
+                <View style={[styles.listCard, { paddingVertical: 10, marginBottom: 4 }]}>
+                  <View style={[styles.inlineRow, { gap: 6, alignItems: 'center', marginBottom: 6 }]}>
+                    <Text style={[styles.listTitle, { fontSize: 13 }]}>Members assigned to "{selectedRole?.name}"</Text>
+                    {isEditingOwnRole && <Text style={{ fontSize: 11, color: '#8C5BF5', fontWeight: '700' }}>← your role</Text>}
+                  </View>
+                  {membersInRole.length === 0 ? (
+                    <Text style={styles.metaText}>No members currently assigned to this role.</Text>
+                  ) : (
+                    membersInRole.map((member) => (
+                      <View key={member.id} style={[styles.inlineRow, { gap: 8, alignItems: 'center', paddingVertical: 4 }]}>
+                        <Text style={{ fontSize: 15 }}>{member.isSuperAdmin ? '👑' : '👤'}</Text>
+                        <View style={{ flex: 1 }}>
+                          <Text style={[styles.listTitle, { fontSize: 12 }]}>
+                            {member.fullName}{member.id === currentUser?.id ? '  (you)' : ''}
+                          </Text>
+                          <Text style={[styles.metaText, { marginTop: 0 }]}>{member.email}</Text>
+                        </View>
+                        {member.isSuperAdmin && <Text style={{ fontSize: 11, color: '#E8C96A', fontWeight: '700' }}>Super Admin</Text>}
+                      </View>
+                    ))
+                  )}
+                </View>
                 <View style={styles.inlineRow}>
               <Pressable
                 disabled={!canManageWorkspace}

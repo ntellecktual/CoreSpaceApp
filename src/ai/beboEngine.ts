@@ -471,151 +471,117 @@ function mkShellConfig(singular: string, plural: string, wsLabel: string, ssLabe
 }
 
 export function buildPharmaPayload(): ScenarioApplyPayload {
-  const wsMfr = mkWorkspace('ws-bebo-pharma-mfr', 'Manufacturer Serialization', 'Serialized Batch', '🏭', [
-    mkSubSpace('ss-unit-serial', 'Unit Serialization', 'Serialized Unit', 'grid', [
-      mkField('f-unit-sn', 'Unit Serial Number', 'text', true),
-      mkField('f-ndc', 'NDC Product Code', 'text', true),
-      mkField('f-lot', 'Lot Number', 'text', true),
-      mkField('f-exp', 'Expiration Date', 'date', true),
-    ]),
-    mkSubSpace('ss-carton-agg', 'Carton Aggregation', 'Carton Aggregation', 'grid', [
-      mkField('f-ctn-sn', 'Carton Serial Number', 'text', true),
-      mkField('f-units-box', 'Units per Box', 'number', false),
-      mkField('f-agg-date', 'Aggregation Date', 'date', false),
-    ]),
-    mkSubSpace('ss-epcis', 'EPCIS Upload', 'Compliance Submission', 'grid', [
-      mkField('f-sub-id', 'Submission ID', 'text', true),
-      mkField('f-sub-date', 'Submission Date', 'date', false),
-      mkField('f-upload-status', 'Upload Status', 'select', true),
-    ]),
+  const wsId = 'ws-bebo-pharma';
+  const ssCarton = mkSubSpace('ss-carton', 'Carton', 'Carton', 'summary', [
+    mkField('f-ctn-serial', 'Carton Serial', 'text', true),
+    mkField('f-ctn-lot', 'Lot Number', 'text', true),
+    mkField('f-ctn-exp', 'Expiration Date', 'date', true),
   ]);
-  const wsDist = mkWorkspace('ws-bebo-pharma-dist', 'Distributor Verification', 'Serialized Batch', '🚚', [
-    mkSubSpace('ss-inbound-scan', 'Inbound Receiving Scan', 'Inbound Scan Event', 'grid', [
-      mkField('f-scan-id', 'Scan Event ID', 'text', true),
-      mkField('f-scanned-ctn', 'Scanned Carton Serial', 'text', true),
-      mkField('f-recv-time', 'Received Time', 'datetime', true),
-    ]),
-    mkSubSpace('ss-serial-verify', 'Serial Verification', 'Verification Event', 'split', [
-      mkField('f-ver-result', 'Verification Result', 'select', true),
-      mkField('f-matched', 'Matched Serial Count', 'number', false),
-      mkField('f-mismatch', 'Mismatch Count', 'number', false),
-    ]),
+  const ssBoxes = mkSubSpace('ss-boxes', 'Boxes Inside Carton', 'Box', 'grid', [
+    mkField('f-box-serial', 'Box Serial', 'text', true),
+    mkField('f-box-ctn', 'Carton Serial', 'text', true),
   ]);
-  const wsRx = mkWorkspace('ws-bebo-pharma-rx', 'Pharmacy Dispense Trace', 'Serialized Batch', '💊', [
-    mkSubSpace('ss-rx-recv', 'Pharmacy Receiving', 'Pharmacy Receiving Event', 'grid', [
-      mkField('f-rx-event', 'Receiving Event ID', 'text', true),
-      mkField('f-rx-ctn', 'Received Carton Serial', 'text', true),
-      mkField('f-rx-result', 'Verification Result', 'select', true),
-    ]),
-    mkSubSpace('ss-dispense', 'Dispense Serial Logging', 'Dispense Event', 'timeline', [
-      mkField('f-disp-sn', 'Dispensed Unit Serial', 'text', true),
-      mkField('f-disp-date', 'Dispense Date', 'date', true),
-      mkField('f-rx-ref', 'Rx Reference', 'text', true),
-    ]),
+  const ssUnits = mkSubSpace('ss-units', 'Individual Units', 'Unit', 'grid', [
+    mkField('f-unit-serial', 'Unit Serial', 'text', true),
+    mkField('f-unit-ndc', 'NDC Product Code', 'text', true),
+    mkField('f-unit-box', 'Box Serial', 'text', true),
   ]);
+  const ssLot = mkSubSpace('ss-lot-info', 'Lot Information', 'Lot Info', 'summary', [
+    mkField('f-lot-num', 'Lot Number', 'text', true),
+    mkField('f-lot-exp', 'Expiration Date', 'date', true),
+    mkField('f-lot-product', 'Product Name', 'text', true),
+  ]);
+  const ssMfr = mkSubSpace('ss-mfr-serial', 'Manufacturer Serialization', 'Serialization Event', 'timeline', [
+    mkField('f-mfr-unit-sn', 'Unit Serial Number', 'text', true),
+    mkField('f-mfr-ctn-sn', 'Carton Serial Number', 'text', true),
+    mkField('f-mfr-agg-date', 'Aggregation Date', 'date', true),
+    mkField('f-mfr-epcis', 'EPCIS Upload Status', 'select', true),
+  ]);
+  const ssDist = mkSubSpace('ss-dist-verify', 'Distributor Verification', 'Verification Event', 'split', [
+    mkField('f-dist-ctn', 'Scanned Carton Serial', 'text', true),
+    mkField('f-dist-result', 'Verification Result', 'select', true),
+    mkField('f-dist-matched', 'Matched Serial Count', 'number', true),
+    mkField('f-dist-time', 'Received Time', 'datetime', true),
+  ]);
+  const ssRx = mkSubSpace('ss-rx-dispense', 'Pharmacy Dispense', 'Dispense Event', 'timeline', [
+    mkField('f-rx-unit', 'Dispensed Unit Serial', 'text', true),
+    mkField('f-rx-ref', 'Rx Reference', 'text', true),
+    mkField('f-rx-date', 'Dispense Date', 'date', true),
+    mkField('f-rx-pharm', 'Pharmacist', 'text', false),
+  ]);
+  const ssTrace = mkSubSpace('ss-trace', 'Traceability & Exceptions', 'Trace Event', 'grid', [
+    mkField('f-trace-type', 'Event Type', 'select', true),
+    mkField('f-trace-serial', 'Impacted Serial', 'text', true),
+    mkField('f-trace-status', 'Exception Status', 'select', true),
+    mkField('f-trace-notes', 'Investigation Notes', 'longText', false),
+  ]);
+  const allSS = [ssCarton, ssBoxes, ssUnits, ssLot, ssMfr, ssDist, ssRx, ssTrace];
+  allSS.forEach((ss, i) => { (ss as any).pipelineOrder = i; });
+
+  const wsFields = [
+    mkField('f-ws-lot', 'Lot Number', 'text', true),
+    mkField('f-ws-exp', 'Expiration Date', 'date', true),
+    mkField('f-ws-ctn', 'Carton Serial', 'text', true),
+  ];
+  const ws = { ...mkWorkspace(wsId, 'DSCSA Serialization Workflow', 'Serialized Batch', '💊', allSS, wsFields), pipelineEnabled: true };
+
   const flows = [
-    mkFlow('flow-bebo-suspect', 'Suspect Product Alert', 'Verification result = Mismatch', ['verification_result = Mismatch', 'serial_count_delta > 0'], 'Quarantine shipment and notify Compliance team immediately', 'ws-bebo-pharma-dist', 'ss-serial-verify', ['Priority:Critical', 'Type:Serialization']),
-    mkFlow('flow-bebo-epcis-fail', 'EPCIS Upload Failure', 'EPCIS upload status = Failed', ['upload_status = Failed'], 'Retry upload and alert Manufacturer Serialization Lead', 'ws-bebo-pharma-mfr', 'ss-epcis', ['Priority:High', 'Type:Compliance']),
-    mkFlow('flow-bebo-dispense-log', 'Dispense Serial Capture', 'Unit dispensed at pharmacy', ['status = Dispensed'], 'Log serial event and update traceability record', 'ws-bebo-pharma-rx', 'ss-dispense', ['Type:Dispense']),
+    mkFlow('flow-bebo-mismatch', 'Serial Mismatch Alert', 'Distributor scan reveals serial numbers that don\'t match the VRS repository', ['mismatch-count > 0', 'verification-result = Mismatch'], 'Quarantine affected units, flag batch for Exception Review, and notify Compliance Trace Analyst', wsId, 'ss-dist-verify', ['Alert:SerialMismatch', 'Priority:High']),
+    mkFlow('flow-bebo-suspect', 'Suspect Product Escalation (FDA §582)', 'A suspect product event is reported anywhere in the supply chain', ['investigation-priority = Critical', 'investigation-outcome contains Pending'], 'Immediately quarantine the entire batch, create an investigation case, and alert the FDA liaison', wsId, 'ss-trace', ['Suspect', 'Quarantine', 'Priority:Critical', 'FDA-Reportable']),
+    mkFlow('flow-bebo-expiry', '90-Day Expiration Warning', 'Pharmacy inventory contains units within 90 days of expiration', ['days_to_expiration <= 90', 'inventory-status = InStock'], 'Tag unit as Expiring Soon, move to priority dispense queue, alert Pharmacy Dispense Manager', wsId, 'ss-rx-dispense', ['Alert:ExpiringSoon', 'Priority:Medium']),
+    mkFlow('flow-bebo-dispense-log', 'Dispense-to-Patient Completion Logger', 'Pharmacist dispenses a serialized unit against a valid Rx reference', ['dispense-unit-serial is set', 'dispense-rx-reference is set'], 'Transition lifecycle to Dispensed, post trace ledger event (FDA-ready), mark inventory as consumed', wsId, 'ss-rx-dispense', ['Lifecycle:Dispensed', 'Trace:Complete']),
+    mkFlow('flow-bebo-auto-advance', 'Auto-Advance Lifecycle on Shipment', 'EPCIS shipping event confirmed against the Verification Router Service', ['upload-status = Confirmed', 'acknowledgement is set'], 'Automatically transition batch lifecycle to Shipped to Distributor and post the EPCIS ObjectEvent', wsId, 'ss-mfr-serial', ['Lifecycle:AutoAdvance', 'EPCIS']),
   ];
   const integrations = [
     mkIntegration('int-bebo-ds-pharma', 'tpl-docusign', fmtDate(-30)),
     mkIntegration('int-bebo-qb-pharma', 'tpl-quickbooks', fmtDate(-20)),
     mkIntegration('int-bebo-http-pharma', 'tpl-custom-http', fmtDate(-10)),
   ];
-  const unitRecords: RuntimeRecord[] = Array.from({ length: 12 }, (_, i) => {
-    const product = PHARMA_PRODUCTS[i % PHARMA_PRODUCTS.length];
-    const ndc = PHARMA_NDCS[i % PHARMA_NDCS.length];
-    const lot = `LOT-${10000 + i}`;
-    const expiry = fmtDate(180 + Math.floor(Math.random() * 720));
-    return mkRecord(
-      `rec-pharma-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-mfr', 'ss-unit-serial',
-      `${product} — ${lot}`,
-      pick(PHARMA_STATUS), undefined, fmtDate(-i * 3), ['Product:Pharma'],
-      {
-        'Unit Serial Number': `SN-${String(10000 + Math.floor(Math.random() * 89999))}`,
-        'NDC Product Code': ndc,
-        'Lot Number': lot,
-        'Expiration Date': expiry,
-      },
-    );
+
+  // ── Records distributed across 8 subspaces (3 product batches matching admin template demo data) ──
+  const batches = [
+    { name: 'Lisinopril 10mg', lot: 'XY-1234', ndc: '68180-0517-01', ctn: 'CTN-78450-A', units: 2400, pfx: 'LIS' },
+    { name: 'Amoxicillin 500mg', lot: 'MZ-9021', ndc: '65862-0007-05', ctn: 'CTN-92103-B', units: 12000, pfx: 'AMX' },
+    { name: 'Epinephrine 1mg/mL', lot: 'JK-4410', ndc: '00409-1631-01', ctn: 'CTN-44109-C', units: 500, pfx: 'EPI' },
+  ];
+
+  const records: RuntimeRecord[] = [];
+  batches.forEach((b, bi) => {
+    const cId = `client-batch-${bi}`;
+    // Carton
+    records.push(mkRecord(`rec-pharma-ctn-${bi}`, cId, wsId, 'ss-carton', `Carton ${b.ctn} (${b.name})`, 'Serialized', b.units, fmtDate(-10 + bi), ['Level:Carton', `Product:${b.pfx}`], { 'Carton Serial': b.ctn, 'Lot Number': b.lot, 'Expiration Date': fmtDate(365 + bi * 60) }));
+    // Boxes Inside Carton
+    records.push(mkRecord(`rec-pharma-box-${bi}-0`, cId, wsId, 'ss-boxes', `BOX-${b.ctn.slice(4)}-001 (24 units)`, 'Serialized', undefined, fmtDate(-9 + bi), ['Level:Box'], { 'Box Serial': `BOX-${b.ctn.slice(4)}-001`, 'Carton Serial': b.ctn }));
+    records.push(mkRecord(`rec-pharma-box-${bi}-1`, cId, wsId, 'ss-boxes', `BOX-${b.ctn.slice(4)}-002 (24 units)`, 'Serialized', undefined, fmtDate(-9 + bi), ['Level:Box'], { 'Box Serial': `BOX-${b.ctn.slice(4)}-002`, 'Carton Serial': b.ctn }));
+    // Individual Units
+    records.push(mkRecord(`rec-pharma-unit-${bi}-0`, cId, wsId, 'ss-units', `SN-${b.pfx}-000001 — ${b.name}`, 'Serialized', undefined, fmtDate(-8 + bi), ['Level:Unit', `NDC:${b.ndc}`], { 'Unit Serial': `SN-${b.pfx}-000001`, 'NDC Product Code': b.ndc, 'Box Serial': `BOX-${b.ctn.slice(4)}-001` }));
+    records.push(mkRecord(`rec-pharma-unit-${bi}-1`, cId, wsId, 'ss-units', `SN-${b.pfx}-000002 — ${b.name}`, 'Serialized', undefined, fmtDate(-8 + bi), ['Level:Unit', `NDC:${b.ndc}`], { 'Unit Serial': `SN-${b.pfx}-000002`, 'NDC Product Code': b.ndc, 'Box Serial': `BOX-${b.ctn.slice(4)}-002` }));
+    // Lot Information
+    records.push(mkRecord(`rec-pharma-lot-${bi}`, cId, wsId, 'ss-lot-info', `Lot ${b.lot} — ${b.name}`, 'Active', undefined, fmtDate(-7 + bi), ['Level:Lot'], { 'Lot Number': b.lot, 'Expiration Date': fmtDate(365 + bi * 60), 'Product Name': b.name }));
+    // Manufacturer Serialization
+    records.push(mkRecord(`rec-pharma-mfr-${bi}`, cId, wsId, 'ss-mfr-serial', `${b.units.toLocaleString()} units serialized — ${b.name}`, 'Serialized', b.units, fmtDate(-6 + bi), ['Stage:Manufacturer'], { 'Unit Serial Number': `SN-${b.pfx}-000001 → SN-${b.pfx}-${String(b.units).padStart(6, '0')}`, 'Carton Serial Number': b.ctn, 'Aggregation Date': fmtDate(-6 + bi), 'EPCIS Upload Status': 'Confirmed' }));
+    // Distributor Verification
+    const mismatch = bi === 1 ? 3 : 0;
+    records.push(mkRecord(`rec-pharma-dist-${bi}`, cId, wsId, 'ss-dist-verify', mismatch > 0 ? `⚠ Verification mismatch — ${mismatch} of ${b.units.toLocaleString()} flagged` : `Verification passed — ${b.units.toLocaleString()} matched`, 'Received by Distributor', b.units, fmtDate(-4 + bi), [mismatch > 0 ? 'Verification:Mismatch' : 'Verification:Passed'], { 'Scanned Carton Serial': b.ctn, 'Verification Result': mismatch > 0 ? 'Mismatch' : 'Match', 'Matched Serial Count': b.units - mismatch, 'Received Time': fmtDate(-4 + bi) }));
   });
-  const cartonRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
-    const ctnSn = `CTN-${String(10000 + Math.floor(Math.random() * 89999))}-${String.fromCharCode(65 + i)}`;
-    const aggDate = fmtDate(-Math.floor(Math.random() * 30));
-    return mkRecord(
-      `rec-pharma-ctn-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-mfr', 'ss-carton-agg',
-      `${ctnSn} — Aggregation`, 'Aggregated',
-      undefined, aggDate, ['Product:Pharma'], {
-        'Carton Serial Number': ctnSn,
-        'Units per Box': (Math.floor(Math.random() * 5) + 1) * 100,
-        'Aggregation Date': aggDate,
-      },
-    );
-  });
-  const epcisRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => {
-    const subDate = fmtDate(-Math.floor(Math.random() * 14));
-    return mkRecord(
-      `rec-pharma-epcis-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-mfr', 'ss-epcis',
-      `EPCIS-${20000 + i}`, pick(['Submitted', 'Accepted', 'Failed', 'Pending']),
-      undefined, subDate, ['Type:Compliance'], {
-        'Submission ID': `EPCIS-${20000 + i}`,
-        'Submission Date': subDate,
-        'Upload Status': pick(['Submitted', 'Accepted', 'Failed', 'Pending']),
-      },
-    );
-  });
-  const scanRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => {
-    const recvTime = fmtDate(-Math.floor(Math.random() * 7));
-    return mkRecord(
-      `rec-pharma-scan-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-dist', 'ss-inbound-scan',
-      `SCAN-${30000 + i}`, 'Received',
-      undefined, recvTime, ['Type:Scan'], {
-        'Scan Event ID': `SCAN-${30000 + i}`,
-        'Scanned Carton Serial': `CTN-${String(10000 + Math.floor(Math.random() * 89999))}-${String.fromCharCode(65 + i)}`,
-        'Received Time': recvTime,
-      },
-    );
-  });
-  const verifyRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => {
-    const matched = Math.floor(Math.random() * 500 + 100);
-    const mismatch = Math.floor(Math.random() * 3);
-    return mkRecord(
-      `rec-pharma-verify-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-dist', 'ss-serial-verify',
-      `Verification Batch ${i + 1}`, mismatch > 0 ? 'Mismatch' : 'Verified',
-      undefined, fmtDate(-Math.floor(Math.random() * 7)), ['Type:Verification'], {
-        'Verification Result': mismatch > 0 ? 'Mismatch' : 'Match',
-        'Matched Serial Count': matched,
-        'Mismatch Count': mismatch,
-      },
-    );
-  });
-  const rxRecvRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => mkRecord(
-    `rec-pharma-rxrecv-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-rx', 'ss-rx-recv',
-    `RX-RECV-${40000 + i}`, 'Verified',
-    undefined, fmtDate(-Math.floor(Math.random() * 14)), ['Type:Receiving'], {
-      'Receiving Event ID': `RX-RECV-${40000 + i}`,
-      'Received Carton Serial': `CTN-${String(10000 + Math.floor(Math.random() * 89999))}-${String.fromCharCode(65 + i)}`,
-      'Verification Result': pick(['Match', 'Match', 'Match', 'Mismatch']),
-    },
-  ));
-  const dispRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => {
-    const dispDate = fmtDate(-Math.floor(Math.random() * 7));
-    return mkRecord(
-      `rec-pharma-disp-${i}`, `client-batch-${i}`, 'ws-bebo-pharma-rx', 'ss-dispense',
-      `Dispense — ${PHARMA_PRODUCTS[i % PHARMA_PRODUCTS.length]}`, 'Dispensed',
-      undefined, dispDate, ['Type:Dispense'], {
-        'Dispensed Unit Serial': `SN-${String(50000 + Math.floor(Math.random() * 49999))}`,
-        'Dispense Date': dispDate,
-        'Rx Reference': `RX-${String(100000 + Math.floor(Math.random() * 99999))}`,
-      },
-    );
-  });
-  const records = [...unitRecords, ...cartonRecords, ...epcisRecords, ...scanRecords, ...verifyRecords, ...rxRecvRecords, ...dispRecords];
-  const clients = Array.from({ length: 12 }, (_, i) => mkClient(`client-batch-${i}`, `Batch ${PHARMA_PRODUCTS[i % PHARMA_PRODUCTS.length]}`, `LOT-${10000 + i}`, ['Vertical:Pharma']));
+  // Pharmacy Dispense (Lisinopril dispensed)
+  records.push(mkRecord('rec-pharma-rx-0', 'client-batch-0', wsId, 'ss-rx-dispense', 'Dispensed SN-LIS-000012 to patient — Rx #RX-83014', 'Dispensed', 1, fmtDate(-1), ['Lifecycle:Dispensed', 'Trace:Complete'], { 'Dispensed Unit Serial': 'SN-LIS-000012', 'Rx Reference': 'RX-83014', 'Dispense Date': fmtDate(-1), 'Pharmacist': 'Dr. Sarah Kim, PharmD' }));
+  // Traceability & Exceptions
+  records.push(mkRecord('rec-pharma-trace-0', 'client-batch-0', wsId, 'ss-trace', 'Full trace: manufacturer → distributor → pharmacy → patient', 'Dispensed', 2400, fmtDate(-1), ['Trace:EndToEnd', 'Product:Lisinopril'], { 'Event Type': 'End-to-End Trace', 'Impacted Serial': 'SN-LIS-000001 → SN-LIS-002400', 'Exception Status': 'None', 'Investigation Notes': 'Complete supply chain traceability verified.' }));
+  records.push(mkRecord('rec-pharma-trace-1', 'client-batch-0', wsId, 'ss-trace', 'Exception: 1 unit damaged in transit — resolved', 'Exception Review', 1, fmtDate(-2), ['Exception:Damage', 'Priority:Low'], { 'Event Type': 'Damage', 'Impacted Serial': 'SN-LIS-000198', 'Exception Status': 'Resolved', 'Investigation Notes': 'Unit SN-LIS-000198 packaging damage during distributor shipment. Replaced and resolved.' }));
+  records.push(mkRecord('rec-pharma-trace-2', 'client-batch-2', wsId, 'ss-trace', '🔴 SUSPECT: Counterfeit serials detected in secondary market', 'Exception Review', 500, fmtDate(0), ['Suspect', 'Quarantine', 'Priority:Critical', 'FDA-Reportable'], { 'Event Type': 'Suspect Product', 'Impacted Serial': 'SN-EPI-000001 → SN-EPI-000500', 'Exception Status': 'Open', 'Investigation Notes': 'Third-party marketplace listing with 12 units matching Lot JK-4410 but duplicate GS1 barcodes. FDA DSCSA §582 notification triggered.' }));
+
+  const clientProducts = [
+    { name: 'Lisinopril 10mg', lot: 'XY-1234' }, { name: 'Amoxicillin 500mg', lot: 'MZ-9021' }, { name: 'Epinephrine 1mg/mL', lot: 'JK-4410' },
+    { name: 'Metformin 1000mg', lot: 'PQ-5502' }, { name: 'Atorvastatin 40mg', lot: 'RS-6711' }, { name: 'Omeprazole 20mg', lot: 'TU-2289' },
+    { name: 'Levothyroxine 100mcg', lot: 'VW-3345' }, { name: 'Amlodipine 5mg', lot: 'AB-7890' }, { name: 'Sertraline 50mg', lot: 'CD-1122' },
+    { name: 'Gabapentin 300mg', lot: 'EF-4456' }, { name: 'Hydrochlorothiazide 25mg', lot: 'GH-7788' }, { name: 'Metoprolol 50mg', lot: 'IJ-9900' },
+  ];
+  const clients = clientProducts.map((p, i) => mkClient(`client-batch-${i}`, `Batch ${p.name}`, `LOT-${p.lot}`, ['Vertical:Pharma']));
+
   return {
-    shellConfig: mkShellConfig('Serialized Batch', 'Serialized Batches', 'Supply Chain Workspace', 'Traceability SubSpace', ['Serialized', 'Shipped to Distributor', 'Received by Distributor', 'Shipped to Pharmacy', 'Received by Pharmacy', 'Dispensed']),
-    workspaces: [wsMfr, wsDist, wsRx], flows, integrations, records, clients,
+    shellConfig: mkShellConfig('Serialized Batch', 'Serialized Batches', 'Supply Chain Workspace', 'Traceability SubSpace', ['Serialized', 'Shipped to Distributor', 'Received by Distributor', 'Shipped to Pharmacy', 'Received by Pharmacy', 'Dispensed', 'Exception Review']),
+    workspaces: [ws], flows, integrations, records, clients,
   };
 }
 
@@ -871,7 +837,8 @@ export function buildLogisticsPayload(): ScenarioApplyPayload {
 }
 
 export function buildLegalPayload(): ScenarioApplyPayload {
-  const wsCases = mkWorkspace('ws-bebo-legal', 'Case Management', 'Case', '⚖️', [
+  // Workspace 1: Case Management (matches useAiHooks Legal template)
+  const wsCases = mkWorkspace('ws-bebo-legal-cases', 'Case Management', 'Case', '⚖️', [
     mkSubSpace('ss-active-cases', 'Active Cases', 'Case', 'grid', [
       mkField('f-case-no', 'Case Number', 'text', true),
       mkField('f-client', 'Client Name', 'text', true),
@@ -880,19 +847,35 @@ export function buildLegalPayload(): ScenarioApplyPayload {
     ]),
     mkSubSpace('ss-deadlines', 'Deadlines & Court Dates', 'Calendar Event', 'timeline', [
       mkField('f-event-type', 'Event Type', 'select', true),
-      mkField('f-court-date', 'Date', 'datetime', true),
+      mkField('f-dl-date', 'Date', 'datetime', true),
       mkField('f-court', 'Court', 'text', false),
+      mkField('f-dl-desc', 'Description', 'longText', false),
     ]),
-    mkSubSpace('ss-billing', 'Time & Billing', 'Time Entry', 'grid', [
+    mkSubSpace('ss-docs', 'Documents', 'Document', 'grid', [
+      mkField('f-doc-name', 'Document Name', 'text', true),
+      mkField('f-doc-type', 'Type', 'select', true),
+      mkField('f-doc-filed', 'Filed Date', 'date', true),
+      mkField('f-doc-case', 'Case Reference', 'text', true),
+    ]),
+  ]);
+  // Workspace 2: Billing & Time
+  const wsBilling = mkWorkspace('ws-bebo-legal-billing', 'Billing & Time', 'Client', '💰', [
+    mkSubSpace('ss-time-entries', 'Time Entries', 'Time Entry', 'grid', [
       mkField('f-entry-date', 'Date', 'date', true),
       mkField('f-hours', 'Hours', 'number', true),
       mkField('f-rate', 'Hourly Rate', 'number', true),
       mkField('f-desc', 'Description', 'longText', false),
     ]),
+    mkSubSpace('ss-invoices', 'Invoices', 'Invoice', 'grid', [
+      mkField('f-inv-no', 'Invoice Number', 'text', true),
+      mkField('f-inv-amt', 'Amount', 'number', true),
+      mkField('f-inv-due', 'Due Date', 'date', true),
+      mkField('f-inv-status', 'Status', 'select', true),
+    ]),
   ]);
   const flows = [
-    mkFlow('flow-bebo-court-deadline', 'Court Deadline Alert', 'Court date within 7 days', ['event_type = Court Hearing', 'days_until <= 7'], 'Send urgent reminder to attorney and paralegal', 'ws-bebo-legal', 'ss-deadlines', ['Priority:Urgent', 'Type:Deadline']),
-    mkFlow('flow-bebo-unbilled', 'Unbilled Time Reminder', 'Time entries older than 30 days not invoiced', ['billed = false', 'age_days > 30'], 'Notify billing department and generate draft invoice', 'ws-bebo-legal', 'ss-billing', ['Type:Billing']),
+    mkFlow('flow-bebo-court-deadline', 'Court Deadline Alert', 'Court date within 7 days', ['event_type = Court Hearing', 'days_until <= 7'], 'Send urgent reminder to attorney and paralegal', 'ws-bebo-legal-cases', 'ss-deadlines', ['Priority:Urgent', 'Type:Deadline']),
+    mkFlow('flow-bebo-unbilled', 'Unbilled Time Reminder', 'Time entries older than 30 days not invoiced', ['billed = false', 'age_days > 30'], 'Notify billing department and generate draft invoice', 'ws-bebo-legal-billing', 'ss-time-entries', ['Type:Billing']),
   ];
   const integrations = [
     mkIntegration('int-bebo-ds-legal', 'tpl-docusign', fmtDate(-90)),
@@ -900,13 +883,14 @@ export function buildLegalPayload(): ScenarioApplyPayload {
   ];
   const legalAdj = ['Greenfield', 'Mountain View', 'Sunrise', 'Pacific', 'Atlantic', 'Northern', 'Western', 'Capital'];
   const legalOrgs = ['LLC', 'Corp.', 'Industries', 'Holdings', 'Group', 'Partners', 'Ventures', 'Associates'];
+  // Active Cases
   const caseRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) => {
     const clientName = `${pick(legalAdj)} ${pick(legalOrgs)}`;
     const matter = pick(MATTER_TYPES);
     const attorney = pick(ATTORNEYS);
     const status = pick(CASE_STATUS);
     return mkRecord(
-      `rec-legal-${i}`, `client-legal-${i}`, 'ws-bebo-legal', 'ss-active-cases',
+      `rec-legal-${i}`, `client-legal-${i}`, 'ws-bebo-legal-cases', 'ss-active-cases',
       `CASE-2026-${1000 + i} — ${matter}`, status,
       Math.floor(Math.random() * 50 + 10) * 1000, fmtDate(-i * 7),
       ['Type:Case'], {
@@ -917,30 +901,49 @@ export function buildLegalPayload(): ScenarioApplyPayload {
       },
     );
   });
+  // Deadlines & Court Dates
   const courtEventTypes = ['Court Hearing', 'Filing Deadline', 'Deposition', 'Mediation', 'Trial Start', 'Motion Deadline'];
   const courts = ['Southern District NY', 'Central District CA', 'Northern District IL', 'Eastern District PA', 'District of Columbia'];
   const deadlineRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
     const evType = pick(courtEventTypes);
     const dt = fmtDate(Math.floor(Math.random() * 60) + 1);
     return mkRecord(
-      `rec-legal-dl-${i}`, `client-legal-${i}`, 'ws-bebo-legal', 'ss-deadlines',
+      `rec-legal-dl-${i}`, `client-legal-${i}`, 'ws-bebo-legal-cases', 'ss-deadlines',
       `${evType} — CASE-2026-${1000 + i}`, pick(CASE_STATUS),
       undefined, dt, ['Type:Deadline'], {
         'Event Type': evType,
         'Date': dt,
         'Court': pick(courts),
+        'Description': pick(['Oral argument on motion to dismiss', 'Response deadline for interrogatories', 'Expert witness deposition', 'Settlement conference', 'Pre-trial motions due', 'Discovery compliance review']),
       },
     );
   });
+  // Documents
+  const docTypes = ['Motion', 'Brief', 'Exhibit', 'Deposition Transcript', 'Contract', 'Correspondence', 'Court Order'];
+  const docRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const docType = pick(docTypes);
+    const filedDate = fmtDate(-Math.floor(Math.random() * 60));
+    return mkRecord(
+      `rec-legal-doc-${i}`, `client-legal-${i}`, 'ws-bebo-legal-cases', 'ss-docs',
+      `${docType} — CASE-2026-${1000 + i}`, 'Filed',
+      undefined, filedDate, ['Type:Document'], {
+        'Document Name': `${docType} re ${pick(MATTER_TYPES)}`,
+        'Type': docType,
+        'Filed Date': filedDate,
+        'Case Reference': `CASE-2026-${1000 + i}`,
+      },
+    );
+  });
+  // Time Entries (Billing & Time workspace)
   const billingDescs = ['Client meeting re strategy', 'Draft motion for summary judgment', 'Document review and analysis', 'Prepare deposition questions', 'Court appearance', 'Settlement negotiation call', 'Legal research — precedent review'];
-  const billingRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+  const timeRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
     const hours = Math.floor(Math.random() * 8 + 1);
     const rate = pick([250, 350, 450, 550, 650]);
     const dt = fmtDate(-Math.floor(Math.random() * 30));
     return mkRecord(
-      `rec-legal-bill-${i}`, `client-legal-${i}`, 'ws-bebo-legal', 'ss-billing',
+      `rec-legal-time-${i}`, `client-legal-${i}`, 'ws-bebo-legal-billing', 'ss-time-entries',
       `${hours}h @ $${rate}/hr — CASE-2026-${1000 + i}`, 'Logged',
-      hours * rate, dt, ['Type:Billing'], {
+      hours * rate, dt, ['Type:TimeEntry'], {
         'Date': dt,
         'Hours': hours,
         'Hourly Rate': rate,
@@ -948,38 +951,75 @@ export function buildLegalPayload(): ScenarioApplyPayload {
       },
     );
   });
-  const records = [...caseRecords, ...deadlineRecords, ...billingRecords];
+  // Invoices
+  const invoiceRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const invAmt = Math.floor(Math.random() * 30 + 5) * 1000;
+    const dueDate = fmtDate(Math.floor(Math.random() * 30) + 7);
+    return mkRecord(
+      `rec-legal-inv-${i}`, `client-legal-${i}`, 'ws-bebo-legal-billing', 'ss-invoices',
+      `INV-2026-${5000 + i} — $${invAmt.toLocaleString()}`, pick(['Draft', 'Sent', 'Paid', 'Overdue']),
+      invAmt, dueDate, ['Type:Invoice'], {
+        'Invoice Number': `INV-2026-${5000 + i}`,
+        'Amount': invAmt,
+        'Due Date': dueDate,
+        'Status': pick(['Draft', 'Sent', 'Paid', 'Overdue']),
+      },
+    );
+  });
+  const records = [...caseRecords, ...deadlineRecords, ...docRecords, ...timeRecords, ...invoiceRecords];
   const clients = Array.from({ length: 8 }, (_, i) => mkClient(`client-legal-${i}`, `${pick(legalAdj)} ${pick(legalOrgs)}`, `CASE-2026-${1000 + i}`, ['Vertical:Legal']));
   return {
     shellConfig: mkShellConfig('Case', 'Cases', 'Legal Workspace', 'Practice Area', ['Intake', 'Engagement', 'Discovery', 'Litigation', 'Settlement', 'Closed', 'Archived']),
-    workspaces: [wsCases], flows, integrations, records, clients,
+    workspaces: [wsCases, wsBilling], flows, integrations, records, clients,
   };
 }
 
 export function buildInsurancePayload(): ScenarioApplyPayload {
-  const wsPolicies = mkWorkspace('ws-bebo-insurance', 'Policy Administration', 'Policy', '🛡️', [
+  // Workspace 1: Policy Administration (matches useAiHooks Insurance template)
+  const wsPolicies = mkWorkspace('ws-bebo-ins-policy', 'Policy Administration', 'Policy', '🛡️', [
     mkSubSpace('ss-active-pols', 'Active Policies', 'Policy', 'grid', [
       mkField('f-pol-no', 'Policy Number', 'text', true),
       mkField('f-insured', 'Insured Name', 'text', true),
       mkField('f-cov-type', 'Coverage Type', 'select', true),
       mkField('f-premium', 'Annual Premium', 'number', true),
-      mkField('f-eff-date', 'Effective Date', 'date', true),
     ]),
-    mkSubSpace('ss-claims', 'Open Claims', 'Claim', 'board', [
+    mkSubSpace('ss-renewals', 'Renewals', 'Renewal Request', 'board', [
+      mkField('f-ren-pol', 'Policy Number', 'text', true),
+      mkField('f-ren-date', 'Renewal Date', 'date', true),
+      mkField('f-ren-pct', 'Change Percentage', 'number', false),
+      mkField('f-ren-notes', 'Agent Notes', 'longText', false),
+    ]),
+    mkSubSpace('ss-endorsements', 'Endorsements', 'Endorsement', 'timeline', [
+      mkField('f-end-id', 'Endorsement ID', 'text', true),
+      mkField('f-end-eff', 'Effective Date', 'date', true),
+      mkField('f-end-desc', 'Change Description', 'longText', true),
+      mkField('f-end-impact', 'Premium Impact', 'number', false),
+    ]),
+  ]);
+  // Workspace 2: Claims Processing
+  const wsClaims = mkWorkspace('ws-bebo-ins-claims', 'Claims Processing', 'Claim', '📋', [
+    mkSubSpace('ss-open-claims', 'Open Claims', 'Claim', 'board', [
       mkField('f-claim-no', 'Claim Number', 'text', true),
       mkField('f-claimant', 'Claimant', 'text', true),
       mkField('f-loss-date', 'Date of Loss', 'date', true),
       mkField('f-est-amount', 'Estimated Amount', 'number', true),
     ]),
-    mkSubSpace('ss-renewals', 'Renewals', 'Renewal Request', 'board', [
-      mkField('f-ren-pol', 'Policy Number', 'text', true),
-      mkField('f-ren-date', 'Renewal Date', 'date', true),
-      mkField('f-prop-prem', 'Proposed Premium', 'number', false),
+    mkSubSpace('ss-payments', 'Payments', 'Payment', 'grid', [
+      mkField('f-pay-id', 'Payment ID', 'text', true),
+      mkField('f-pay-claim', 'Claim Number', 'text', true),
+      mkField('f-pay-amt', 'Amount', 'number', true),
+      mkField('f-pay-date', 'Payment Date', 'date', true),
+    ]),
+    mkSubSpace('ss-claim-docs', 'Documents', 'Document', 'grid', [
+      mkField('f-cdoc-name', 'Document Name', 'text', true),
+      mkField('f-cdoc-type', 'Document Type', 'select', true),
+      mkField('f-cdoc-date', 'Upload Date', 'date', true),
+      mkField('f-cdoc-claim', 'Related Claim', 'text', true),
     ]),
   ]);
   const flows = [
-    mkFlow('flow-bebo-high-claim', 'High-Value Claim Escalation', 'Claim amount exceeds $50,000', ['estimated_amount > 50000', 'status = Open'], 'Escalate to senior adjuster and notify management', 'ws-bebo-insurance', 'ss-claims', ['Priority:High', 'Type:Claim']),
-    mkFlow('flow-bebo-renewal', 'Policy Renewal Reminder', 'Policy expiring within 30 days', ['expiry_days <= 30', 'renewal_status = None'], 'Generate renewal quote and notify policyholder', 'ws-bebo-insurance', 'ss-active-pols', ['Type:Policy', 'Status:Expiring']),
+    mkFlow('flow-bebo-high-claim', 'High-Value Claim Escalation', 'Claim amount exceeds $50,000', ['estimated_amount > 50000', 'status = Open'], 'Escalate to senior adjuster and notify management', 'ws-bebo-ins-claims', 'ss-open-claims', ['Priority:High', 'Type:Claim']),
+    mkFlow('flow-bebo-renewal', 'Policy Renewal Reminder', 'Policy expiring within 30 days', ['expiry_days <= 30', 'renewal_status = None'], 'Generate renewal quote and notify policyholder', 'ws-bebo-ins-policy', 'ss-active-pols', ['Type:Policy', 'Status:Expiring']),
   ];
   const integrations = [
     mkIntegration('int-bebo-ds-ins', 'tpl-docusign', fmtDate(-120)),
@@ -988,29 +1028,59 @@ export function buildInsurancePayload(): ScenarioApplyPayload {
   ];
   const insPrefixes = ['Sunrise', 'Northland', 'Pacific', 'Prairie', 'Valley', 'Metro', 'Coastal', 'Highland'];
   const insSuffixes = ['LLC', 'Corp', 'Holdings', 'Inc', 'Group', 'Association'];
-  const insAgents = ['Alex Johnson', 'Maria Santos', 'Kevin Wu', 'Rachel Green', 'Tyler Morris'];
+  // Active Policies
   const policyRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) => {
     const covType = pick(COV_TYPES);
     const insured = `${pick(insPrefixes)} ${pick(insSuffixes)}`;
     const premium = Math.floor(Math.random() * 50 + 5) * 1000;
     const effDate = fmtDate(-Math.floor(Math.random() * 365));
     return mkRecord(
-      `rec-ins-${i}`, `client-ins-${i}`, 'ws-bebo-insurance', 'ss-active-pols',
+      `rec-ins-${i}`, `client-ins-${i}`, 'ws-bebo-ins-policy', 'ss-active-pols',
       `POL-2026${String(10000 + i)} — ${covType}`, pick(INS_STATUS),
       premium, effDate, ['Type:Policy'], {
         'Policy Number': `POL-2026${String(10000 + i)}`,
         'Insured Name': insured,
         'Coverage Type': covType,
         'Annual Premium': premium,
-        'Effective Date': effDate,
       },
     );
   });
+  // Renewals
+  const renewalRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const renDate = fmtDate(Math.floor(Math.random() * 60) + 7);
+    const changePct = Math.floor(Math.random() * 15 - 3);
+    return mkRecord(
+      `rec-ins-ren-${i}`, `client-ins-${i + 4}`, 'ws-bebo-ins-policy', 'ss-renewals',
+      `Renewal — POL-2026${String(10000 + i + 4)}`, 'Renewal Pending',
+      undefined, renDate, ['Type:Renewal'], {
+        'Policy Number': `POL-2026${String(10000 + i + 4)}`,
+        'Renewal Date': renDate,
+        'Change Percentage': changePct,
+        'Agent Notes': pick(['Standard renewal, no changes', 'Client requested higher deductible', 'Adding umbrella coverage', 'Premium increase due to claims history']),
+      },
+    );
+  });
+  // Endorsements
+  const endorsementRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => {
+    const effDate = fmtDate(-Math.floor(Math.random() * 90));
+    const impact = (Math.floor(Math.random() * 10) - 2) * 500;
+    return mkRecord(
+      `rec-ins-end-${i}`, `client-ins-${i}`, 'ws-bebo-ins-policy', 'ss-endorsements',
+      `END-2026-${6000 + i} — POL-2026${String(10000 + i)}`, 'Processed',
+      Math.abs(impact), effDate, ['Type:Endorsement'], {
+        'Endorsement ID': `END-2026-${6000 + i}`,
+        'Effective Date': effDate,
+        'Change Description': pick(['Add additional insured', 'Increase liability limit to $2M', 'Remove vehicle from auto policy', 'Add flood coverage rider', 'Update property valuation']),
+        'Premium Impact': impact,
+      },
+    );
+  });
+  // Open Claims
   const claimRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
     const estAmt = Math.floor(Math.random() * 80 + 5) * 1000;
     const lossDate = fmtDate(-Math.floor(Math.random() * 60));
     return mkRecord(
-      `rec-ins-claim-${i}`, `client-ins-${i}`, 'ws-bebo-insurance', 'ss-claims',
+      `rec-ins-claim-${i}`, `client-ins-${i}`, 'ws-bebo-ins-claims', 'ss-open-claims',
       `CLM-2026${String(50000 + i)} — ${pick(COV_TYPES)}`, pick(['Open', 'Under Review', 'Approved', 'Denied']),
       estAmt, lossDate, ['Type:Claim'], {
         'Claim Number': `CLM-2026${String(50000 + i)}`,
@@ -1020,25 +1090,42 @@ export function buildInsurancePayload(): ScenarioApplyPayload {
       },
     );
   });
-  const renewalRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
-    const renDate = fmtDate(Math.floor(Math.random() * 60) + 7);
-    const propPrem = Math.floor(Math.random() * 50 + 5) * 1000;
+  // Payments
+  const paymentRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => {
+    const payAmt = Math.floor(Math.random() * 40 + 5) * 1000;
+    const payDate = fmtDate(-Math.floor(Math.random() * 30));
     return mkRecord(
-      `rec-ins-ren-${i}`, `client-ins-${i + 4}`, 'ws-bebo-insurance', 'ss-renewals',
-      `Renewal — POL-2026${String(10000 + i + 4)}`, 'Renewal Pending',
-      propPrem, renDate, ['Type:Renewal'], {
-        'Policy Number': `POL-2026${String(10000 + i + 4)}`,
-        'Renewal Date': renDate,
-        'Proposed Premium': propPrem,
+      `rec-ins-pay-${i}`, `client-ins-${i}`, 'ws-bebo-ins-claims', 'ss-payments',
+      `PAY-2026-${7000 + i} — $${payAmt.toLocaleString()}`, 'Issued',
+      payAmt, payDate, ['Type:Payment'], {
+        'Payment ID': `PAY-2026-${7000 + i}`,
+        'Claim Number': `CLM-2026${String(50000 + i)}`,
+        'Amount': payAmt,
+        'Payment Date': payDate,
       },
     );
   });
-  const records = [...policyRecords, ...claimRecords, ...renewalRecords];
+  // Claim Documents
+  const claimDocRecords: RuntimeRecord[] = Array.from({ length: 3 }, (_, i) => {
+    const uploadDate = fmtDate(-Math.floor(Math.random() * 45));
+    const docType = pick(['Loss Report', 'Police Report', 'Medical Records', 'Repair Estimate', 'Photos', 'Affidavit']);
+    return mkRecord(
+      `rec-ins-doc-${i}`, `client-ins-${i}`, 'ws-bebo-ins-claims', 'ss-claim-docs',
+      `${docType} — CLM-2026${String(50000 + i)}`, 'Uploaded',
+      undefined, uploadDate, ['Type:Document'], {
+        'Document Name': `${docType} for CLM-2026${String(50000 + i)}`,
+        'Document Type': docType,
+        'Upload Date': uploadDate,
+        'Related Claim': `CLM-2026${String(50000 + i)}`,
+      },
+    );
+  });
+  const records = [...policyRecords, ...renewalRecords, ...endorsementRecords, ...claimRecords, ...paymentRecords, ...claimDocRecords];
   const insNames = ['Lakewood Ins', 'Summit Coverage', 'Pinnacle Shield', 'Harbor Mutual', 'Eagle Assurance', 'Crestview Group', 'Meridian Ins', 'Horizon Union'];
   const clients = Array.from({ length: 8 }, (_, i) => mkClient(`client-ins-${i}`, insNames[i], `POL-${4000 + i}`, ['Vertical:Insurance']));
   return {
     shellConfig: mkShellConfig('Policy', 'Policies', 'Insurance Workspace', 'Service Line', ['Application', 'Underwriting', 'Bound', 'Active', 'Renewal Pending', 'Lapsed', 'Cancelled']),
-    workspaces: [wsPolicies], flows, integrations, records, clients,
+    workspaces: [wsPolicies, wsClaims], flows, integrations, records, clients,
   };
 }
 
@@ -1059,7 +1146,7 @@ function buildPharmaBusinessFunctions(): BusinessFunction[] {
       namePlural: 'Drug Inventories',
       icon: '💊',
       description: 'Track serialized pharmaceutical batches across the DSCSA supply chain',
-      workspaceIds: ['ws-bebo-pharma-mfr', 'ws-bebo-pharma-dist', 'ws-bebo-pharma-rx'],
+      workspaceIds: ['ws-bebo-pharma'],
     }],
   }];
 }
@@ -1149,12 +1236,12 @@ const INTEGRATION_CATALOG: BeboCardIntegrationStatus['integrations'] = [
 ];
 
 const WORKSPACE_KPI: Record<DemoVertical, { v1: string; v2: string; v3: string; wsCount: number; flowCount: number }> = {
-  pharma: { v1: '247 Serialized Batches', v2: '99.8% Compliance Rate', v3: '3 Workspaces Active', wsCount: 3, flowCount: 3 },
+  pharma: { v1: '247 Serialized Batches', v2: '99.8% Compliance Rate', v3: '1 Pipeline Workspace', wsCount: 1, flowCount: 5 },
   sales: { v1: '$2.4M Pipeline Value', v2: '34% Win Rate', v3: '183 Tracked Records', wsCount: 1, flowCount: 3 },
   healthcare: { v1: '412 Patient Records', v2: '94% Appointment Show Rate', v3: '38 Visits Today', wsCount: 1, flowCount: 2 },
   logistics: { v1: '891 Shipments Active', v2: '97.2% On-Time Rate', v3: '12 Alerts Today', wsCount: 1, flowCount: 2 },
-  legal: { v1: '94 Active Cases', v2: '$1.8M Billed YTD', v3: '8 Court Dates This Month', wsCount: 1, flowCount: 2 },
-  insurance: { v1: '318 Active Policies', v2: '$4.2M Annual Premium', v3: '27 Open Claims', wsCount: 1, flowCount: 2 },
+  legal: { v1: '94 Active Cases', v2: '$1.8M Billed YTD', v3: '8 Court Dates This Month', wsCount: 2, flowCount: 2 },
+  insurance: { v1: '318 Active Policies', v2: '$4.2M Annual Premium', v3: '27 Open Claims', wsCount: 2, flowCount: 2 },
 };
 
 // ─── Response Generator ───────────────────────────────────────────────

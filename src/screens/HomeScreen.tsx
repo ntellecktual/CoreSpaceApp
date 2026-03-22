@@ -869,7 +869,7 @@ export function HomeScreen() {
               accessibilityRole="button"
               accessibilityLabel="End User"
             >
-              <Text style={{ fontSize: 18 }}>▣</Text>
+              <Text style={{ fontSize: 18, color: mode === 'day' ? '#2F2249' : 'rgba(214,204,235,0.85)' }}>▣</Text>
             </Pressable>
           )}
 
@@ -1029,7 +1029,7 @@ export function HomeScreen() {
                     accessibilityRole="button"
                     accessibilityLabel={item.label}
                   >
-                    <Text style={{ fontSize: 18 }}>{NAV_ICONS[item.id] ?? '•'}</Text>
+                    <Text style={{ fontSize: 18, color: mode === 'day' ? '#2F2249' : 'rgba(214,204,235,0.85)' }}>{NAV_ICONS[item.id] ?? '•'}</Text>
                   </Pressable>
                 );
               })}
@@ -1061,7 +1061,7 @@ export function HomeScreen() {
               accessibilityLabel={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' }}
             >
-              <Text style={{ fontSize: 18 }}>🔔</Text>
+              <Text style={{ fontSize: 18, color: mode === 'day' ? '#2F2249' : 'rgba(214,204,235,0.85)' }}>🔔</Text>
               {unreadCount > 0 && (
                 <View style={{ backgroundColor: '#EF4444', borderRadius: 9, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4, marginLeft: -2, marginTop: -8 }}>
                   <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '800' }}>{unreadCount}</Text>

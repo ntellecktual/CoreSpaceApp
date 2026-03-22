@@ -96,6 +96,20 @@ function getContrastTextColor(hex: string) {
   return luminance > 0.56 ? '#111111' : '#FFFFFF';
 }
 
+// Returns a pure RGB mix of `hex` with white at `ratio` (0–1 = pure white…pure color).
+// Use this for day-mode brand backgrounds so the result is independent of what's underneath.
+function hexMixWithWhite(hex: string, ratio: number): string {
+  const raw = hex.replace('#', '');
+  if (raw.length !== 6) return '#F5F1FF';
+  const r = parseInt(raw.slice(0, 2), 16);
+  const g = parseInt(raw.slice(2, 4), 16);
+  const b = parseInt(raw.slice(4, 6), 16);
+  const lr = Math.round(r * ratio + 255 * (1 - ratio));
+  const lg = Math.round(g * ratio + 255 * (1 - ratio));
+  const lb = Math.round(b * ratio + 255 * (1 - ratio));
+  return `rgb(${lr},${lg},${lb})`;
+}
+
 // ── Tenant Customization Options ─────────────────────────────────────
 const INDUSTRY_OPTIONS = ['Healthcare', 'Finance', 'Logistics', 'Technology', 'Manufacturing', 'Legal', 'Education', 'Government', 'Retail', 'Energy'];
 const FONT_OPTIONS = ['System Default', 'Inter', 'Roboto', 'Poppins', 'Monospace'];
@@ -342,10 +356,15 @@ export function HomeScreen() {
   const tenantSecondaryResolved = normalizeHex(tenantSecondaryColor, activeTenantBranding.brandColors[1]);
   const tenantAccentResolved = normalizeHex(tenantAccentColor, activeTenantBranding.brandColors[2]);
   const tenantAccentTextColor = getContrastTextColor(tenantAccentResolved);
+  // Day-mode color variants: genuine RGB blend with white so backgrounds are
+  // always light regardless of how dark the raw tenant brand colors are.
+  const tenantPrimaryDay = mode === 'day' ? hexMixWithWhite(tenantPrimaryResolved, 0.13) : tenantPrimaryResolved;
+  const tenantSecondaryDay = mode === 'day' ? hexMixWithWhite(tenantSecondaryResolved, 0.16) : tenantSecondaryResolved;
+  const tenantAccentDay = mode === 'day' ? hexMixWithWhite(tenantAccentResolved, 0.22) : tenantAccentResolved;
   const endUserFooterSecondaryButtonStyle = tenantBrandedMode
     ? {
-        borderColor: withAlpha(tenantAccentResolved, mode === 'day' ? 'CC' : 'DD'),
-        backgroundColor: withAlpha(tenantAccentResolved, mode === 'day' ? 'B5' : 'A6'),
+        borderColor: mode === 'day' ? withAlpha(tenantAccentResolved, '88') : withAlpha(tenantAccentResolved, 'DD'),
+        backgroundColor: mode === 'day' ? hexMixWithWhite(tenantAccentResolved, 0.28) : withAlpha(tenantAccentResolved, 'A6'),
       }
     : null;
   const endUserFooterPrimaryButtonStyle = tenantBrandedMode
@@ -355,18 +374,18 @@ export function HomeScreen() {
       }
     : null;
   const endUserFooterButtonTextStyle = tenantBrandedMode
-    ? { color: tenantAccentTextColor }
+    ? { color: mode === 'day' ? getContrastTextColor(tenantAccentDay) : tenantAccentTextColor }
     : null;
   const endUserFooterBarStyle = tenantBrandedMode
     ? {
-        borderTopColor: withAlpha(tenantAccentResolved, mode === 'day' ? '8F' : 'A8'),
-        backgroundColor: withAlpha(tenantSecondaryResolved, mode === 'day' ? 'D6' : 'B5'),
+        borderTopColor: withAlpha(tenantAccentResolved, mode === 'day' ? '66' : 'A8'),
+        backgroundColor: mode === 'day' ? hexMixWithWhite(tenantSecondaryResolved, 0.18) : withAlpha(tenantSecondaryResolved, 'B5'),
       }
     : null;
   const endUserFooterStatusTextStyle = tenantBrandedMode
     ? {
         color: mode === 'day'
-          ? withAlpha(getContrastTextColor(tenantSecondaryResolved), 'E8')
+          ? getContrastTextColor(tenantSecondaryDay)
           : withAlpha(getContrastTextColor(tenantAccentResolved), 'F2'),
       }
     : null;
@@ -751,7 +770,7 @@ export function HomeScreen() {
             isSidebarCollapsed && styles.dashboardSidebarCollapsed,
             compactShell ? styles.dashboardSidebarCompact : { width: resolvedSidebarWidth },
             styles.dashboardSidebarSmooth,
-            tenantBrandedMode && { backgroundColor: tenantPrimaryResolved },
+            tenantBrandedMode && { backgroundColor: tenantPrimaryDay },
             { paddingHorizontal: shellSpace },
           ]}
         >
@@ -1037,12 +1056,12 @@ export function HomeScreen() {
           )}
         </View>
 
-        <View style={[styles.dashboardMainPane, compactShell && styles.dashboardMainPaneCompact, tenantBrandedMode && { backgroundColor: mode === 'day' ? withAlpha(tenantSecondaryResolved, '22') : tenantSecondaryResolved }]}>
+        <View style={[styles.dashboardMainPane, compactShell && styles.dashboardMainPaneCompact, tenantBrandedMode && { backgroundColor: mode === 'day' ? tenantSecondaryDay : tenantSecondaryResolved }]}>
           <View
             style={[
               styles.dashboardMainHeader,
               compactShell && styles.dashboardMainHeaderCompact,
-              tenantBrandedMode && { backgroundColor: mode === 'day' ? withAlpha(tenantPrimaryResolved, '18') : tenantPrimaryResolved },
+              tenantBrandedMode && { backgroundColor: mode === 'day' ? tenantPrimaryDay : tenantPrimaryResolved },
               { paddingHorizontal: shellSpace, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
             ]}
           >

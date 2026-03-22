@@ -985,7 +985,7 @@ export function HomeScreen() {
                   accessibilityLabel="Settings"
                   accessibilityHint="Opens app settings"
                 >
-                  <Text style={[styles.dashboardSidebarActionText, settingsOpen && styles.dashboardSidebarActionTextActive]}>
+                  <Text style={[styles.dashboardSidebarActionText, settingsOpen && styles.dashboardSidebarActionTextActive, tenantBrandedMode && settingsOpen && { color: tenantAccentResolved }]}>
                     Settings {settingsOpen ? '▾' : '▸'}
                   </Text>
                 </Pressable>
@@ -1001,7 +1001,7 @@ export function HomeScreen() {
                   accessibilityRole="button"
                   accessibilityLabel="CoreSpace Documentation"
                 >
-                  <Text style={[styles.dashboardSidebarActionText, !tenantAccessOpen && page === 'architecture' && styles.dashboardSidebarActionTextActive]}>
+                  <Text style={[styles.dashboardSidebarActionText, !tenantAccessOpen && page === 'architecture' && styles.dashboardSidebarActionTextActive, tenantBrandedMode && !tenantAccessOpen && page === 'architecture' && { color: tenantAccentResolved }]}>
                     Platform Docs
                   </Text>
                 </Pressable>
@@ -1053,13 +1053,13 @@ export function HomeScreen() {
                     accessibilityRole="button"
                     accessibilityLabel="Tenant access"
                   >
-                    <Text style={[styles.dashboardSidebarActionText, tenantAccessOpen && styles.dashboardSidebarActionTextActive]}>
+                    <Text style={[styles.dashboardSidebarActionText, tenantAccessOpen && styles.dashboardSidebarActionTextActive, tenantBrandedMode && tenantAccessOpen && { color: tenantAccentResolved }]}>
                       Tenant Access {tenantAccessOpen ? '▾' : '▸'}
                     </Text>
                   </Pressable>
                 )}
 
-                <Text style={styles.dashboardSectionLabel}>Access</Text>
+                <Text style={[styles.dashboardSectionLabel, tenantBrandedMode && { color: tenantAccentResolved }]}>Access</Text>
                 {roles.map((role) => (
                   <Pressable
                     key={role.id}
@@ -1069,7 +1069,7 @@ export function HomeScreen() {
                     accessibilityState={{ selected: activeRole?.id === role.id }}
                     accessibilityLabel={`Switch to ${role.name} role`}
                   >
-                    <Text style={[styles.dashboardRoleItemText, activeRole?.id === role.id && styles.dashboardRoleItemTextActive]}>{role.name}</Text>
+                    <Text style={[styles.dashboardRoleItemText, activeRole?.id === role.id && styles.dashboardRoleItemTextActive, tenantBrandedMode && activeRole?.id === role.id && { color: tenantAccentResolved }]}>{role.name}</Text>
                   </Pressable>
                 ))}
                   </View>
@@ -1084,7 +1084,7 @@ export function HomeScreen() {
                 </Pressable>
                 <Text style={styles.dashboardUserText}>Signed in as {currentUser?.fullName ?? 'User'}</Text>
                 {isSuperAdmin && <Text style={styles.dashboardUserText}>Role: Super Admin</Text>}
-                <Text style={styles.dashboardUserText}>Tenant: {activeTenantName}</Text>
+                <Text style={[styles.dashboardUserText, tenantBrandedMode && { color: tenantAccentResolved, fontWeight: '600' }]}>Tenant: {activeTenantName}</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 }}>
                   <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: typeof navigator !== 'undefined' && navigator.onLine !== false ? '#22C55E' : '#EF4444' }} />
                   <Text style={styles.dashboardUserText}>{typeof navigator !== 'undefined' && navigator.onLine !== false ? 'Online' : 'Offline'}</Text>

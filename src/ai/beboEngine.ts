@@ -400,11 +400,11 @@ const CASE_STATUS = ['Intake', 'Engagement', 'Discovery', 'Litigation', 'Settlem
 
 function generateLegalData(count = 20) {
   const headers = ['Case Number', 'Client Name', 'Matter Type', 'Assigned Attorney', 'Filed Date', 'Status', 'Hours Billed', 'Outstanding Balance'];
-  const adjectives = ['Greenfield', 'Mountain View', 'Sunrise', 'Pacific', 'Atlantic', 'Northern', 'Western', 'Capital'];
-  const orgs = ['LLC', 'Corp.', 'Industries', 'Holdings', 'Group', 'Partners', 'Ventures'];
+  const firstNames = ['James', 'Sofia', 'Marcus', 'Elena', 'David', 'Priya', 'Thomas', 'Natalie', 'Liam', 'Amara', 'Robert', 'Yuki'];
+  const lastNames  = ['Morrison', 'Chen', 'Thompson', 'Patel', 'Williams', 'Rodriguez', 'Kim', 'Martinez', 'Okafor', 'Dubois', 'Reyes', 'Nakamura'];
   const rows: string[][] = Array.from({ length: count }, (_, i) => [
     `CASE-2026-${String(1000 + i)}`,
-    `${pick(adjectives)} ${pick(orgs)}`,
+    `${pick(firstNames)} ${pick(lastNames)}`,
     pick(MATTER_TYPES),
     pick(ATTORNEYS),
     fmtDate(-Math.floor(Math.random() * 120)),
@@ -422,11 +422,11 @@ const INS_STATUS = ['Application', 'Underwriting', 'Bound', 'Active', 'Renewal P
 
 function generateInsuranceData(count = 20) {
   const headers = ['Policy Number', 'Insured Name', 'Coverage Type', 'Annual Premium', 'Effective Date', 'Expiry Date', 'Status', 'Agent'];
-  const prefixes = ['Sunrise', 'Northland', 'Pacific', 'Prairie', 'Valley', 'Metro', 'Coastal', 'Highland'];
-  const suffixes = ['LLC', 'Corp', 'Holdings', 'Inc', 'Group', 'Association'];
+  const firstNamesIns = ['Angela', 'Carlos', 'Brianna', 'Kevin', 'Fatima', 'Derek', 'Simone', 'Patrick'];
+  const lastNamesIns  = ['Jefferson', 'Morales', 'Wallace', 'Huang', 'Osei', 'Larkin', 'Nkosi', 'McLaughlin'];
   const rows: string[][] = Array.from({ length: count }, (_, i) => [
     `POL-2026${String(10000 + i)}`,
-    `${pick(prefixes)} ${pick(suffixes)}`,
+    `${pick(firstNamesIns)} ${pick(lastNamesIns)}`,
     pick(COV_TYPES),
     `$${(Math.floor(Math.random() * 50 + 5) * 1000).toLocaleString()}`,
     fmtDate(-Math.floor(Math.random() * 365)),
@@ -884,11 +884,11 @@ export function buildLegalPayload(): ScenarioApplyPayload {
     mkIntegration('int-bebo-ds-legal', 'tpl-docusign', fmtDate(-90)),
     mkIntegration('int-bebo-qb-legal', 'tpl-quickbooks', fmtDate(-60)),
   ];
-  const legalAdj = ['Greenfield', 'Mountain View', 'Sunrise', 'Pacific', 'Atlantic', 'Northern', 'Western', 'Capital'];
-  const legalOrgs = ['LLC', 'Corp.', 'Industries', 'Holdings', 'Group', 'Partners', 'Ventures', 'Associates'];
+  const legalFirst = ['James', 'Sofia', 'Marcus', 'Elena', 'David', 'Priya', 'Thomas', 'Natalie'];
+  const legalLast  = ['Morrison', 'Chen', 'Thompson', 'Patel', 'Williams', 'Rodriguez', 'Kim', 'Martinez'];
   // Active Cases
   const caseRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) => {
-    const clientName = `${pick(legalAdj)} ${pick(legalOrgs)}`;
+    const clientName = `${pick(legalFirst)} ${pick(legalLast)}`;
     const matter = pick(MATTER_TYPES);
     const attorney = pick(ATTORNEYS);
     const status = pick(CASE_STATUS);
@@ -970,7 +970,7 @@ export function buildLegalPayload(): ScenarioApplyPayload {
     );
   });
   const records = [...caseRecords, ...deadlineRecords, ...docRecords, ...timeRecords, ...invoiceRecords];
-  const clients = Array.from({ length: 8 }, (_, i) => mkClient(`client-legal-${i}`, `${pick(legalAdj)} ${pick(legalOrgs)}`, `CASE-2026-${1000 + i}`, ['Vertical:Legal']));
+  const clients = Array.from({ length: 8 }, (_, i) => mkClient(`client-legal-${i}`, `${legalFirst[i % legalFirst.length]} ${legalLast[i % legalLast.length]}`, `CASE-2026-${1000 + i}`, ['Vertical:Legal']));
   return {
     shellConfig: mkShellConfig('Case', 'Cases', 'Legal Workspace', 'Practice Area', ['Intake', 'Engagement', 'Discovery', 'Litigation', 'Settlement', 'Closed', 'Archived']),
     workspaces: [wsCases, wsBilling], flows, integrations, records, clients,

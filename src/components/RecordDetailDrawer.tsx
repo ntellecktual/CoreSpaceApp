@@ -25,6 +25,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
   subSpaces,
   workspaceName,
   onMoveToSubSpace,
+  tenantAccent,
 }: {
   visible: boolean;
   record: RuntimeRecord | null;
@@ -39,6 +40,8 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
   subSpaces?: SubSpaceDefinition[];
   workspaceName?: string;
   onMoveToSubSpace?: (recordId: string, targetSubSpaceId: string) => void;
+  /** Optional tenant brand accent hex — used for interactive elements when branded. */
+  tenantAccent?: string;
 }) {
   const { mode } = useUiTheme();
   const isDark = mode === 'night';
@@ -48,13 +51,28 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
   const textColor = isDark ? '#E2D9F3' : '#1A1230';
   const dimText = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
   const sectionBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)';
-  const accent = isDark ? '#E878F6' : '#8C5BF5';
-  const tagBg = isDark ? 'rgba(140,91,245,0.18)' : 'rgba(140,91,245,0.10)';
-  const tagText = isDark ? '#E878F6' : '#8C5BF5';
+  // Use tenant brand accent when available, otherwise fall back to CoreSpace purple
+  const accent = tenantAccent ?? (isDark ? '#E878F6' : '#8C5BF5');
+  const tagBg = isDark ? `${accent}2E` : `${accent}1A`;
+  const tagText = accent;
 
   const dataEntries = useMemo(() => {
     if (!record) return [];
     return Object.entries(record.data).filter(([, v]) => v !== undefined && v !== '');
+  }, [record]);
+
+  // Detect a person-name client field for the care banner
+  const personClientName = useMemo(() => {
+    if (!record) return null;
+    const nameVal = String(
+      record.data['Client Name'] ?? record.data['Insured Name'] ?? record.data['Patient Name'] ?? '',
+    ).trim();
+    if (!nameVal) return null;
+    // Heuristic: looks like a real person if it has 2 space-separated words and no corp keywords
+    const corpKeywords = /\b(LLC|Corp|Inc|Ltd|Holdings|Industries|Group|Partners|Associates|Ventures|Co\.)\b/i;
+    const wordCount = nameVal.trim().split(/\s+/).length;
+    if (wordCount >= 2 && wordCount <= 4 && !corpKeywords.test(nameVal)) return nameVal;
+    return null;
   }, [record]);
 
   /* Section card wrapper for consistent modular sections */
@@ -224,6 +242,36 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
             contentContainerStyle={{ padding: 18, gap: 14 }}
             showsVerticalScrollIndicator={false}
           >
+            {/* Care Banner — shown when the client is a real person */}
+            {personClientName && (
+              <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 12,
+                paddingHorizontal: 14,
+                paddingVertical: 10,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: `${accent}33`,
+                backgroundColor: isDark ? `${accent}12` : `${accent}0D`,
+              }}>
+                {/* Initials circle */}
+                <View style={{
+                  width: 38, height: 38, borderRadius: 19,
+                  backgroundColor: accent,
+                  alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
+                  <Text style={{ fontSize: 14, fontWeight: '800', color: '#FFFFFF' }}>
+                    {personClientName.split(' ').slice(0, 2).map((s) => s[0]).join('').toUpperCase()}
+                  </Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: textColor }}>{personClientName}</Text>
+                  <Text style={{ fontSize: 11, color: dimText, marginTop: 1 }}>💙 Real person. This work matters to them.</Text>
+                </View>
+              </View>
+            )}
+
             {/* ── CRUD Action Bar ── */}
             <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
               {onUpdate && !editMode && (

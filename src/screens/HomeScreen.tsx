@@ -756,7 +756,7 @@ export function HomeScreen() {
           ]}
         >
           <View style={styles.dashboardBrandWrap}>
-            <View style={[styles.dashboardBrandTopRow, !compactShell && !isSidebarCollapsed && { gap: 0 }]}>
+            <View style={styles.dashboardBrandTopRow}>
               <Pressable
                 style={styles.dashboardHamburgerButton}
                 onPress={() => {
@@ -783,10 +783,9 @@ export function HomeScreen() {
 
               {!isSidebarCollapsed && (
                 <BrandLogo
-                  width={220}
-                  height={60}
+                  width={180}
+                  height={52}
                   logoUri={tenantBrandedMode ? tenantLogoUri : undefined}
-                  style={!compactShell ? { marginLeft: -10 } : undefined}
                 />
               )}
             </View>

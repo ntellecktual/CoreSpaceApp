@@ -96,6 +96,81 @@ function getContrastTextColor(hex: string) {
   return luminance > 0.56 ? '#111111' : '#FFFFFF';
 }
 
+// ── Tenant Customization Options ─────────────────────────────────────
+const INDUSTRY_OPTIONS = ['Healthcare', 'Finance', 'Logistics', 'Technology', 'Manufacturing', 'Legal', 'Education', 'Government', 'Retail', 'Energy'];
+const FONT_OPTIONS = ['System Default', 'Inter', 'Roboto', 'Poppins', 'Monospace'];
+const HEADING_WEIGHT_OPTIONS = [{ label: 'Bold', value: '700' }, { label: 'Extra Bold', value: '800' }, { label: 'Black', value: '900' }];
+const RADIUS_OPTIONS = [{ label: 'Sharp', value: 'sharp' }, { label: 'Rounded', value: 'rounded' }, { label: 'Pill', value: 'pill' }];
+const DENSITY_OPTIONS = [{ label: 'Compact', value: 'compact' }, { label: 'Comfortable', value: 'comfortable' }, { label: 'Spacious', value: 'spacious' }];
+const SIDEBAR_STYLE_OPTIONS = [{ label: 'Solid', value: 'solid' }, { label: 'Glass', value: 'glass' }, { label: 'Gradient', value: 'gradient' }];
+const CARD_STYLE_OPTIONS = [{ label: 'Flat', value: 'flat' }, { label: 'Elevated', value: 'elevated' }, { label: 'Glass', value: 'glass' }, { label: 'Outlined', value: 'outlined' }];
+const LAYOUT_OPTIONS = [{ label: 'Grid', value: 'grid' }, { label: 'List', value: 'list' }, { label: 'Magazine', value: 'magazine' }];
+const THEME_MODE_OPTIONS = [{ label: 'Night', value: 'night' }, { label: 'Day', value: 'day' }, { label: 'Auto', value: 'auto' }];
+const DATE_FORMAT_OPTIONS = ['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD'];
+const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF'];
+const TIMEZONE_OPTIONS = ['UTC', 'US/Eastern', 'US/Central', 'US/Mountain', 'US/Pacific', 'Europe/London', 'Europe/Berlin', 'Asia/Tokyo', 'Asia/Shanghai', 'Australia/Sydney'];
+
+const PALETTE_PRESETS = [
+  { name: 'Cosmic Purple', colors: ['#120C23', '#1A1230', '#8C5BF5', '#A78BFA', '#22C55E', '#F59E0B', '#EF4444', '#1E1535'] as const },
+  { name: 'Ocean Blue', colors: ['#0A1628', '#0F1D32', '#3B82F6', '#60A5FA', '#10B981', '#F59E0B', '#EF4444', '#152238'] as const },
+  { name: 'Forest Green', colors: ['#0A1A0F', '#0F261A', '#22C55E', '#4ADE80', '#3B82F6', '#F59E0B', '#EF4444', '#0D1F14'] as const },
+  { name: 'Sunset Coral', colors: ['#1A0E14', '#261420', '#F43F5E', '#FB7185', '#8B5CF6', '#F59E0B', '#EF4444', '#1F1018'] as const },
+  { name: 'Golden Finance', colors: ['#1A1608', '#26200C', '#D97706', '#FBBF24', '#3B82F6', '#22C55E', '#EF4444', '#1F1A0A'] as const },
+  { name: 'Midnight Slate', colors: ['#0F0F14', '#181B22', '#6366F1', '#818CF8', '#22C55E', '#F59E0B', '#EF4444', '#141620'] as const },
+  { name: 'Rose Healthcare', colors: ['#18090E', '#221018', '#DB2777', '#F472B6', '#14B8A6', '#F59E0B', '#EF4444', '#1D0C12'] as const },
+  { name: 'Emerald Enterprise', colors: ['#091A14', '#0C2620', '#059669', '#34D399', '#8B5CF6', '#F59E0B', '#F43F5E', '#0B1F18'] as const },
+];
+
+type TenantTabId = 'brand' | 'colors' | 'typography' | 'layout' | 'dashboard' | 'business' | 'team' | 'manage' | 'create';
+const TENANT_TABS: Array<{ id: TenantTabId; label: string; icon: string }> = [
+  { id: 'brand', label: 'Brand', icon: '🏢' },
+  { id: 'colors', label: 'Colors', icon: '🎨' },
+  { id: 'typography', label: 'Typography', icon: '✏️' },
+  { id: 'layout', label: 'Layout', icon: '📐' },
+  { id: 'dashboard', label: 'Dashboard', icon: '🖥️' },
+  { id: 'business', label: 'Business', icon: '💼' },
+  { id: 'team', label: 'Team', icon: '👥' },
+  { id: 'manage', label: 'Manage', icon: '⚙️' },
+  { id: 'create', label: 'Create', icon: '➕' },
+];
+
+const DEFAULT_TENANT_EXTRAS = {
+  tagline: '', industryVertical: '', accentSecondary: '#A78BFA', successColor: '#22C55E',
+  warningColor: '#F59E0B', dangerColor: '#EF4444', surfaceColor: '#1E1535', fontFamily: 'System Default',
+  headingWeight: '800', baseFontSize: 13, borderRadius: 'rounded', uiDensity: 'comfortable',
+  sidebarStyle: 'glass', cardStyle: 'elevated', welcomeMessage: '', heroImageUri: '',
+  dashboardLayout: 'grid', defaultThemeMode: 'night', animationsEnabled: true, departments: [] as string[],
+  timezone: 'UTC', dateFormat: 'MM/DD/YYYY', currencyCode: 'USD',
+};
+
+function extractExtras(branding: any) {
+  return {
+    tagline: branding?.tagline ?? '',
+    industryVertical: branding?.industryVertical ?? '',
+    accentSecondary: branding?.accentSecondary ?? '#A78BFA',
+    successColor: branding?.successColor ?? '#22C55E',
+    warningColor: branding?.warningColor ?? '#F59E0B',
+    dangerColor: branding?.dangerColor ?? '#EF4444',
+    surfaceColor: branding?.surfaceColor ?? '#1E1535',
+    fontFamily: branding?.fontFamily ?? 'System Default',
+    headingWeight: branding?.headingWeight ?? '800',
+    baseFontSize: branding?.baseFontSize ?? 13,
+    borderRadius: branding?.borderRadius ?? 'rounded',
+    uiDensity: branding?.uiDensity ?? 'comfortable',
+    sidebarStyle: branding?.sidebarStyle ?? 'glass',
+    cardStyle: branding?.cardStyle ?? 'elevated',
+    welcomeMessage: branding?.welcomeMessage ?? '',
+    heroImageUri: branding?.heroImageUri ?? '',
+    dashboardLayout: branding?.dashboardLayout ?? 'grid',
+    defaultThemeMode: branding?.defaultThemeMode ?? 'night',
+    animationsEnabled: branding?.animationsEnabled ?? true,
+    departments: branding?.departments ?? [],
+    timezone: branding?.timezone ?? 'UTC',
+    dateFormat: branding?.dateFormat ?? 'MM/DD/YYYY',
+    currencyCode: branding?.currencyCode ?? 'USD',
+  };
+}
+
 export function HomeScreen() {
   const { width } = useWindowDimensions();
   const { mode, toggleMode, styles } = useUiTheme();
@@ -154,6 +229,13 @@ export function HomeScreen() {
   const [newTenantCustomRoleTitle, setNewTenantCustomRoleTitle] = useState('');
   const [newTenantRolesExpanded, setNewTenantRolesExpanded] = useState(false);
   const [moduleActions, setModuleActions] = useState<ModulePageActions | null>(null);
+  const [tenantTab, setTenantTab] = useState<TenantTabId>('brand');
+  const [tenantExtras, setTenantExtras] = useState(() => extractExtras(activeTenantBranding));
+  const [newTenantExtras, setNewTenantExtras] = useState({ ...DEFAULT_TENANT_EXTRAS });
+  const [tenantDeptInput, setTenantDeptInput] = useState('');
+  const [newTenantDeptInput, setNewTenantDeptInput] = useState('');
+  const updateExtra = (key: string, value: any) => setTenantExtras((prev: any) => ({ ...prev, [key]: value }));
+  const updateNewExtra = (key: string, value: any) => setNewTenantExtras((prev: any) => ({ ...prev, [key]: value }));
   const activePage = pages.find((item) => item.id === page);
   const mainPaneTitle = tenantAccessOpen
     ? 'Tenant Access'
@@ -250,7 +332,7 @@ export function HomeScreen() {
   const cosmoNavIcon = mode === 'day'
     ? require('../../assets/cs_orbitaldarklogo.png')
     : require('../../assets/cs_orbitallightlogo.png');
-  const tenantBrandedMode = page === 'enduser' && !tenantAccessOpen;
+  const tenantBrandedMode = !tenantAccessOpen;
   const moduleActionEnabled = (tenantAccessOpen && isSuperAdmin) || (!tenantAccessOpen && (page === 'admin' || page === 'signal' || page === 'orbital' || page === 'bebo' || page === 'cosmograph' || page === 'financial' || page === 'ingestion' || page === 'workflow'));
   const saveDraftLabel = moduleActions?.saveDraftLabel ?? 'Save Draft';
   const publishLabel = moduleActions?.publishLabel ?? 'Publish';
@@ -321,6 +403,7 @@ export function HomeScreen() {
     setTenantAccentColor(activeTenantBranding.brandColors[2]);
     setTenantRoleTitles(activeTenantBranding.employeeTitles);
     setTenantCustomRoleTitle('');
+    setTenantExtras(extractExtras(activeTenantBranding));
   }, [activeTenantName, activeTenantBranding]);
 
   useEffect(() => {
@@ -360,6 +443,8 @@ export function HomeScreen() {
     newTenantSecondaryColor,
     newTenantAccentColor,
     newTenantRoleTitles,
+    tenantExtras,
+    newTenantExtras,
   ]);
 
   const handleSwitchTenant = (tenantId: string) => {
@@ -507,6 +592,29 @@ export function HomeScreen() {
       brandColors: [tenantPrimaryResolved, tenantSecondaryResolved, tenantAccentResolved],
       widgetTwoColumnBreakpoint: GLOBAL_WIDGET_TWO_COLUMN_BREAKPOINT,
       employeeTitles: tenantRoleTitles,
+      tagline: tenantExtras.tagline || undefined,
+      industryVertical: tenantExtras.industryVertical || undefined,
+      accentSecondary: tenantExtras.accentSecondary,
+      successColor: tenantExtras.successColor,
+      warningColor: tenantExtras.warningColor,
+      dangerColor: tenantExtras.dangerColor,
+      surfaceColor: tenantExtras.surfaceColor,
+      fontFamily: tenantExtras.fontFamily,
+      headingWeight: tenantExtras.headingWeight,
+      baseFontSize: tenantExtras.baseFontSize,
+      borderRadius: tenantExtras.borderRadius,
+      uiDensity: tenantExtras.uiDensity,
+      sidebarStyle: tenantExtras.sidebarStyle,
+      cardStyle: tenantExtras.cardStyle,
+      welcomeMessage: tenantExtras.welcomeMessage || undefined,
+      heroImageUri: tenantExtras.heroImageUri || undefined,
+      dashboardLayout: tenantExtras.dashboardLayout,
+      defaultThemeMode: tenantExtras.defaultThemeMode,
+      animationsEnabled: tenantExtras.animationsEnabled,
+      departments: tenantExtras.departments,
+      timezone: tenantExtras.timezone,
+      dateFormat: tenantExtras.dateFormat,
+      currencyCode: tenantExtras.currencyCode,
     });
     if (!brandingResult.ok) {
       return brandingResult.reason ?? 'Unable to update tenant branding.';
@@ -544,6 +652,29 @@ export function HomeScreen() {
         ],
         widgetTwoColumnBreakpoint: GLOBAL_WIDGET_TWO_COLUMN_BREAKPOINT,
         employeeTitles: newTenantRoleTitles,
+        tagline: newTenantExtras.tagline || undefined,
+        industryVertical: newTenantExtras.industryVertical || undefined,
+        accentSecondary: newTenantExtras.accentSecondary,
+        successColor: newTenantExtras.successColor,
+        warningColor: newTenantExtras.warningColor,
+        dangerColor: newTenantExtras.dangerColor,
+        surfaceColor: newTenantExtras.surfaceColor,
+        fontFamily: newTenantExtras.fontFamily,
+        headingWeight: newTenantExtras.headingWeight,
+        baseFontSize: newTenantExtras.baseFontSize,
+        borderRadius: newTenantExtras.borderRadius,
+        uiDensity: newTenantExtras.uiDensity,
+        sidebarStyle: newTenantExtras.sidebarStyle,
+        cardStyle: newTenantExtras.cardStyle,
+        welcomeMessage: newTenantExtras.welcomeMessage || undefined,
+        heroImageUri: newTenantExtras.heroImageUri || undefined,
+        dashboardLayout: newTenantExtras.dashboardLayout,
+        defaultThemeMode: newTenantExtras.defaultThemeMode,
+        animationsEnabled: newTenantExtras.animationsEnabled,
+        departments: newTenantExtras.departments,
+        timezone: newTenantExtras.timezone,
+        dateFormat: newTenantExtras.dateFormat,
+        currencyCode: newTenantExtras.currencyCode,
       });
 
       if (!createResult.ok) {
@@ -560,6 +691,7 @@ export function HomeScreen() {
       setNewTenantRoleTitles(['Operations Coordinator']);
       setNewTenantCustomRoleTitle('');
       setNewTenantRolesExpanded(false);
+      setNewTenantExtras({ ...DEFAULT_TENANT_EXTRAS });
     }
 
     const message = creatingNewTenant
@@ -967,294 +1099,547 @@ export function HomeScreen() {
             {tenantAccessOpen && isSuperAdmin ? (
               <ScrollView style={styles.pageWrap} contentContainerStyle={[styles.pageContent, styles.pageContentTight]} keyboardShouldPersistTaps="handled">
                 <Text style={styles.sectionEyebrow}>Tenant Access</Text>
-                <Text style={styles.sectionLeadText}>Manage tenant identity, branding, user titles, and dashboard layout controls — all from one place.</Text>
-                <View style={styles.tenantWidgetGrid}>
-                  <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
-                    <View style={[styles.card, styles.tenantWidgetCard]}>
-                    <Text style={styles.cardTitle}>Tenant Configuration</Text>
-                    <View style={styles.cardBody}>
-                      <LabeledInput
-                        label="Active Tenant Name"
-                        value={tenantRenameValue}
-                        onChangeText={setTenantRenameValue}
-                        placeholder="Rename selected tenant"
-                      />
+                <Text style={styles.sectionLeadText}>Full-spectrum tenant theming — brand identity, color palettes, typography, layout, dashboard, business profile, team roles, and tenant lifecycle.</Text>
 
-                      <Text style={styles.metaText}>Available Tenants</Text>
-                      <Text style={styles.metaText}>Export Format</Text>
-                      <View style={styles.inlineRow}>
-                        {(['cosmos', 'postgres', 'mongodb'] as PortableDatabaseTarget[]).map((target) => {
-                          const selected = tenantExportTarget === target;
-                          return (
-                            <Pressable
-                              key={`tenant-export-target-${target}`}
-                              style={[styles.pill, selected && styles.pillActive]}
-                              onPress={() => setTenantExportTarget(target)}
-                              accessibilityRole="button"
-                              accessibilityState={{ selected }}
-                              accessibilityLabel={`Set export format ${target}`}
-                            >
-                              <Text style={[styles.pillText, selected && styles.pillTextActive]}>{target.toUpperCase()}</Text>
-                            </Pressable>
-                          );
-                        })}
-                      </View>
-                      {tenants.map((tenant) => (
-                        <View key={tenant.id} style={styles.listCard}>
-                          <Text style={styles.listTitle}>{tenant.name}</Text>
-                          <Text style={styles.metaText}>Titles configured: {tenant.branding.employeeTitles.length}</Text>
+                {/* ── Tab Navigation ──────────────────────────────────── */}
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16, flexGrow: 0 }} contentContainerStyle={{ gap: 4, paddingVertical: 2 }}>
+                  {TENANT_TABS.map((tab) => {
+                    const active = tenantTab === tab.id;
+                    return (
+                      <Pressable key={tab.id} onPress={() => setTenantTab(tab.id)} style={[styles.pill, active && styles.pillActive, { paddingHorizontal: 14, paddingVertical: 8 }]} accessibilityRole="tab" accessibilityState={{ selected: active }} accessibilityLabel={`${tab.label} tab`}>
+                        <Text style={[styles.pillText, active && styles.pillTextActive]}>{tab.icon} {tab.label}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView>
+
+                {/* ── Brand Tab ──────────────────────────────────── */}
+                {tenantTab === 'brand' && (
+                  <View style={styles.tenantWidgetGrid}>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>Logo & Identity</Text>
+                        <View style={styles.cardBody}>
+                          <LabeledInput label="Tenant Logo URL" value={tenantLogoUri} onChangeText={setTenantLogoUri} placeholder="https://your-domain.com/logo.png" />
                           <View style={styles.inlineRow}>
-                            <Pressable
-                              style={[styles.pill, activeTenantId === tenant.id && styles.pillActive]}
-                              onPress={() => handleSwitchTenant(tenant.id)}
-                              accessibilityRole="button"
-                              accessibilityState={{ selected: activeTenantId === tenant.id }}
-                              accessibilityLabel={`Switch to ${tenant.name}`}
-                            >
-                              <Text style={[styles.pillText, activeTenantId === tenant.id && styles.pillTextActive]}>
-                                {activeTenantId === tenant.id ? 'Active Tenant' : 'Switch to Tenant'}
-                              </Text>
+                            <Pressable style={styles.secondaryButton} onPress={handlePickActiveTenantLogo} accessibilityRole="button" accessibilityLabel="Upload tenant logo">
+                              <Text style={styles.secondaryButtonText}>Upload Logo</Text>
                             </Pressable>
-                            <Pressable
-                              style={styles.secondaryButton}
-                              onPress={() => { void handleExportTenantDataset(tenant.id, tenant.name); }}
-                              accessibilityRole="button"
-                              accessibilityLabel={`Download mapped dataset for ${tenant.name}`}
-                            >
-                              <Text style={styles.secondaryButtonText}>Download Dataset</Text>
+                            <Pressable style={styles.secondaryButton} onPress={handleRemoveActiveTenantLogo} accessibilityRole="button" accessibilityLabel="Remove tenant logo">
+                              <Text style={styles.secondaryButtonText}>Remove Logo</Text>
                             </Pressable>
                           </View>
-                        </View>
-                      ))}
-                    </View>
-                    </View>
-                  </BlurView>
-
-                  <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
-                    <View style={[styles.card, styles.tenantWidgetCard]}>
-                    <Text style={styles.cardTitle}>Logo Widget</Text>
-                    <View style={styles.cardBody}>
-                      <LabeledInput
-                        label="Tenant Logo URL"
-                        value={tenantLogoUri}
-                        onChangeText={setTenantLogoUri}
-                        placeholder="https://your-domain.com/logo.png"
-                      />
-                      <Pressable
-                        style={styles.secondaryButton}
-                        onPress={handlePickActiveTenantLogo}
-                        accessibilityRole="button"
-                        accessibilityLabel="Choose or capture active tenant logo"
-                      >
-                        <Text style={styles.secondaryButtonText}>Choose or Capture Tenant Logo</Text>
-                      </Pressable>
-                      <Pressable
-                        style={styles.secondaryButton}
-                        onPress={handleRemoveActiveTenantLogo}
-                        accessibilityRole="button"
-                        accessibilityLabel="Remove active tenant logo"
-                      >
-                        <Text style={styles.secondaryButtonText}>Remove Logo</Text>
-                      </Pressable>
-                      <View style={styles.listCard}>
-                        <Text style={styles.metaText}>End User Logo Preview</Text>
-                        <BrandLogo width={220} height={60} logoUri={tenantLogoUri.trim() || undefined} />
-                      </View>
-                    </View>
-                    </View>
-                  </BlurView>
-
-                  <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
-                    <View style={[styles.card, styles.tenantWidgetCard]}>
-                    <Text style={styles.cardTitle}>Color Widget</Text>
-                    <View style={styles.cardBody}>
-                      <LabeledInput
-                        label="Brand Color 1 (Sidebar)"
-                        value={tenantPrimaryColor}
-                        onChangeText={setTenantPrimaryColor}
-                        placeholder="#120C23"
-                      />
-                      <LabeledInput
-                        label="Brand Color 2 (Main Background)"
-                        value={tenantSecondaryColor}
-                        onChangeText={setTenantSecondaryColor}
-                        placeholder="#1A1230"
-                      />
-                      <LabeledInput
-                        label="Brand Color 3 (Accent)"
-                        value={tenantAccentColor}
-                        onChangeText={setTenantAccentColor}
-                        placeholder="#8C5BF5"
-                      />
-                      <View style={styles.inlineRow}>
-                        <View style={[styles.pill, { backgroundColor: tenantPrimaryResolved, borderColor: tenantPrimaryResolved }]}>
-                          <Text style={[styles.pillText, { color: '#FFFFFF' }]}>Color 1</Text>
-                        </View>
-                        <View style={[styles.pill, { backgroundColor: tenantSecondaryResolved, borderColor: tenantSecondaryResolved }]}>
-                          <Text style={[styles.pillText, { color: '#FFFFFF' }]}>Color 2</Text>
-                        </View>
-                        <View style={[styles.pill, { backgroundColor: tenantAccentResolved, borderColor: tenantAccentResolved }]}>
-                          <Text style={[styles.pillText, { color: '#FFFFFF' }]}>Color 3</Text>
+                          {tenantLogoUri.trim() ? (
+                            <View style={styles.listCard}>
+                              <Text style={styles.metaText}>Logo Preview</Text>
+                              <BrandLogo width={220} height={60} logoUri={tenantLogoUri.trim()} />
+                            </View>
+                          ) : null}
                         </View>
                       </View>
-                    </View>
-                    </View>
-                  </BlurView>
-
-                  <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
-                    <View style={[styles.card, styles.tenantWidgetCard]}>
-                    <Text style={styles.cardTitle}>Titles Widget</Text>
-                    <View style={styles.cardBody}>
-                      <Pressable
-                        style={styles.secondaryButton}
-                        onPress={() => setTenantRolesExpanded((current) => !current)}
-                        accessibilityRole="button"
-                        accessibilityLabel="Toggle active tenant end user title options"
-                      >
-                        <Text style={styles.secondaryButtonText}>End User Titles {tenantRolesExpanded ? '▾' : '▸'}</Text>
-                      </Pressable>
-                      {tenantRolesExpanded && (
-                        <View style={styles.inlineRow}>
-                          {tenantTitleOptions.map((title) => {
-                            const isSelected = tenantRoleTitles.some((item) => item.toLowerCase() === title.toLowerCase());
-                            return (
-                              <Pressable
-                                key={`active-title-${title}`}
-                                style={[styles.pill, isSelected && styles.pillActive]}
-                                onPress={() => toggleTitleSelection(title, tenantRoleTitles, setTenantRoleTitles)}
-                                accessibilityRole="button"
-                                accessibilityState={{ selected: isSelected }}
-                                accessibilityLabel={`Toggle ${title}`}
-                              >
-                                <Text style={[styles.pillText, isSelected && styles.pillTextActive]}>{title}</Text>
-                              </Pressable>
-                            );
-                          })}
+                    </BlurView>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>Tagline & Industry</Text>
+                        <View style={styles.cardBody}>
+                          <LabeledInput label="Company Tagline" value={tenantExtras.tagline} onChangeText={(v: string) => updateExtra('tagline', v)} placeholder="Your company motto or slogan" />
+                          <Text style={styles.metaText}>Industry Vertical</Text>
+                          <View style={styles.inlineRow}>
+                            {INDUSTRY_OPTIONS.map((ind) => {
+                              const sel = tenantExtras.industryVertical === ind;
+                              return (
+                                <Pressable key={ind} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('industryVertical', ind)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{ind}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
                         </View>
-                      )}
+                      </View>
+                    </BlurView>
+                  </View>
+                )}
 
-                      <LabeledInput
-                        label="Add Custom End User Title"
-                        value={tenantCustomRoleTitle}
-                        onChangeText={setTenantCustomRoleTitle}
-                        placeholder="Example: Shift Lead"
-                      />
-                      <Pressable
-                        style={styles.secondaryButton}
-                        onPress={() =>
-                          addCustomTitle(tenantCustomRoleTitle, tenantRoleTitles, setTenantRoleTitles, () => setTenantCustomRoleTitle(''))
-                        }
-                        accessibilityRole="button"
-                        accessibilityLabel="Add custom end user title"
-                      >
-                        <Text style={styles.secondaryButtonText}>Add Title</Text>
-                      </Pressable>
-                    </View>
-                    </View>
-                  </BlurView>
-
-                  <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
-                    <View style={[styles.card, styles.tenantWidgetCard]}>
-                    <Text style={styles.cardTitle}>Create New Tenant Widget</Text>
-                    <View style={styles.cardBody}>
-                      <LabeledInput
-                        label="New Tenant Name"
-                        value={newTenantName}
-                        onChangeText={setNewTenantName}
-                        placeholder="Example: Tenant B"
-                      />
-                      <LabeledInput
-                        label="New Tenant Logo URL"
-                        value={newTenantLogoUri}
-                        onChangeText={setNewTenantLogoUri}
-                        placeholder="https://your-domain.com/logo.png"
-                      />
-                      <Pressable
-                        style={styles.secondaryButton}
-                        onPress={handlePickNewTenantLogo}
-                        accessibilityRole="button"
-                        accessibilityLabel="Choose or capture new tenant logo"
-                      >
-                        <Text style={styles.secondaryButtonText}>Choose or Capture New Tenant Logo</Text>
-                      </Pressable>
-                      <Pressable
-                        style={styles.secondaryButton}
-                        onPress={handleRemoveNewTenantLogo}
-                        accessibilityRole="button"
-                        accessibilityLabel="Remove new tenant logo"
-                      >
-                        <Text style={styles.secondaryButtonText}>Remove New Tenant Logo</Text>
-                      </Pressable>
-
-                      <LabeledInput
-                        label="New Tenant Color 1"
-                        value={newTenantPrimaryColor}
-                        onChangeText={setNewTenantPrimaryColor}
-                        placeholder="#120C23"
-                      />
-                      <LabeledInput
-                        label="New Tenant Color 2"
-                        value={newTenantSecondaryColor}
-                        onChangeText={setNewTenantSecondaryColor}
-                        placeholder="#1A1230"
-                      />
-                      <LabeledInput
-                        label="New Tenant Color 3"
-                        value={newTenantAccentColor}
-                        onChangeText={setNewTenantAccentColor}
-                        placeholder="#8C5BF5"
-                      />
-                      <Pressable
-                        style={styles.secondaryButton}
-                        onPress={() => setNewTenantRolesExpanded((current) => !current)}
-                        accessibilityRole="button"
-                        accessibilityLabel="Toggle new tenant end user title options"
-                      >
-                        <Text style={styles.secondaryButtonText}>New Tenant End User Titles {newTenantRolesExpanded ? '▾' : '▸'}</Text>
-                      </Pressable>
-                      {newTenantRolesExpanded && (
-                        <View style={styles.inlineRow}>
-                          {tenantTitleOptions.map((title) => {
-                            const isSelected = newTenantRoleTitles.some((item) => item.toLowerCase() === title.toLowerCase());
-                            return (
-                              <Pressable
-                                key={`new-title-${title}`}
-                                style={[styles.pill, isSelected && styles.pillActive]}
-                                onPress={() => toggleTitleSelection(title, newTenantRoleTitles, setNewTenantRoleTitles)}
-                                accessibilityRole="button"
-                                accessibilityState={{ selected: isSelected }}
-                                accessibilityLabel={`Toggle ${title}`}
-                              >
-                                <Text style={[styles.pillText, isSelected && styles.pillTextActive]}>{title}</Text>
-                              </Pressable>
-                            );
-                          })}
+                {/* ── Colors Tab ──────────────────────────────────── */}
+                {tenantTab === 'colors' && (
+                  <View style={styles.tenantWidgetGrid}>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>Color Palette</Text>
+                        <View style={styles.cardBody}>
+                          <LabeledInput label="Sidebar (Primary)" value={tenantPrimaryColor} onChangeText={setTenantPrimaryColor} placeholder="#120C23" />
+                          <LabeledInput label="Background (Secondary)" value={tenantSecondaryColor} onChangeText={setTenantSecondaryColor} placeholder="#1A1230" />
+                          <LabeledInput label="Accent" value={tenantAccentColor} onChangeText={setTenantAccentColor} placeholder="#8C5BF5" />
+                          <LabeledInput label="Accent Secondary" value={tenantExtras.accentSecondary} onChangeText={(v: string) => updateExtra('accentSecondary', v)} placeholder="#A78BFA" />
+                          <LabeledInput label="Success" value={tenantExtras.successColor} onChangeText={(v: string) => updateExtra('successColor', v)} placeholder="#22C55E" />
+                          <LabeledInput label="Warning" value={tenantExtras.warningColor} onChangeText={(v: string) => updateExtra('warningColor', v)} placeholder="#F59E0B" />
+                          <LabeledInput label="Danger" value={tenantExtras.dangerColor} onChangeText={(v: string) => updateExtra('dangerColor', v)} placeholder="#EF4444" />
+                          <LabeledInput label="Surface" value={tenantExtras.surfaceColor} onChangeText={(v: string) => updateExtra('surfaceColor', v)} placeholder="#1E1535" />
+                          <View style={[styles.inlineRow, { marginTop: 8 }]}>
+                            {[
+                              { label: 'Pri', hex: tenantPrimaryResolved },
+                              { label: 'Sec', hex: tenantSecondaryResolved },
+                              { label: 'Acc', hex: tenantAccentResolved },
+                              { label: 'Acc2', hex: normalizeHex(tenantExtras.accentSecondary, '#A78BFA') },
+                              { label: 'Ok', hex: normalizeHex(tenantExtras.successColor, '#22C55E') },
+                              { label: 'Wrn', hex: normalizeHex(tenantExtras.warningColor, '#F59E0B') },
+                              { label: 'Err', hex: normalizeHex(tenantExtras.dangerColor, '#EF4444') },
+                              { label: 'Srf', hex: normalizeHex(tenantExtras.surfaceColor, '#1E1535') },
+                            ].map((swatch) => (
+                              <View key={swatch.label} style={{ alignItems: 'center', gap: 3 }}>
+                                <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: swatch.hex, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' }} />
+                                <Text style={[styles.metaText, { fontSize: 9 }]}>{swatch.label}</Text>
+                              </View>
+                            ))}
+                          </View>
                         </View>
-                      )}
+                      </View>
+                    </BlurView>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>Palette Presets</Text>
+                        <View style={styles.cardBody}>
+                          <Text style={styles.metaText}>One-click color schemes — instantly transform your tenant's look.</Text>
+                          {PALETTE_PRESETS.map((preset) => (
+                            <Pressable
+                              key={preset.name}
+                              style={[styles.listCard, { flexDirection: 'row', alignItems: 'center', gap: 10 }]}
+                              onPress={() => {
+                                const [p, s, a, a2, suc, wrn, dan, sur] = preset.colors;
+                                setTenantPrimaryColor(p);
+                                setTenantSecondaryColor(s);
+                                setTenantAccentColor(a);
+                                updateExtra('accentSecondary', a2);
+                                updateExtra('successColor', suc);
+                                updateExtra('warningColor', wrn);
+                                updateExtra('dangerColor', dan);
+                                updateExtra('surfaceColor', sur);
+                                setTenantNotice(`Applied "${preset.name}" palette.`);
+                              }}
+                              accessibilityRole="button"
+                              accessibilityLabel={`Apply ${preset.name} palette`}
+                            >
+                              <View style={{ flexDirection: 'row', gap: 3 }}>
+                                {preset.colors.map((c, i) => (
+                                  <View key={i} style={{ width: 18, height: 18, borderRadius: 4, backgroundColor: c, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)' }} />
+                                ))}
+                              </View>
+                              <Text style={styles.listTitle}>{preset.name}</Text>
+                            </Pressable>
+                          ))}
+                        </View>
+                      </View>
+                    </BlurView>
+                  </View>
+                )}
 
-                      <LabeledInput
-                        label="Add Custom Title For New Tenant"
-                        value={newTenantCustomRoleTitle}
-                        onChangeText={setNewTenantCustomRoleTitle}
-                        placeholder="Example: Team Captain"
-                      />
-                      <Pressable
-                        style={styles.secondaryButton}
-                        onPress={() =>
-                          addCustomTitle(newTenantCustomRoleTitle, newTenantRoleTitles, setNewTenantRoleTitles, () =>
-                            setNewTenantCustomRoleTitle(''),
-                          )
-                        }
-                        accessibilityRole="button"
-                        accessibilityLabel="Add custom title for new tenant"
-                      >
-                        <Text style={styles.secondaryButtonText}>Add New Tenant Title</Text>
-                      </Pressable>
+                {/* ── Typography Tab ──────────────────────────────── */}
+                {tenantTab === 'typography' && (
+                  <View style={styles.tenantWidgetGrid}>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>Typography</Text>
+                        <View style={styles.cardBody}>
+                          <Text style={styles.metaText}>Font Family</Text>
+                          <View style={styles.inlineRow}>
+                            {FONT_OPTIONS.map((font) => {
+                              const sel = tenantExtras.fontFamily === font;
+                              return (
+                                <Pressable key={font} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('fontFamily', font)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{font}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Text style={styles.metaText}>Heading Weight</Text>
+                          <View style={styles.inlineRow}>
+                            {HEADING_WEIGHT_OPTIONS.map((opt) => {
+                              const sel = tenantExtras.headingWeight === opt.value;
+                              return (
+                                <Pressable key={opt.value} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('headingWeight', opt.value)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{opt.label}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Text style={styles.metaText}>Base Font Size</Text>
+                          <View style={styles.inlineRow}>
+                            {[11, 12, 13, 14, 15, 16].map((size) => {
+                              const sel = tenantExtras.baseFontSize === size;
+                              return (
+                                <Pressable key={size} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('baseFontSize', size)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{size}px</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <View style={[styles.listCard, { marginTop: 8 }]}>
+                            <Text style={[styles.metaText, { fontSize: 10 }]}>Preview</Text>
+                            <Text style={{ fontWeight: tenantExtras.headingWeight as any, fontSize: tenantExtras.baseFontSize + 6, color: mode === 'night' ? '#FFFFFF' : '#1A1A2E' }}>Heading Sample</Text>
+                            <Text style={{ fontSize: tenantExtras.baseFontSize, color: mode === 'night' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)', marginTop: 4 }}>Body text preview with {tenantExtras.baseFontSize}px base font size and {tenantExtras.fontFamily} font family.</Text>
+                          </View>
+                        </View>
+                      </View>
+                    </BlurView>
+                  </View>
+                )}
 
-                    </View>
-                    </View>
-                  </BlurView>
-                </View>
+                {/* ── Layout Tab ──────────────────────────────────── */}
+                {tenantTab === 'layout' && (
+                  <View style={styles.tenantWidgetGrid}>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>Shape & Layout</Text>
+                        <View style={styles.cardBody}>
+                          <Text style={styles.metaText}>Border Radius</Text>
+                          <View style={styles.inlineRow}>
+                            {RADIUS_OPTIONS.map((opt) => {
+                              const sel = tenantExtras.borderRadius === opt.value;
+                              return (
+                                <Pressable key={opt.value} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('borderRadius', opt.value)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{opt.label}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Text style={styles.metaText}>UI Density</Text>
+                          <View style={styles.inlineRow}>
+                            {DENSITY_OPTIONS.map((opt) => {
+                              const sel = tenantExtras.uiDensity === opt.value;
+                              return (
+                                <Pressable key={opt.value} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('uiDensity', opt.value)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{opt.label}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Text style={styles.metaText}>Sidebar Style</Text>
+                          <View style={styles.inlineRow}>
+                            {SIDEBAR_STYLE_OPTIONS.map((opt) => {
+                              const sel = tenantExtras.sidebarStyle === opt.value;
+                              return (
+                                <Pressable key={opt.value} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('sidebarStyle', opt.value)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{opt.label}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Text style={styles.metaText}>Card Style</Text>
+                          <View style={styles.inlineRow}>
+                            {CARD_STYLE_OPTIONS.map((opt) => {
+                              const sel = tenantExtras.cardStyle === opt.value;
+                              return (
+                                <Pressable key={opt.value} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('cardStyle', opt.value)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{opt.label}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                        </View>
+                      </View>
+                    </BlurView>
+                  </View>
+                )}
+
+                {/* ── Dashboard Tab ──────────────────────────────── */}
+                {tenantTab === 'dashboard' && (
+                  <View style={styles.tenantWidgetGrid}>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>Dashboard Experience</Text>
+                        <View style={styles.cardBody}>
+                          <LabeledInput label="Welcome Message" value={tenantExtras.welcomeMessage} onChangeText={(v: string) => updateExtra('welcomeMessage', v)} placeholder="Welcome back to your workspace" />
+                          <LabeledInput label="Hero Image URL" value={tenantExtras.heroImageUri} onChangeText={(v: string) => updateExtra('heroImageUri', v)} placeholder="https://your-domain.com/hero.png" />
+                          <Text style={styles.metaText}>Dashboard Layout</Text>
+                          <View style={styles.inlineRow}>
+                            {LAYOUT_OPTIONS.map((opt) => {
+                              const sel = tenantExtras.dashboardLayout === opt.value;
+                              return (
+                                <Pressable key={opt.value} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('dashboardLayout', opt.value)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{opt.label}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Text style={styles.metaText}>Default Theme Mode</Text>
+                          <View style={styles.inlineRow}>
+                            {THEME_MODE_OPTIONS.map((opt) => {
+                              const sel = tenantExtras.defaultThemeMode === opt.value;
+                              return (
+                                <Pressable key={opt.value} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('defaultThemeMode', opt.value)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{opt.label}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Pressable style={[styles.pill, tenantExtras.animationsEnabled && styles.pillActive, { marginTop: 8 }]} onPress={() => updateExtra('animationsEnabled', !tenantExtras.animationsEnabled)} accessibilityRole="switch" accessibilityState={{ checked: tenantExtras.animationsEnabled }} accessibilityLabel="Toggle UI animations">
+                            <Text style={[styles.pillText, tenantExtras.animationsEnabled && styles.pillTextActive]}>Animations {tenantExtras.animationsEnabled ? 'On' : 'Off'}</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    </BlurView>
+                  </View>
+                )}
+
+                {/* ── Business Tab ──────────────────────────────── */}
+                {tenantTab === 'business' && (
+                  <View style={styles.tenantWidgetGrid}>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>Business Profile</Text>
+                        <View style={styles.cardBody}>
+                          <Text style={styles.metaText}>Departments</Text>
+                          <View style={styles.inlineRow}>
+                            {tenantExtras.departments.map((dept: string, idx: number) => (
+                              <Pressable key={`dept-${idx}`} style={[styles.pill, styles.pillActive]} onPress={() => updateExtra('departments', tenantExtras.departments.filter((_: string, i: number) => i !== idx))} accessibilityRole="button" accessibilityLabel={`Remove ${dept}`}>
+                                <Text style={[styles.pillText, styles.pillTextActive]}>{dept} ×</Text>
+                              </Pressable>
+                            ))}
+                          </View>
+                          <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-end' }}>
+                            <View style={{ flex: 1 }}>
+                              <LabeledInput label="Add Department" value={tenantDeptInput} onChangeText={setTenantDeptInput} placeholder="e.g. Engineering" />
+                            </View>
+                            <Pressable style={[styles.secondaryButton, { marginBottom: 6 }]} onPress={() => { if (tenantDeptInput.trim()) { updateExtra('departments', [...tenantExtras.departments, tenantDeptInput.trim()]); setTenantDeptInput(''); } }} accessibilityRole="button" accessibilityLabel="Add department">
+                              <Text style={styles.secondaryButtonText}>Add</Text>
+                            </Pressable>
+                          </View>
+                          <Text style={styles.metaText}>Timezone</Text>
+                          <View style={styles.inlineRow}>
+                            {TIMEZONE_OPTIONS.map((tz) => {
+                              const sel = tenantExtras.timezone === tz;
+                              return (
+                                <Pressable key={tz} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('timezone', tz)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{tz}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Text style={styles.metaText}>Date Format</Text>
+                          <View style={styles.inlineRow}>
+                            {DATE_FORMAT_OPTIONS.map((fmt) => {
+                              const sel = tenantExtras.dateFormat === fmt;
+                              return (
+                                <Pressable key={fmt} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('dateFormat', fmt)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{fmt}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Text style={styles.metaText}>Currency</Text>
+                          <View style={styles.inlineRow}>
+                            {CURRENCY_OPTIONS.map((cur) => {
+                              const sel = tenantExtras.currencyCode === cur;
+                              return (
+                                <Pressable key={cur} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateExtra('currencyCode', cur)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{cur}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                        </View>
+                      </View>
+                    </BlurView>
+                  </View>
+                )}
+
+                {/* ── Team Tab ──────────────────────────────────── */}
+                {tenantTab === 'team' && (
+                  <View style={styles.tenantWidgetGrid}>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>Team & Titles</Text>
+                        <View style={styles.cardBody}>
+                          <Pressable style={styles.secondaryButton} onPress={() => setTenantRolesExpanded((current) => !current)} accessibilityRole="button" accessibilityLabel="Toggle active tenant end user title options">
+                            <Text style={styles.secondaryButtonText}>Available Titles {tenantRolesExpanded ? '▾' : '▸'}</Text>
+                          </Pressable>
+                          {tenantRolesExpanded && (
+                            <View style={styles.inlineRow}>
+                              {tenantTitleOptions.map((title) => {
+                                const isSelected = tenantRoleTitles.some((item) => item.toLowerCase() === title.toLowerCase());
+                                return (
+                                  <Pressable key={`active-title-${title}`} style={[styles.pill, isSelected && styles.pillActive]} onPress={() => toggleTitleSelection(title, tenantRoleTitles, setTenantRoleTitles)} accessibilityRole="button" accessibilityState={{ selected: isSelected }} accessibilityLabel={`Toggle ${title}`}>
+                                    <Text style={[styles.pillText, isSelected && styles.pillTextActive]}>{title}</Text>
+                                  </Pressable>
+                                );
+                              })}
+                            </View>
+                          )}
+                          <LabeledInput label="Add Custom End User Title" value={tenantCustomRoleTitle} onChangeText={setTenantCustomRoleTitle} placeholder="Example: Shift Lead" />
+                          <Pressable style={styles.secondaryButton} onPress={() => addCustomTitle(tenantCustomRoleTitle, tenantRoleTitles, setTenantRoleTitles, () => setTenantCustomRoleTitle(''))} accessibilityRole="button" accessibilityLabel="Add custom end user title">
+                            <Text style={styles.secondaryButtonText}>Add Title</Text>
+                          </Pressable>
+                          {tenantRoleTitles.length > 0 && (
+                            <View style={[styles.inlineRow, { marginTop: 8 }]}>
+                              {tenantRoleTitles.map((title) => (
+                                <View key={`selected-${title}`} style={[styles.pill, styles.pillActive]}>
+                                  <Text style={[styles.pillText, styles.pillTextActive]}>{title}</Text>
+                                </View>
+                              ))}
+                            </View>
+                          )}
+                        </View>
+                      </View>
+                    </BlurView>
+                  </View>
+                )}
+
+                {/* ── Manage Tab ──────────────────────────────────── */}
+                {tenantTab === 'manage' && (
+                  <View style={styles.tenantWidgetGrid}>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>Tenant Configuration</Text>
+                        <View style={styles.cardBody}>
+                          <LabeledInput label="Active Tenant Name" value={tenantRenameValue} onChangeText={setTenantRenameValue} placeholder="Rename selected tenant" />
+                          <Text style={styles.metaText}>Export Format</Text>
+                          <View style={styles.inlineRow}>
+                            {(['cosmos', 'postgres', 'mongodb'] as PortableDatabaseTarget[]).map((target) => {
+                              const selected = tenantExportTarget === target;
+                              return (
+                                <Pressable key={`tenant-export-target-${target}`} style={[styles.pill, selected && styles.pillActive]} onPress={() => setTenantExportTarget(target)} accessibilityRole="button" accessibilityState={{ selected }} accessibilityLabel={`Set export format ${target}`}>
+                                  <Text style={[styles.pillText, selected && styles.pillTextActive]}>{target.toUpperCase()}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Text style={styles.metaText}>Available Tenants</Text>
+                          {tenants.map((tenant) => (
+                            <View key={tenant.id} style={styles.listCard}>
+                              <Text style={styles.listTitle}>{tenant.name}</Text>
+                              <Text style={styles.metaText}>Titles: {tenant.branding.employeeTitles.length} · Departments: {(tenant.branding.departments ?? []).length} · Industry: {tenant.branding.industryVertical ?? 'Not set'}</Text>
+                              <View style={styles.inlineRow}>
+                                <Pressable style={[styles.pill, activeTenantId === tenant.id && styles.pillActive]} onPress={() => handleSwitchTenant(tenant.id)} accessibilityRole="button" accessibilityState={{ selected: activeTenantId === tenant.id }} accessibilityLabel={`Switch to ${tenant.name}`}>
+                                  <Text style={[styles.pillText, activeTenantId === tenant.id && styles.pillTextActive]}>{activeTenantId === tenant.id ? 'Active Tenant' : 'Switch to Tenant'}</Text>
+                                </Pressable>
+                                <Pressable style={styles.secondaryButton} onPress={() => { void handleExportTenantDataset(tenant.id, tenant.name); }} accessibilityRole="button" accessibilityLabel={`Download mapped dataset for ${tenant.name}`}>
+                                  <Text style={styles.secondaryButtonText}>Download Dataset</Text>
+                                </Pressable>
+                              </View>
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    </BlurView>
+                  </View>
+                )}
+
+                {/* ── Create Tab ──────────────────────────────────── */}
+                {tenantTab === 'create' && (
+                  <View style={styles.tenantWidgetGrid}>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>New Tenant Identity</Text>
+                        <View style={styles.cardBody}>
+                          <LabeledInput label="Tenant Name" value={newTenantName} onChangeText={setNewTenantName} placeholder="Example: Acme Corp" />
+                          <LabeledInput label="Logo URL" value={newTenantLogoUri} onChangeText={setNewTenantLogoUri} placeholder="https://your-domain.com/logo.png" />
+                          <View style={styles.inlineRow}>
+                            <Pressable style={styles.secondaryButton} onPress={handlePickNewTenantLogo} accessibilityRole="button" accessibilityLabel="Upload new tenant logo">
+                              <Text style={styles.secondaryButtonText}>Upload Logo</Text>
+                            </Pressable>
+                            <Pressable style={styles.secondaryButton} onPress={handleRemoveNewTenantLogo} accessibilityRole="button" accessibilityLabel="Remove new tenant logo">
+                              <Text style={styles.secondaryButtonText}>Remove</Text>
+                            </Pressable>
+                          </View>
+                          <LabeledInput label="Tagline" value={newTenantExtras.tagline} onChangeText={(v: string) => updateNewExtra('tagline', v)} placeholder="Company tagline" />
+                          <Text style={styles.metaText}>Industry</Text>
+                          <View style={styles.inlineRow}>
+                            {INDUSTRY_OPTIONS.map((ind) => {
+                              const sel = newTenantExtras.industryVertical === ind;
+                              return (
+                                <Pressable key={`new-ind-${ind}`} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateNewExtra('industryVertical', ind)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{ind}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                        </View>
+                      </View>
+                    </BlurView>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>New Tenant Colors</Text>
+                        <View style={styles.cardBody}>
+                          <LabeledInput label="Primary" value={newTenantPrimaryColor} onChangeText={setNewTenantPrimaryColor} placeholder="#120C23" />
+                          <LabeledInput label="Secondary" value={newTenantSecondaryColor} onChangeText={setNewTenantSecondaryColor} placeholder="#1A1230" />
+                          <LabeledInput label="Accent" value={newTenantAccentColor} onChangeText={setNewTenantAccentColor} placeholder="#8C5BF5" />
+                          <LabeledInput label="Accent Secondary" value={newTenantExtras.accentSecondary} onChangeText={(v: string) => updateNewExtra('accentSecondary', v)} placeholder="#A78BFA" />
+                          <LabeledInput label="Success" value={newTenantExtras.successColor} onChangeText={(v: string) => updateNewExtra('successColor', v)} placeholder="#22C55E" />
+                          <LabeledInput label="Warning" value={newTenantExtras.warningColor} onChangeText={(v: string) => updateNewExtra('warningColor', v)} placeholder="#F59E0B" />
+                          <LabeledInput label="Danger" value={newTenantExtras.dangerColor} onChangeText={(v: string) => updateNewExtra('dangerColor', v)} placeholder="#EF4444" />
+                          <LabeledInput label="Surface" value={newTenantExtras.surfaceColor} onChangeText={(v: string) => updateNewExtra('surfaceColor', v)} placeholder="#1E1535" />
+                          <Text style={styles.metaText}>Apply Preset</Text>
+                          <View style={styles.inlineRow}>
+                            {PALETTE_PRESETS.map((preset) => (
+                              <Pressable key={`new-preset-${preset.name}`} style={styles.pill} onPress={() => { const [p, s, a, a2, suc, wrn, dan, sur] = preset.colors; setNewTenantPrimaryColor(p); setNewTenantSecondaryColor(s); setNewTenantAccentColor(a); updateNewExtra('accentSecondary', a2); updateNewExtra('successColor', suc); updateNewExtra('warningColor', wrn); updateNewExtra('dangerColor', dan); updateNewExtra('surfaceColor', sur); }} accessibilityRole="button" accessibilityLabel={`Apply ${preset.name} preset`}>
+                                <Text style={styles.pillText}>{preset.name}</Text>
+                              </Pressable>
+                            ))}
+                          </View>
+                        </View>
+                      </View>
+                    </BlurView>
+                    <BlurView intensity={30} tint={mode === 'day' ? 'light' : 'dark'} style={styles.tenantWidgetBlur}>
+                      <View style={[styles.card, styles.tenantWidgetCard]}>
+                        <Text style={styles.cardTitle}>New Tenant Settings</Text>
+                        <View style={styles.cardBody}>
+                          <Text style={styles.metaText}>Font Family</Text>
+                          <View style={styles.inlineRow}>
+                            {FONT_OPTIONS.map((font) => {
+                              const sel = newTenantExtras.fontFamily === font;
+                              return (
+                                <Pressable key={`new-font-${font}`} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateNewExtra('fontFamily', font)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{font}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Text style={styles.metaText}>Border Radius</Text>
+                          <View style={styles.inlineRow}>
+                            {RADIUS_OPTIONS.map((opt) => {
+                              const sel = newTenantExtras.borderRadius === opt.value;
+                              return (
+                                <Pressable key={`new-rad-${opt.value}`} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateNewExtra('borderRadius', opt.value)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{opt.label}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Text style={styles.metaText}>Sidebar Style</Text>
+                          <View style={styles.inlineRow}>
+                            {SIDEBAR_STYLE_OPTIONS.map((opt) => {
+                              const sel = newTenantExtras.sidebarStyle === opt.value;
+                              return (
+                                <Pressable key={`new-sb-${opt.value}`} style={[styles.pill, sel && styles.pillActive]} onPress={() => updateNewExtra('sidebarStyle', opt.value)} accessibilityRole="button" accessibilityState={{ selected: sel }}>
+                                  <Text style={[styles.pillText, sel && styles.pillTextActive]}>{opt.label}</Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                          <Pressable style={styles.secondaryButton} onPress={() => setNewTenantRolesExpanded((current) => !current)} accessibilityRole="button" accessibilityLabel="Toggle new tenant title options">
+                            <Text style={styles.secondaryButtonText}>End User Titles {newTenantRolesExpanded ? '▾' : '▸'}</Text>
+                          </Pressable>
+                          {newTenantRolesExpanded && (
+                            <View style={styles.inlineRow}>
+                              {tenantTitleOptions.map((title) => {
+                                const isSelected = newTenantRoleTitles.some((item) => item.toLowerCase() === title.toLowerCase());
+                                return (
+                                  <Pressable key={`new-title-${title}`} style={[styles.pill, isSelected && styles.pillActive]} onPress={() => toggleTitleSelection(title, newTenantRoleTitles, setNewTenantRoleTitles)} accessibilityRole="button" accessibilityState={{ selected: isSelected }} accessibilityLabel={`Toggle ${title}`}>
+                                    <Text style={[styles.pillText, isSelected && styles.pillTextActive]}>{title}</Text>
+                                  </Pressable>
+                                );
+                              })}
+                            </View>
+                          )}
+                          <LabeledInput label="Add Custom Title" value={newTenantCustomRoleTitle} onChangeText={setNewTenantCustomRoleTitle} placeholder="Example: Team Captain" />
+                          <Pressable style={styles.secondaryButton} onPress={() => addCustomTitle(newTenantCustomRoleTitle, newTenantRoleTitles, setNewTenantRoleTitles, () => setNewTenantCustomRoleTitle(''))} accessibilityRole="button" accessibilityLabel="Add custom title for new tenant">
+                            <Text style={styles.secondaryButtonText}>Add Title</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    </BlurView>
+                  </View>
+                )}
 
               </ScrollView>
             ) : (

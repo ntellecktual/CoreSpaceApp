@@ -212,14 +212,41 @@ function normalizeTenantBranding(branding?: Partial<TenantBrandingProfile>): Ten
     .map((title) => title.trim())
     .filter((title, index, all) => title.length > 0 && all.findIndex((item) => item.toLowerCase() === title.toLowerCase()) === index);
 
+  const departments = (branding?.departments ?? [])
+    .map((d) => d.trim())
+    .filter((d, i, a) => d.length > 0 && a.indexOf(d) === i);
+
   return {
     logoUri: branding?.logoUri?.trim() || undefined,
+    tagline: branding?.tagline?.trim() || undefined,
+    industryVertical: branding?.industryVertical || undefined,
     brandColors: [
       normalizeHexColor(colors[0], DEFAULT_TENANT_BRAND_COLORS[0]),
       normalizeHexColor(colors[1], DEFAULT_TENANT_BRAND_COLORS[1]),
       normalizeHexColor(colors[2], DEFAULT_TENANT_BRAND_COLORS[2]),
     ],
+    accentSecondary: branding?.accentSecondary ? normalizeHexColor(branding.accentSecondary, '#A78BFA') : undefined,
+    successColor: branding?.successColor ? normalizeHexColor(branding.successColor, '#22C55E') : undefined,
+    warningColor: branding?.warningColor ? normalizeHexColor(branding.warningColor, '#F59E0B') : undefined,
+    dangerColor: branding?.dangerColor ? normalizeHexColor(branding.dangerColor, '#EF4444') : undefined,
+    surfaceColor: branding?.surfaceColor ? normalizeHexColor(branding.surfaceColor, '#1E1535') : undefined,
+    fontFamily: branding?.fontFamily || undefined,
+    headingWeight: branding?.headingWeight || undefined,
+    baseFontSize: branding?.baseFontSize ? Math.max(10, Math.min(20, Math.round(branding.baseFontSize))) : undefined,
+    borderRadius: branding?.borderRadius || undefined,
+    uiDensity: branding?.uiDensity || undefined,
+    sidebarStyle: branding?.sidebarStyle || undefined,
+    cardStyle: branding?.cardStyle || undefined,
+    welcomeMessage: branding?.welcomeMessage?.trim() || undefined,
+    heroImageUri: branding?.heroImageUri?.trim() || undefined,
+    dashboardLayout: branding?.dashboardLayout || undefined,
+    defaultThemeMode: branding?.defaultThemeMode || undefined,
+    animationsEnabled: branding?.animationsEnabled ?? true,
     employeeTitles: employeeTitles.length > 0 ? employeeTitles : DEFAULT_END_USER_TITLES,
+    departments,
+    timezone: branding?.timezone || undefined,
+    dateFormat: branding?.dateFormat || undefined,
+    currencyCode: branding?.currencyCode || undefined,
     widgetTwoColumnBreakpoint: normalizeWidgetBreakpoint(branding?.widgetTwoColumnBreakpoint, DEFAULT_WIDGET_TWO_COLUMN_BREAKPOINT),
   };
 }

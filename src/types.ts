@@ -285,9 +285,39 @@ export interface AuthSession {
 }
 
 export interface TenantBrandingProfile {
+  // ── Identity ──
   logoUri?: string;
+  tagline?: string;
+  industryVertical?: string;
+  // ── Palette ──
   brandColors: [string, string, string];
+  accentSecondary?: string;
+  successColor?: string;
+  warningColor?: string;
+  dangerColor?: string;
+  surfaceColor?: string;
+  // ── Typography ──
+  fontFamily?: string;
+  headingWeight?: string;
+  baseFontSize?: number;
+  // ── Shape & Layout ──
+  borderRadius?: string;
+  uiDensity?: string;
+  sidebarStyle?: string;
+  cardStyle?: string;
+  // ── Dashboard ──
+  welcomeMessage?: string;
+  heroImageUri?: string;
+  dashboardLayout?: string;
+  defaultThemeMode?: string;
+  animationsEnabled?: boolean;
+  // ── Business ──
   employeeTitles: string[];
+  departments?: string[];
+  timezone?: string;
+  dateFormat?: string;
+  currencyCode?: string;
+  // ── Layout ──
   widgetTwoColumnBreakpoint: number;
 }
 

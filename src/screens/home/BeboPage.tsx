@@ -348,7 +348,7 @@ function ArchitectureCard({
           <Text style={{ color: '#9CA3AF', fontSize: 11 }}>{card.industry}</Text>
         </View>
         <View style={{ backgroundColor: `${accent}20`, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
-          <Text style={{ color: accent, fontSize: 10, fontWeight: '700' }}>{card.functions.length} function{card.functions.length !== 1 ? 's' : ''}</Text>
+          <Text style={{ color: accent, fontSize: 10, fontWeight: '700' }}>{card.functions.length} department{card.functions.length !== 1 ? 's' : ''}</Text>
         </View>
       </View>
 
@@ -515,7 +515,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     setMessages(prev => [...prev, {
       id: uid(),
       role: 'assistant',
-      text: `✅ **Applied!** Your **${icon} ${label}** scenario is now live across CoreSpace.\n\n• **${payload.workspaces.length}** workspace${payload.workspaces.length !== 1 ? 's' : ''} created in Admin\n• **${payload.records.length}** records added to End User\n• **${payload.flows.length}** Signal flows published\n• **${payload.integrations.length}** Orbital integrations activated${(payload.businessFunctions?.length ?? 0) > 0 ? `\n• **${payload.businessFunctions!.length}** business function${payload.businessFunctions!.length !== 1 ? 's' : ''} loaded in Architecture` : ''}\n• Shell labels updated to ${label} terminology\n\nNavigate to **Admin** → Workspace Design to inspect the structure, or go to **End User** to interact with live ${label.toLowerCase()} data.`,
+      text: `✅ **Applied!** Your **${icon} ${label}** scenario is now live across CoreSpace.\n\n• **${payload.workspaces.length}** workspace${payload.workspaces.length !== 1 ? 's' : ''} created in Admin\n• **${payload.records.length}** records added to End User\n• **${payload.flows.length}** Signal flows published\n• **${payload.integrations.length}** Orbital integrations activated${(payload.businessFunctions?.length ?? 0) > 0 ? `\n• **${payload.businessFunctions!.length}** department${payload.businessFunctions!.length !== 1 ? 's' : ''} loaded in Architecture` : ''}\n• Shell labels updated to ${label} terminology\n\nNavigate to **Admin** → Workspace Design to inspect the structure, or go to **End User** to interact with live ${label.toLowerCase()} data.`,
       cards: [],
       quickReplies: ['Generate more sample data', 'Show platform analytics', 'Customize workspace fields', 'Try another scenario'],
       timestamp: new Date(),

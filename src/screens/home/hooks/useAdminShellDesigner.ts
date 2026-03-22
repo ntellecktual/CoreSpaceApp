@@ -25,8 +25,8 @@ export function useAdminShellDesigner() {
   const [subjectPlural, setSubjectPlural] = useState(shellConfig.subjectPlural);
   const [workspaceLabel, setWorkspaceLabel] = useState(shellConfig.workspaceLabel);
   const [subSpaceLabel, setSubSpaceLabel] = useState(shellConfig.subSpaceLabel);
-  const [functionLabel, setFunctionLabel] = useState(shellConfig.functionLabel ?? 'Function');
-  const [functionLabelPlural, setFunctionLabelPlural] = useState(shellConfig.functionLabelPlural ?? 'Functions');
+  const [functionLabel, setFunctionLabel] = useState(shellConfig.functionLabel ?? 'Department');
+  const [functionLabelPlural, setFunctionLabelPlural] = useState(shellConfig.functionLabelPlural ?? 'Departments');
   const [objectLabel, setObjectLabel] = useState(shellConfig.objectLabel ?? 'Inventory');
   const [objectLabelPlural, setObjectLabelPlural] = useState(shellConfig.objectLabelPlural ?? 'Inventories');
   const [collectionLabel, setCollectionLabel] = useState(shellConfig.collectionLabel ?? 'Batch');
@@ -56,8 +56,8 @@ export function useAdminShellDesigner() {
     setSubjectPlural(shellConfig.subjectPlural);
     setWorkspaceLabel(shellConfig.workspaceLabel);
     setSubSpaceLabel(shellConfig.subSpaceLabel);
-    setFunctionLabel(shellConfig.functionLabel ?? 'Function');
-    setFunctionLabelPlural(shellConfig.functionLabelPlural ?? 'Functions');
+    setFunctionLabel(shellConfig.functionLabel ?? 'Department');
+    setFunctionLabelPlural(shellConfig.functionLabelPlural ?? 'Departments');
     setObjectLabel(shellConfig.objectLabel ?? 'Inventory');
     setObjectLabelPlural(shellConfig.objectLabelPlural ?? 'Inventories');
     setCollectionLabel(shellConfig.collectionLabel ?? 'Batch');
@@ -95,8 +95,8 @@ export function useAdminShellDesigner() {
       subjectPlural: plural,
       workspaceLabel: workspace,
       subSpaceLabel: subSpace,
-      functionLabel: functionLabel.trim() || 'Function',
-      functionLabelPlural: functionLabelPlural.trim() || 'Functions',
+      functionLabel: functionLabel.trim() || 'Department',
+      functionLabelPlural: functionLabelPlural.trim() || 'Departments',
       objectLabel: objectLabel.trim() || 'Inventory',
       objectLabelPlural: objectLabelPlural.trim() || 'Inventories',
       collectionLabel: collectionLabel.trim() || 'Batch',

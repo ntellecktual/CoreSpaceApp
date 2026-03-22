@@ -297,10 +297,10 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     {
       key: 'architecture',
       label: 'Business Architecture',
-      description: 'Define business functions and objects — the layer above workspaces that organises your whole operation.',
+      description: 'Define departments and objects — the layer above workspaces that organises your whole operation.',
       items: [
-        { label: 'Functions & Objects', detail: 'Build and manage your business hierarchy', onPress: () => setAdminTab('architecture') },
-        { label: 'Architecture Terminology', detail: 'Rename functions, objects, and collections', onPress: () => { setAdminTab('shell'); setShellPane('labels'); } },
+        { label: 'Departments & Objects', detail: 'Build and manage your business hierarchy', onPress: () => setAdminTab('architecture') },
+        { label: 'Architecture Terminology', detail: 'Rename departments, objects, and collections', onPress: () => { setAdminTab('shell'); setShellPane('labels'); } },
       ],
     },
     {
@@ -363,7 +363,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   ];
 
   const getActiveNavItemKey = (): string => {
-    if (adminTab === 'architecture') return 'Functions & Objects';
+    if (adminTab === 'architecture') return 'Departments & Objects';
     if (adminTab === 'workspace') return workspacePane === 'workspace' ? 'Configure Workspace' : 'SubSpace Lanes & Fields';
     if (adminTab === 'shell') {
       if (shellPane === 'labels') return 'App Terminology';
@@ -387,7 +387,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const adminContentHeaders: Record<string, { title: string; description: string }> = {
     architecture: {
       title: 'Business Architecture',
-      description: `Define ${data.shellConfig.functionLabelPlural ?? 'Functions'} and ${data.shellConfig.objectLabelPlural ?? 'Objects'} — the layer above workspaces that maps your entire operation before any records are created.`,
+      description: `Define ${data.shellConfig.functionLabelPlural ?? 'Departments'} and ${data.shellConfig.objectLabelPlural ?? 'Objects'} — the layer above workspaces that maps your entire operation before any records are created.`,
     },
     workspace: {
       title: 'Workspace Design',
@@ -1770,8 +1770,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             <View style={[styles.listCard, { gap: 4, paddingVertical: 12 }]}>
               <Text style={[styles.metaText, { fontWeight: '700', marginBottom: 4 }]}>The 6-Layer Architecture Hierarchy</Text>
               {[
-                { icon: '🏢', label: data.shellConfig.functionLabel ?? 'Function', desc: 'A major division of your business (e.g. Supply Chain, Finance, Service Ops)', color: '#8C5BF5' },
-                { icon: '📦', label: data.shellConfig.objectLabel ?? 'Object', desc: `What each ${data.shellConfig.functionLabel ?? 'Function'} manages (e.g. Drug Inventory, Device Inventory, Policy Book)`, color: '#3B82F6' },
+                { icon: '🏢', label: data.shellConfig.functionLabel ?? 'Department', desc: 'A major division of your business (e.g. Supply Chain, Finance, Service Ops)', color: '#8C5BF5' },
+                { icon: '📦', label: data.shellConfig.objectLabel ?? 'Object', desc: `What each ${data.shellConfig.functionLabel ?? 'Department'} manages (e.g. Drug Inventory, Device Inventory, Policy Book)`, color: '#3B82F6' },
                 { icon: '🗂️', label: data.shellConfig.collectionLabel ?? 'Batch', desc: `Groups or collections of ${data.shellConfig.objectLabelPlural ?? 'Objects'} (e.g. Lot XY-1234, Work Order WO-5001)`, color: '#10B981' },
                 { icon: '🔲', label: 'Workspace', desc: 'The processing area — each workspace handles one stage of the workflow', color: '#F59E0B' },
                 { icon: '📋', label: 'SubSpace', desc: 'A lane inside a workspace (e.g. Distributor Verification, Repair Tasks)', color: '#EF4444' },
@@ -1796,10 +1796,10 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             <View style={[styles.listCard, { gap: 10 }]}>
               <Text style={[styles.metaText, { fontWeight: '700' }]}>How to build your architecture in 4 steps:</Text>
               {[
-                { step: '1', title: `Define ${data.shellConfig.functionLabelPlural ?? 'Functions'}`, detail: `Name the major areas of your business. Example: "Supply Chain & Regulatory", "Service Operations", "Finance"`, color: '#8C5BF5' },
-                { step: '2', title: `Add ${data.shellConfig.objectLabelPlural ?? 'Objects'}`, detail: `Under each ${data.shellConfig.functionLabel ?? 'Function'}, define what it tracks. Example: "Drug Inventory" under Supply Chain, "Device Inventory" under Service Ops`, color: '#3B82F6' },
+                { step: '1', title: `Define ${data.shellConfig.functionLabelPlural ?? 'Departments'}`, detail: `Name the major areas of your business. Example: "Supply Chain & Regulatory", "Service Operations", "Finance"`, color: '#8C5BF5' },
+                { step: '2', title: `Add ${data.shellConfig.objectLabelPlural ?? 'Objects'}`, detail: `Under each ${data.shellConfig.functionLabel ?? 'Department'}, define what it tracks. Example: "Drug Inventory" under Supply Chain, "Device Inventory" under Service Ops`, color: '#3B82F6' },
                 { step: '3', title: 'Link Workspaces', detail: `Tap each ${data.shellConfig.objectLabel ?? 'Object'} to connect it to the workspaces that process it. This powers the End User navigation and filtering.`, color: '#10B981' },
-                { step: '4', title: 'Set Terminology (Optional)', detail: `Go to App Terminology to rename ${data.shellConfig.functionLabel ?? 'Function'}, ${data.shellConfig.objectLabel ?? 'Object'}, and ${data.shellConfig.collectionLabel ?? 'Batch'} to match your industry.`, color: '#F59E0B' },
+                { step: '4', title: 'Set Terminology (Optional)', detail: `Go to App Terminology to rename ${data.shellConfig.functionLabel ?? 'Department'}, ${data.shellConfig.objectLabel ?? 'Object'}, and ${data.shellConfig.collectionLabel ?? 'Batch'} to match your industry.`, color: '#F59E0B' },
               ].map((item, i) => (
                 <View key={i} style={{ flexDirection: 'row', gap: 10, alignItems: 'flex-start', paddingVertical: 4 }}>
                   <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: `${item.color}22`, borderWidth: 1, borderColor: `${item.color}44`, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1816,7 +1816,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             {/* Load Examples */}
             <View style={[styles.listCard, { gap: 10 }]}>
               <Text style={[styles.metaText, { fontWeight: '700' }]}>🚀 Load a Pre-Built Example</Text>
-              <Text style={styles.metaText}>One click loads a complete business architecture with Functions, Objects, and terminology pre-configured for your industry.</Text>
+              <Text style={styles.metaText}>One click loads a complete business architecture with Departments, Objects, and terminology pre-configured for your industry.</Text>
               <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                 <Pressable
                   style={[styles.secondaryButton, { borderColor: '#8C5BF5', flex: 1 }]}
@@ -1884,7 +1884,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <View style={{ flexDirection: 'row', gap: 14, flexWrap: 'wrap' }}>
                 <Text style={styles.metaText}>
                   <Text style={{ color: '#8C5BF5', fontWeight: '700' }}>{(data.businessFunctions ?? []).length}</Text>
-                  {` ${(data.businessFunctions?.length ?? 0) === 1 ? (data.shellConfig.functionLabel ?? 'Function') : (data.shellConfig.functionLabelPlural ?? 'Functions')}`}
+                  {` ${(data.businessFunctions?.length ?? 0) === 1 ? (data.shellConfig.functionLabel ?? 'Department') : (data.shellConfig.functionLabelPlural ?? 'Departments')}`}
                 </Text>
                 <Text style={styles.metaText}>
                   <Text style={{ color: '#3B82F6', fontWeight: '700' }}>{(data.businessFunctions ?? []).reduce((a, f) => a + f.objects.length, 0)}</Text>
@@ -1896,7 +1896,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 </Text>
               </View>
               <Text style={[styles.metaText, { marginTop: 6, fontSize: 11 }]}>
-                {`Hierarchy: ${data.shellConfig.functionLabel ?? 'Function'} → ${data.shellConfig.objectLabel ?? 'Object'} → ${data.shellConfig.collectionLabel ?? 'Batch'} → Workspace → SubSpace → Record`}
+                {`Hierarchy: ${data.shellConfig.functionLabel ?? 'Department'} → ${data.shellConfig.objectLabel ?? 'Object'} → ${data.shellConfig.collectionLabel ?? 'Batch'} → Workspace → SubSpace → Record`}
               </Text>
             </View>
 
@@ -1967,7 +1967,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                   <LabeledInput label="Name" value={newFnName} onChangeText={setNewFnName} placeholder="e.g. Supply Chain & Regulatory" />
                   <LabeledInput label="Icon (emoji)" value={newFnIcon} onChangeText={setNewFnIcon} placeholder="🔗" />
                   <LabeledInput label="Accent Color (hex)" value={newFnColor} onChangeText={setNewFnColor} placeholder="#8C5BF5" />
-                  <LabeledInput label="Description (optional)" value={newFnDesc} onChangeText={setNewFnDesc} placeholder="What this function covers" />
+                  <LabeledInput label="Description (optional)" value={newFnDesc} onChangeText={setNewFnDesc} placeholder="What this department covers" />
                   <Pressable style={styles.secondaryButton} onPress={() => {
                     if (!newFnName.trim()) return;
                     upsertBusinessFunction({ ...fn, name: newFnName.trim(), icon: newFnIcon.trim() || undefined, color: newFnColor.trim() || fn.color, description: newFnDesc.trim() || undefined });
@@ -2099,11 +2099,11 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
         {/* Add new function form */}
         {editingFunctionId === '__new__' ? (
           <View style={[styles.listCard, { marginTop: 8 }]}>
-            <Text style={styles.listTitle}>New {data.shellConfig.functionLabel ?? 'Function'}</Text>
+            <Text style={styles.listTitle}>New {data.shellConfig.functionLabel ?? 'Department'}</Text>
             <LabeledInput label="Name" value={newFnName} onChangeText={setNewFnName} placeholder="e.g. Finance" />
             <LabeledInput label="Icon (emoji)" value={newFnIcon} onChangeText={setNewFnIcon} placeholder="💰" />
             <LabeledInput label="Accent Color (hex)" value={newFnColor} onChangeText={setNewFnColor} placeholder="#8C5BF5" />
-            <LabeledInput label="Description (optional)" value={newFnDesc} onChangeText={setNewFnDesc} placeholder="What this function covers" />
+            <LabeledInput label="Description (optional)" value={newFnDesc} onChangeText={setNewFnDesc} placeholder="What this department covers" />
             <View style={styles.inlineRow}>
               <Pressable style={styles.secondaryButton} onPress={() => {
                 if (!newFnName.trim()) return;
@@ -2113,7 +2113,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 setNewFnName(''); setNewFnIcon(''); setNewFnColor('#8C5BF5'); setNewFnDesc('');
                 setEditingFunctionId(null);
               }}>
-                <Text style={styles.secondaryButtonText}>Add {data.shellConfig.functionLabel ?? 'Function'}</Text>
+                <Text style={styles.secondaryButtonText}>Add {data.shellConfig.functionLabel ?? 'Department'}</Text>
               </Pressable>
               <Pressable style={[styles.secondaryButton, { marginLeft: 8 }]} onPress={() => setEditingFunctionId(null)}>
                 <Text style={styles.secondaryButtonText}>Cancel</Text>
@@ -2125,7 +2125,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             setNewFnName(''); setNewFnIcon(''); setNewFnColor('#8C5BF5'); setNewFnDesc('');
             setEditingFunctionId('__new__');
           }}>
-            <Text style={styles.secondaryButtonText}>+ Add {data.shellConfig.functionLabel ?? 'Function'}</Text>
+            <Text style={styles.secondaryButtonText}>+ Add {data.shellConfig.functionLabel ?? 'Department'}</Text>
           </Pressable>
         )}
       </Card>}
@@ -2157,8 +2157,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             <LabeledInput label="Main item (many)" helperText="What do you call multiple records?" value={subjectPlural} onChangeText={setSubjectPlural} placeholder="Example: Batches" />
             <LabeledInput label="Workspace name word" helperText="What should this area be called in the app?" value={workspaceLabel} onChangeText={setWorkspaceLabel} placeholder="Example: Team Workspace" />
             <LabeledInput label="SubSpace name word" helperText="What should each smaller work area be called?" value={subSpaceLabel} onChangeText={setSubSpaceLabel} placeholder="Example: Work Lane" />
-            <LabeledInput label={`${data.shellConfig.functionLabel ?? 'Function'} (one)`} helperText="How do you call one top-level business division?" value={functionLabel} onChangeText={setFunctionLabel} placeholder="Function" />
-            <LabeledInput label={`${data.shellConfig.functionLabel ?? 'Function'} (many)`} helperText="Plural version" value={functionLabelPlural} onChangeText={setFunctionLabelPlural} placeholder="Functions" />
+            <LabeledInput label={`${data.shellConfig.functionLabel ?? 'Department'} (one)`} helperText="How do you call one top-level business division?" value={functionLabel} onChangeText={setFunctionLabel} placeholder="Department" />
+            <LabeledInput label={`${data.shellConfig.functionLabel ?? 'Department'} (many)`} helperText="Plural version" value={functionLabelPlural} onChangeText={setFunctionLabelPlural} placeholder="Departments" />
             <LabeledInput label={`${data.shellConfig.objectLabel ?? 'Object'} (one)`} helperText="The type of inventory or asset portfolio being tracked" value={shellObjectLabel} onChangeText={setShellObjectLabel} placeholder="Inventory" />
             <LabeledInput label={`${data.shellConfig.objectLabel ?? 'Object'} (many)`} helperText="Plural version" value={objectLabelPlural} onChangeText={setObjectLabelPlural} placeholder="Inventories" />
             <LabeledInput label={`${data.shellConfig.collectionLabel ?? 'Batch'} (one)`} helperText="An individual tracked collection or client portfolio" value={collectionLabel} onChangeText={setCollectionLabel} placeholder="Batch" />

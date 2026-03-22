@@ -209,7 +209,7 @@ export interface ShellConfig {
   workspaceLabel: string;
   subSpaceLabel: string;
   // Business architecture terminology — all optional with sensible defaults
-  functionLabel?: string;         // "Function" or custom: "Division", "Domain", "Department"
+  functionLabel?: string;         // "Department" or custom: "Division", "Domain", "Function"
   functionLabelPlural?: string;
   objectLabel?: string;           // "Registry" or custom: "Inventory", "Ledger", "Portfolio"
   objectLabelPlural?: string;

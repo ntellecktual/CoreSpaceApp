@@ -605,8 +605,8 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const subSpaceLabel = shellConfig.subSpaceLabel;
   const collectionLabel = shellConfig.collectionLabel ?? 'Collection';
   const collectionLabelPlural = shellConfig.collectionLabelPlural ?? 'Collections';
-  const functionLabel = shellConfig.functionLabel ?? 'Function';
-  const functionLabelPlural = shellConfig.functionLabelPlural ?? 'Functions';
+  const functionLabel = shellConfig.functionLabel ?? 'Department';
+  const functionLabelPlural = shellConfig.functionLabelPlural ?? 'Departments';
   const objectLabel = shellConfig.objectLabel ?? 'Registry';
   const objectLabelPlural = shellConfig.objectLabelPlural ?? 'Registries';
   const accentColor = accentPalette?.accent ? normalizeHex(accentPalette.accent, '#8C5BF5') : '#8C5BF5';
@@ -877,7 +877,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           {businessFunctions.length > 0 && (
             <View style={{ marginBottom: 6 }}>
               <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#E878F6' }}>
-                {appData.shellConfig.functionLabelPlural?.toUpperCase() ?? 'FUNCTIONS'}
+                {appData.shellConfig.functionLabelPlural?.toUpperCase() ?? 'DEPARTMENTS'}
               </Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 3 }}>
                 <View style={{ flexDirection: 'row', gap: 4, paddingVertical: 2 }}>

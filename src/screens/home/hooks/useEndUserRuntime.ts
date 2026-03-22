@@ -54,29 +54,11 @@ export function useEndUserRuntime(selectedClientId: string) {
     });
   }, [lifecycleTransitions, activePersona]);
 
+  // All stage names are available when creating a new record (no transition constraint applies
+  // to fresh entries — transitions govern existing record movements, not initial status choice).
   const allowedLifecycleStageNames = useMemo(() => {
-    const names: string[] = [];
-    if (defaultLifecycleStage?.name) {
-      names.push(defaultLifecycleStage.name);
-    }
-
-    if (!defaultLifecycleStage) {
-      return names;
-    }
-
-    const targets = applicableLifecycleTransitions
-      .filter((transition) => transition.fromStageId === defaultLifecycleStage.id)
-      .map((transition) => transition.toStageId);
-
-    for (const stageId of targets) {
-      const stage = lifecycleStages.find((item) => item.id === stageId);
-      if (stage?.name && !names.includes(stage.name)) {
-        names.push(stage.name);
-      }
-    }
-
-    return names;
-  }, [defaultLifecycleStage, applicableLifecycleTransitions, lifecycleStages]);
+    return lifecycleStages.map((stage) => stage.name);
+  }, [lifecycleStages]);
 
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(workspaces[0]?.id ?? '');
 
@@ -280,14 +262,8 @@ export function useEndUserRuntime(selectedClientId: string) {
 
     if (!baseForm) return undefined;
 
-    // Inject lifecycle status field if not already present
-    const hasStatus = baseForm.fields.some((f) => f.id === 'status');
-    const fields = hasStatus
-      ? baseForm.fields.map((f) => f.id === 'status' ? { ...f, options: allowedLifecycleStageNames } : f)
-      : [
-          ...baseForm.fields,
-          { id: 'status', label: 'Lifecycle Status', type: 'select' as const, required: false, options: allowedLifecycleStageNames },
-        ];
+    // Strip any explicit 'status' field — lifecycle is set via the stage pill picker, not a text input.
+    const fields = baseForm.fields.filter((f) => f.id !== 'status');
 
     return { ...baseForm, fields };
   }, [workspace, selectedSubSpace, getFormForSubSpace, allowedLifecycleStageNames]);
@@ -333,21 +309,11 @@ export function useEndUserRuntime(selectedClientId: string) {
 
     const requestedStatus = formValues.status?.trim();
     const allowedStatuses = new Set(lifecycleStages.map((stage) => stage.name));
+    // Any valid lifecycle stage may be set on a brand-new record — transition rules
+    // apply only when moving an *existing* record between stages, not on initial creation.
     if (requestedStatus && !allowedStatuses.has(requestedStatus)) {
       setMessage('Status must match an admin-defined lifecycle stage.');
       return;
-    }
-    if (requestedStatus && defaultLifecycleStage && requestedStatus !== defaultLifecycleStage.name) {
-      const requestedStage = lifecycleStages.find((stage) => stage.name === requestedStatus);
-      const hasTransition = applicableLifecycleTransitions.some(
-        (transition) =>
-          transition.fromStageId === defaultLifecycleStage.id &&
-          transition.toStageId === requestedStage?.id,
-      );
-      if (!hasTransition) {
-        setMessage(`Status transition not allowed from default stage ${defaultLifecycleStage.name}.`);
-        return;
-      }
     }
     const normalizedStatus =
       requestedStatus && allowedStatuses.has(requestedStatus)

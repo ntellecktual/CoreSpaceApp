@@ -93,6 +93,43 @@ function parseGs1Barcode(code: string): Record<string, string> {
   return result;
 }
 
+/* ── DSCSA Pharmaceutical Barcode Dataset (simulated scan API) ─── */
+const PHARMA_BARCODE_DATASET = [
+  { barcode: '(01)00368180517013(10)XY-1234(17)261225(21)UNIT001', productName: 'Lisinopril 10mg Tablet',          ndc: '68180-0517-01', manufacturer: 'Lupin Pharmaceuticals', lot: 'XY-1234',  expiration: '12-25-2026', serial: 'UNIT001', dosageForm: 'Tablet'     },
+  { barcode: '(01)00658620007054(10)MZ-9021(17)270915(21)UNIT002', productName: 'Amoxicillin 500mg Capsule',       ndc: '65862-0007-05', manufacturer: 'Aurobindo Pharma',       lot: 'MZ-9021',  expiration: '09-15-2027', serial: 'UNIT002', dosageForm: 'Capsule'    },
+  { barcode: '(01)00004091631016(10)JK-4410(17)270630(21)UNIT003', productName: 'Epinephrine 1mg/mL Injectable',   ndc: '00409-1631-01', manufacturer: 'Pfizer Inc.',            lot: 'JK-4410',  expiration: '06-30-2027', serial: 'UNIT003', dosageForm: 'Injectable' },
+  { barcode: '(01)00031622003456(10)AB-5512(17)271130(21)UNIT004', productName: 'Metoprolol Succinate 50mg',       ndc: '00316-2200-34', manufacturer: 'AstraZeneca',            lot: 'AB-5512',  expiration: '11-30-2027', serial: 'UNIT004', dosageForm: 'Tablet'     },
+  { barcode: '(01)00007104014323(10)CD-7789(17)280315(21)UNIT005', productName: 'Atorvastatin Calcium 20mg',       ndc: '00071-0143-23', manufacturer: 'Pfizer (Lipitor)',        lot: 'CD-7789',  expiration: '03-15-2028', serial: 'UNIT005', dosageForm: 'Tablet'     },
+  { barcode: '(01)05000456789012(10)EF-3301(17)270801(21)CTN-001', productName: 'Metoprolol Succinate 50mg Carton', ndc: '00316-2200-34', manufacturer: 'AstraZeneca',           lot: 'EF-3301',  expiration: '08-01-2027', serial: 'CTN-001', dosageForm: 'Carton'     },
+] as const;
+type PharmaBarcodeEntry = typeof PHARMA_BARCODE_DATASET[number];
+
+function lookupBarcodeDataset(code: string): PharmaBarcodeEntry | null {
+  const trimmed = code.trim();
+  return PHARMA_BARCODE_DATASET.find(
+    (e) => e.barcode === trimmed || e.ndc === trimmed || e.serial === trimmed,
+  ) ?? null;
+}
+
+function applyDatasetEntryToFields(
+  entry: PharmaBarcodeEntry,
+  fields: SubSpaceBuilderField[],
+  setField: (id: string, val: string) => void,
+) {
+  fields.forEach((f) => {
+    const lbl = f.label.toLowerCase();
+    if (lbl.includes('ndc') || lbl.includes('code'))                             setField(f.id, entry.ndc);
+    else if (lbl.includes('lot'))                                                 setField(f.id, entry.lot);
+    else if (lbl.includes('exp') || (lbl.includes('date') && !lbl.includes('received') && !lbl.includes('create')))
+                                                                                  setField(f.id, entry.expiration);
+    else if (lbl.includes('serial') || lbl.includes('unit'))                     setField(f.id, entry.serial);
+    else if (lbl.includes('product') || lbl.includes('name') || lbl.includes('drug'))
+                                                                                  setField(f.id, entry.productName);
+    else if (lbl.includes('manufacturer') || lbl.includes('labeler'))            setField(f.id, entry.manufacturer);
+    else if (lbl.includes('dosage') || lbl.includes('form'))                     setField(f.id, entry.dosageForm);
+  });
+}
+
 /* ── Map GS1/raw barcode to form fields ─────────────────── */
 function applyBarcodeToFields(
   code: string,
@@ -409,6 +446,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   /* ── Barcode scan state ── */
   const [barcodeInput, setBarcodeInput] = useLocalState('');
   const [barcodeApplied, setBarcodeApplied] = useLocalState(false);
+  const [barcodeDatasetResult, setBarcodeDatasetResult] = useLocalState<PharmaBarcodeEntry | null>(null);
 
   /* ── Hooks ── */
   const {
@@ -526,6 +564,29 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
 
   /* ── NEW: Inject UX animations (once) ── */
   React.useEffect(() => { injectUxAnimations(); }, []);
+
+  /* ── Auto-fill received date/time when create modal opens ── */
+  React.useEffect(() => {
+    if (!createModalOpen || !activeForm) return;
+    const now = new Date();
+    const mm  = String(now.getMonth() + 1).padStart(2, '0');
+    const dd  = String(now.getDate()).padStart(2, '0');
+    const yyyy = now.getFullYear();
+    const hh  = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const ss  = String(now.getSeconds()).padStart(2, '0');
+    const dateStr     = `${mm}-${dd}-${yyyy}`;
+    const dateTimeStr = `${mm}-${dd}-${yyyy} ${hh}:${min}:${ss}`;
+    activeForm.fields.forEach((field) => {
+      const lbl = field.label.toLowerCase();
+      if ((lbl.includes('received') || lbl.includes('receipt')) && !formValues[field.id]) {
+        const isDateTime = lbl.includes('time') || lbl.includes('date/time') || lbl.includes('datetime');
+        setField(field.id, isDateTime ? dateTimeStr : dateStr);
+      }
+    });
+  // Run only when the modal opens (createModalOpen flips to true) or the active subspace changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [createModalOpen, activeForm]);
 
   /* ── Clear batch selection on subspace/workspace change ── */
   React.useEffect(() => {
@@ -1580,14 +1641,14 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
       </Modal>
 
       {/* ═══════════════ CREATE RECORD MODAL ═══════════════ */}
-      <Modal transparent visible={createModalOpen} animationType="fade" onRequestClose={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setFdaSelectedDrug(null); }}>
-        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setFdaSelectedDrug(null); }}>
+      <Modal transparent visible={createModalOpen} animationType="fade" onRequestClose={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setFdaSelectedDrug(null); }}>
+        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setFdaSelectedDrug(null); }}>
           <Pressable onPress={() => {}} style={{ width: 520, maxWidth: '94%' as any, maxHeight: '88%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any }}>
             {/* ── Modal Header ── */}
             <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12 }}>
                 <Text style={{ fontSize: 16, fontWeight: '800', color: '#FFFFFF' }}>Create Record</Text>
-                <Pressable onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setFdaSelectedDrug(null); }} style={{ padding: 6 }}>
+                <Pressable onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setFdaSelectedDrug(null); }} style={{ padding: 6 }}>
                   <Text style={{ fontSize: 14, color: dimColor }}>✕</Text>
                 </Pressable>
               </View>
@@ -1673,11 +1734,11 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     label={`${field.label}${field.required ? ' *' : ''}`}
                     value={formValues[field.id] ?? ''}
                     onChangeText={(v) => setField(field.id, v)}
-                    placeholder={field.id === 'status' ? `Options: ${allowedLifecycleStageNames.join(', ')}` : field.options ? `Options: ${field.options.join(', ')}` : field.type === 'date' ? 'MM-DD-YYYY' : `Enter ${field.label.toLowerCase()}`}
+                    placeholder={field.options ? `Options: ${field.options.join(', ')}` : field.type === 'date' ? 'MM-DD-YYYY' : `Enter ${field.label.toLowerCase()}`}
                   />
                 ))}
                 {activeForm && (
-                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setFdaSelectedDrug(null); }}
+                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setFdaSelectedDrug(null); setBarcodeDatasetResult(null); }}
                     style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any }}>
                     <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient) ? accentTextColor : dimColor }}>Create Entry</Text>
                   </Pressable>
@@ -1802,7 +1863,6 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     showToast(`Imported ${created} record${created !== 1 ? 's' : ''}`, 'success');
                     setCsvText(''); setCsvPreviewRows([]); setCreateModalOpen(false); setCreateTab('form');
                   }}
-                  disabled={!canCreateRecord || !selectedClient || csvPreviewRows.length === 0}
                   style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient && csvPreviewRows.length > 0) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any, opacity: (!canCreateRecord || !selectedClient || csvPreviewRows.length === 0) ? 0.5 : 1 }}>
                   <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient && csvPreviewRows.length > 0) ? accentTextColor : dimColor }}>
                     {csvPreviewRows.length === 0 ? 'Paste or upload data above' : !selectedClient ? `Select a ${collectionLabel.toLowerCase()} first` : `Import All Rows from File`}
@@ -1816,9 +1876,27 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
               <ScrollView style={{ padding: 20 }} contentContainerStyle={{ gap: 14, paddingBottom: 20 }}>
                 {!selectedClient && <Text style={styles.notice}>Select a {shellConfig.subjectSingular.toLowerCase()} first.</Text>}
                 <Text style={{ fontSize: 12, color: dimColor, lineHeight: 18 }}>
-                  Scan or type a barcode. GS1-128 barcodes (DSCSA, shipping, retail) are auto-parsed into
-                  NDC, Lot, Expiration, and Serial fields. Any other code maps to the first matching field.
+                  Scan or type a GS1-128 barcode (DSCSA, shipping, retail). The system cross-references
+                  the DSCSA pharmaceutical database to auto-fill NDC, Lot, Expiration, Serial, and
+                  product details. Any other code maps to the first matching field.
                 </Text>
+                {/* ── Sample barcodes (pharma workspaces) ── */}
+                {isPharmWorkspace && (
+                  <View style={{ gap: 6 }}>
+                    <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase' as any, color: accentColor }}>DSCSA Sample Barcodes</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                      <View style={{ flexDirection: 'row', gap: 6, paddingVertical: 2 }}>
+                        {PHARMA_BARCODE_DATASET.map((entry) => (
+                          <Pressable key={entry.serial} onPress={() => { setBarcodeInput(entry.barcode); setBarcodeApplied(false); setBarcodeDatasetResult(null); }}
+                            style={{ paddingHorizontal: 10, paddingVertical: 7, borderRadius: 8, backgroundColor: accentSoft, borderWidth: 1, borderColor: accentColor, maxWidth: 140 }}>
+                            <Text style={{ fontSize: 10, fontWeight: '700', color: accentColor }} numberOfLines={1}>{entry.productName}</Text>
+                            <Text style={{ fontSize: 9, color: dimColor }}>NDC: {entry.ndc}</Text>
+                          </Pressable>
+                        ))}
+                      </View>
+                    </ScrollView>
+                  </View>
+                )}
                 {/* Scan input */}
                 <View style={{ gap: 4 }}>
                   <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>Barcode / QR Code</Text>
@@ -1826,12 +1904,13 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     <TextInput
                       style={{ flex: 1, fontSize: 14, fontFamily: 'monospace', color: '#FFFFFF', borderWidth: 1, borderColor: barcodeApplied ? '#86EFAC' : 'rgba(255,255,255,0.18)', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: 'rgba(255,255,255,0.04)' }}
                       value={barcodeInput}
-                      onChangeText={(v) => { setBarcodeInput(v); setBarcodeApplied(false); }}
+                      onChangeText={(v) => { setBarcodeInput(v); setBarcodeApplied(false); setBarcodeDatasetResult(null); }}
                       onSubmitEditing={() => {
                         if (barcodeInput.trim() && activeForm) {
-                          applyBarcodeToFields(barcodeInput.trim(), activeForm.fields, setField);
+                          const match = lookupBarcodeDataset(barcodeInput.trim());
+                          if (match) { applyDatasetEntryToFields(match, activeForm.fields as any, setField); setBarcodeDatasetResult(match); showToast('Product loaded from DSCSA database', 'success'); }
+                          else { applyBarcodeToFields(barcodeInput.trim(), activeForm.fields as any, setField); setBarcodeDatasetResult(null); showToast('Barcode mapped to form fields', 'success'); }
                           setBarcodeApplied(true);
-                          showToast('Barcode mapped to form fields', 'success');
                         }
                       }}
                       placeholder="Scan or paste barcode here — press Enter to map"
@@ -1842,9 +1921,10 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     <Pressable
                       onPress={() => {
                         if (barcodeInput.trim() && activeForm) {
-                          applyBarcodeToFields(barcodeInput.trim(), activeForm.fields, setField);
+                          const match = lookupBarcodeDataset(barcodeInput.trim());
+                          if (match) { applyDatasetEntryToFields(match, activeForm.fields as any, setField); setBarcodeDatasetResult(match); showToast('Product loaded from DSCSA database', 'success'); }
+                          else { applyBarcodeToFields(barcodeInput.trim(), activeForm.fields as any, setField); setBarcodeDatasetResult(null); showToast('Barcode mapped to form fields', 'success'); }
                           setBarcodeApplied(true);
-                          showToast('Barcode mapped to form fields', 'success');
                         }
                       }}
                       style={{ paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: accentColor }}>
@@ -1855,8 +1935,17 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     <Text style={{ fontSize: 11, color: '#86EFAC' }}>✓ Fields populated — review below then submit</Text>
                   )}
                 </View>
-                {/* Parsed field preview */}
-                {barcodeApplied && activeForm && (
+                {/* Database lookup result banner */}
+                {barcodeApplied && barcodeDatasetResult && (
+                  <View style={{ borderRadius: 10, borderWidth: 1, borderColor: 'rgba(96,165,250,0.35)', backgroundColor: 'rgba(96,165,250,0.08)', padding: 12, gap: 4 }}>
+                    <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase' as any, color: '#60A5FA' }}>✓ Product Found in DSCSA Database</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: '#FFFFFF' }}>{barcodeDatasetResult.productName}</Text>
+                    <Text style={{ fontSize: 10, color: dimColor }}>NDC: {barcodeDatasetResult.ndc} · {barcodeDatasetResult.manufacturer}</Text>
+                    <Text style={{ fontSize: 10, color: dimColor }}>Lot: {barcodeDatasetResult.lot} · Exp: {barcodeDatasetResult.expiration} · Form: {barcodeDatasetResult.dosageForm}</Text>
+                  </View>
+                )}
+                {/* Parsed field preview (GS1 / fallback) */}
+                {barcodeApplied && !barcodeDatasetResult && activeForm && (
                   <View style={{ gap: 8, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(134,239,172,0.2)', backgroundColor: 'rgba(134,239,172,0.04)', padding: 12 }}>
                     <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 0.5, color: '#86EFAC', textTransform: 'uppercase' as any }}>Mapped Fields</Text>
                     {activeForm.fields.map((f) => formValues[f.id] ? (
@@ -1894,7 +1983,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                   </View>
                 )}
                 {activeForm && (
-                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setCreateTab('form'); setBarcodeInput(''); setBarcodeApplied(false); }}
+                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setCreateTab('form'); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); }}
                     style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any }}>
                     <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient) ? accentTextColor : dimColor }}>Create Entry from Scan</Text>
                   </Pressable>

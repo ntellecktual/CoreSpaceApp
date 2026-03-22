@@ -1358,6 +1358,12 @@ export function useAdminWorkspace() {
     setNotice('SubSpace order updated.');
   };
 
+  const applySubSpaceOrder = (ordered: SubSpaceDefinition[]) => {
+    if (!workspace) return;
+    const reordered = ordered.map((s, i) => ({ ...s, pipelineOrder: i }));
+    upsertWorkspace({ ...workspace, subSpaces: reordered });
+  };
+
   return {
     workspaces: data.workspaces,
     workspace,
@@ -1409,5 +1415,6 @@ export function useAdminWorkspace() {
     togglePipelineEnabled,
     reorderSubSpace,
     moveSubSpaceToIndex,
+    applySubSpaceOrder,
   };
 }

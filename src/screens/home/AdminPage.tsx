@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Reorder, useDragControls } from 'framer-motion';
 import { Platform, ScrollView, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { InteractivePressable as Pressable } from '../../components/InteractivePressable';
 import { AiChatPanel } from '../../components/AiChatPanel';
@@ -206,6 +207,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     togglePipelineEnabled,
     reorderSubSpace,
     moveSubSpaceToIndex,
+    applySubSpaceOrder,
   } = useAdminWorkspace();
   const insights = useAdminEnterpriseInsights(workspace);
   const { activeTenantId, data, isSuperAdmin, currentUser, tenants, copyActiveDataToAllTenants, getFormForSubSpace, upsertBusinessFunction, deleteBusinessFunction, upsertBusinessObject, deleteBusinessObject } = useAppState();
@@ -1093,34 +1095,35 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     {workspaceSubSpaces.length > 0 && (
                       <View style={{ gap: 6 }}>
                         <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Your sections ({workspaceSubSpaces.length})</Text>
-                        <View style={{ gap: 4 }}>
+                        <Reorder.Group
+                          as="div"
+                          axis="y"
+                          values={workspaceSubSpaces}
+                          onReorder={canManageSubSpace ? applySubSpaceOrder : () => {}}
+                          style={{ display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'none', padding: 0, margin: 0 }}
+                        >
                           {workspaceSubSpaces.map((ss, ssIdx) => (
-                            <View
+                            <Reorder.Item
                               key={ss.id}
+                              value={ss}
+                              as="div"
                               style={{
-                                flexDirection: 'row', alignItems: 'center', gap: 10,
+                                display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10,
                                 backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.10)' : 'rgba(140,91,245,0.06)',
-                                borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1,
+                                borderRadius: 10, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10,
+                                borderWidth: 1, borderStyle: 'solid',
                                 borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : mode === 'night' ? 'rgba(140,91,245,0.20)' : 'rgba(140,91,245,0.14)',
+                                cursor: canManageSubSpace ? 'grab' : 'default',
+                                userSelect: 'none',
+                                position: 'relative',
                               }}
+                              whileDrag={{ scale: 1.02, boxShadow: '0 8px 32px rgba(140,91,245,0.30)', zIndex: 50, borderColor: '#8C5BF5' }}
+                              dragListener={canManageSubSpace}
                             >
-                              {/* ▲▼ reorder buttons — universal cross-browser */}
-                              <View style={{ gap: 2 }}>
-                                <Pressable
-                                  disabled={!canManageSubSpace || ssIdx === 0}
-                                  style={{ width: 22, height: 22, borderRadius: 5, alignItems: 'center' as any, justifyContent: 'center' as any, backgroundColor: ssIdx === 0 ? 'transparent' : 'rgba(140,91,245,0.18)', opacity: ssIdx === 0 ? 0.2 : 1 }}
-                                  onPress={() => reorderSubSpace(ss.id, -1)}
-                                >
-                                  <Text style={{ fontSize: 10, color: '#A78BFA', fontWeight: '900', lineHeight: 12 }}>▲</Text>
-                                </Pressable>
-                                <Pressable
-                                  disabled={!canManageSubSpace || ssIdx === workspaceSubSpaces.length - 1}
-                                  style={{ width: 22, height: 22, borderRadius: 5, alignItems: 'center' as any, justifyContent: 'center' as any, backgroundColor: ssIdx === workspaceSubSpaces.length - 1 ? 'transparent' : 'rgba(140,91,245,0.18)', opacity: ssIdx === workspaceSubSpaces.length - 1 ? 0.2 : 1 }}
-                                  onPress={() => reorderSubSpace(ss.id, 1)}
-                                >
-                                  <Text style={{ fontSize: 10, color: '#A78BFA', fontWeight: '900', lineHeight: 12 }}>▼</Text>
-                                </Pressable>
-                              </View>
+                              {/* ⠿ drag handle */}
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 18, opacity: canManageSubSpace ? 0.45 : 0.15, cursor: canManageSubSpace ? 'grab' : 'default', flexShrink: 0 }}>
+                                <span style={{ fontSize: 16, color: '#A78BFA', lineHeight: 1 }}>⠿</span>
+                              </div>
                               <View style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(140,91,245,0.20)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
                                 <Text style={{ fontSize: 12, color: '#A78BFA', fontWeight: '800' }}>{ssIdx + 1}</Text>
                               </View>
@@ -1141,9 +1144,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                               >
                                 <Text style={{ fontSize: 13, color: '#EF4444', fontWeight: '700' }}>✕</Text>
                               </Pressable>
-                            </View>
+                            </Reorder.Item>
                           ))}
-                        </View>
+                        </Reorder.Group>
                       </View>
                     )}
 
@@ -1550,38 +1553,32 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
 
                   <View style={styles.separator} />
                   <Text style={[styles.metaText, styles.builderStudioTextSecondary, { fontSize: 11 }]}>{workspace.pipelineEnabled ? 'Pipeline flow →' : 'Sections'}</Text>
-                  <View style={[styles.inlineRow, { flexWrap: 'wrap' as any }]}>
+                  <Reorder.Group
+                    as="div"
+                    axis="x"
+                    values={workspace.subSpaces ?? []}
+                    onReorder={canManageSubSpace ? applySubSpaceOrder : () => {}}
+                    style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignItems: 'center', listStyle: 'none', padding: 0, margin: 0 }}
+                  >
                     {(workspace.subSpaces ?? []).map((ss, idx) => (
-                      <React.Fragment key={`prev-${ss.id}`}>
+                      <Reorder.Item
+                        key={`prev-${ss.id}`}
+                        value={ss}
+                        as="div"
+                        style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4, cursor: canManageSubSpace ? 'grab' : 'default', userSelect: 'none' }}
+                        whileDrag={{ scale: 1.06, zIndex: 50 }}
+                        dragListener={canManageSubSpace}
+                      >
                         {workspace.pipelineEnabled && idx > 0 && <Text style={{ fontSize: 14, color: '#8C5BF5', fontWeight: '800' }}>→</Text>}
-                        <View style={{ flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-                          <Pressable
-                            style={[styles.pill, selectedSubSpaceId === ss.id && styles.pillActive]}
-                            onPress={() => setSelectedSubSpaceId(ss.id)}
-                          >
-                            <Text style={[styles.pillText, selectedSubSpaceId === ss.id && styles.pillTextActive]}>{workspace.pipelineEnabled ? `${idx + 1}. ` : ''}{ss.name}</Text>
-                          </Pressable>
-                          {/* ◀ ▶ reorder buttons under each pill */}
-                          <View style={{ flexDirection: 'row', gap: 3 }}>
-                            <Pressable
-                              disabled={!canManageSubSpace || idx === 0}
-                              style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, backgroundColor: idx === 0 ? 'transparent' : 'rgba(140,91,245,0.18)', opacity: idx === 0 ? 0.15 : 1 }}
-                              onPress={() => reorderSubSpace(ss.id, -1)}
-                            >
-                              <Text style={{ fontSize: 9, color: '#A78BFA', fontWeight: '900' }}>◀</Text>
-                            </Pressable>
-                            <Pressable
-                              disabled={!canManageSubSpace || idx === (workspace.subSpaces ?? []).length - 1}
-                              style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, backgroundColor: idx === (workspace.subSpaces ?? []).length - 1 ? 'transparent' : 'rgba(140,91,245,0.18)', opacity: idx === (workspace.subSpaces ?? []).length - 1 ? 0.15 : 1 }}
-                              onPress={() => reorderSubSpace(ss.id, 1)}
-                            >
-                              <Text style={{ fontSize: 9, color: '#A78BFA', fontWeight: '900' }}>▶</Text>
-                            </Pressable>
-                          </View>
-                        </View>
-                      </React.Fragment>
+                        <Pressable
+                          style={[styles.pill, selectedSubSpaceId === ss.id && styles.pillActive]}
+                          onPress={() => setSelectedSubSpaceId(ss.id)}
+                        >
+                          <Text style={[styles.pillText, selectedSubSpaceId === ss.id && styles.pillTextActive]}>{workspace.pipelineEnabled ? `${idx + 1}. ` : ''}{ss.name}</Text>
+                        </Pressable>
+                      </Reorder.Item>
                     ))}
-                  </View>
+                  </Reorder.Group>
 
                   {selectedSubSpace && (
                     <View style={styles.listCard}>

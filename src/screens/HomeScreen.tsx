@@ -1,5 +1,5 @@
 import React, { JSX, useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Platform, ScrollView, Share, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Easing, Image, Platform, ScrollView, Share, Text, View } from 'react-native';
 import { useWindowDimensions } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { BlurView } from 'expo-blur';
@@ -108,6 +108,36 @@ function hexMixWithWhite(hex: string, ratio: number): string {
   const lg = Math.round(g * ratio + 255 * (1 - ratio));
   const lb = Math.round(b * ratio + 255 * (1 - ratio));
   return `rgb(${lr},${lg},${lb})`;
+}
+
+// ── Notification bell sound (Web Audio API — no external dependency) ────────
+function playBellSound() {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+  try {
+    const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx() as AudioContext;
+    // Three partials that approximate a struck bell: fundamental + 2 harmonics
+    const partials: [number, number, number][] = [
+      [880, 0.38, 1.4],   // A5 — body of the bell
+      [2637, 0.18, 0.9],  // E7 — shimmer partial
+      [1760, 0.12, 1.1],  // A6 — mid partial
+    ];
+    partials.forEach(([freq, vol, decay]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(vol, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + decay);
+      osc.start();
+      osc.stop(ctx.currentTime + decay + 0.05);
+    });
+    // Close context after the longest partial to free resources
+    setTimeout(() => ctx.close().catch(() => {}), 1700);
+  } catch { /* audio unavailable / policy blocked */ }
 }
 
 // ── Tenant Customization Options ─────────────────────────────────────
@@ -274,6 +304,32 @@ export function HomeScreen() {
 
   // ── Notifications ──
   const { notifications, unreadCount, addNotification, markRead, clearAll: clearAllNotifications } = useNotifications(activeTenantId);
+
+  // ── Bell jingle + badge pulse animations ──
+  const bellRotation = React.useRef(new Animated.Value(0)).current;
+  const badgeScale   = React.useRef(new Animated.Value(1)).current;
+  const prevUnreadRef = React.useRef(unreadCount);
+  useEffect(() => {
+    if (unreadCount > prevUnreadRef.current) {
+      playBellSound();
+      // Damped jingle swing: ±15° tapering to ±7° then settle at 0
+      Animated.sequence([
+        Animated.timing(bellRotation, { toValue: -15, duration:  75, useNativeDriver: true, easing: Easing.out(Easing.ease) }),
+        Animated.timing(bellRotation, { toValue:  15, duration: 120, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
+        Animated.timing(bellRotation, { toValue: -12, duration: 110, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
+        Animated.timing(bellRotation, { toValue:  12, duration: 100, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
+        Animated.timing(bellRotation, { toValue:  -7, duration:  90, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
+        Animated.timing(bellRotation, { toValue:   7, duration:  80, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
+        Animated.timing(bellRotation, { toValue:   0, duration: 130, useNativeDriver: true, easing: Easing.out(Easing.ease) }),
+      ]).start();
+      // Badge: pop to 1.45× then elastic-spring back to 1
+      Animated.sequence([
+        Animated.timing(badgeScale, { toValue: 1.45, duration: 160, useNativeDriver: true, easing: Easing.out(Easing.back(1.5)) }),
+        Animated.timing(badgeScale, { toValue: 1,    duration: 700, useNativeDriver: true, easing: Easing.elastic(1.3) }),
+      ]).start();
+    }
+    prevUnreadRef.current = unreadCount;
+  }, [unreadCount]);
 
   // ── Audit Log (lifted to HomeScreen so all pages share one log) ──
   const auditLog = useAuditLog(activeTenantId, currentUser);
@@ -1080,11 +1136,24 @@ export function HomeScreen() {
               accessibilityLabel={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' }}
             >
-              <Text style={{ fontSize: 18, color: mode === 'day' ? '#2F2249' : 'rgba(214,204,235,0.85)' }}>🔔</Text>
+              {/* Bell — jingles on every new notification via rotation animation */}
+              <Animated.View style={{
+                transform: [{
+                  rotate: bellRotation.interpolate({ inputRange: [-15, 15], outputRange: ['-15deg', '15deg'] }),
+                }],
+                // Rotate around the top-center (bell's clapper pivot)
+                transformOrigin: '50% 0%',
+              } as any}>
+                <Text style={{ fontSize: 18, color: mode === 'day' ? '#2F2249' : 'rgba(214,204,235,0.85)' }}>🔔</Text>
+              </Animated.View>
               {unreadCount > 0 && (
-                <View style={{ backgroundColor: '#EF4444', borderRadius: 9, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4, marginLeft: -2, marginTop: -8 }}>
+                /* Badge — pops and elastic-springs back on every new notification */
+                <Animated.View style={[
+                  { backgroundColor: '#EF4444', borderRadius: 9, minWidth: 18, height: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4, marginLeft: -2, marginTop: -8 },
+                  { transform: [{ scale: badgeScale }] },
+                ]}>
                   <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '800' }}>{unreadCount}</Text>
-                </View>
+                </Animated.View>
               )}
             </Pressable>
           </View>

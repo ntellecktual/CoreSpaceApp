@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Image, Modal, Platform, Pressable as RNPressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { InteractivePressable as Pressable } from './InteractivePressable';
+// RNPressable is used for the modal backdrop so the CSS [data-interactive] :active
+// transform (scale 0.97) on the full-screen overlay does not shift buttons mid-click
 import { useUiTheme } from '../context/UiThemeContext';
 import { formatDate } from '../formatDate';
 import { formatCurrency } from '../api';
@@ -157,7 +159,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
 
   return (
     <Modal transparent visible animationType="fade" onRequestClose={handleClose}>
-      <Pressable
+      <RNPressable
         style={{
           flex: 1,
           alignItems: 'center',
@@ -647,7 +649,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
             </View>
           </ScrollView>
         </View>
-      </Pressable>
+      </RNPressable>
     </Modal>
   );
 });

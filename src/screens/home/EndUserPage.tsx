@@ -188,9 +188,29 @@ function CompositeFieldInput({
       ? { mm: m[1], dd: m[2], yyyy: m[3], hh: '', min: '', ampm: 'AM' }
       : { mm: '', dd: '', yyyy: '', hh: '', min: '', ampm: 'AM' };
   };
-  const { mm, dd, yyyy, hh, min, ampm } = parseParts(value);
-  const write = (nMm: string, nDd: string, nYyyy: string, nHh: string, nMin: string, nAmpm: string) =>
-    onChange(isDatetime ? `${nMm}-${nDd}-${nYyyy} ${nHh}:${nMin} ${nAmpm}` : `${nMm}-${nDd}-${nYyyy}`);
+  const mkString = (nMm: string, nDd: string, nYyyy: string, nHh: string, nMin: string, nAmpm: string) =>
+    isDatetime ? `${nMm}-${nDd}-${nYyyy} ${nHh}:${nMin} ${nAmpm}` : `${nMm}-${nDd}-${nYyyy}`;
+
+  // Local state per sub-field — avoids re-deriving from combined value on every render
+  // (a partial string like '3--' would fail the regex and reset all fields)
+  const initial = parseParts(value);
+  const [mm, setMm] = useLocalState(initial.mm);
+  const [dd, setDd] = useLocalState(initial.dd);
+  const [yyyy, setYyyy] = useLocalState(initial.yyyy);
+  const [hh, setHh] = useLocalState(initial.hh);
+  const [min, setMin] = useLocalState(initial.min);
+  const [ampm, setAmpm] = useLocalState(initial.ampm || 'AM');
+  // Track last value we wrote so we can distinguish external changes (auto-fill) from our own
+  const lastWritten = useRef(value);
+  useEffect(() => {
+    if (value !== lastWritten.current) {
+      const p = parseParts(value);
+      setMm(p.mm); setDd(p.dd); setYyyy(p.yyyy);
+      setHh(p.hh); setMin(p.min); setAmpm(p.ampm || 'AM');
+      lastWritten.current = value;
+    }
+  }, [value]);
+
   const inp: any = {
     fontSize: 14, color: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)',
     borderRadius: 8, paddingHorizontal: 6, paddingVertical: 8,
@@ -200,19 +220,31 @@ function CompositeFieldInput({
     <View style={{ gap: 4 }}>
       <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>{label}</Text>
       <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center' as any, flexWrap: 'wrap' as any }}>
-        <TextInput style={{ ...inp, width: 42 }} value={mm} onChangeText={(v) => write(v, dd, yyyy, hh, min, ampm)} placeholder="MM" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={2} />
+        <TextInput style={{ ...inp, width: 42 }} value={mm}
+          onChangeText={(v) => { setMm(v); const s = mkString(v, dd, yyyy, hh, min, ampm); lastWritten.current = s; onChange(s); }}
+          placeholder="MM" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={2} />
         <Text style={{ color: dimColor, fontSize: 16 }}>/</Text>
-        <TextInput style={{ ...inp, width: 42 }} value={dd} onChangeText={(v) => write(mm, v, yyyy, hh, min, ampm)} placeholder="DD" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={2} />
+        <TextInput style={{ ...inp, width: 42 }} value={dd}
+          onChangeText={(v) => { setDd(v); const s = mkString(mm, v, yyyy, hh, min, ampm); lastWritten.current = s; onChange(s); }}
+          placeholder="DD" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={2} />
         <Text style={{ color: dimColor, fontSize: 16 }}>/</Text>
-        <TextInput style={{ ...inp, width: 60 }} value={yyyy} onChangeText={(v) => write(mm, dd, v, hh, min, ampm)} placeholder="YYYY" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={4} />
+        <TextInput style={{ ...inp, width: 60 }} value={yyyy}
+          onChangeText={(v) => { setYyyy(v); const s = mkString(mm, dd, v, hh, min, ampm); lastWritten.current = s; onChange(s); }}
+          placeholder="YYYY" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={4} />
         {isDatetime && (
           <>
             <Text style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, paddingHorizontal: 2 }}>·</Text>
-            <TextInput style={{ ...inp, width: 42 }} value={hh} onChangeText={(v) => write(mm, dd, yyyy, v, min, ampm)} placeholder="HH" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={2} />
+            <TextInput style={{ ...inp, width: 42 }} value={hh}
+              onChangeText={(v) => { setHh(v); const s = mkString(mm, dd, yyyy, v, min, ampm); lastWritten.current = s; onChange(s); }}
+              placeholder="HH" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={2} />
             <Text style={{ color: dimColor, fontSize: 16 }}>:</Text>
-            <TextInput style={{ ...inp, width: 42 }} value={min} onChangeText={(v) => write(mm, dd, yyyy, hh, v, ampm)} placeholder="MM" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={2} />
-            <Pressable onPress={() => write(mm, dd, yyyy, hh, min, ampm === 'AM' ? 'PM' : 'AM')} style={{ paddingHorizontal: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.06)' }}>
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#FFFFFF' }}>{ampm || 'AM'}</Text>
+            <TextInput style={{ ...inp, width: 42 }} value={min}
+              onChangeText={(v) => { setMin(v); const s = mkString(mm, dd, yyyy, hh, v, ampm); lastWritten.current = s; onChange(s); }}
+              placeholder="MM" placeholderTextColor={dimColor} keyboardType="numeric" maxLength={2} />
+            <Pressable
+              onPress={() => { const next = ampm === 'AM' ? 'PM' : 'AM'; setAmpm(next); const s = mkString(mm, dd, yyyy, hh, min, next); lastWritten.current = s; onChange(s); }}
+              style={{ paddingHorizontal: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.06)' }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#FFFFFF' }}>{ampm}</Text>
             </Pressable>
           </>
         )}

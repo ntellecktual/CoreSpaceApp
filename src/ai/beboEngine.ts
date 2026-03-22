@@ -538,11 +538,20 @@ export function buildPharmaPayload(): ScenarioApplyPayload {
     mkIntegration('int-bebo-http-pharma', 'tpl-custom-http', fmtDate(-10)),
   ];
 
-  // ── Records distributed across 8 subspaces (3 product batches matching admin template demo data) ──
+  // ── Records distributed across 8 subspaces (12 product batches) ──
   const batches = [
-    { name: 'Lisinopril 10mg', lot: 'XY-1234', ndc: '68180-0517-01', ctn: 'CTN-78450-A', units: 2400, pfx: 'LIS' },
-    { name: 'Amoxicillin 500mg', lot: 'MZ-9021', ndc: '65862-0007-05', ctn: 'CTN-92103-B', units: 12000, pfx: 'AMX' },
-    { name: 'Epinephrine 1mg/mL', lot: 'JK-4410', ndc: '00409-1631-01', ctn: 'CTN-44109-C', units: 500, pfx: 'EPI' },
+    { name: 'Lisinopril 10mg',         lot: 'XY-1234', ndc: '68180-0517-01', ctn: 'CTN-78450-A', units: 2400,  pfx: 'LIS' },
+    { name: 'Amoxicillin 500mg',        lot: 'MZ-9021', ndc: '65862-0007-05', ctn: 'CTN-92103-B', units: 12000, pfx: 'AMX' },
+    { name: 'Epinephrine 1mg/mL',       lot: 'JK-4410', ndc: '00409-1631-01', ctn: 'CTN-44109-C', units: 500,   pfx: 'EPI' },
+    { name: 'Metformin 1000mg',         lot: 'PQ-5502', ndc: '00093-1094-01', ctn: 'CTN-55024-D', units: 3000,  pfx: 'MET' },
+    { name: 'Atorvastatin 40mg',        lot: 'RS-6711', ndc: '16477-0203-01', ctn: 'CTN-67110-E', units: 1800,  pfx: 'ATV' },
+    { name: 'Omeprazole 20mg',          lot: 'TU-2289', ndc: '00093-0032-05', ctn: 'CTN-22890-F', units: 2100,  pfx: 'OMP' },
+    { name: 'Levothyroxine 100mcg',     lot: 'VW-3345', ndc: '00074-4417-13', ctn: 'CTN-33450-G', units: 900,   pfx: 'LVT' },
+    { name: 'Amlodipine 5mg',           lot: 'AB-7890', ndc: '73160-0143-01', ctn: 'CTN-78900-H', units: 1500,  pfx: 'AML' },
+    { name: 'Sertraline 50mg',          lot: 'CD-1122', ndc: '69097-0148-01', ctn: 'CTN-11220-I', units: 1200,  pfx: 'SRT' },
+    { name: 'Gabapentin 300mg',         lot: 'EF-4456', ndc: '00093-0247-01', ctn: 'CTN-44560-J', units: 2700,  pfx: 'GBP' },
+    { name: 'Hydrochlorothiazide 25mg', lot: 'GH-7788', ndc: '00378-2274-01', ctn: 'CTN-77880-K', units: 3600,  pfx: 'HCT' },
+    { name: 'Metoprolol 50mg',          lot: 'IJ-9900', ndc: '00378-2074-01', ctn: 'CTN-99000-L', units: 2000,  pfx: 'MPL' },
   ];
 
   const records: RuntimeRecord[] = [];
@@ -571,13 +580,7 @@ export function buildPharmaPayload(): ScenarioApplyPayload {
   records.push(mkRecord('rec-pharma-trace-1', 'client-batch-0', wsId, 'ss-trace', 'Exception: 1 unit damaged in transit — resolved', 'Exception Review', 1, fmtDate(-2), ['Exception:Damage', 'Priority:Low'], { 'Event Type': 'Damage', 'Impacted Serial': 'SN-LIS-000198', 'Exception Status': 'Resolved', 'Investigation Notes': 'Unit SN-LIS-000198 packaging damage during distributor shipment. Replaced and resolved.' }));
   records.push(mkRecord('rec-pharma-trace-2', 'client-batch-2', wsId, 'ss-trace', '🔴 SUSPECT: Counterfeit serials detected in secondary market', 'Exception Review', 500, fmtDate(0), ['Suspect', 'Quarantine', 'Priority:Critical', 'FDA-Reportable'], { 'Event Type': 'Suspect Product', 'Impacted Serial': 'SN-EPI-000001 → SN-EPI-000500', 'Exception Status': 'Open', 'Investigation Notes': 'Third-party marketplace listing with 12 units matching Lot JK-4410 but duplicate GS1 barcodes. FDA DSCSA §582 notification triggered.' }));
 
-  const clientProducts = [
-    { name: 'Lisinopril 10mg', lot: 'XY-1234' }, { name: 'Amoxicillin 500mg', lot: 'MZ-9021' }, { name: 'Epinephrine 1mg/mL', lot: 'JK-4410' },
-    { name: 'Metformin 1000mg', lot: 'PQ-5502' }, { name: 'Atorvastatin 40mg', lot: 'RS-6711' }, { name: 'Omeprazole 20mg', lot: 'TU-2289' },
-    { name: 'Levothyroxine 100mcg', lot: 'VW-3345' }, { name: 'Amlodipine 5mg', lot: 'AB-7890' }, { name: 'Sertraline 50mg', lot: 'CD-1122' },
-    { name: 'Gabapentin 300mg', lot: 'EF-4456' }, { name: 'Hydrochlorothiazide 25mg', lot: 'GH-7788' }, { name: 'Metoprolol 50mg', lot: 'IJ-9900' },
-  ];
-  const clients = clientProducts.map((p, i) => mkClient(`client-batch-${i}`, `Batch ${p.name}`, `LOT-${p.lot}`, ['Vertical:Pharma']));
+  const clients = batches.map((b, i) => mkClient(`client-batch-${i}`, `Batch ${b.name}`, `LOT-${b.lot}`, ['Vertical:Pharma']));
 
   return {
     shellConfig: mkShellConfig('Serialized Batch', 'Serialized Batches', 'Supply Chain Workspace', 'Traceability SubSpace', ['Serialized', 'Shipped to Distributor', 'Received by Distributor', 'Shipped to Pharmacy', 'Received by Pharmacy', 'Dispensed', 'Exception Review']),

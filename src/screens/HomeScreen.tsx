@@ -119,6 +119,7 @@ const PALETTE_PRESETS = [
   { name: 'Midnight Slate', colors: ['#0F0F14', '#181B22', '#6366F1', '#818CF8', '#22C55E', '#F59E0B', '#EF4444', '#141620'] as const },
   { name: 'Rose Healthcare', colors: ['#18090E', '#221018', '#DB2777', '#F472B6', '#14B8A6', '#F59E0B', '#EF4444', '#1D0C12'] as const },
   { name: 'Emerald Enterprise', colors: ['#091A14', '#0C2620', '#059669', '#34D399', '#8B5CF6', '#F59E0B', '#F43F5E', '#0B1F18'] as const },
+  { name: 'Legal Navy & Gold', colors: ['#0F1C5C', '#162269', '#C9A84C', '#E8C96A', '#2ECC71', '#E8A838', '#E74C3C', '#141E5C'] as const },
 ];
 
 type TenantTabId = 'brand' | 'colors' | 'typography' | 'layout' | 'dashboard' | 'business' | 'team' | 'manage' | 'create';

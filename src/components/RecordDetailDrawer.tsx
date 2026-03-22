@@ -138,62 +138,79 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
   if (!visible || !record) return null;
 
   return (
-    <Modal transparent visible animationType="slide" onRequestClose={handleClose}>
+    <Modal transparent visible animationType="fade" onRequestClose={handleClose}>
       <Pressable
         style={{
           flex: 1,
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          backgroundColor: 'rgba(0,0,0,0.4)',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: isDark ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0.35)',
         }}
         onPress={handleClose}
       >
         <View
           {...(Platform.OS === 'web' ? { onClick: (e: any) => e.stopPropagation() } as any : {})}
           style={{
-            width: '90%',
-            maxWidth: 480,
-            backgroundColor: bg,
-            borderLeftWidth: 1,
-            borderLeftColor: border,
-            paddingTop: 0,
-          }}
+            width: '94%',
+            maxWidth: 540,
+            maxHeight: '90%',
+            backgroundColor: isDark ? '#110D1F' : '#FFFFFF',
+            borderRadius: 20,
+            borderWidth: 1,
+            borderColor: isDark ? 'rgba(140,91,245,0.18)' : 'rgba(0,0,0,0.08)',
+            overflow: 'hidden',
+            ...(Platform.OS === 'web' ? { boxShadow: isDark ? '0 24px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(140,91,245,0.12)' : '0 24px 80px rgba(0,0,0,0.18)' } : { elevation: 24 }),
+          } as any}
         >
           {/* Header */}
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              gap: 12,
               paddingHorizontal: 20,
-              paddingVertical: 16,
+              paddingTop: 18,
+              paddingBottom: 14,
               borderBottomWidth: 1,
               borderBottomColor: border,
+              backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
             }}
           >
+            {record.imageUri && (
+              <Image
+                source={{ uri: record.imageUri }}
+                style={{ width: 44, height: 44, borderRadius: 10, flexShrink: 0 }}
+                resizeMode="cover"
+              />
+            )}
             <View style={{ flex: 1, gap: 2 }}>
-              {record.imageUri && (
-                <Image
-                  source={{ uri: record.imageUri }}
-                  style={{ width: 56, height: 56, borderRadius: 12, marginBottom: 8, alignSelf: 'flex-start' }}
-                  resizeMode="cover"
-                />
-              )}
-              <Text style={{ fontSize: 18, fontWeight: '700', color: textColor }} numberOfLines={2}>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: textColor, letterSpacing: -0.3 }} numberOfLines={2}>
                 {record.title}
               </Text>
-              <Text style={{ fontSize: 12, color: dimText }}>
-                {record.id}
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 }}>
+                <View style={{ paddingHorizontal: 9, paddingVertical: 3, borderRadius: 6, backgroundColor: tagBg }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: tagText }}>{record.status}</Text>
+                </View>
+                {record.amount !== undefined && (
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: accent }}>
+                    {(formatAmount ?? formatCurrency)(record.amount)}
+                  </Text>
+                )}
+                {record.date && (
+                  <Text style={{ fontSize: 11, color: dimText }}>{formatDate(record.date)}</Text>
+                )}
+              </View>
             </View>
             <Pressable
               onPress={handleClose}
               {...(Platform.OS === 'web' ? { onClick: handleClose } as any : {})}
               style={{
-                paddingHorizontal: 12,
-                paddingVertical: 6,
+                width: 32,
+                height: 32,
                 borderRadius: 8,
                 backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
               accessibilityRole="button"
               accessibilityLabel="Close drawer"
@@ -204,7 +221,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
 
           <ScrollView
             style={{ flex: 1 }}
-            contentContainerStyle={{ padding: 20, gap: 16 }}
+            contentContainerStyle={{ padding: 18, gap: 14 }}
             showsVerticalScrollIndicator={false}
           >
             {/* ── CRUD Action Bar ── */}
@@ -213,7 +230,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                 <Pressable
                   onPress={startEdit}
                   style={{
-                    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
+                    paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8,
                     borderWidth: 1, borderColor: accent, backgroundColor: tagBg,
                   }}
                 >
@@ -225,7 +242,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                   <Pressable
                     onPress={saveEdit}
                     style={{
-                      paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
+                      paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8,
                       backgroundColor: accent,
                     }}
                   >
@@ -234,7 +251,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                   <Pressable
                     onPress={cancelEdit}
                     style={{
-                      paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
+                      paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8,
                       borderWidth: 1, borderColor: border,
                     }}
                   >
@@ -248,7 +265,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                     <Pressable
                       onPress={() => setConfirmDelete(true)}
                       style={{
-                        paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
+                        paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8,
                         borderWidth: 1, borderColor: 'rgba(239,68,68,0.4)', backgroundColor: 'rgba(239,68,68,0.08)',
                       }}
                     >
@@ -260,7 +277,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                       <Pressable
                         onPress={handleDelete}
                         style={{
-                          paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
+                          paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8,
                           backgroundColor: '#EF4444',
                         }}
                       >
@@ -269,7 +286,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                       <Pressable
                         onPress={() => setConfirmDelete(false)}
                         style={{
-                          paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
+                          paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8,
                           borderWidth: 1, borderColor: border,
                         }}
                       >
@@ -348,48 +365,22 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
               </View>
             )}
             {/* Status Badge */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <View
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 5,
-                  borderRadius: 20,
-                  backgroundColor: tagBg,
-                }}
-              >
-                <Text style={{ fontSize: 12, fontWeight: '700', color: tagText }}>{record.status}</Text>
-              </View>
-              {record.amount !== undefined && (
-                <Text style={{ fontSize: 14, fontWeight: '600', color: accent }}>
-                  {(formatAmount ?? formatCurrency)(record.amount)}
-                </Text>
-              )}
-              {record.date && (
-                <Text style={{ fontSize: 12, color: dimText }}>
-                  {formatDate(record.date)}
-                </Text>
-              )}
-            </View>
-
-            {/* Tags */}
-            {record.tags.length > 0 && (
-              <SectionCard icon="🏷️" title="Tags">
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                  {record.tags.map((tag) => (
-                    <View
-                      key={tag}
-                      style={{
-                        paddingHorizontal: 10,
-                        paddingVertical: 4,
-                        borderRadius: 8,
-                        backgroundColor: tagBg,
-                      }}
-                    >
-                      <Text style={{ fontSize: 12, color: tagText }}>{tag}</Text>
-                    </View>
-                  ))}
+            {!editMode && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              {record.tags.length > 0 && record.tags.map((tag) => (
+                <View
+                  key={tag}
+                  style={{
+                    paddingHorizontal: 9,
+                    paddingVertical: 3,
+                    borderRadius: 6,
+                    backgroundColor: tagBg,
+                  }}
+                >
+                  <Text style={{ fontSize: 11, color: tagText }}>{tag}</Text>
                 </View>
-              </SectionCard>
+              ))}
+            </View>
             )}
 
             {/* Data Fields */}
@@ -469,45 +460,8 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
               </SectionCard>
             )}
 
-            {/* Metadata */}
-            <SectionCard icon="🔎" title="Metadata">
-              <View
-                style={{
-                  borderRadius: 12,
-                  borderWidth: 1,
-                  borderColor: border,
-                  backgroundColor: sectionBg,
-                  overflow: 'hidden',
-                }}
-              >
-                {[
-                  ['Record ID', record.id],
-                  ['Client ID', record.clientId],
-                  ['Workspace ID', record.workspaceId],
-                  ['SubSpace ID', record.subSpaceId],
-                ].map(([label, val], i) => (
-                  <View
-                    key={label}
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      paddingHorizontal: 14,
-                      paddingVertical: 8,
-                      borderBottomWidth: i < 3 ? 1 : 0,
-                      borderBottomColor: border,
-                    }}
-                  >
-                    <Text style={{ fontSize: 12, color: dimText }}>{label}</Text>
-                    <Text style={{ fontSize: 11, fontFamily: 'monospace', color: textColor }} numberOfLines={1}>
-                      {val}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </SectionCard>
-
             {/* Quick Actions */}
-            {onTransition && validNextStages.length > 0 && (
+            {onTransition && validNextStages.length > 0 && !editMode && (
               <SectionCard icon="⚡" title="Quick Actions">
                 <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                   {validNextStages.map((stage) => (
@@ -516,8 +470,8 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                       onPress={() => onTransition(record.id, stage.name)}
                       style={{
                         paddingHorizontal: 14,
-                        paddingVertical: 8,
-                        borderRadius: 10,
+                        paddingVertical: 7,
+                        borderRadius: 8,
                         borderWidth: 1,
                         borderColor: border,
                         backgroundColor: 'transparent',
@@ -627,6 +581,22 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
                 </SectionCard>
               );
             })()}
+            {/* ── Metadata (collapsed at bottom) ── */}
+            <View style={{ gap: 6, opacity: 0.6 }}>
+              <Text style={{ fontSize: 10, fontWeight: '600', letterSpacing: 0.8, textTransform: 'uppercase', color: dimText }}>Metadata</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+                {[
+                  ['Record', record.id],
+                  ['Client', record.clientId],
+                  ['Workspace', record.workspaceId],
+                  ['SubSpace', record.subSpaceId],
+                ].map(([label, val]) => (
+                  <Text key={label} style={{ fontSize: 9, color: dimText, fontFamily: 'monospace' }}>
+                    {label}: {val}
+                  </Text>
+                ))}
+              </View>
+            </View>
           </ScrollView>
         </View>
       </Pressable>

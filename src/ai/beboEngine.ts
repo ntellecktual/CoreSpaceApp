@@ -17,6 +17,7 @@ import type {
   LifecycleStage,
   LifecycleTransition,
   BusinessFunction,
+  ClientProfile,
 } from '../types';
 
 // ─── Public Types ────────────────────────────────────────────────────
@@ -137,6 +138,7 @@ export interface ScenarioApplyPayload {
   flows: SignalFlow[];
   integrations: IntegrationActivation[];
   records: RuntimeRecord[];
+  clients?: ClientProfile[];
   businessFunctions?: BusinessFunction[];
 }
 
@@ -268,6 +270,18 @@ function mkRecord(
   data?: Record<string, string | number>,
 ): RuntimeRecord {
   return { id, clientId, workspaceId: wsId, subSpaceId: ssId, title, status, amount, date, tags: tags ?? [], data: data ?? {} };
+}
+
+function mkClient(id: string, name: string, caseRef: string, tags: string[] = []): ClientProfile {
+  const parts = name.split(' ');
+  return {
+    id,
+    firstName: parts[0] ?? name,
+    lastName: parts.slice(1).join(' ') || '',
+    caseRef,
+    tags,
+    createdAt: new Date().toISOString(),
+  };
 }
 
 // ─── Fake Data Generators ─────────────────────────────────────────────
@@ -598,9 +612,10 @@ export function buildPharmaPayload(): ScenarioApplyPayload {
     );
   });
   const records = [...unitRecords, ...cartonRecords, ...epcisRecords, ...scanRecords, ...verifyRecords, ...rxRecvRecords, ...dispRecords];
+  const clients = Array.from({ length: 12 }, (_, i) => mkClient(`client-batch-${i}`, `Batch ${PHARMA_PRODUCTS[i % PHARMA_PRODUCTS.length]}`, `LOT-${10000 + i}`, ['Vertical:Pharma']));
   return {
     shellConfig: mkShellConfig('Serialized Batch', 'Serialized Batches', 'Supply Chain Workspace', 'Traceability SubSpace', ['Serialized', 'Shipped to Distributor', 'Received by Distributor', 'Shipped to Pharmacy', 'Received by Pharmacy', 'Dispensed']),
-    workspaces: [wsMfr, wsDist, wsRx], flows, integrations, records,
+    workspaces: [wsMfr, wsDist, wsRx], flows, integrations, records, clients,
   };
 }
 
@@ -684,9 +699,10 @@ export function buildSalesPayload(): ScenarioApplyPayload {
     );
   });
   const records = [...leadRecords, ...oppRecords, ...actRecords];
+  const clients = COMPANIES.slice(0, 12).map((co, i) => mkClient(`client-sales-${i}`, co, `ACCT-${1000 + i}`, ['Vertical:Sales']));
   return {
     shellConfig: mkShellConfig('Account', 'Accounts', 'Sales Workspace', 'Pipeline Stage', ['New Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost']),
-    workspaces: [wsPipeline], flows, integrations, records,
+    workspaces: [wsPipeline], flows, integrations, records, clients,
   };
 }
 
@@ -771,9 +787,12 @@ export function buildHealthcarePayload(): ScenarioApplyPayload {
     );
   });
   const records = [...apptRecords, ...rxRecords, ...labRecords];
+  const patientFirsts = ['James', 'Olivia', 'Liam', 'Sophia', 'Noah', 'Ava'];
+  const patientLasts = ['Anderson', 'Martinez', 'Thompson', 'Rivera', 'Clark', 'Lee'];
+  const clients = Array.from({ length: 6 }, (_, i) => mkClient(`client-health-${i}`, `${patientFirsts[i]} ${patientLasts[i]}`, `PAT-${2000 + i}`, ['Vertical:Healthcare']));
   return {
     shellConfig: mkShellConfig('Patient', 'Patients', 'Clinical Workspace', 'Care Area', ['Registered', 'Scheduled', 'In Progress', 'Completed', 'Follow-Up', 'Discharged']),
-    workspaces: [wsPatients], flows, integrations, records,
+    workspaces: [wsPatients], flows, integrations, records, clients,
   };
 }
 
@@ -843,9 +862,11 @@ export function buildLogisticsPayload(): ScenarioApplyPayload {
     },
   ));
   const records = [...outboundRecords, ...receivingRecords, ...pickRecords];
+  const shippers = ['FastFreight Co', 'Global Shipping', 'Prime Logistics', 'Express Route', 'Swift Cargo', 'Alliance Transport'];
+  const clients = Array.from({ length: 6 }, (_, i) => mkClient(`client-logistics-${i}`, shippers[i], `SHP-${3000 + i}`, ['Vertical:Logistics']));
   return {
     shellConfig: mkShellConfig('Shipment', 'Shipments', 'Logistics Workspace', 'Operations Lane', ['Ordered', 'Received', 'Picking', 'Packed', 'Shipped', 'Delivered', 'Returned']),
-    workspaces: [wsFulfillment], flows, integrations, records,
+    workspaces: [wsFulfillment], flows, integrations, records, clients,
   };
 }
 
@@ -928,9 +949,10 @@ export function buildLegalPayload(): ScenarioApplyPayload {
     );
   });
   const records = [...caseRecords, ...deadlineRecords, ...billingRecords];
+  const clients = Array.from({ length: 8 }, (_, i) => mkClient(`client-legal-${i}`, `${pick(legalAdj)} ${pick(legalOrgs)}`, `CASE-2026-${1000 + i}`, ['Vertical:Legal']));
   return {
     shellConfig: mkShellConfig('Case', 'Cases', 'Legal Workspace', 'Practice Area', ['Intake', 'Engagement', 'Discovery', 'Litigation', 'Settlement', 'Closed', 'Archived']),
-    workspaces: [wsCases], flows, integrations, records,
+    workspaces: [wsCases], flows, integrations, records, clients,
   };
 }
 
@@ -1012,9 +1034,11 @@ export function buildInsurancePayload(): ScenarioApplyPayload {
     );
   });
   const records = [...policyRecords, ...claimRecords, ...renewalRecords];
+  const insNames = ['Lakewood Ins', 'Summit Coverage', 'Pinnacle Shield', 'Harbor Mutual', 'Eagle Assurance', 'Crestview Group', 'Meridian Ins', 'Horizon Union'];
+  const clients = Array.from({ length: 8 }, (_, i) => mkClient(`client-ins-${i}`, insNames[i], `POL-${4000 + i}`, ['Vertical:Insurance']));
   return {
     shellConfig: mkShellConfig('Policy', 'Policies', 'Insurance Workspace', 'Service Line', ['Application', 'Underwriting', 'Bound', 'Active', 'Renewal Pending', 'Lapsed', 'Cancelled']),
-    workspaces: [wsPolicies], flows, integrations, records,
+    workspaces: [wsPolicies], flows, integrations, records, clients,
   };
 }
 

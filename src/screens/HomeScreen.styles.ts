@@ -54,8 +54,8 @@ const nightStyleObject = {
     gap: 6,
   },
   dashboardSidebarSmooth: {
-    transitionProperty: 'width',
-    transitionDuration: '220ms',
+    transitionProperty: 'width, padding',
+    transitionDuration: '260ms',
     transitionTimingFunction: 'cubic-bezier(0.22, 0, 0.18, 1)',
   },
   dashboardSidebarCompact: {
@@ -69,6 +69,43 @@ const nightStyleObject = {
     width: 92,
     paddingHorizontal: 10,
     alignItems: 'center',
+  },
+  dashboardCollapsedNavSection: {
+    gap: 4,
+    alignItems: 'center',
+    width: '100%',
+    paddingTop: 4,
+  },
+  dashboardCollapsedNavItem: {
+    width: 48,
+    height: 48,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+  },
+  dashboardCollapsedNavItemActive: {
+    backgroundColor: 'rgba(140,91,245,0.38)',
+  },
+  dashboardTenantPill: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(253,156,253,0.3)',
+    backgroundColor: 'rgba(32,21,53,0.65)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginHorizontal: 2,
+    marginTop: 4,
+  },
+  dashboardTenantPillActive: {
+    borderColor: 'rgba(253,156,253,0.85)',
+    backgroundColor: 'rgba(140,91,245,0.34)',
+  },
+  dashboardTenantPillText: {
+    color: '#DCCFF5',
+    fontSize: 12,
+    fontWeight: '600',
+    flex: 1,
   },
   dashboardBrandWrap: {
     gap: 2,
@@ -127,8 +164,8 @@ const nightStyleObject = {
     gap: 2,
   },
   dashboardNavIcon: {
-    fontSize: 14,
-    width: 22,
+    fontSize: 17,
+    width: 26,
     textAlign: 'center',
     color: 'rgba(214,204,235,0.70)',
   },
@@ -146,9 +183,9 @@ const nightStyleObject = {
   },
   dashboardNavItem: {
     borderRadius: 8,
-    paddingHorizontal: 8,
-    minHeight: 30,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    minHeight: 36,
+    paddingVertical: 5,
     backgroundColor: 'transparent',
     justifyContent: 'center',
   },
@@ -179,13 +216,13 @@ const nightStyleObject = {
     paddingLeft: 8,
   },
   dashboardTenantNavItem: {
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: 'rgba(253,156,253,0.3)',
     backgroundColor: 'rgba(32,21,53,0.65)',
-    paddingHorizontal: 8,
-    minHeight: 28,
-    paddingVertical: 4,
+    paddingHorizontal: 7,
+    minHeight: 24,
+    paddingVertical: 3,
     justifyContent: 'center',
   },
   dashboardTenantNavItemActive: {
@@ -199,12 +236,12 @@ const nightStyleObject = {
   },
   dashboardTenantNavItemText: {
     color: '#DCCFF5',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
   },
   dashboardNavItemText: {
     color: '#D6CCEB',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
   },
   dashboardNavItemDesc: {
@@ -2133,6 +2170,23 @@ const dayOverrides = {
   },
   dashboardTenantNavItemText: {
     color: '#2F2249',
+  },
+  dashboardTenantPill: {
+    borderColor: 'rgba(112,85,163,0.5)',
+    backgroundColor: 'rgba(112,85,163,0.12)',
+  },
+  dashboardTenantPillActive: {
+    borderColor: 'rgba(111,75,207,0.88)',
+    backgroundColor: 'rgba(111,75,207,0.78)',
+  },
+  dashboardTenantPillText: {
+    color: '#2F2249',
+  },
+  dashboardCollapsedNavItem: {
+    backgroundColor: 'transparent',
+  },
+  dashboardCollapsedNavItemActive: {
+    backgroundColor: '#6F4BCF',
   },
   dashboardNavItemTextActive: {
     color: '#FFFFFF',

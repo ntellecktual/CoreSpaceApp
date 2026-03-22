@@ -1682,9 +1682,10 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     showToast(`Imported ${created} record${created !== 1 ? 's' : ''}`, 'success');
                     setCsvText(''); setCsvPreviewRows([]); setCreateModalOpen(false); setCreateTab('form');
                   }}
-                  style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient && csvPreviewRows.length > 0) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any }}>
+                  disabled={!canCreateRecord || !selectedClient || csvPreviewRows.length === 0}
+                  style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient && csvPreviewRows.length > 0) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any, opacity: (!canCreateRecord || !selectedClient || csvPreviewRows.length === 0) ? 0.5 : 1 }}>
                   <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient && csvPreviewRows.length > 0) ? accentTextColor : dimColor }}>
-                    {csvPreviewRows.length > 0 ? `Import All Rows from File` : 'Paste or upload data above'}
+                    {csvPreviewRows.length === 0 ? 'Paste or upload data above' : !selectedClient ? `Select a ${collectionLabel.toLowerCase()} first` : `Import All Rows from File`}
                   </Text>
                 </Pressable>
               </ScrollView>

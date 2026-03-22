@@ -201,6 +201,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     reorderBuilderFieldInWorkspace,
     removeBuilderFieldFromSubSpace,
     moveBuilderFieldInSubSpace,
+    applyBuilderFieldOrderInSubSpace,
     renameBuilderFieldInSubSpace,
     toggleWorkspaceFieldRequired,
     toggleBuilderFieldRequired,
@@ -1373,27 +1374,35 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         {/* Existing fields in selected section */}
                         {(selectedSubSpace.builderFields ?? []).length > 0 && (
                           <View style={{ gap: 4 }}>
-                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Fields in "{selectedSubSpace.name}" — tap name to rename, use arrows to reorder</Text>
-                            {(selectedSubSpace.builderFields ?? []).map((field, fieldIdx, allFields) => (
-                              <View key={field.id} style={{ backgroundColor: editingFieldId === field.id ? (mode === 'night' ? acRgba(0.14) : acRgba(0.08)) : (mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'), borderRadius: 10, borderWidth: 1, borderColor: editingFieldId === field.id ? ac : (mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'), overflow: 'hidden' as any }}>
+                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Fields in "{selectedSubSpace.name}" — tap name to rename, drag to reorder</Text>
+                            <Reorder.Group
+                              as="div"
+                              axis="y"
+                              values={selectedSubSpace.builderFields ?? []}
+                              onReorder={canManageSubSpace ? applyBuilderFieldOrderInSubSpace : () => {}}
+                              style={{ display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'none', padding: 0, margin: 0 }}
+                            >
+                            {(selectedSubSpace.builderFields ?? []).map((field) => (
+                              <Reorder.Item
+                                key={field.id}
+                                value={field}
+                                as="div"
+                                style={{
+                                  backgroundColor: editingFieldId === field.id ? (mode === 'night' ? acRgba(0.14) : acRgba(0.08)) : (mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'),
+                                  borderRadius: 10, borderWidth: 1, borderStyle: 'solid',
+                                  borderColor: editingFieldId === field.id ? ac : (mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'),
+                                  overflow: 'hidden',
+                                  cursor: canManageSubSpace ? 'grab' : 'default',
+                                  userSelect: 'none',
+                                }}
+                                whileDrag={{ scale: 1.02, boxShadow: '0 6px 24px rgba(0,0,0,0.28)', zIndex: 50 }}
+                                dragListener={canManageSubSpace}
+                              >
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 10, paddingVertical: 8 }}>
-                                  {/* Move up/down */}
-                                  <View style={{ gap: 2 }}>
-                                    <Pressable
-                                      disabled={!canManageSubSpace || fieldIdx === 0}
-                                      style={{ width: 22, height: 20, borderRadius: 5, alignItems: 'center' as any, justifyContent: 'center' as any, backgroundColor: fieldIdx === 0 ? 'transparent' : 'rgba(140,91,245,0.14)', borderWidth: 1, borderColor: fieldIdx === 0 ? 'transparent' : 'rgba(140,91,245,0.26)' }}
-                                      onPress={() => moveBuilderFieldInSubSpace(field.id, 'up')}
-                                    >
-                                      <Text style={{ fontSize: 10, color: fieldIdx === 0 ? 'transparent' : '#A78BFA', lineHeight: 12 }}>▲</Text>
-                                    </Pressable>
-                                    <Pressable
-                                      disabled={!canManageSubSpace || fieldIdx === allFields.length - 1}
-                                      style={{ width: 22, height: 20, borderRadius: 5, alignItems: 'center' as any, justifyContent: 'center' as any, backgroundColor: fieldIdx === allFields.length - 1 ? 'transparent' : 'rgba(140,91,245,0.14)', borderWidth: 1, borderColor: fieldIdx === allFields.length - 1 ? 'transparent' : 'rgba(140,91,245,0.26)' }}
-                                      onPress={() => moveBuilderFieldInSubSpace(field.id, 'down')}
-                                    >
-                                      <Text style={{ fontSize: 10, color: fieldIdx === allFields.length - 1 ? 'transparent' : '#A78BFA', lineHeight: 12 }}>▼</Text>
-                                    </Pressable>
-                                  </View>
+                                  {/* Drag handle */}
+                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 18, opacity: canManageSubSpace ? 0.45 : 0.15, cursor: canManageSubSpace ? 'grab' : 'default', flexShrink: 0 }}>
+                                    <span style={{ fontSize: 16, color: '#A78BFA', lineHeight: 1 }}>⠿</span>
+                                  </div>
                                   {/* Type icon */}
                                   <View style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: 'rgba(140,91,245,0.15)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
                                     <Text style={{ fontSize: 13 }}>{fieldTypeIcons[field.type] ?? '?'}</Text>
@@ -1450,8 +1459,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                     </Pressable>
                                   </View>
                                 )}
-                              </View>
+                              </Reorder.Item>
                             ))}
+                            </Reorder.Group>
                           </View>
                         )}
                       </>

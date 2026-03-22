@@ -852,6 +852,15 @@ export function useAdminWorkspace() {
     setNotice(`Field moved ${direction}.`);
   };
 
+  const applyBuilderFieldOrderInSubSpace = (ordered: SubSpaceBuilderField[]) => {
+    if (!can('subspace.manage', workspace?.id)) {
+      setNotice(deniedMessage('subspace.manage'));
+      return;
+    }
+    if (!workspace || !selectedSubSpace) return;
+    updateSubSpace(workspace.id, { ...selectedSubSpace, builderFields: ordered });
+  };
+
   const toggleBuilderFieldRequired = (fieldId: string) => {
     if (!can('subspace.manage', workspace?.id)) {
       setNotice(deniedMessage('subspace.manage'));
@@ -1771,6 +1780,7 @@ export function useAdminWorkspace() {
     addBuilderFieldToWorkspace,
     removeBuilderFieldFromSubSpace,
     moveBuilderFieldInSubSpace,
+    applyBuilderFieldOrderInSubSpace,
     renameBuilderFieldInSubSpace,
     removeBuilderFieldFromWorkspace,
     moveBuilderFieldInWorkspace,

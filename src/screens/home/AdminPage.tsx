@@ -225,8 +225,6 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const canManageWorkspace = can('workspace.manage');
   const canManageSubSpace = can('subspace.manage');
-  const membersInRole = data.users.filter((u) => u.roleId === selectedRoleId);
-  const isEditingOwnRole = !!(currentUser && currentUser.roleId === selectedRoleId);
   const isWeb = Platform.OS === 'web';
   const resolvedWorkspaceName = workspaceName.trim() || workspace?.name || 'Untitled Workspace';
   const resolvedRootEntity = rootEntity.trim() || workspace?.rootEntity || 'Core record';
@@ -640,6 +638,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     saveRole,
     removeRole,
   } = useRolePolicyBuilder();
+
+  const membersInRole = data.users.filter((u) => u.roleId === selectedRoleId);
+  const isEditingOwnRole = !!(currentUser && currentUser.roleId === selectedRoleId);
 
   useEffect(() => {
     if (isCreatingWorkspace) {

@@ -138,8 +138,6 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const [draggedFieldType, setDraggedFieldType] = useState<SubSpaceBuilderFieldType | null>(null);
   const [wsDragFromIndex, setWsDragFromIndex] = useState<number | null>(null);
   const [wsDragOverIndex, setWsDragOverIndex] = useState<number | null>(null);
-  const [ssDragFromIndex, setSsDragFromIndex] = useState<number | null>(null);
-  const [ssDragOverIndex, setSsDragOverIndex] = useState<number | null>(null);
   const [wizardStep, setWizardStep] = useState<1 | 2 | 3 | 4>(1);
   const [wizardActiveFieldType, setWizardActiveFieldType] = useState<SubSpaceBuilderFieldType>('text');
   const [shellPane, setShellPane] = useState<'labels' | 'intake' | 'personas' | 'lifecycle'>('labels');
@@ -1099,25 +1097,30 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                           {workspaceSubSpaces.map((ss, ssIdx) => (
                             <View
                               key={ss.id}
-                              draggable
-                              onDragStart={(e: any) => { e.dataTransfer.effectAllowed = 'move'; setSsDragFromIndex(ssIdx); }}
-                              onDragOver={(e: any) => { e.preventDefault(); setSsDragOverIndex(ssIdx); }}
-                              onDragEnd={() => {
-                                if (ssDragFromIndex !== null && ssDragOverIndex !== null && ssDragFromIndex !== ssDragOverIndex) {
-                                  moveSubSpaceToIndex(ssDragFromIndex, ssDragOverIndex);
-                                }
-                                setSsDragFromIndex(null); setSsDragOverIndex(null);
-                              }}
                               style={{
                                 flexDirection: 'row', alignItems: 'center', gap: 10,
                                 backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.10)' : 'rgba(140,91,245,0.06)',
                                 borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1,
-                                borderColor: ssDragOverIndex === ssIdx ? '#8C5BF5' : selectedSubSpaceId === ss.id ? '#8C5BF5' : mode === 'night' ? 'rgba(140,91,245,0.20)' : 'rgba(140,91,245,0.14)',
-                                opacity: ssDragFromIndex === ssIdx ? 0.45 : 1,
-                                cursor: 'grab',
+                                borderColor: selectedSubSpaceId === ss.id ? '#8C5BF5' : mode === 'night' ? 'rgba(140,91,245,0.20)' : 'rgba(140,91,245,0.14)',
                               }}
                             >
-                              <Text style={{ fontSize: 16, opacity: 0.5, userSelect: 'none' } as any}>⠿</Text>
+                              {/* ▲▼ reorder buttons — universal cross-browser */}
+                              <View style={{ gap: 2 }}>
+                                <Pressable
+                                  disabled={!canManageSubSpace || ssIdx === 0}
+                                  style={{ width: 22, height: 22, borderRadius: 5, alignItems: 'center' as any, justifyContent: 'center' as any, backgroundColor: ssIdx === 0 ? 'transparent' : 'rgba(140,91,245,0.18)', opacity: ssIdx === 0 ? 0.2 : 1 }}
+                                  onPress={() => reorderSubSpace(ss.id, -1)}
+                                >
+                                  <Text style={{ fontSize: 10, color: '#A78BFA', fontWeight: '900', lineHeight: 12 }}>▲</Text>
+                                </Pressable>
+                                <Pressable
+                                  disabled={!canManageSubSpace || ssIdx === workspaceSubSpaces.length - 1}
+                                  style={{ width: 22, height: 22, borderRadius: 5, alignItems: 'center' as any, justifyContent: 'center' as any, backgroundColor: ssIdx === workspaceSubSpaces.length - 1 ? 'transparent' : 'rgba(140,91,245,0.18)', opacity: ssIdx === workspaceSubSpaces.length - 1 ? 0.2 : 1 }}
+                                  onPress={() => reorderSubSpace(ss.id, 1)}
+                                >
+                                  <Text style={{ fontSize: 10, color: '#A78BFA', fontWeight: '900', lineHeight: 12 }}>▼</Text>
+                                </Pressable>
+                              </View>
                               <View style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(140,91,245,0.20)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
                                 <Text style={{ fontSize: 12, color: '#A78BFA', fontWeight: '800' }}>{ssIdx + 1}</Text>
                               </View>
@@ -1551,25 +1554,31 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     {(workspace.subSpaces ?? []).map((ss, idx) => (
                       <React.Fragment key={`prev-${ss.id}`}>
                         {workspace.pipelineEnabled && idx > 0 && <Text style={{ fontSize: 14, color: '#8C5BF5', fontWeight: '800' }}>→</Text>}
-                        <Pressable
-                          draggable
-                          onDragStart={(e: any) => { e.dataTransfer.effectAllowed = 'move'; setSsDragFromIndex(idx); }}
-                          onDragOver={(e: any) => { e.preventDefault(); setSsDragOverIndex(idx); }}
-                          onDragEnd={() => {
-                            if (ssDragFromIndex !== null && ssDragOverIndex !== null && ssDragFromIndex !== ssDragOverIndex) {
-                              moveSubSpaceToIndex(ssDragFromIndex, ssDragOverIndex);
-                            }
-                            setSsDragFromIndex(null); setSsDragOverIndex(null);
-                          }}
-                          style={[styles.pill, selectedSubSpaceId === ss.id && styles.pillActive, {
-                            opacity: ssDragFromIndex === idx ? 0.45 : 1,
-                            borderStyle: ssDragOverIndex === idx ? 'dashed' : 'solid',
-                            cursor: 'grab',
-                          } as any]}
-                          onPress={() => setSelectedSubSpaceId(ss.id)}
-                        >
-                          <Text style={[styles.pillText, selectedSubSpaceId === ss.id && styles.pillTextActive]}>{workspace.pipelineEnabled ? `${idx + 1}. ` : ''}{ss.name}</Text>
-                        </Pressable>
+                        <View style={{ flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                          <Pressable
+                            style={[styles.pill, selectedSubSpaceId === ss.id && styles.pillActive]}
+                            onPress={() => setSelectedSubSpaceId(ss.id)}
+                          >
+                            <Text style={[styles.pillText, selectedSubSpaceId === ss.id && styles.pillTextActive]}>{workspace.pipelineEnabled ? `${idx + 1}. ` : ''}{ss.name}</Text>
+                          </Pressable>
+                          {/* ◀ ▶ reorder buttons under each pill */}
+                          <View style={{ flexDirection: 'row', gap: 3 }}>
+                            <Pressable
+                              disabled={!canManageSubSpace || idx === 0}
+                              style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, backgroundColor: idx === 0 ? 'transparent' : 'rgba(140,91,245,0.18)', opacity: idx === 0 ? 0.15 : 1 }}
+                              onPress={() => reorderSubSpace(ss.id, -1)}
+                            >
+                              <Text style={{ fontSize: 9, color: '#A78BFA', fontWeight: '900' }}>◀</Text>
+                            </Pressable>
+                            <Pressable
+                              disabled={!canManageSubSpace || idx === (workspace.subSpaces ?? []).length - 1}
+                              style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, backgroundColor: idx === (workspace.subSpaces ?? []).length - 1 ? 'transparent' : 'rgba(140,91,245,0.18)', opacity: idx === (workspace.subSpaces ?? []).length - 1 ? 0.15 : 1 }}
+                              onPress={() => reorderSubSpace(ss.id, 1)}
+                            >
+                              <Text style={{ fontSize: 9, color: '#A78BFA', fontWeight: '900' }}>▶</Text>
+                            </Pressable>
+                          </View>
+                        </View>
                       </React.Fragment>
                     ))}
                   </View>

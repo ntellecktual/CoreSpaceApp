@@ -164,7 +164,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
           flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: isDark ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0.35)',
+          backgroundColor: 'transparent',
         }}
         onPress={handleClose}
       >

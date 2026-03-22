@@ -593,7 +593,7 @@ export function useAiWorkspaceBuilder() {
   const [proposal, setProposal] = useState<ReturnType<typeof buildGenericProposal> | null>(null);
 
   const startSession = useCallback((tenantId: string) => {
-    const s = createAiSession(tenantId, 'workspace-builder');
+    const s = createAiSession(tenantId, 'workspace-builder', data.shellConfig);
     const welcome = addAssistantMessage(s, `Hi! I'm **Bebo**, CoreSpace's AI workspace architect.\n\nTell me about your business or industry and I'll generate a **complete operational workspace** in seconds — workspaces, subspaces, data fields, team roles, lifecycle stages, and Signal Studio automation flows.\n\nI already know **11 industries** out of the box, including a full **DSCSA pharmaceutical serialization** template with track-and-trace from manufacturer to pharmacy. Try one of these:\n\n• *"We're a pharma distributor verifying serial numbers under DSCSA"*\n• *"I run a property management company with 200 units"*\n• *"We manage insurance claims and need compliance tracking"*`);
     setSession(welcome);
     setProposal(null);
@@ -801,7 +801,7 @@ export function useAiFlowBuilder() {
   const [proposedFlow, setProposedFlow] = useState<Partial<SignalFlow> | null>(null);
 
   const startSession = useCallback((tenantId: string) => {
-    const s = createAiSession(tenantId, 'signal-builder');
+    const s = createAiSession(tenantId, 'signal-builder', data.shellConfig);
     const welcome = addAssistantMessage(s, `I'll help you create automation flows. Describe what should happen automatically in your system.\n\nFor example: *"When a maintenance request has been open for more than 48 hours, escalate it to the property manager."*`);
     setSession(welcome);
     setProposedFlow(null);
@@ -970,7 +970,7 @@ export function useAiDataAssistant() {
   const [suggestions, setSuggestions] = useState<Record<string, string | number> | null>(null);
 
   const startSession = useCallback((tenantId: string) => {
-    const s = createAiSession(tenantId, 'data-assistant');
+    const s = createAiSession(tenantId, 'data-assistant', data.shellConfig);
     const welcome = addAssistantMessage(
       s,
       `I'm your data assistant. I can help you:\n• **Auto-fill** form fields based on what you've entered so far\n• **Validate** a record before saving\n• **Suggest tags** for your records\n• **Summarize** a client's history\n\nJust describe what you need!`,
@@ -1166,7 +1166,7 @@ export function useAiQueryEngine() {
   const [queryResult, setQueryResult] = useState<QueryResult | null>(null);
 
   const startSession = useCallback((tenantId: string) => {
-    const s = createAiSession(tenantId, 'query');
+    const s = createAiSession(tenantId, 'query', data.shellConfig);
     const welcome = addAssistantMessage(
       s,
       `Ask me anything about your records in natural language. I'll translate your question into a query and show results.\n\nExamples:\n• *"Show me all overdue items"*\n• *"Records tagged as urgent from last week"*\n• *"How many open cases do we have?"*`,

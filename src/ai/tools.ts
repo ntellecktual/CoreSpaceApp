@@ -222,7 +222,33 @@ Be encouraging, ask one question at a time, and use tools to build as you go.`,
 
 // ─── AI Session Utilities ───────────────────────────────────────────
 
-export function createAiSession(tenantId: string, context: AiSessionContext): AiSession {
+/**
+ * Builds a terminology glossary block injected into every Bebo session so the AI
+ * understands the tenant's industry-specific language mapped to CoreSpace's
+ * platform-agnostic concepts (workspace / subspace / collection / record).
+ */
+export function buildTerminologyContext(cfg: Partial<ShellConfig>): string {
+  const lines: string[] = [
+    '## Tenant Terminology Mapping',
+    'This tenant uses industry-specific terms for CoreSpace platform concepts.',
+    'Always use the tenant term when speaking to the user, and understand their industry term maps to the platform concept.',
+    '',
+    `| Platform Concept | This Tenant's Term |`,
+    `|---|---|`,
+    `| Record (tracked item) | ${cfg.subjectSingular ?? 'Record'} / ${cfg.subjectPlural ?? 'Records'} |`,
+    `| Collection (group of records belonging to one entity) | ${cfg.collectionLabel ?? 'Collection'} / ${cfg.collectionLabelPlural ?? 'Collections'} |`,
+    `| Workspace (a business domain / process area) | ${cfg.workspaceLabel ?? 'Workspace'} |`,
+    `| SubSpace (a lane or category within a workspace) | ${cfg.subSpaceLabel ?? 'SubSpace'} |`,
+    `| Department / Division (top-level grouping) | ${cfg.functionLabel ?? 'Department'} / ${cfg.functionLabelPlural ?? 'Departments'} |`,
+    '',
+    'When the user says their industry term, treat it as the corresponding CoreSpace platform concept.',
+  ];
+  return lines.join('\n');
+}
+
+export function createAiSession(tenantId: string, context: AiSessionContext, shellConfig?: Partial<ShellConfig>): AiSession {
+  const basePrompt = SYSTEM_PROMPTS[context];
+  const terminologyBlock = shellConfig ? `\n\n${buildTerminologyContext(shellConfig)}` : '';
   return {
     id: `ai-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
     tenantId,
@@ -231,7 +257,7 @@ export function createAiSession(tenantId: string, context: AiSessionContext): Ai
       {
         id: `msg-system-${Date.now()}`,
         role: 'system',
-        content: SYSTEM_PROMPTS[context],
+        content: basePrompt + terminologyBlock,
         timestamp: new Date().toISOString(),
       },
     ],

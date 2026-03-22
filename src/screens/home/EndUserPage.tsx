@@ -603,6 +603,9 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const subjectSingular = shellConfig.subjectSingular;
   const subjectPlural = shellConfig.subjectPlural;
   const subSpaceLabel = shellConfig.subSpaceLabel;
+  const workspaceLabelSingular = shellConfig.workspaceLabel ?? 'Workspace';
+  const workspaceLabelPlural = workspaceLabelSingular.trim().replace(/s$/i, '') + 's'; // e.g. 'Case Workspace' → 'Case Workspaces'
+  const subSpaceLabelPlural = subSpaceLabel.trim().replace(/s$/i, '') + 's'; // e.g. 'Case SubSpace' → 'Case SubSpaces'
   const collectionLabel = shellConfig.collectionLabel ?? 'Collection';
   const collectionLabelPlural = shellConfig.collectionLabelPlural ?? 'Collections';
   const functionLabel = shellConfig.functionLabel ?? 'Department';
@@ -876,7 +879,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           ) : (<>
           {businessFunctions.length > 0 && (
             <View style={{ marginBottom: 6 }}>
-              <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#E878F6' }}>
+              <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>
                 {appData.shellConfig.functionLabelPlural?.toUpperCase() ?? 'DEPARTMENTS'}
               </Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 3 }}>
@@ -925,15 +928,19 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           )}
 
           {/* Item selector (compact) */}
-          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#E878F6' }}>{collectionLabelPlural.toUpperCase()}</Text>
+          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>{collectionLabelPlural.toUpperCase()}</Text>
           <ScrollView nativeID="eu-batch-list" style={{ maxHeight: isCompact ? 80 : 140 }} showsVerticalScrollIndicator={false}>
             {clients.length === 0 && <Text style={{ fontSize: 11, color: dimColor }}>No {collectionLabelPlural.toLowerCase()} yet</Text>}
             {clients.map((c) => {
               const sel = selectedClientId === c.id;
+              const initials = getItemTitle(c).split(' ').slice(0, 2).map((s: string) => s[0] ?? '').join('').toUpperCase().slice(0, 2);
               return (
                 <Pressable key={c.id} onPress={() => setSelectedClientId(c.id)}
-                  style={{ paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, marginBottom: 3, backgroundColor: sel ? accentSoft : 'transparent', borderWidth: sel ? 1 : 0, borderColor: sel ? accentColor : 'transparent' }}>
-                  <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? '#FFFFFF' : dimColor }} numberOfLines={1}>{getItemTitle(c)}</Text>
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, marginBottom: 3, backgroundColor: sel ? accentSoft : 'transparent', borderWidth: sel ? 1 : 0, borderColor: sel ? accentColor : 'transparent' }}>
+                  <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: sel ? accentColor : `${accentColor}2A`, alignItems: 'center' as any, justifyContent: 'center' as any, flexShrink: 0 }}>
+                    <Text style={{ fontSize: 9, fontWeight: '800', color: sel ? accentTextColor : accentColor }}>{initials}</Text>
+                  </View>
+                  <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? '#FFFFFF' : dimColor, flex: 1 }} numberOfLines={1}>{getItemTitle(c)}</Text>
                 </Pressable>
               );
             })}
@@ -946,18 +953,27 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.06)', marginVertical: 4 }} />
 
           {/* Workspace tabs */}
-          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#E878F6' }}>WORKSPACES</Text>
+          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>{workspaceLabelPlural}</Text>
           <ScrollView nativeID="eu-workspace-list" style={{ maxHeight: isCompact ? 100 : 160 }} showsVerticalScrollIndicator={false}>
             {displayedWorkspaces.map((ws) => {
               const sel = selectedWorkspaceId === ws.id;
               const fCount = flows.filter((f) => f.workspaceId === ws.id && f.status === 'published').length;
+              const ssCount = ws.subSpaces?.length ?? 0;
               return (
                 <Pressable key={ws.id} onPress={() => setSelectedWorkspaceId(ws.id)}
                   style={{ paddingVertical: 7, paddingHorizontal: 8, borderRadius: 8, marginBottom: 3, backgroundColor: sel ? accentSoft : 'transparent', borderLeftWidth: sel ? 3 : 0, borderLeftColor: accentColor }}>
-                  <Text style={{ fontSize: 11, fontWeight: '700', color: sel ? '#FFFFFF' : dimColor }} numberOfLines={1}>
-                    {workspaceStepTitles[ws.id] ?? ws.name}
-                  </Text>
-                  {fCount > 0 && <Text style={{ fontSize: 9, color: '#86EFAC', marginTop: 1 }}>{fCount} flow{fCount > 1 ? 's' : ''}</Text>}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' as any }}>
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: sel ? '#FFFFFF' : dimColor, flex: 1 }} numberOfLines={1}>
+                      {workspaceStepTitles[ws.id] ?? ws.name}
+                    </Text>
+                    {ssCount > 0 && (
+                      <View style={{ minWidth: 20, height: 16, borderRadius: 8, backgroundColor: sel ? accentColor : 'rgba(255,255,255,0.08)', alignItems: 'center' as any, justifyContent: 'center' as any, paddingHorizontal: 4, marginLeft: 4 }}>
+                        <Text style={{ fontSize: 8, fontWeight: '700', color: sel ? accentTextColor : dimColor }}>{ssCount}</Text>
+                      </View>
+                    )}
+                  </View>
+                  {!!ws.rootEntity && <Text style={{ fontSize: 9, color: `${accentColor}99`, marginTop: 1 }} numberOfLines={1}>↳ {ws.rootEntity}</Text>}
+                  {fCount > 0 && <Text style={{ fontSize: 9, color: '#86EFAC', marginTop: 1 }}>⚡ {fCount} flow{fCount > 1 ? 's' : ''}</Text>}
                 </Pressable>
               );
             })}
@@ -966,7 +982,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.06)', marginVertical: 4 }} />
 
           {/* SubSpace list (clickable) */}
-          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#E878F6' }}>SUBSPACES</Text>
+          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>{subSpaceLabelPlural}</Text>
           <ScrollView nativeID="eu-subspace-list" style={{ maxHeight: isCompact ? 100 : 160 }} showsVerticalScrollIndicator={false}>
             {visibleSubSpaces.length === 0 && <Text style={{ fontSize: 11, color: dimColor }}>No {subSpaceLabel.toLowerCase()} visible</Text>}
             {visibleSubSpaces.map((ss, ssIdx) => {
@@ -1063,7 +1079,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           {/* ── Recently Viewed (overview only) ── */}
           {!selectedSubSpaceId && recentlyViewed.length > 0 && (
             <View style={{ paddingHorizontal: 12, paddingTop: 8 }}>
-              <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: '#E878F6', marginBottom: 6 }}>RECENTLY VIEWED</Text>
+              <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor, marginBottom: 6 }}>RECENTLY VIEWED</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
                 {recentlyViewed.map((rec) => (
                   <Pressable key={`rv-${rec.id}`} onPress={() => { setSelectedDrawerRecord(rec); setRecordDrawerVisible(true); }}
@@ -1409,6 +1425,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           }
         }}
         onDelete={(id) => { const rec = selectedDrawerRecord; deleteRecord(id); showToast('Record deleted', 'info'); auditLog?.logEntry({ action: 'delete', entityType: 'record', entityId: id, entityName: rec?.title || id, after: { detail: 'Record deleted' } }); setRecordDrawerVisible(false); setSelectedDrawerRecord(null); }}
+        tenantAccent={accentColor}
       />
 
       {/* ═══════════════ INTAKE MODAL ═══════════════ */}

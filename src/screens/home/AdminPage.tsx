@@ -167,6 +167,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     beginCreateWorkspace,
     applyDscsaSerializationTemplate,
     applyWrvasTemplate,
+    applyLegalCaseTemplate,
     removeWorkspace,
     workspaceName,
     setWorkspaceName,
@@ -949,6 +950,23 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                           <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Use This Template →</Text>
                         </View>
                       </Pressable>
+                      <Pressable
+                        nativeID="wt-load-legal-template"
+                        style={{ flex: 1, minWidth: 200, backgroundColor: mode === 'night' ? 'rgba(201,168,76,0.10)' : 'rgba(201,168,76,0.06)', borderRadius: 14, padding: 18, gap: 10, borderWidth: 1, borderColor: 'rgba(201,168,76,0.28)' }}
+                        onPress={() => {
+                          applyLegalCaseTemplate();
+                          setWizardStep(4);
+                          auditLog?.logEntry({ action: 'import', entityType: 'workspace', entityId: 'template', entityName: 'Legal Case Management Template', after: { template: 'Legal', subSpaces: 5, records: 10, flows: 4 } });
+                          addNotification?.({ type: 'system', title: 'Template Loaded!', body: 'Legal Case Management ready — 5 practice areas, 6 sample cases, 4 automation flows.', severity: 'success' });
+                        }}
+                      >
+                        <Text style={{ fontSize: 32 }}>⚖️</Text>
+                        <Text style={{ color: mode === 'night' ? '#E8E4FF' : '#1a1030', fontWeight: '700', fontSize: 14 }}>Legal Case Management</Text>
+                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.48)', fontSize: 11, lineHeight: 17 }}>5 practice areas · 6 sample cases · 4 automation flows · Intake → Closed/Archive</Text>
+                        <View style={{ backgroundColor: '#C9A84C', borderRadius: 10, paddingVertical: 10, alignItems: 'center' as any }}>
+                          <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Use This Template →</Text>
+                        </View>
+                      </Pressable>
                     </View>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -1079,6 +1097,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         </Pressable>
                         <Pressable nativeID="wt-load-wrvas-template" style={[styles.secondaryButton, { flex: 1 }]} onPress={() => { applyWrvasTemplate(); setWizardStep(4); addNotification?.({ type: 'system', title: 'Template Loaded!', body: 'WRVAS workspace loaded.', severity: 'success' }); }}>
                           <Text style={styles.secondaryButtonText}>🖥️ WRVAS Template</Text>
+                        </Pressable>
+                        <Pressable nativeID="wt-load-legal-template-wizard" style={[styles.secondaryButton, { flex: 1 }]} onPress={() => { applyLegalCaseTemplate(); setWizardStep(4); addNotification?.({ type: 'system', title: 'Template Loaded!', body: 'Legal Case Management loaded.', severity: 'success' }); }}>
+                          <Text style={styles.secondaryButtonText}>⚖️ Legal Template</Text>
                         </Pressable>
                       </View>
                       {isSuperAdmin && tenants.length > 1 && (

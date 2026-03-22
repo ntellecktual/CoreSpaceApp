@@ -276,6 +276,91 @@ const wrvasTemplate = {
   ],
 };
 
+const legalCaseTemplate = {
+  name: 'Legal Case Management',
+  rootEntity: 'Case',
+  route: '/workspace/legal-case-management',
+  workspaceFields: [
+    { label: 'Case Number', type: 'text' as const, required: true },
+    { label: 'Assigned Attorney', type: 'text' as const, required: true },
+    { label: 'Firm / Office', type: 'text' as const, required: false },
+  ],
+  subSpaces: [
+    {
+      name: 'Active Cases',
+      sourceEntity: 'Case',
+      displayType: 'grid' as const,
+      visibilityRule: 'always' as const,
+      fields: [
+        { label: 'Case Number', type: 'text' as const, required: true },
+        { label: 'Case Phase', type: 'select' as const, required: true },   // Intake | Discovery | Pre-Litigation | Litigation | Settlement
+        { label: 'Matter Type', type: 'select' as const, required: true },
+        { label: 'Client Name', type: 'text' as const, required: true },
+        { label: 'Assigned Attorney', type: 'text' as const, required: true },
+        { label: 'Opposing Counsel', type: 'text' as const, required: false },
+        { label: 'Court / Jurisdiction', type: 'text' as const, required: false },
+        { label: 'Filing Date', type: 'date' as const, required: true },
+        { label: 'Case Value', type: 'number' as const, required: false },
+      ],
+    },
+    {
+      name: 'Deadlines & Court Dates',
+      sourceEntity: 'Court Event',
+      displayType: 'timeline' as const,
+      visibilityRule: 'always' as const,
+      fields: [
+        { label: 'Event Date', type: 'date' as const, required: true },
+        { label: 'Hearing Type', type: 'select' as const, required: true }, // Motion / Discovery / Mediation / Trial / Status
+        { label: 'Filing Deadline', type: 'date' as const, required: false },
+        { label: 'Location / Courtroom', type: 'text' as const, required: false },
+        { label: 'Event Notes', type: 'longText' as const, required: false },
+      ],
+    },
+    {
+      name: 'Documents & Filings',
+      sourceEntity: 'Case Document',
+      displayType: 'grid' as const,
+      visibilityRule: 'always' as const,
+      fields: [
+        { label: 'Document Title', type: 'text' as const, required: true },
+        { label: 'Document Type', type: 'select' as const, required: true }, // Pleading / Motion / Discovery / Exhibit / Order / Correspondence
+        { label: 'Filed Date', type: 'date' as const, required: true },
+        { label: 'Filed By', type: 'text' as const, required: true },
+        { label: 'Document Notes', type: 'longText' as const, required: false },
+      ],
+    },
+    {
+      name: 'Billing & Time',
+      sourceEntity: 'Billing Entry',
+      displayType: 'summary' as const,
+      visibilityRule: 'always' as const,
+      fields: [
+        { label: 'Billing Date', type: 'date' as const, required: true },
+        { label: 'Billing Type', type: 'select' as const, required: true }, // Hourly | Flat Fee | Contingency
+        { label: 'Hours Billed', type: 'number' as const, required: false },
+        { label: 'Hourly Rate', type: 'number' as const, required: false },
+        { label: 'Total Amount', type: 'number' as const, required: true },
+        { label: 'Attorney', type: 'text' as const, required: true },
+      ],
+    },
+    {
+      name: 'Closed Cases',
+      sourceEntity: 'Closed Case',
+      displayType: 'grid' as const,
+      visibilityRule: 'ifRecords' as const,
+      fields: [
+        { label: 'Case Number', type: 'text' as const, required: true },
+        { label: 'Closure Date', type: 'date' as const, required: true },
+        { label: 'Days to Closure', type: 'number' as const, required: true }, // computed: closure date − filing date
+        { label: 'Closure Type', type: 'select' as const, required: true },   // <60 Days — Closed | >60 Days — Archived
+        { label: 'Final Resolution', type: 'select' as const, required: true }, // Settled | Won | Dismissed | Lost | Withdrawn
+        { label: 'Final Award / Amount', type: 'number' as const, required: false },
+        { label: 'Closing Notes', type: 'longText' as const, required: false },
+      ],
+    },
+  ],
+};
+
 function slugify(value: string) {
   return value
     .trim()
@@ -309,7 +394,7 @@ function createBuilderField(
 }
 
 export function useAdminWorkspace() {
-  const { data, upsertWorkspace, addSubSpace, deleteSubSpace, updateSubSpace, deleteWorkspace, addClient, addRecord, upsertFlow, upsertBusinessFunction } = useAppState();
+  const { data, upsertWorkspace, addSubSpace, deleteSubSpace, updateSubSpace, deleteWorkspace, addClient, addRecord, upsertFlow, upsertBusinessFunction, upsertShellConfig } = useAppState();
   const { can, deniedMessage } = useRbac();
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(data.workspaces[0]?.id ?? '');
   const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(data.workspaces.length === 0);
@@ -1317,6 +1402,286 @@ export function useAdminWorkspace() {
     setNotice('WRVAS template applied: Dock Log, Serial Capture, Inspection, Diagnostics, Cost Eval, Repair, Retest, Config, Kitting, QA, Packing, and Shipping lanes are ready. 5 Signal Studio flows created.' + (addedNewSubSpaces ? ' Demo data seeded with Dell Laptop, HP Printer (BER), and Cisco Server (retest fail) work orders.' : ''));
   };
 
+  /* ── Legal Case Management Template ── */
+  const applyLegalCaseTemplate = () => {
+    if (!can('workspace.manage', workspace?.id)) {
+      setNotice(deniedMessage('workspace.manage'));
+      return;
+    }
+
+    const baseWorkspace: WorkspaceDefinition = workspace ?? {
+      id: `ws-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
+      name: legalCaseTemplate.name,
+      rootEntity: legalCaseTemplate.rootEntity,
+      route: legalCaseTemplate.route,
+      countBadgesEnabled: true,
+      countStrategy: 'perSubSpace' as const,
+      builderFields: [],
+      subSpaces: [],
+      published: false,
+    };
+    const isNewWorkspace = !workspace;
+
+    const rootToken = slugify(baseWorkspace.rootEntity || legalCaseTemplate.rootEntity) || 'case';
+    const nextWorkspaceFields = [...(baseWorkspace.builderFields ?? [])];
+
+    for (const field of legalCaseTemplate.workspaceFields) {
+      const exists = nextWorkspaceFields.some((item) => item.label.toLowerCase() === field.label.toLowerCase());
+      if (exists) continue;
+      nextWorkspaceFields.push(
+        createBuilderField('wf', field.label, field.type, field.required, [
+          `Workspace:${slugify(baseWorkspace.name) || 'workspace'}`,
+          'Scope:Workspace',
+          `Field:${slugify(field.label)}`,
+        ]),
+      );
+    }
+
+    const existingSubSpaceNames = new Set((baseWorkspace.subSpaces ?? []).map((item) => item.name.toLowerCase()));
+    const nextSubSpaces = [...(baseWorkspace.subSpaces ?? [])];
+
+    let addedNewSubSpaces = false;
+    for (const templateSubSpace of legalCaseTemplate.subSpaces) {
+      if (existingSubSpaceNames.has(templateSubSpace.name.toLowerCase())) continue;
+
+      const sourceToken = slugify(templateSubSpace.sourceEntity) || 'entity';
+      const initialFields: SubSpaceBuilderField[] = (templateSubSpace.fields ?? []).map((field) =>
+        createBuilderField('sf', field.label, field.type, field.required, [
+          `SubSpace:${slugify(templateSubSpace.name)}`,
+          `Field:${slugify(field.label)}`,
+        ]),
+      );
+
+      nextSubSpaces.push({
+        id: `ss-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
+        name: templateSubSpace.name,
+        sourceEntity: templateSubSpace.sourceEntity,
+        bindMode: 'relatedEntityView',
+        relationship: `${sourceToken}.${rootToken}Id = ${rootToken}.Id`,
+        displayType: templateSubSpace.displayType,
+        visibilityRule: templateSubSpace.visibilityRule,
+        showCount: true,
+        countMode: 'direct',
+        builderFields: initialFields,
+      });
+      addedNewSubSpaces = true;
+    }
+
+    upsertWorkspace({
+      ...baseWorkspace,
+      icon: '⚖️',
+      description: 'Full case lifecycle from intake through discovery, litigation, settlement, and closure.',
+      countBadgesEnabled: true,
+      countStrategy: 'perSubSpace',
+      pipelineEnabled: true,
+      builderFields: nextWorkspaceFields,
+      subSpaces: nextSubSpaces.map((ss, idx) => ({ ...ss, pipelineOrder: ss.pipelineOrder ?? idx })),
+    });
+
+    if (isNewWorkspace) {
+      setSelectedWorkspaceId(baseWorkspace.id);
+      setIsCreatingWorkspace(false);
+      setWorkspaceName(baseWorkspace.name);
+      setRootEntity(baseWorkspace.rootEntity);
+      setRoute(baseWorkspace.route);
+    }
+
+    // ── Update ShellConfig with legal terminology + lifecycle stages ──
+    const currentShell = data.shellConfig;
+    const legalShell = {
+      ...currentShell,
+      subjectSingular: 'Case',
+      subjectPlural: 'Cases',
+      workspaceLabel: 'Legal Workspace',
+      subSpaceLabel: 'Practice Area',
+      collectionLabel: 'Client',
+      collectionLabelPlural: 'Clients',
+      objectLabel: 'Case',
+      objectLabelPlural: 'Cases',
+      functionLabel: 'Practice Group',
+      functionLabelPlural: 'Practice Groups',
+      intakeFields: currentShell.intakeFields.length > 0 ? currentShell.intakeFields : [
+        { id: 'lif-client-name', label: 'Client Name', type: 'text' as const, required: true },
+        { id: 'lif-matter-type', label: 'Matter Type', type: 'select' as const, required: true, options: ['Personal Injury', 'Real Estate', 'Family Law', 'Employment', 'Commercial Litigation', 'Criminal Defense', 'Estate Planning'] },
+        { id: 'lif-case-phase', label: 'Case Phase', type: 'select' as const, required: true, options: ['Intake', 'Discovery', 'Pre-Litigation', 'Litigation', 'Settlement'] },
+        { id: 'lif-filing-date', label: 'Filing Date', type: 'date' as const, required: true },
+        { id: 'lif-case-value', label: 'Case Value ($)', type: 'number' as const, required: false },
+      ],
+      lifecycleStages: [
+        { id: 'lstage-intake', name: 'Intake', description: 'Initial client consultation and case evaluation.' },
+        { id: 'lstage-discovery', name: 'Discovery', description: 'Evidence gathering, depositions, and document exchange.' },
+        { id: 'lstage-pre-lit', name: 'Pre-Litigation', description: 'Demand letter sent; negotiation before formal filing.' },
+        { id: 'lstage-litigation', name: 'Litigation', description: 'Active court proceedings — motions, hearings, trial.' },
+        { id: 'lstage-settlement', name: 'Settlement', description: 'Settlement negotiations in progress or agreement reached.' },
+        { id: 'lstage-closed', name: 'Closed (<60 Days)', description: 'Case closed within 60 days — standard closure.' },
+        { id: 'lstage-archived', name: 'Archived (>60 Days)', description: 'Case closed after 60+ days — long-form archive.' },
+      ],
+      defaultLifecycleStageId: 'lstage-intake',
+      lifecycleTransitions: [
+        { id: 'llt-intake-discovery', fromStageId: 'lstage-intake', toStageId: 'lstage-discovery' },
+        { id: 'llt-intake-pre-lit', fromStageId: 'lstage-intake', toStageId: 'lstage-pre-lit' },
+        { id: 'llt-discovery-pre-lit', fromStageId: 'lstage-discovery', toStageId: 'lstage-pre-lit' },
+        { id: 'llt-discovery-litigation', fromStageId: 'lstage-discovery', toStageId: 'lstage-litigation' },
+        { id: 'llt-pre-lit-litigation', fromStageId: 'lstage-pre-lit', toStageId: 'lstage-litigation' },
+        { id: 'llt-pre-lit-settlement', fromStageId: 'lstage-pre-lit', toStageId: 'lstage-settlement' },
+        { id: 'llt-litigation-settlement', fromStageId: 'lstage-litigation', toStageId: 'lstage-settlement' },
+        { id: 'llt-settlement-closed', fromStageId: 'lstage-settlement', toStageId: 'lstage-closed' },
+        { id: 'llt-settlement-archived', fromStageId: 'lstage-settlement', toStageId: 'lstage-archived' },
+        { id: 'llt-litigation-closed', fromStageId: 'lstage-litigation', toStageId: 'lstage-closed' },
+        { id: 'llt-litigation-archived', fromStageId: 'lstage-litigation', toStageId: 'lstage-archived' },
+      ],
+    };
+    upsertShellConfig(legalShell);
+
+    if (addedNewSubSpaces) {
+      const wsId = baseWorkspace.id;
+      const ssMap: Record<string, string> = {};
+      for (const ss of nextSubSpaces) { ssMap[ss.name] = ss.id; }
+
+      const _lgImg = getRecordPlaceholderImage(baseWorkspace.name);
+      const _lgRec = (r: any) => addRecord({ ...r, imageUri: _lgImg });
+
+      // ── Case 1: Maria Santos — Personal Injury (Intake) ──
+      const clMaria = addClient({
+        id: '',
+        firstName: 'Maria',
+        lastName: 'Santos',
+        caseRef: 'CASE-2026-1001',
+        tags: ['MatterType:Personal Injury', 'Phase:Intake'],
+        createdAt: '03-10-2026',
+        profileData: { matterType: 'Personal Injury', filingDate: '03-10-2026', assignedAttorney: 'Jennifer Walsh' },
+      });
+      if (ssMap['Active Cases']) {
+        _lgRec({ id: '', clientId: clMaria.id, workspaceId: wsId, subSpaceId: ssMap['Active Cases'], title: 'CASE-2026-1001 — Personal Injury (Intake)', status: 'Intake', amount: 85000, tags: ['Phase:Intake', 'MatterType:Personal Injury'], data: { 'case-number': 'CASE-2026-1001', 'case-phase': 'Intake', 'matter-type': 'Personal Injury', 'client-name': 'Maria Santos', 'assigned-attorney': 'Jennifer Walsh', 'filing-date': '03-10-2026', 'case-value': 85000, 'opposing-counsel': 'TBD', 'court-jurisdiction': 'Pending' } });
+      }
+      if (ssMap['Deadlines & Court Dates']) {
+        _lgRec({ id: '', clientId: clMaria.id, workspaceId: wsId, subSpaceId: ssMap['Deadlines & Court Dates'], title: 'Initial Consultation — Maria Santos', status: 'Scheduled', tags: ['EventType:Consultation'], data: { 'event-date': '03-17-2026', 'hearing-type': 'Status Conference', 'filing-deadline': '04-10-2026', 'location-courtroom': 'Firm Office — Room 3B', 'event-notes': 'Initial client intake meeting. Gather incident report, medical records, and witness info.' } });
+      }
+
+      // ── Case 2: James Holden — Discovery Phase ──
+      const clJames = addClient({
+        id: '',
+        firstName: 'James',
+        lastName: 'Holden',
+        caseRef: 'CASE-2026-1002',
+        tags: ['MatterType:Real Estate', 'Phase:Discovery'],
+        createdAt: '01-15-2026',
+        profileData: { matterType: 'Real Estate', filingDate: '01-15-2026', assignedAttorney: 'Marcus Reid' },
+      });
+      if (ssMap['Active Cases']) {
+        _lgRec({ id: '', clientId: clJames.id, workspaceId: wsId, subSpaceId: ssMap['Active Cases'], title: 'CASE-2026-1002 — Real Estate Dispute (Discovery)', status: 'Discovery', amount: 220000, tags: ['Phase:Discovery', 'MatterType:Real Estate'], data: { 'case-number': 'CASE-2026-1002', 'case-phase': 'Discovery', 'matter-type': 'Real Estate', 'client-name': 'James Holden', 'assigned-attorney': 'Marcus Reid', 'filing-date': '01-15-2026', 'case-value': 220000, 'opposing-counsel': 'David Nance, Esq.', 'court-jurisdiction': 'District Court — Central Division' } });
+      }
+      if (ssMap['Deadlines & Court Dates']) {
+        _lgRec({ id: '', clientId: clJames.id, workspaceId: wsId, subSpaceId: ssMap['Deadlines & Court Dates'], title: 'Discovery Deadline — Holden v. Meridian Properties', status: 'Upcoming', tags: ['EventType:Discovery'], data: { 'event-date': '04-01-2026', 'hearing-type': 'Discovery Deadline', 'filing-deadline': '04-01-2026', 'location-courtroom': 'N/A', 'event-notes': 'All interrogatories, document requests, and deposition transcripts due.' } });
+      }
+      if (ssMap['Documents & Filings']) {
+        _lgRec({ id: '', clientId: clJames.id, workspaceId: wsId, subSpaceId: ssMap['Documents & Filings'], title: 'Motion to Compel Discovery — Holden', status: 'Filed', tags: ['DocType:Motion'], data: { 'document-title': 'Motion to Compel Discovery Production', 'document-type': 'Motion', 'filed-date': '02-20-2026', 'filed-by': 'Marcus Reid', 'document-notes': 'Opposing counsel has failed to produce 3 of 5 requested document sets. Motion filed to compel production within 10 days.' } });
+      }
+
+      // ── Case 3: Priya Rodriguez — Litigation ──
+      const clPriya = addClient({
+        id: '',
+        firstName: 'Priya',
+        lastName: 'Rodriguez',
+        caseRef: 'CASE-2026-1006',
+        tags: ['MatterType:Real Estate', 'Phase:Litigation'],
+        createdAt: '02-02-2026',
+        profileData: { matterType: 'Real Estate', filingDate: '02-02-2026', assignedAttorney: 'Carlos Mendoza' },
+      });
+      if (ssMap['Active Cases']) {
+        _lgRec({ id: '', clientId: clPriya.id, workspaceId: wsId, subSpaceId: ssMap['Active Cases'], title: 'CASE-2026-1006 — Real Estate (Litigation)', status: 'Litigation', amount: 51000, tags: ['Phase:Litigation', 'MatterType:Real Estate'], data: { 'case-number': 'CASE-2026-1006', 'case-phase': 'Litigation', 'matter-type': 'Real Estate', 'client-name': 'Priya Rodriguez', 'assigned-attorney': 'Carlos Mendoza', 'filing-date': '02-02-2026', 'case-value': 51000, 'opposing-counsel': 'TBD', 'court-jurisdiction': 'Superior Court — Division 4' } });
+      }
+      if (ssMap['Deadlines & Court Dates']) {
+        _lgRec({ id: '', clientId: clPriya.id, workspaceId: wsId, subSpaceId: ssMap['Deadlines & Court Dates'], title: 'Summary Judgment Hearing — Rodriguez', status: 'Scheduled', tags: ['EventType:Hearing'], data: { 'event-date': '04-15-2026', 'hearing-type': 'Motion Hearing', 'filing-deadline': '04-08-2026', 'location-courtroom': 'Room 4B, Superior Court', 'event-notes': 'Plaintiff\u2019s motion for summary judgment. Response brief due 04-08-2026.' } });
+      }
+      if (ssMap['Billing & Time']) {
+        _lgRec({ id: '', clientId: clPriya.id, workspaceId: wsId, subSpaceId: ssMap['Billing & Time'], title: 'Feb–Mar Litigation Work — Rodriguez', status: 'Invoiced', amount: 7200, tags: ['BillingType:Hourly', 'Attorney:CMendoza'], data: { 'billing-date': '03-31-2026', 'billing-type': 'Hourly', 'hours-billed': 18, 'hourly-rate': 400, 'total-amount': 7200, 'attorney': 'Carlos Mendoza' } });
+      }
+
+      // ── Case 4: Thomas Kim — Settlement ──
+      const clThomas = addClient({
+        id: '',
+        firstName: 'Thomas',
+        lastName: 'Kim',
+        caseRef: 'CASE-2026-1004',
+        tags: ['MatterType:Employment', 'Phase:Settlement'],
+        createdAt: '12-05-2025',
+        profileData: { matterType: 'Employment', filingDate: '12-05-2025', assignedAttorney: 'Jennifer Walsh' },
+      });
+      if (ssMap['Active Cases']) {
+        _lgRec({ id: '', clientId: clThomas.id, workspaceId: wsId, subSpaceId: ssMap['Active Cases'], title: 'CASE-2026-1004 — Employment Law (Settlement)', status: 'Settlement', amount: 95000, tags: ['Phase:Settlement', 'MatterType:Employment'], data: { 'case-number': 'CASE-2026-1004', 'case-phase': 'Settlement', 'matter-type': 'Employment', 'client-name': 'Thomas Kim', 'assigned-attorney': 'Jennifer Walsh', 'filing-date': '12-05-2025', 'case-value': 95000, 'opposing-counsel': 'Harris & Cole LLP', 'court-jurisdiction': 'Federal District Court — Northern Division' } });
+      }
+      if (ssMap['Billing & Time']) {
+        _lgRec({ id: '', clientId: clThomas.id, workspaceId: wsId, subSpaceId: ssMap['Billing & Time'], title: 'Q1 Settlement Negotiation Work — Kim', status: 'Invoiced', amount: 12500, tags: ['BillingType:Contingency'], data: { 'billing-date': '03-31-2026', 'billing-type': 'Contingency', 'hours-billed': 35, 'hourly-rate': 0, 'total-amount': 12500, 'attorney': 'Jennifer Walsh' } });
+      }
+
+      // ── Case 5: Natalie Martinez — Closed <60 Days ──
+      const clNatalie = addClient({
+        id: '',
+        firstName: 'Natalie',
+        lastName: 'Martinez',
+        caseRef: 'CASE-2026-1003',
+        tags: ['MatterType:Family Law', 'Phase:Closed'],
+        createdAt: '02-14-2026',
+        profileData: { matterType: 'Family Law', filingDate: '02-14-2026', assignedAttorney: 'Marcus Reid' },
+      });
+      if (ssMap['Closed Cases']) {
+        _lgRec({ id: '', clientId: clNatalie.id, workspaceId: wsId, subSpaceId: ssMap['Closed Cases'], title: 'CASE-2026-1003 — Family Law [CLOSED <60 Days]', status: 'Closed', amount: 18000, tags: ['ClosureType:Closed', 'Phase:Closed', 'Resolution:Settled'], data: { 'case-number': 'CASE-2026-1003', 'closure-date': '03-28-2026', 'days-to-closure': 42, 'closure-type': '<60 Days — Closed', 'final-resolution': 'Settled', 'final-award-amount': 18000, 'closing-notes': 'Uncontested divorce. Property settlement reached. Closed in 42 days from filing.' } });
+      }
+
+      // ── Case 6: Elena Voss — Archived >60 Days ──
+      const clElena = addClient({
+        id: '',
+        firstName: 'Elena',
+        lastName: 'Voss',
+        caseRef: 'CASE-2025-0882',
+        tags: ['MatterType:Commercial Litigation', 'Phase:Archived'],
+        createdAt: '09-01-2025',
+        profileData: { matterType: 'Commercial Litigation', filingDate: '09-01-2025', assignedAttorney: 'Carlos Mendoza' },
+      });
+      if (ssMap['Closed Cases']) {
+        _lgRec({ id: '', clientId: clElena.id, workspaceId: wsId, subSpaceId: ssMap['Closed Cases'], title: 'CASE-2025-0882 — Commercial Litigation [ARCHIVED >60 Days]', status: 'Archived', amount: 340000, tags: ['ClosureType:Archived', 'Phase:Archived', 'Resolution:Won'], data: { 'case-number': 'CASE-2025-0882', 'closure-date': '01-15-2026', 'days-to-closure': 136, 'closure-type': '>60 Days — Archived', 'final-resolution': 'Won', 'final-award-amount': 340000, 'closing-notes': 'Jury verdict in favor of client. Full damages awarded. Extended litigation — archived per 60-day policy.' } });
+      }
+
+      // ── Legal Signal Studio Flows ──
+      const flowBase = { triggerType: 'event' as const, runOnExisting: true, status: 'published' as const, totalRuns: 0, failures7d: 0, avgTimeMs: 0 };
+      if (ssMap['Active Cases']) {
+        upsertFlow({ ...flowBase, id: '', name: 'Case Phase Advancement Alert', signal: 'Case Phase field updated on an Active Case record', workspaceId: wsId, subSpaceId: ssMap['Active Cases'], rules: ['case-phase is set', 'case-phase changed'], action: 'Notify assigned attorney, tag record with Phase:[new phase], update lifecycle stage accordingly', targetTags: ['Phase:Changed', 'Attorney:Alert'] });
+        upsertFlow({ ...flowBase, id: '', name: 'High-Value Case Flag', signal: 'Active case value exceeds $100,000', workspaceId: wsId, subSpaceId: ssMap['Active Cases'], rules: ['case-value > 100000'], action: 'Tag as Priority:High, alert managing partner, and require senior attorney sign-off', targetTags: ['Priority:High', 'HighValue'] });
+      }
+      if (ssMap['Deadlines & Court Dates']) {
+        upsertFlow({ ...flowBase, id: '', name: '14-Day Deadline Warning', signal: 'A court date or filing deadline is within 14 days', workspaceId: wsId, subSpaceId: ssMap['Deadlines & Court Dates'], rules: ['event-date within 14 days', 'status != Completed'], action: 'Send reminder to assigned attorney and paralegal; tag as Deadline:Urgent', runOnExisting: false, targetTags: ['Deadline:Urgent', 'Priority:High'] });
+      }
+      if (ssMap['Closed Cases']) {
+        upsertFlow({ ...flowBase, id: '', name: 'Auto-Classify Closure Type', signal: 'A case is moved to Closed Cases subspace', workspaceId: wsId, subSpaceId: ssMap['Closed Cases'], rules: ['closure-date is set', 'days-to-closure is set'], action: 'If days-to-closure < 60 → set Closure Type = "<60 Days — Closed". If days-to-closure ≥ 60 → set Closure Type = ">60 Days — Archived". Tag accordingly.', runOnExisting: false, targetTags: ['ClosureType:Auto'] });
+        upsertFlow({ ...flowBase, id: '', name: 'Settlement Override — Force Settlement Phase', signal: 'Case in Litigation receives a settlement offer (amount field updated)', workspaceId: wsId, subSpaceId: ssMap['Active Cases'] ?? ssMap['Closed Cases'], rules: ['case-phase = Litigation', 'settlement-offer-amount > 0'], action: 'Advance case-phase to Settlement, alert assigned attorney and client contact', runOnExisting: false, targetTags: ['Phase:Settlement', 'Alert:SettlementOffer'] });
+      }
+
+      // ── Legal business architecture ──
+      upsertBusinessFunction({
+        id: 'bfn-legal-practice',
+        name: 'Legal Practice',
+        icon: '⚖️',
+        color: '#C9A84C',
+        order: 0,
+        description: 'Full case lifecycle management — intake, discovery, litigation, settlement, closure, and archive',
+        objects: [
+          {
+            id: 'bobj-legal-cases',
+            functionId: 'bfn-legal-practice',
+            name: 'Case',
+            namePlural: 'Cases',
+            icon: '📋',
+            description: 'Legal cases tracked from initial intake through closure or archive. Each case progresses through: Intake → Discovery → Pre-Litigation → Litigation → Settlement → Closed/Archived',
+            workspaceIds: [baseWorkspace.id],
+          },
+        ],
+      });
+    }
+
+    setNotice('Legal Case Management template applied: Active Cases (5 phases), Deadlines & Court Dates, Documents & Filings, Billing & Time, and Closed Cases lanes are ready. 4 Signal Studio flows created. App terminology updated to legal vocabulary.' + (addedNewSubSpaces ? ' Demo data seeded with 6 sample cases across all phases and closure types.' : ''));
+  };
+
   /* ── Pipeline mode toggle ── */
   const togglePipelineEnabled = () => {
     if (!workspace) return;
@@ -1374,6 +1739,7 @@ export function useAdminWorkspace() {
     beginCreateWorkspace,
     applyDscsaSerializationTemplate,
     applyWrvasTemplate,
+    applyLegalCaseTemplate,
     removeWorkspace,
     workspaceName,
     setWorkspaceName,

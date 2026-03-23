@@ -1487,217 +1487,56 @@ export function buildFulfillmentPayload(): ScenarioApplyPayload {
   };
 }
 
-// ─── Universal Enterprise Suite (8 Business Workspaces) ──────────────
+// ─── Universal Tenant Scaffold ────────────────────────────────────────
+// Not a template — this is the standard org layer provisioned with every
+// tenant. Operations holds the active vertical's workspaces. All other
+// departments are empty containers that accept workspaces over time.
 
-export function buildUniversalPayload(): ScenarioApplyPayload {
-  const wsOps = mkWorkspace('ws-univ-operations', 'Operations', 'Process', '⚙️', [
-    mkSubSpace('ss-ops-processes', 'Processes & Approvals', 'Process', 'board', [
-      mkField('f-ops-name',     'Process Name', 'text',   true),
-      mkField('f-ops-owner',    'Owner',        'text',   true),
-      mkField('f-ops-status',   'Status',       'select', true),
-      mkField('f-ops-priority', 'Priority',     'select', false),
-    ]),
-    mkSubSpace('ss-ops-vendors', 'Vendor Management', 'Vendor Contract', 'grid', [
-      mkField('f-vnd-name',     'Vendor Name',   'text',   true),
-      mkField('f-vnd-service',  'Service Type',  'text',   true),
-      mkField('f-vnd-contract', 'Contract End',  'date',   false),
-      mkField('f-vnd-amount',   'Annual Value',  'number', false),
-    ]),
-    mkSubSpace('ss-ops-facilities', 'Facilities', 'Facility', 'grid', [
-      mkField('f-fac-name',     'Location Name', 'text',   true),
-      mkField('f-fac-type',     'Type',          'select', false),
-      mkField('f-fac-capacity', 'Capacity',      'number', false),
-    ]),
-  ]);
+export function buildTenantScaffold(verticalPayload?: ScenarioApplyPayload): ScenarioApplyPayload {
+  // Operations: subspaces are the active vertical's workspaces (listed by name).
+  // When no vertical is loaded yet, Operations is an empty ready container.
+  const opsSubSpaces = (verticalPayload?.workspaces ?? []).map(ws =>
+    mkSubSpace(`ss-ops-ws-${ws.id}`, ws.name, ws.rootEntity, 'board',
+      ws.builderFields?.length ? ws.builderFields : [mkField(`f-ops-ws-${ws.id}`, 'Name', 'text', true)])
+  );
 
-  const wsFinance = mkWorkspace('ws-univ-finance', 'Finance', 'Transaction', '💰', [
-    mkSubSpace('ss-fin-ledger', 'Ledger & Transactions', 'Transaction', 'grid', [
-      mkField('f-fin-date',     'Transaction Date', 'date',   true),
-      mkField('f-fin-desc',     'Description',      'text',   true),
-      mkField('f-fin-amount',   'Amount',           'number', true),
-      mkField('f-fin-category', 'Category',         'select', true),
-    ]),
-    mkSubSpace('ss-fin-invoices', 'Invoices', 'Invoice', 'board', [
-      mkField('f-finv-no',      'Invoice Number',  'text',   true),
-      mkField('f-finv-vendor',  'Vendor/Client',   'text',   true),
-      mkField('f-finv-amount',  'Amount',          'number', true),
-      mkField('f-finv-due',     'Due Date',        'date',   true),
-      mkField('f-finv-status',  'Status',          'select', true),
-    ]),
-    mkSubSpace('ss-fin-budgets', 'Budgets', 'Budget', 'summary', [
-      mkField('f-bud-dept',      'Department', 'select', true),
-      mkField('f-bud-period',    'Period',     'text',   true),
-      mkField('f-bud-allocated', 'Allocated',  'number', true),
-      mkField('f-bud-spent',     'Spent',      'number', false),
-    ]),
-  ]);
+  const wsOps            = mkWorkspace('ws-univ-operations',    'Operations',        'Process',    '⚙️', opsSubSpaces);
+  const wsFinance        = mkWorkspace('ws-univ-finance',       'Finance',           'Record',     '💰', []);
+  const wsHR             = mkWorkspace('ws-univ-hr',            'Human Resources',   'Record',     '👥', []);
+  const wsMarketing      = mkWorkspace('ws-univ-marketing',     'Marketing',         'Record',     '📣', []);
+  const wsSales          = mkWorkspace('ws-univ-sales',         'Sales',             'Record',     '📈', []);
+  const wsLegal          = mkWorkspace('ws-univ-legal',         'Legal',             'Record',     '⚖️', []);
+  const wsIT             = mkWorkspace('ws-univ-it',            'IT',                'Record',     '💻', []);
+  const wsSustainability = mkWorkspace('ws-univ-sustainability','Sustainability',     'Record',     '🌱', []);
 
-  const wsHR = mkWorkspace('ws-univ-hr', 'Human Resources', 'Employee', '👥', [
-    mkSubSpace('ss-hr-employees', 'Employee Directory', 'Employee', 'grid', [
-      mkField('f-emp-name',   'Full Name',  'text',   true),
-      mkField('f-emp-dept',   'Department', 'select', true),
-      mkField('f-emp-title',  'Title',      'text',   true),
-      mkField('f-emp-start',  'Start Date', 'date',   false),
-      mkField('f-emp-status', 'Status',     'select', true),
-    ]),
-    mkSubSpace('ss-hr-offboarding', 'Offboarding Cases', 'Offboarding Case', 'board', [
-      mkField('f-hroff-emp',       'Employee',            'text',     true),
-      mkField('f-hroff-last',      'Last Day',            'date',     true),
-      mkField('f-hroff-reason',    'Reason',              'select',   false),
-      mkField('f-hroff-checklist', 'Checklist Complete',  'checkbox', false),
-    ]),
-    mkSubSpace('ss-hr-benefits', 'Benefits & PTO', 'Benefits Record', 'grid', [
-      mkField('f-ben-emp',     'Employee',        'text',   true),
-      mkField('f-ben-pto-bal', 'PTO Balance (days)', 'number', false),
-      mkField('f-ben-plan',    'Benefits Plan',   'select', false),
-    ]),
-  ]);
-
-  const wsMarketing = mkWorkspace('ws-univ-marketing', 'Marketing', 'Campaign', '📣', [
-    mkSubSpace('ss-mkt-campaigns', 'Campaigns', 'Campaign', 'board', [
-      mkField('f-cmp-name',    'Campaign Name', 'text',   true),
-      mkField('f-cmp-channel', 'Channel',       'select', true),
-      mkField('f-cmp-budget',  'Budget',        'number', false),
-      mkField('f-cmp-start',   'Start Date',    'date',   false),
-      mkField('f-cmp-status',  'Status',        'select', true),
-    ]),
-    mkSubSpace('ss-mkt-assets', 'Brand Assets', 'Asset', 'grid', [
-      mkField('f-ast-name',     'Asset Name', 'text',     true),
-      mkField('f-ast-type',     'Type',       'select',   true),
-      mkField('f-ast-approved', 'Approved',   'checkbox', false),
-    ]),
-    mkSubSpace('ss-mkt-analytics', 'Campaign Analytics', 'Analytics Record', 'summary', [
-      mkField('f-anl-campaign',     'Campaign',            'text',   true),
-      mkField('f-anl-impressions',  'Impressions',         'number', false),
-      mkField('f-anl-clicks',       'Clicks',              'number', false),
-      mkField('f-anl-conversions',  'Conversions',         'number', false),
-      mkField('f-anl-cpa',          'Cost Per Acquisition','number', false),
-    ]),
-  ]);
-
-  const wsSales = mkWorkspace('ws-univ-sales', 'Sales', 'Account', '📈', [
-    mkSubSpace('ss-sal-pipeline', 'Pipeline', 'Opportunity', 'board', [
-      mkField('f-sal-co',    'Company',       'text',   true),
-      mkField('f-sal-val',   'Deal Value',    'number', true),
-      mkField('f-sal-stage', 'Stage',         'select', true),
-      mkField('f-sal-owner', 'Sales Rep',     'text',   false),
-      mkField('f-sal-close', 'Expected Close','date',   false),
-    ]),
-    mkSubSpace('ss-sal-accounts', 'Accounts', 'Account', 'grid', [
-      mkField('f-acct-name',     'Account Name',             'text',   true),
-      mkField('f-acct-industry', 'Industry',                 'select', false),
-      mkField('f-acct-arr',      'ARR',                      'number', false),
-      mkField('f-acct-csm',      'Customer Success Manager', 'text',   false),
-    ]),
-    mkSubSpace('ss-sal-activities', 'Activities', 'Activity', 'timeline', [
-      mkField('f-sact-type',    'Type',    'select',   true),
-      mkField('f-sact-subject', 'Subject', 'text',     true),
-      mkField('f-sact-date',    'Date',    'datetime', true),
-      mkField('f-sact-account', 'Account', 'text',     false),
-    ]),
-  ]);
-
-  const wsLegal = mkWorkspace('ws-univ-legal', 'Legal', 'Contract', '⚖️', [
-    mkSubSpace('ss-leg-contracts', 'Contracts', 'Contract', 'grid', [
-      mkField('f-con-name',   'Contract Name',   'text',   true),
-      mkField('f-con-party',  'Counterparty',    'text',   true),
-      mkField('f-con-value',  'Contract Value',  'number', false),
-      mkField('f-con-exp',    'Expiration Date', 'date',   false),
-      mkField('f-con-status', 'Status',          'select', true),
-    ]),
-    mkSubSpace('ss-leg-compliance', 'Compliance', 'Compliance Item', 'board', [
-      mkField('f-cmp2-regulation', 'Regulation', 'text',   true),
-      mkField('f-cmp2-owner',      'Owner',      'text',   true),
-      mkField('f-cmp2-due',        'Due Date',   'date',   false),
-      mkField('f-cmp2-status',     'Status',     'select', true),
-    ]),
-    mkSubSpace('ss-leg-filings', 'Regulatory Filings', 'Filing', 'timeline', [
-      mkField('f-fil-name',   'Filing Name', 'text', true),
-      mkField('f-fil-agency', 'Agency',      'text', true),
-      mkField('f-fil-due',    'Due Date',    'date', true),
-      mkField('f-fil-filed',  'Filed Date',  'date', false),
-    ]),
-  ]);
-
-  const wsTechnology = mkWorkspace('ws-univ-technology', 'Technology', 'Project', '💻', [
-    mkSubSpace('ss-tec-projects', 'Projects', 'Project', 'board', [
-      mkField('f-prj-name',     'Project Name', 'text',   true),
-      mkField('f-prj-lead',     'Project Lead', 'text',   true),
-      mkField('f-prj-status',   'Status',       'select', true),
-      mkField('f-prj-deadline', 'Deadline',     'date',   false),
-      mkField('f-prj-priority', 'Priority',     'select', false),
-    ]),
-    mkSubSpace('ss-tec-assets', 'IT Assets', 'Asset', 'grid', [
-      mkField('f-itast-name',     'Asset Name',    'text',   true),
-      mkField('f-itast-type',     'Type',          'select', true),
-      mkField('f-itast-assignee', 'Assigned To',   'text',   false),
-      mkField('f-itast-serial',   'Serial Number', 'text',   false),
-      mkField('f-itast-warranty', 'Warranty Expiry','date',  false),
-    ]),
-    mkSubSpace('ss-tec-incidents', 'Incident Reports', 'Incident', 'board', [
-      mkField('f-inc-title',    'Title',        'text',   true),
-      mkField('f-inc-severity', 'Severity',     'select', true),
-      mkField('f-inc-reported', 'Reported By',  'text',   true),
-      mkField('f-inc-status',   'Status',       'select', true),
-    ]),
-  ]);
-
-  const wsSustainability = mkWorkspace('ws-univ-sustainability', 'Sustainability', 'Initiative', '🌱', [
-    mkSubSpace('ss-sus-initiatives', 'ESG Initiatives', 'Initiative', 'board', [
-      mkField('f-ini-name',     'Initiative Name', 'text',   true),
-      mkField('f-ini-category', 'Category',        'select', true),
-      mkField('f-ini-owner',    'Owner',            'text',   true),
-      mkField('f-ini-target',   'Target Date',      'date',   false),
-      mkField('f-ini-status',   'Status',           'select', true),
-    ]),
-    mkSubSpace('ss-sus-metrics', 'Carbon & Energy Metrics', 'Metric', 'grid', [
-      mkField('f-met-period', 'Period',       'text',   true),
-      mkField('f-met-scope',  'Scope',        'select', true),
-      mkField('f-met-co2',    'CO2e (tons)',  'number', false),
-      mkField('f-met-energy', 'Energy (MWh)', 'number', false),
-    ]),
-    mkSubSpace('ss-sus-reports', 'ESG Reports', 'Report', 'timeline', [
-      mkField('f-rep-title',     'Report Title',      'text', true),
-      mkField('f-rep-period',    'Reporting Period',  'text', true),
-      mkField('f-rep-published', 'Published Date',    'date', false),
-      mkField('f-rep-url',       'Report URL',        'text', false),
-    ]),
-  ]);
-
+  // Standard cross-department signal flows — wired once the departments are
+  // built out; all triggered via the Operations gateway workspace.
   const flows = [
-    mkFlow('flow-univ-deal-won',        'Deal Won → Finance & CS',          'Sales opportunity stage changed to Closed Won',                    ['stage = Closed Won'],                              'Create invoice in Finance, notify CS to begin onboarding, track commission',           'ws-univ-sales',           'ss-sal-pipeline',    ['Cross:Sales→Finance', 'Type:DealWon']),
-    mkFlow('flow-univ-new-employee',    'New Hire → IT + HR',               'New employee record added to HR Directory with Active status',      ['status = Active', 'start_date is set'],            'Create IT asset request, provision accounts, send welcome email sequence',             'ws-univ-hr',              'ss-hr-employees',    ['Cross:HR→IT', 'Type:Onboarding']),
-    mkFlow('flow-univ-contract-expiry', 'Contract Expiry Warning',          'Legal contract expiring within 30 days',                           ['expiration_date_days <= 30', 'status = Active'],   'Notify legal team and contract owner with renewal task and draft renewal',             'ws-univ-legal',           'ss-leg-contracts',   ['Type:Legal', 'Status:Expiring']),
-    mkFlow('flow-univ-invoice-overdue', 'Overdue Invoice Escalation',       'Invoice past due date with no payment recorded',                   ['status = Sent', 'due_days_past > 0'],              'Escalate to Finance Director and send auto-reminder to customer',                     'ws-univ-finance',         'ss-fin-invoices',    ['Type:Finance', 'Status:Overdue']),
-    mkFlow('flow-univ-incident-p1',     'P1 Incident → War Room',           'Technology incident logged with P1/Critical severity',             ['severity = Critical'],                             'Page on-call lead, create war room channel, auto-update status page',                 'ws-univ-technology',      'ss-tec-incidents',   ['Priority:Critical', 'Type:Incident']),
-    mkFlow('flow-univ-esg-deadline',    'ESG Report Deadline',              'Sustainability report due within 14 days, not yet published',      ['due_date_days <= 14', 'published_date is empty'],  'Alert sustainability team and assign report completion task',                          'ws-univ-sustainability',  'ss-sus-reports',     ['Type:ESG', 'Status:Due']),
+    mkFlow('flow-univ-deal-won',        'Deal Won → Finance & CS',     'Sales opportunity stage closed won',               ['stage = Closed Won'],                          'Create invoice in Finance, notify CS to begin onboarding',     'ws-univ-operations', 'ss-ops-ws-ws-univ-sales',         ['Cross:Sales→Finance']),
+    mkFlow('flow-univ-new-employee',    'New Hire → IT + HR',          'New employee record added with Active status',     ['status = Active', 'start_date is set'],        'Create IT asset request, provision accounts',                  'ws-univ-operations', 'ss-ops-ws-ws-univ-hr',            ['Cross:HR→IT']),
+    mkFlow('flow-univ-contract-expiry', 'Contract Expiry Warning',     'Legal contract expiring within 30 days',          ['expiration_date_days <= 30'],                  'Notify legal team with renewal task',                          'ws-univ-operations', 'ss-ops-ws-ws-univ-legal',         ['Type:Legal']),
+    mkFlow('flow-univ-invoice-overdue', 'Overdue Invoice Escalation',  'Invoice past due with no payment recorded',       ['status = Sent', 'due_days_past > 0'],          'Escalate to Finance Director, send auto-reminder',             'ws-univ-operations', 'ss-ops-ws-ws-univ-finance',       ['Type:Finance']),
+    mkFlow('flow-univ-incident-p1',     'P1 Incident → War Room',      'IT incident logged with Critical severity',       ['severity = Critical'],                         'Page on-call lead, create war room, update status page',       'ws-univ-operations', 'ss-ops-ws-ws-univ-it',            ['Priority:Critical']),
+    mkFlow('flow-univ-esg-deadline',    'ESG Report Deadline Alert',   'Sustainability report due within 14 days',        ['due_date_days <= 14'],                         'Alert sustainability team, assign completion task',            'ws-univ-operations', 'ss-ops-ws-ws-univ-sustainability', ['Type:ESG']),
   ];
 
-  const integrations = [
-    mkIntegration('int-univ-ds',   'tpl-docusign',    fmtDate(-60)),
-    mkIntegration('int-univ-qb',   'tpl-quickbooks',  fmtDate(-45)),
-    mkIntegration('int-univ-http', 'tpl-custom-http', fmtDate(-30)),
-  ];
-
-  const records: RuntimeRecord[] = [
-    mkRecord('rec-univ-ops-0', 'client-univ-0', 'ws-univ-operations',    'ss-ops-processes',     'Q2 Vendor Review Process',                'In Progress', undefined,  fmtDate(-5),   ['Dept:Operations'],     { 'Process Name': 'Q2 Vendor Review',              'Owner': 'Ops Director',      'Status': 'In Progress', 'Priority': 'Medium' }),
-    mkRecord('rec-univ-fin-0', 'client-univ-1', 'ws-univ-finance',       'ss-fin-invoices',      'INV-2026-001 — Acme Corp $12,500',        'Sent',        12500,       fmtDate(-10),  ['Dept:Finance'],        { 'Invoice Number': 'INV-2026-001',                'Vendor/Client': 'Acme Corp', 'Amount': 12500, 'Due Date': fmtDate(20), 'Status': 'Sent' }),
-    mkRecord('rec-univ-hr-0',  'client-univ-2', 'ws-univ-hr',            'ss-hr-employees',      'Jordan Kim — Technology',                 'Active',      undefined,  fmtDate(-90),  ['Dept:HR'],             { 'Full Name': 'Jordan Kim',                       'Department': 'Technology',   'Title': 'Senior Engineer', 'Start Date': fmtDate(-90), 'Status': 'Active' }),
-    mkRecord('rec-univ-mkt-0', 'client-univ-3', 'ws-univ-marketing',     'ss-mkt-campaigns',     'Q2 Product Launch Campaign',              'Active',      25000,       fmtDate(-14),  ['Dept:Marketing'],      { 'Campaign Name': 'Q2 Product Launch',            'Channel': 'Paid Social + Email', 'Budget': 25000, 'Start Date': fmtDate(-14), 'Status': 'Active' }),
-    mkRecord('rec-univ-sal-0', 'client-univ-4', 'ws-univ-sales',         'ss-sal-pipeline',      'TechStart Inc — $85,000 Deal',            'Proposal',    85000,       fmtDate(15),   ['Dept:Sales'],          { 'Company': 'TechStart Inc',                      'Deal Value': 85000, 'Stage': 'Proposal', 'Sales Rep': 'Marcus Lee', 'Expected Close': fmtDate(30) }),
-    mkRecord('rec-univ-leg-0', 'client-univ-5', 'ws-univ-legal',         'ss-leg-contracts',     'MSA — Redwood Solutions', 'Active',  120000, fmtDate(-180), ['Dept:Legal'], { 'Contract Name': 'Master Services Agreement', 'Counterparty': 'Redwood Solutions', 'Contract Value': 120000, 'Expiration Date': fmtDate(185), 'Status': 'Active' }),
-    mkRecord('rec-univ-tec-0', 'client-univ-6', 'ws-univ-technology',    'ss-tec-projects',      'Platform v2.0 Migration',                 'In Progress', undefined,  fmtDate(-30),  ['Dept:Technology'],     { 'Project Name': 'Platform v2.0 Migration',       'Project Lead': 'CTO', 'Status': 'In Progress', 'Deadline': fmtDate(60), 'Priority': 'High' }),
-    mkRecord('rec-univ-sus-0', 'client-univ-7', 'ws-univ-sustainability', 'ss-sus-initiatives',  'Carbon Neutral by 2030',                  'Active',      undefined,  fmtDate(-365), ['Dept:Sustainability'], { 'Initiative Name': 'Carbon Neutral by 2030',     'Category': 'Environmental', 'Owner': 'Sustainability Director', 'Target Date': fmtDate(1400), 'Status': 'Active' }),
-  ];
-
-  const deptClientNames = ['Operations Corp', 'Finance Group', 'People First HR', 'Brand Labs', 'Revenue Team', 'Legal Partners', 'Tech Division', 'Green Initiatives'];
-  const clients = deptClientNames.map((name, i) => mkClient(`client-univ-${i}`, name, `UNIV-${1000 + i}`, ['Universal:Enterprise']));
+  const clients = ['Operations Corp', 'Finance Group', 'People First HR', 'Brand Labs', 'Revenue Team', 'Legal Partners', 'Tech Division', 'Green Initiatives']
+    .map((name, i) => mkClient(`client-univ-${i}`, name, `UNIV-${1000 + i}`, ['Universal:Enterprise']));
 
   return {
-    shellConfig: mkShellConfig('Record', 'Records', 'Enterprise Workspace', 'Business Function', ['Draft', 'In Review', 'Active', 'Pending', 'Completed', 'Archived']),
-    workspaces: [wsOps, wsFinance, wsHR, wsMarketing, wsSales, wsLegal, wsTechnology, wsSustainability],
-    flows, integrations, records, clients,
+    shellConfig: mkShellConfig('Record', 'Records', 'Enterprise Workspace', 'Department',
+      ['Draft', 'Active', 'In Review', 'Completed', 'Archived']),
+    workspaces: [wsOps, wsFinance, wsHR, wsMarketing, wsSales, wsLegal, wsIT, wsSustainability],
+    flows,
+    integrations: [],
+    records: [],
+    clients,
   };
+}
+
+/** @deprecated Use buildTenantScaffold() */
+export function buildUniversalPayload(): ScenarioApplyPayload {
+  return buildTenantScaffold();
 }
 
 // ─── Kitting (BOM-Driven Assembly) Payload ───────────────────────────

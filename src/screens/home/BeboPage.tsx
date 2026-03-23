@@ -27,8 +27,9 @@ import {
   DemoVertical,
   ScenarioApplyPayload,
   VERTICAL_META,
-  buildUniversalPayload,
+  buildTenantScaffold,
   generateBeboResponse,
+  getPayloadForVertical,
   getScenarioIntroResponse,
 } from '../../ai/beboEngine';
 import { GuidedPageProps } from './types';
@@ -502,14 +503,20 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     }, delay);
   }, [isThinking, vertical]);
 
-  // ── Universal Enterprise Suite ──────────────────────────────────────
+  // ── Universal Tenant Org Layer ─────────────────────────────────────
+  // Universal is NOT a template — it is the standard org scaffold that comes
+  // with every tenant. Operations holds the active vertical's workspaces.
+  // All other departments are empty containers ready to accept workspaces.
   const handleUniversalSuite = useCallback(() => {
-    const payload = buildUniversalPayload();
+    const verticalPayload = getPayloadForVertical(vertical);
+    const scaffold = buildTenantScaffold(verticalPayload);
+    const { label, icon } = VERTICAL_META[vertical];
+
     const wsCard: BeboCardWorkspaceProposal = {
       type: 'workspace_proposal',
       id: `card-universal-${Date.now()}`,
-      industry: 'Universal Enterprise Suite',
-      workspaces: payload.workspaces.map(ws => ({
+      industry: 'Tenant Org Layer — Universal',
+      workspaces: scaffold.workspaces.map(ws => ({
         name: ws.name,
         icon: ws.icon ?? '🗂️',
         rootEntity: ws.rootEntity,
@@ -520,21 +527,27 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
           fieldCount: ss.builderFields?.length ?? 0,
         })),
       })),
-      personas: ['Department Head', 'Team Member', 'Admin', 'Executive', 'Cross-Dept Collaborator'],
-      lifecycleStages: ['Draft', 'In Review', 'Active', 'Pending', 'Completed', 'Archived'],
-      flows: payload.flows.map(f => ({ name: f.name, trigger: f.signal, action: f.action })),
-      applyPayload: payload,
+      personas: ['Department Head', 'Team Member', 'Executive', 'Cross-Dept Collaborator'],
+      lifecycleStages: ['Draft', 'Active', 'In Review', 'Completed', 'Archived'],
+      flows: scaffold.flows.map(f => ({ name: f.name, trigger: f.signal, action: f.action })),
+      applyPayload: scaffold,
     };
+
     setMessages(prev => [...prev, {
       id: uid(),
       role: 'assistant',
-      text: `🌐 **Universal Enterprise Suite** — your entire organization in one click.\n\nThis template provisions **8 connected business workspaces** across every department, wired together with **6 cross-department signal flows** so nothing falls through the cracks.\n\n**Departments included:** ⚙️ Operations · 💰 Finance · 👥 HR · 📣 Marketing · 📈 Sales · ⚖️ Legal · 💻 Technology · 🌱 Sustainability\n\n**Cross-dept automations:**\n• Deal Won → Finance invoice + CS onboarding\n• New Hire → IT asset request + HR checklist\n• Contract Expiry → Legal renewal task\n• Overdue Invoice → Finance escalation\n• P1 Incident → IT war room + status page\n• ESG Deadline → Sustainability team alert\n\nReady to deploy to your live CoreSpace environment?`,
+      text: `🌐 **Universal is your tenant's org layer** — it ships with every CoreSpace tenant automatically. It is not a template.\n\n**How it works:**\n• **⚙️ Operations** contains your active vertical's workspaces (currently ${icon} **${label}**)\n• **💰 Finance · 👥 HR · 📣 Marketing · 📈 Sales · ⚖️ Legal · 💻 IT · 🌱 Sustainability** — all empty department containers, each ready to accept workspaces as your org grows\n\nAny workspace — whether from a vertical template or manually created — is placed into the department it belongs to. Operations is where your vertical's core workspaces live.\n\n**6 cross-department signal flows are pre-wired** and activate as departments are built out:\n• Deal Won → Finance invoice + CS onboarding\n• New Hire → IT provisioning + HR onboarding checklist\n• Contract Expiry → Legal renewal task\n• Overdue Invoice → Finance Director escalation\n• P1 Incident → IT war room + status page update\n• ESG Deadline → Sustainability team alert`,
       cards: [wsCard],
-      quickReplies: ['Apply all 8 workspaces now', 'Customize department names', 'Show cross-dept signal flows', 'Preview Finance workspace'],
+      quickReplies: [
+        `View ${label} workspaces in Operations`,
+        'Add workspace to Finance',
+        'Preview cross-dept signal flows',
+        'How do departments accept workspaces?',
+      ],
       timestamp: new Date(),
     }]);
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
-  }, []);
+  }, [vertical]);
 
   // ── Apply payload ───────────────────────────────────────────────────
   const handleApply = useCallback((payload: ScenarioApplyPayload, cardId: string) => {

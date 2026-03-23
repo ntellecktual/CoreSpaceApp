@@ -542,6 +542,8 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const [barcodeApplied, setBarcodeApplied] = useLocalState(false);
   const [barcodeDatasetResult, setBarcodeDatasetResult] = useLocalState<PharmaBarcodeEntry | null>(null);
   const [qrCodeData, setQrCodeData] = useLocalState<string>('');
+  const [customTags, setCustomTags] = useLocalState<string[]>([]);
+  const [customTagInput, setCustomTagInput] = useLocalState('');
 
   /* ── Hooks ── */
   const {
@@ -593,9 +595,15 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const businessFunctions = appData.businessFunctions ?? [];
   const selectedFunction = businessFunctions.find((f) => f.id === selectedFunctionId) ?? null;
   const selectedObject = selectedFunction?.objects.find((o) => o.id === selectedObjectId) ?? null;
-  const displayedWorkspaces = selectedObject && selectedObject.workspaceIds.length > 0
-    ? workspaces.filter((ws) => selectedObject.workspaceIds.includes(ws.id))
-    : workspaces;
+  const displayedWorkspaces = useMemo(() => {
+    if (selectedObject && selectedObject.workspaceIds.length > 0)
+      return workspaces.filter((ws) => selectedObject.workspaceIds.includes(ws.id));
+    if (selectedFunction) {
+      const fnWsIds = selectedFunction.objects.flatMap((o) => o.workspaceIds);
+      if (fnWsIds.length > 0) return workspaces.filter((ws) => fnWsIds.includes(ws.id));
+    }
+    return workspaces;
+  }, [workspaces, selectedObject, selectedFunction]);
 
   /* ── NEW: Search, sort, filter state ── */
   const [searchQuery, setSearchQuery] = useLocalState('');
@@ -1043,56 +1051,6 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
               })}
             </View>
           ) : (<>
-          {businessFunctions.length > 0 && (
-            <View style={{ marginBottom: 6 }}>
-              <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>
-                {appData.shellConfig.functionLabelPlural?.toUpperCase() ?? 'DEPARTMENTS'}
-              </Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 3 }}>
-                <View style={{ flexDirection: 'row', gap: 4, paddingVertical: 2 }}>
-                  <Pressable
-                    onPress={() => { setSelectedFunctionId(''); setSelectedObjectId(''); }}
-                    style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, backgroundColor: !selectedFunctionId ? accentColor : 'rgba(255,255,255,0.06)' }}
-                  >
-                    <Text style={{ fontSize: 10, fontWeight: '700', color: !selectedFunctionId ? accentTextColor : dimColor }}>All</Text>
-                  </Pressable>
-                  {businessFunctions.sort((a, b) => a.order - b.order).map((fn) => {
-                    const isSel = selectedFunctionId === fn.id;
-                    return (
-                      <Pressable
-                        key={fn.id}
-                        onPress={() => { setSelectedFunctionId(fn.id); setSelectedObjectId(''); }}
-                        style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, flexDirection: 'row', gap: 4, alignItems: 'center' as any, backgroundColor: isSel ? accentSoft : 'rgba(255,255,255,0.06)', borderLeftWidth: 2, borderLeftColor: isSel ? (fn.color ?? accentColor) : 'transparent' }}
-                      >
-                        {!!fn.icon && <Text style={{ fontSize: 11 }}>{fn.icon}</Text>}
-                        <Text style={{ fontSize: 10, fontWeight: '700', color: isSel ? '#FFFFFF' : dimColor }} numberOfLines={1}>{fn.name}</Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              </ScrollView>
-              {selectedFunction && selectedFunction.objects.length > 0 && (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 3 }}>
-                  <View style={{ flexDirection: 'row', gap: 4, paddingVertical: 2 }}>
-                    {selectedFunction.objects.map((obj) => {
-                      const isSel = selectedObjectId === obj.id;
-                      return (
-                        <Pressable
-                          key={obj.id}
-                          onPress={() => setSelectedObjectId(isSel ? '' : obj.id)}
-                          style={{ paddingVertical: 3, paddingHorizontal: 7, borderRadius: 8, flexDirection: 'row', gap: 3, alignItems: 'center' as any, backgroundColor: isSel ? accentColor : 'rgba(255,255,255,0.06)', borderWidth: isSel ? 1 : 0, borderColor: accentColor }}
-                        >
-                          {!!obj.icon && <Text style={{ fontSize: 10 }}>{obj.icon}</Text>}
-                          <Text style={{ fontSize: 10, fontWeight: '700', color: isSel ? accentTextColor : dimColor }} numberOfLines={1}>{obj.name}</Text>
-                        </Pressable>
-                      );
-                    })}
-                  </View>
-                </ScrollView>
-              )}
-            </View>
-          )}
-
           {/* Item selector (compact) */}
           <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>{clientSectionLabel.toUpperCase()}</Text>
           <ScrollView nativeID="eu-batch-list" style={{ maxHeight: isCompact ? 80 : 140 }} showsVerticalScrollIndicator={false}>
@@ -1115,37 +1073,6 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           <Pressable nativeID="eu-new-batch" onPress={() => setIntakeModalOpen(true)} style={{ paddingVertical: 7, paddingHorizontal: 10, borderRadius: 10, backgroundColor: accentColor, alignItems: 'center' as any }}>
             <Text style={{ fontSize: 11, fontWeight: '700', color: accentTextColor }}>+ New {clientSectionLabelSingle}</Text>
           </Pressable>
-
-          <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.06)', marginVertical: 4 }} />
-
-          {/* Workspace tabs */}
-          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>{workspaceLabelPlural}</Text>
-          <ScrollView nativeID="eu-workspace-list" style={{ maxHeight: isCompact ? 100 : 160 }} showsVerticalScrollIndicator={false}>
-            {displayedWorkspaces.map((ws) => {
-              const sel = selectedWorkspaceId === ws.id;
-              const fCount = flows.filter((f) => f.workspaceId === ws.id && f.status === 'published').length;
-              const ssCount = ws.subSpaces?.length ?? 0;
-              return (
-                <Pressable key={ws.id} onPress={() => setSelectedWorkspaceId(ws.id)}
-                  style={{ paddingVertical: 7, paddingHorizontal: 8, borderRadius: 8, marginBottom: 3, backgroundColor: sel ? accentSoft : 'transparent', borderLeftWidth: sel ? 3 : 0, borderLeftColor: accentColor }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' as any }}>
-                    <Text style={{ fontSize: 11, fontWeight: '700', color: sel ? '#FFFFFF' : dimColor, flex: 1 }} numberOfLines={1}>
-                      {workspaceStepTitles[ws.id] ?? ws.name}
-                    </Text>
-                    {ssCount > 0 && (
-                      <View style={{ minWidth: 20, height: 16, borderRadius: 8, backgroundColor: sel ? accentColor : 'rgba(255,255,255,0.08)', alignItems: 'center' as any, justifyContent: 'center' as any, paddingHorizontal: 4, marginLeft: 4 }}>
-                        <Text style={{ fontSize: 8, fontWeight: '700', color: sel ? accentTextColor : dimColor }}>{ssCount}</Text>
-                      </View>
-                    )}
-                  </View>
-                  {!!ws.rootEntity && <Text style={{ fontSize: 9, color: `${accentColor}99`, marginTop: 1 }} numberOfLines={1}>↳ {ws.rootEntity}</Text>}
-                  {fCount > 0 && <Text style={{ fontSize: 9, color: '#86EFAC', marginTop: 1 }}>⚡ {fCount} flow{fCount > 1 ? 's' : ''}</Text>}
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-
-          <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.06)', marginVertical: 4 }} />
 
           {/* SubSpace list (clickable) */}
           <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>{subSpaceLabelPlural}</Text>
@@ -1205,6 +1132,60 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
 
         {/* ═══════════════ CENTER STAGE ═══════════════ */}
         <View style={[g(), { flex: 1, overflow: 'hidden' as any }]}>
+
+          {/* ── Department → Workspace Navigator ── */}
+          {businessFunctions.length > 0 && (
+            <View style={{ borderBottomWidth: 1, borderBottomColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.01)' }}>
+              {/* Row 1: Department tabs */}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ borderBottomWidth: 1, borderBottomColor: mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }}>
+                <View style={{ flexDirection: 'row', gap: 2, paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4 }}>
+                  <Pressable
+                    onPress={() => { setSelectedFunctionId(''); setSelectedObjectId(''); }}
+                    style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: !selectedFunctionId ? accentColor : (mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)') }}
+                  >
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: !selectedFunctionId ? accentTextColor : dimColor }}>All</Text>
+                  </Pressable>
+                  {[...businessFunctions].sort((a, b) => a.order - b.order).map((fn) => {
+                    const isSel = selectedFunctionId === fn.id;
+                    const deptColor = fn.color ?? accentColor;
+                    return (
+                      <Pressable
+                        key={fn.id}
+                        onPress={() => { setSelectedFunctionId(fn.id); setSelectedObjectId(''); }}
+                        style={{ flexDirection: 'row', alignItems: 'center' as any, gap: 5, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: isSel ? `${deptColor}28` : (mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'), borderWidth: 1, borderColor: isSel ? `${deptColor}70` : 'transparent' }}
+                      >
+                        {!!fn.icon && <Text style={{ fontSize: 13 }}>{fn.icon}</Text>}
+                        <Text style={{ fontSize: 12, fontWeight: isSel ? '700' : '500', color: isSel ? '#FFFFFF' : dimColor }}>{fn.name}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+              {/* Row 2: Workspace tabs for selected department */}
+              {displayedWorkspaces.length > 0 && (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={{ flexDirection: 'row', gap: 2, paddingHorizontal: 12, paddingTop: 4, paddingBottom: 6 }}>
+                    {displayedWorkspaces.map((ws) => {
+                      const isSel = selectedWorkspaceId === ws.id;
+                      const fCount = flows.filter((f) => f.workspaceId === ws.id && f.status === 'published').length;
+                      return (
+                        <Pressable
+                          key={ws.id}
+                          onPress={() => setSelectedWorkspaceId(ws.id)}
+                          style={{ flexDirection: 'row', alignItems: 'center' as any, gap: 5, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8, backgroundColor: isSel ? accentSoft : (mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'), borderBottomWidth: isSel ? 2 : 0, borderBottomColor: accentColor }}
+                        >
+                          {!!ws.icon && <Text style={{ fontSize: 11 }}>{ws.icon}</Text>}
+                          <Text style={{ fontSize: 12, fontWeight: isSel ? '700' : '500', color: isSel ? '#FFFFFF' : dimColor }}>{workspaceStepTitles[ws.id] ?? ws.name}</Text>
+                          {fCount > 0 && <Text style={{ fontSize: 9, color: '#86EFAC' }}>⚡</Text>}
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </ScrollView>
+              )}
+            </View>
+          )}
+
           {/* ── Breadcrumb + Saving indicator ── */}
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 6 }}>
             <Breadcrumb
@@ -1738,14 +1719,14 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
       </Modal>
 
       {/* ═══════════════ CREATE RECORD MODAL ═══════════════ */}
-      <Modal transparent visible={createModalOpen} animationType="fade" onRequestClose={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); }}>
-        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); }}>
+      <Modal transparent visible={createModalOpen} animationType="fade" onRequestClose={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); setCustomTags([]); setCustomTagInput(''); }}>
+        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); setCustomTags([]); setCustomTagInput(''); }}>
           <Pressable onPress={() => {}} style={{ width: 520, maxWidth: '94%' as any, maxHeight: '88%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any }}>
             {/* ── Modal Header ── */}
             <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12 }}>
                 <Text style={{ fontSize: 16, fontWeight: '800', color: '#FFFFFF' }}>Create Record</Text>
-                <Pressable onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); }} style={{ padding: 6 }}>
+                <Pressable onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); setCustomTags([]); setCustomTagInput(''); }} style={{ padding: 6 }}>
                   <Text style={{ fontSize: 14, color: dimColor }}>✕</Text>
                 </Pressable>
               </View>
@@ -1846,8 +1827,40 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     />
                   )
                 ))}
+                {/* ── Custom Tags ── */}
+                <View style={{ gap: 6 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>Tags</Text>
+                  {customTags.length > 0 && (
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+                      {customTags.map((tag) => (
+                        <View key={tag} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: accentSoft, borderWidth: 1, borderColor: accentColor }}>
+                          <Text style={{ fontSize: 11, fontWeight: '600', color: '#FFFFFF' }}>{tag}</Text>
+                          <Pressable onPress={() => setCustomTags((prev) => prev.filter((t) => t !== tag))}>
+                            <Text style={{ fontSize: 10, color: dimColor }}>✕</Text>
+                          </Pressable>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                  <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+                    <TextInput
+                      style={{ flex: 1, fontSize: 13, color: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: 'rgba(255,255,255,0.04)', outlineStyle: 'none' } as any}
+                      value={customTagInput}
+                      onChangeText={setCustomTagInput}
+                      onSubmitEditing={() => { const t = customTagInput.trim(); if (t && !customTags.includes(t)) { setCustomTags((prev) => [...prev, t]); } setCustomTagInput(''); }}
+                      placeholder="Add a tag and press Enter..."
+                      placeholderTextColor={dimColor}
+                      returnKeyType="done"
+                    />
+                    <Pressable
+                      onPress={() => { const t = customTagInput.trim(); if (t && !customTags.includes(t)) { setCustomTags((prev) => [...prev, t]); } setCustomTagInput(''); }}
+                      style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10, backgroundColor: accentSoft, borderWidth: 1, borderColor: accentColor }}>
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: accentColor }}>Add</Text>
+                    </Pressable>
+                  </View>
+                </View>
                 {activeForm && (
-                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setFdaSelectedDrug(null); setBarcodeDatasetResult(null); setQrCodeData(''); }}
+                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { if (customTags.length > 0) { updateRecord(rec.id, { tags: [...rec.tags, ...customTags] }); } showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setFdaSelectedDrug(null); setBarcodeDatasetResult(null); setQrCodeData(''); setCustomTags([]); setCustomTagInput(''); }}
                     style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any }}>
                     <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient) ? accentTextColor : dimColor }}>Create Entry</Text>
                   </Pressable>
@@ -2130,8 +2143,40 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     </View>
                   </View>
                 )}
+                {/* ── Custom Tags ── */}
+                <View style={{ gap: 6 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>Tags</Text>
+                  {customTags.length > 0 && (
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+                      {customTags.map((tag) => (
+                        <View key={tag} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: accentSoft, borderWidth: 1, borderColor: accentColor }}>
+                          <Text style={{ fontSize: 11, fontWeight: '600', color: '#FFFFFF' }}>{tag}</Text>
+                          <Pressable onPress={() => setCustomTags((prev) => prev.filter((t) => t !== tag))}>
+                            <Text style={{ fontSize: 10, color: dimColor }}>✕</Text>
+                          </Pressable>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                  <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+                    <TextInput
+                      style={{ flex: 1, fontSize: 13, color: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: 'rgba(255,255,255,0.04)', outlineStyle: 'none' } as any}
+                      value={customTagInput}
+                      onChangeText={setCustomTagInput}
+                      onSubmitEditing={() => { const t = customTagInput.trim(); if (t && !customTags.includes(t)) { setCustomTags((prev) => [...prev, t]); } setCustomTagInput(''); }}
+                      placeholder="Add a tag and press Enter..."
+                      placeholderTextColor={dimColor}
+                      returnKeyType="done"
+                    />
+                    <Pressable
+                      onPress={() => { const t = customTagInput.trim(); if (t && !customTags.includes(t)) { setCustomTags((prev) => [...prev, t]); } setCustomTagInput(''); }}
+                      style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10, backgroundColor: accentSoft, borderWidth: 1, borderColor: accentColor }}>
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: accentColor }}>Add</Text>
+                    </Pressable>
+                  </View>
+                </View>
                 {activeForm && (
-                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setCreateTab('form'); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); }}
+                  <Pressable disabled={!canCreateRecord || !selectedClient} onPress={() => { const rec = submit(); if (rec) { if (customTags.length > 0) { updateRecord(rec.id, { tags: [...rec.tags, ...customTags] }); } showToast(`Record "${rec.title}" created`, 'success'); auditLog?.logEntry({ action: 'create', entityType: 'record', entityId: rec.id, entityName: rec.title || rec.id, after: { subSpace: selectedSubSpace?.name ?? 'subspace' } }); if (addNotification) flowEngine.onRecordCreated(rec, addNotification); } setCreateModalOpen(false); setCreateTab('form'); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setCustomTags([]); setCustomTagInput(''); }}
                     style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: (canCreateRecord && selectedClient) ? accentColor : 'rgba(255,255,255,0.1)', alignItems: 'center' as any }}>
                     <Text style={{ fontSize: 13, fontWeight: '700', color: (canCreateRecord && selectedClient) ? accentTextColor : dimColor }}>Create Entry from QR</Text>
                   </Pressable>

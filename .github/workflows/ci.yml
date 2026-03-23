@@ -1,4 +1,4 @@
-name: CI
+name: CI / Deploy
 
 on:
   push:
@@ -6,72 +6,179 @@ on:
   pull_request:
     branches: [main]
 
+# Shared build output is cached across jobs via upload/download artifact
+env:
+  NODE_VERSION: '20'
+
 jobs:
+  # ─── 1. Lint ──────────────────────────────────────────────────────
   lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
       - run: npm ci
       - run: npm run lint || echo "No lint script defined"
 
+  # ─── 2. Test ──────────────────────────────────────────────────────
   test:
+    name: Test
     runs-on: ubuntu-latest
     needs: lint
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
       - run: npm ci
       - run: npm test -- --ci --passWithNoTests
 
+  # ─── 3. Build (single artifact shared by all deploy jobs) ─────────
   build:
+    name: Build Web
     runs-on: ubuntu-latest
     needs: test
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
       - run: npm ci
-      - run: npx expo export || npm run build || echo "No build script defined"
-      - name: Upload build artifacts
+      - name: Export Expo web build
+        run: npx expo export --platform web
+      - name: Copy static routing & header files into dist
+        run: |
+          cp _headers dist/_headers 2>/dev/null || true
+          cp _redirects dist/_redirects 2>/dev/null || true
+      - name: Upload dist artifact
         uses: actions/upload-artifact@v4
         with:
           name: web-dist
           path: dist/
+          retention-days: 1
 
-  deploy:
+  # ─── 4a. Deploy → Netlify ─────────────────────────────────────────
+  deploy-netlify:
+    name: Deploy → Netlify
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: netlify
+      url: ${{ steps.netlify.outputs.deploy-url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v4
+      - uses: actions/download-artifact@v4
         with:
-          node-version: 20
-      - run: npm ci
-      - name: Build for web
-        run: npx expo export --platform web
+          name: web-dist
+          path: dist
       - name: Deploy to Netlify
+        id: netlify
         uses: nwtgck/actions-netlify@v3
         with:
           publish-dir: dist
           production-branch: main
           production-deploy: true
-          deploy-message: "Deploy from GitHub Actions — ${{ github.sha }}"
+          deploy-message: "Deploy ${{ github.sha }}"
           enable-pull-request-comment: false
           enable-commit-comment: false
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+  # ─── 4b. Deploy → Vercel ──────────────────────────────────────────
+  deploy-vercel:
+    name: Deploy → Vercel
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: vercel
+      url: https://corespace.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: dist
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+      - name: Deploy to Vercel (production)
+        run: vercel deploy --prebuilt --prod --yes
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  # ─── 4c. Deploy → Cloudflare Pages ───────────────────────────────
+  deploy-cloudflare:
+    name: Deploy → Cloudflare Pages
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: cloudflare
+      url: https://corespace.pages.dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: dist
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: corespace
+          directory: dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─── 4d. Deploy → GitHub Pages ────────────────────────────────────
+  deploy-github-pages:
+    name: Deploy → GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: dist
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # ─── 4e. Deploy → Surge ───────────────────────────────────────────
+  deploy-surge:
+    name: Deploy → Surge
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: surge
+      url: https://corespace.surge.sh
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: dist
       - name: Deploy to Surge
         run: npx surge dist corespace.surge.sh
         env:

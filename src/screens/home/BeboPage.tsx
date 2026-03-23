@@ -532,21 +532,16 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     <View style={{ flex: 1, backgroundColor: pal.bg }}>
 
       {/* ── Sticky Header ── */}
-      <View style={{ backgroundColor: pal.headerBg, borderBottomWidth: 1, borderBottomColor: pal.headerBorder, paddingTop: 12, paddingBottom: 10, paddingHorizontal: compact ? 10 : 18, gap: 9, backdropFilter: 'blur(20px)', zIndex: 10 } as any}>
+      <View style={{ backgroundColor: pal.headerBg, borderBottomWidth: 1, borderBottomColor: pal.headerBorder, paddingTop: 10, paddingBottom: 8, paddingHorizontal: compact ? 10 : 18, gap: 8, backdropFilter: 'blur(20px)', zIndex: 10 } as any}>
 
         {/* Title row */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: `${accent}22`, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: `${accent}44` } as any}>
-            <Text style={{ fontSize: 18 }}>🤖</Text>
+          <View style={{ width: 30, height: 30, borderRadius: 9, backgroundColor: `${accent}22`, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: `${accent}44` } as any}>
+            <Text style={{ fontSize: 16 }}>✦</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ color: isDark ? '#FFFFFF' : '#1E1535', fontWeight: '800', fontSize: 15, letterSpacing: -0.3 }}>Bebo Ai</Text>
-            <Text style={{ color: pal.subtleText, fontSize: 10 }}>CEO Demo Mode  ·  Conference Ready</Text>
-          </View>
-          {/* Live badge */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(239,68,68,0.14)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.40)', borderRadius: 6, paddingHorizontal: 9, paddingVertical: 4 } as any}>
-            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#EF4444' }} />
-            <Text style={{ color: '#EF4444', fontWeight: '800', fontSize: 9, letterSpacing: 1 }}>LIVE DEMO</Text>
+            <Text style={{ color: isDark ? '#FFFFFF' : '#1E1535', fontWeight: '800', fontSize: 14, letterSpacing: -0.3 }}>Bebo AI</Text>
+            <Text style={{ color: pal.subtleText, fontSize: 10 }}>Ask anything · Build workspaces, flows & data instantly</Text>
           </View>
         </View>
 

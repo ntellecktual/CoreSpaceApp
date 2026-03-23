@@ -1165,46 +1165,62 @@ export function HomeScreen() {
                 flexDirection: 'row',
                 alignItems: 'center',
                 paddingHorizontal: 16,
-                paddingVertical: 6,
+                paddingVertical: 5,
                 borderBottomWidth: 1,
-                borderBottomColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
-                backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+                borderBottomColor: mode === 'night' ? 'rgba(140,91,245,0.14)' : 'rgba(140,91,245,0.10)',
+                backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.05)' : 'rgba(140,91,245,0.03)',
                 gap: 2,
                 flexWrap: 'wrap' as any,
+                ...(Platform.OS === 'web' ? { boxShadow: mode === 'night' ? 'inset 0 -1px 0 rgba(140,91,245,0.12)' : 'inset 0 -1px 0 rgba(140,91,245,0.08)' } : {}),
               }}>
-                <Text style={{ fontSize: 10, color: mode === 'night' ? 'rgba(255,255,255,0.36)' : 'rgba(0,0,0,0.36)', fontWeight: '600', marginRight: 8, letterSpacing: 0.5 }}>DEMO FLOW</Text>
+                {/* Left accent pip */}
+                <View style={{ width: 3, height: 16, borderRadius: 2, backgroundColor: '#8C5BF5', marginRight: 10, opacity: 0.7 }} />
                 {DEMO_STEPS.map((step, idx) => {
                   const isCurrent = page === step.id;
                   const accent = '#8C5BF5';
+                  const stepNum = idx + 1;
                   return (
                     <React.Fragment key={step.id}>
                       {idx > 0 && (
-                        <Text style={{ fontSize: 10, color: mode === 'night' ? 'rgba(255,255,255,0.20)' : 'rgba(0,0,0,0.20)', marginHorizontal: 1 }}>›</Text>
+                        <Text style={{ fontSize: 9, color: mode === 'night' ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.18)', marginHorizontal: 2, letterSpacing: 1 }}>›</Text>
                       )}
                       <Pressable
                         onPress={() => { setTenantAccessOpen(false); setPage(step.id); }}
-                        style={[
-                          {
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            gap: 4,
-                            paddingHorizontal: 8,
-                            paddingVertical: 4,
-                            borderRadius: 6,
-                            borderWidth: 1,
-                            borderColor: isCurrent ? `${accent}50` : 'transparent',
-                            backgroundColor: isCurrent
-                              ? (mode === 'night' ? `${accent}22` : `${accent}12`)
-                              : 'transparent',
-                          },
-                        ]}
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 5,
+                          paddingHorizontal: isCurrent ? 10 : 8,
+                          paddingVertical: 4,
+                          borderRadius: 20,
+                          borderWidth: 1,
+                          borderColor: isCurrent ? `${accent}60` : 'transparent',
+                          backgroundColor: isCurrent
+                            ? (mode === 'night' ? `${accent}28` : `${accent}14`)
+                            : 'transparent',
+                          ...(Platform.OS === 'web' && isCurrent ? { boxShadow: `0 0 10px ${accent}30` } : {}),
+                        } as any}
                         accessibilityRole="button"
                         accessibilityLabel={`Go to ${step.label}`}
                         accessibilityHint={step.tip}
                       >
-                        <Text style={{ fontSize: 11, color: isCurrent ? accent : (mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)') }}>{step.icon}</Text>
-                        <Text style={{ fontSize: 11, fontWeight: isCurrent ? '700' : '500', color: isCurrent ? accent : (mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)') }}>{step.label}</Text>
-                        {isCurrent && <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: accent, marginLeft: 1 }} />}
+                        {/* Step number badge (inactive) or icon (active) */}
+                        {isCurrent ? (
+                          <Text style={{ fontSize: 12 }}>{step.icon}</Text>
+                        ) : (
+                          <View style={{ width: 16, height: 16, borderRadius: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.18)', alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={{ fontSize: 8, fontWeight: '700', color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)', lineHeight: 10 }}>{stepNum}</Text>
+                          </View>
+                        )}
+                        <Text style={{
+                          fontSize: isCurrent ? 12 : 11,
+                          fontWeight: isCurrent ? '700' : '500',
+                          color: isCurrent ? accent : (mode === 'night' ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.48)'),
+                          letterSpacing: isCurrent ? 0.1 : 0,
+                        }}>{step.label}</Text>
+                        {isCurrent && (
+                          <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: accent, opacity: 0.9 }} />
+                        )}
                       </Pressable>
                     </React.Fragment>
                   );
@@ -1212,11 +1228,23 @@ export function HomeScreen() {
                 <View style={{ flex: 1 }} />
                 <Pressable
                   onPress={openTour}
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.12)' : 'rgba(140,91,245,0.08)', borderWidth: 1, borderColor: 'rgba(140,91,245,0.25)' }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 5,
+                    paddingHorizontal: 11,
+                    paddingVertical: 5,
+                    borderRadius: 20,
+                    backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.16)' : 'rgba(140,91,245,0.10)',
+                    borderWidth: 1,
+                    borderColor: 'rgba(140,91,245,0.35)',
+                    ...(Platform.OS === 'web' ? { boxShadow: '0 0 8px rgba(140,91,245,0.20)' } : {}),
+                  } as any}
                   accessibilityRole="button"
                   accessibilityLabel="Start tour guide"
                 >
-                  <Text style={{ fontSize: 10, color: '#8C5BF5', fontWeight: '700' }}>🎯 Tour Guide</Text>
+                  <Text style={{ fontSize: 11 }}>✦</Text>
+                  <Text style={{ fontSize: 11, color: '#A78BFA', fontWeight: '700', letterSpacing: 0.2 }}>Tour Guide</Text>
                 </Pressable>
               </View>
             )}

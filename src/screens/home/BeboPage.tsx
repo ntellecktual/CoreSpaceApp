@@ -5,6 +5,7 @@
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Image,
   Platform,
   ScrollView,
   Text,
@@ -26,6 +27,7 @@ import {
   DemoVertical,
   ScenarioApplyPayload,
   VERTICAL_META,
+  buildUniversalPayload,
   generateBeboResponse,
   getScenarioIntroResponse,
 } from '../../ai/beboEngine';
@@ -44,15 +46,17 @@ interface ChatMsg {
 
 // ─── Scenario Config ──────────────────────────────────────────────────
 
-const VERTICALS: DemoVertical[] = ['pharma', 'sales', 'healthcare', 'logistics', 'legal', 'insurance'];
+const VERTICALS: DemoVertical[] = ['pharma', 'sales', 'healthcare', 'logistics', 'legal', 'insurance', 'lifecycle', 'fulfillment'];
 
 const DEMO_QUICK_PROMPTS: Record<DemoVertical, string[]> = {
-  pharma:     ['Build workspace architecture', 'Generate DSCSA records', 'Show Signal flows', 'Show Orbital integrations'],
-  sales:      ['Build Sales Pipeline workspace', 'Generate deal data', 'Show automation flows', 'Show Orbital'],
-  healthcare: ['Build Patient Care workspace',  'Generate patient data', 'Show automation flows', 'Show Orbital'],
-  logistics:  ['Build Fulfillment workspace',   'Generate shipment data','Show automation flows', 'Show Orbital'],
-  legal:      ['Build Case Management workspace','Generate case data',   'Show deadline automations','Show Orbital'],
-  insurance:  ['Build Policy Admin workspace',  'Generate policy data', 'Show claim automations', 'Show Orbital'],
+  pharma:      ['Build workspace architecture', 'Generate DSCSA records', 'Show Signal flows', 'Show Orbital integrations'],
+  sales:       ['Build Sales Pipeline workspace', 'Generate deal data', 'Show automation flows', 'Show Orbital'],
+  healthcare:  ['Build Patient Care workspace',  'Generate patient data', 'Show automation flows', 'Show Orbital'],
+  logistics:   ['Build Fulfillment workspace',   'Generate shipment data','Show automation flows', 'Show Orbital'],
+  legal:       ['Build Case Management workspace','Generate case data',   'Show deadline automations','Show Orbital'],
+  insurance:   ['Build Policy Admin workspace',  'Generate policy data', 'Show claim automations', 'Show Orbital'],
+  lifecycle:   ['Build Onboarding workspace', 'Generate service records', 'Show SLA automations', 'Show Orbital'],
+  fulfillment: ['Build Pick-Pack-Ship workspace', 'Generate fulfillment data', 'Show automation flows', 'Show Orbital'],
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────
@@ -497,6 +501,30 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     }, delay);
   }, [isThinking, vertical]);
 
+  // ── Universal Enterprise Suite ──────────────────────────────────────
+  const handleUniversalSuite = useCallback(() => {
+    const payload = buildUniversalPayload();
+    const wsCard: BeboCardWorkspaceProposal = {
+      type: 'workspace_proposal',
+      id: `card-universal-${Date.now()}`,
+      industry: 'Universal Enterprise Suite',
+      workspaces: payload.workspaces.map(ws => ({ id: ws.id, name: ws.name, icon: ws.icon, subSpaceCount: ws.subSpaces?.length ?? 0, fieldCount: (ws.subSpaces ?? []).reduce((n, ss) => n + (ss.fields?.length ?? 0), 0) })),
+      personas: ['Department Head', 'Team Member', 'Admin', 'Executive', 'Cross-Dept Collaborator'],
+      lifecycleStages: ['Draft', 'In Review', 'Active', 'Pending', 'Completed', 'Archived'],
+      flows: payload.flows.map(f => ({ name: f.name, trigger: f.signal, action: f.action })),
+      applyPayload: payload,
+    };
+    setMessages(prev => [...prev, {
+      id: uid(),
+      role: 'assistant',
+      text: `🌐 **Universal Enterprise Suite** — your entire organization in one click.\n\nThis template provisions **8 connected business workspaces** across every department, wired together with **6 cross-department signal flows** so nothing falls through the cracks.\n\n**Departments included:** ⚙️ Operations · 💰 Finance · 👥 HR · 📣 Marketing · 📈 Sales · ⚖️ Legal · 💻 Technology · 🌱 Sustainability\n\n**Cross-dept automations:**\n• Deal Won → Finance invoice + CS onboarding\n• New Hire → IT asset request + HR checklist\n• Contract Expiry → Legal renewal task\n• Overdue Invoice → Finance escalation\n• P1 Incident → IT war room + status page\n• ESG Deadline → Sustainability team alert\n\nReady to deploy to your live CoreSpace environment?`,
+      cards: [wsCard],
+      quickReplies: ['Apply all 8 workspaces now', 'Customize department names', 'Show cross-dept signal flows', 'Preview Finance workspace'],
+      timestamp: new Date(),
+    }]);
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
+  }, []);
+
   // ── Apply payload ───────────────────────────────────────────────────
   const handleApply = useCallback((payload: ScenarioApplyPayload, cardId: string) => {
     if (payload.shellConfig && appState.data.shellConfig) {
@@ -543,6 +571,16 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
             <Text style={{ color: isDark ? '#FFFFFF' : '#1E1535', fontWeight: '800', fontSize: 14, letterSpacing: -0.3 }}>Bebo AI</Text>
             <Text style={{ color: pal.subtleText, fontSize: 10 }}>Ask anything · Build workspaces, flows & data instantly</Text>
           </View>
+          {!!VERTICAL_META[vertical].tenantLogo && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)' } as any}>
+              <Image source={{ uri: VERTICAL_META[vertical].tenantLogo }} style={{ width: 48, height: 16, resizeMode: 'contain' } as any} />
+            </View>
+          )}
+          {!VERTICAL_META[vertical].tenantLogo && !!VERTICAL_META[vertical].tenantName && (
+            <View style={{ backgroundColor: `${accent}18`, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: `${accent}30` } as any}>
+              <Text style={{ color: accent, fontSize: 10, fontWeight: '700' }}>{VERTICAL_META[vertical].tenantName}</Text>
+            </View>
+          )}
         </View>
 
         {/* Scenario tabs */}
@@ -570,6 +608,20 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
                 </TouchableOpacity>
               );
             })}
+            {/* Universal Suite chip */}
+            <TouchableOpacity
+              onPress={handleUniversalSuite}
+              activeOpacity={0.8}
+              style={{
+                flexDirection: 'row', alignItems: 'center', gap: 4,
+                backgroundColor: '#7C3AED',
+                borderWidth: 1, borderColor: '#7C3AED',
+                borderRadius: 7, paddingHorizontal: 9, paddingVertical: 5,
+              } as any}
+            >
+              <Text style={{ fontSize: 12 }}>🌐</Text>
+              <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '700' }}>Universal</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>

@@ -22,7 +22,7 @@ import type {
 
 // ─── Public Types ────────────────────────────────────────────────────
 
-export type DemoVertical = 'pharma' | 'sales' | 'healthcare' | 'logistics' | 'legal' | 'insurance';
+export type DemoVertical = 'pharma' | 'sales' | 'healthcare' | 'logistics' | 'legal' | 'insurance' | 'lifecycle' | 'fulfillment';
 
 export type BeboIntent =
   | 'build_workspace'
@@ -439,6 +439,58 @@ function generateInsuranceData(count = 20) {
   return { headers, rows: rows.slice(0, 6), totalRows: count, csvContent: csv, jsonContent: json };
 }
 
+// ─── Lifecycle & Fulfillment Data Generators ─────────────────────
+
+const LIFECYCLE_COMPANIES = [
+  'Acme Technologies', 'GlobalTech Inc', 'Summit Systems', 'ProEdge Corp', 'Nexus Digital',
+  'Pinnacle Group', 'Apex Enterprises', 'Stellar Holdings', 'Horizon Connect', 'Vertex Solutions',
+];
+const LIFECYCLE_SERVICES = ['Onboarding', 'Offboarding', 'Advanced Exchange', 'Support Ticket'];
+const LIFECYCLE_DEVICES = ['Dell Latitude 5540', 'MacBook Pro 14"', 'Surface Pro 9', 'HP EliteBook 840', 'Lenovo ThinkPad X1', 'iPad Pro 12.9"'];
+
+function generateLifecycleData(count = 20) {
+  const headers = ['Customer', 'Contact', 'Service Type', 'Device Model', 'Priority', 'Status', 'Start Date', 'Assigned To'];
+  const firstNames = ['Sarah', 'Michael', 'Jessica', 'Robert', 'Emily', 'James', 'Laura', 'Kevin'];
+  const lastNames  = ['Chen', 'Johnson', 'Williams', 'Brown', 'Davis', 'Taylor', 'Wilson', 'Moore'];
+  const agents = ['Alex Torres', 'Morgan Li', 'Casey Adams', 'Jordan Kim', 'Sam Rivera'];
+  const rows: string[][] = Array.from({ length: count }, (_, i) => [
+    LIFECYCLE_COMPANIES[i % LIFECYCLE_COMPANIES.length],
+    `${pick(firstNames)} ${pick(lastNames)}`,
+    pick(LIFECYCLE_SERVICES),
+    pick(LIFECYCLE_DEVICES),
+    pick(['Standard', 'Urgent', 'Critical']),
+    pick(['Submitted', 'In Progress', 'Awaiting Customer', 'Resolved', 'Closed', 'Escalated']),
+    fmtDate(-Math.floor(Math.random() * 30)),
+    pick(agents),
+  ]);
+  const csv  = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+  const json = JSON.stringify(rows.map(r => Object.fromEntries(headers.map((h, i2) => [h, r[i2]]))), null, 2);
+  return { headers, rows: rows.slice(0, 6), totalRows: count, csvContent: csv, jsonContent: json };
+}
+
+const FULFILLMENT_PRODUCTS = [
+  'Widget Pro 2.0', 'Sensor Module X4', 'Industrial Filter', 'Valve Control Kit',
+  'Motor Drive 3A', 'Power Supply 12V', 'Circuit Assembly', 'Pump Assembly Unit',
+];
+
+function generateFulfillmentData(count = 20) {
+  const headers = ['Order ID', 'SKU', 'Product', 'Qty', 'Warehouse', 'Step', 'Carrier', 'Status'];
+  const steps   = ['Received', 'Inventoried', 'Ordered', 'Picking', 'Packing', 'Shipped', 'Delivered'];
+  const rows: string[][] = Array.from({ length: count }, (_, i) => [
+    `ORD-RF-${String(50000 + i)}`,
+    `SKU-${String(3000 + (i % 80)).padStart(4, '0')}`,
+    pick(FULFILLMENT_PRODUCTS),
+    String(Math.floor(Math.random() * 200 + 1)),
+    pick(WAREHOUSES),
+    pick(steps),
+    pick(CARRIERS),
+    pick(['On Track', 'Delayed', 'Exception', 'Completed']),
+  ]);
+  const csv  = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+  const json = JSON.stringify(rows.map(r => Object.fromEntries(headers.map((h, i2) => [h, r[i2]]))), null, 2);
+  return { headers, rows: rows.slice(0, 6), totalRows: count, csvContent: csv, jsonContent: json };
+}
+
 export function getDataForVertical(vertical: DemoVertical) {
   switch (vertical) {
     case 'pharma': return generatePharmaData();
@@ -447,6 +499,8 @@ export function getDataForVertical(vertical: DemoVertical) {
     case 'logistics': return generateLogisticsData();
     case 'legal': return generateLegalData();
     case 'insurance': return generateInsuranceData();
+    case 'lifecycle': return generateLifecycleData();
+    case 'fulfillment': return generateFulfillmentData();
   }
 }
 
@@ -1132,6 +1186,479 @@ export function buildInsurancePayload(): ScenarioApplyPayload {
   };
 }
 
+// ─── LifecycleOS Payload ─────────────────────────────────────────────
+
+export function buildLifecyclePayload(): ScenarioApplyPayload {
+  const wsOnboarding = mkWorkspace('ws-bebo-lcos-onboarding', 'Customer Onboarding', 'Account', '🚀', [
+    mkSubSpace('ss-onb-list', 'Active Onboardings', 'Onboarding Record', 'grid', [
+      mkField('f-onb-company',  'Company Name',       'text',   true),
+      mkField('f-onb-contact',  'Primary IT Contact', 'text',   true),
+      mkField('f-onb-devices',  'Device Count',       'number', true),
+      mkField('f-onb-goLive',   'Target Go-Live',     'date',   false),
+    ]),
+    mkSubSpace('ss-onb-wizard', 'Wizard Progress', 'Onboarding Step', 'timeline', [
+      mkField('f-onb-step',      'Step Name',    'text',     true),
+      mkField('f-onb-status',    'Step Status',  'select',   true),
+      mkField('f-onb-completed', 'Completed',    'date',     false),
+      mkField('f-onb-notes',     'Step Notes',   'longText', false),
+    ]),
+    mkSubSpace('ss-onb-devices', 'Device Configuration', 'Device Config', 'grid', [
+      mkField('f-dev-type',    'Device Type',          'select',   true),
+      mkField('f-dev-mdm',     'MDM Platform',         'select',   true),
+      mkField('f-dev-count',   'Count',                'number',   true),
+      mkField('f-dev-special', 'Special Requirements', 'longText', false),
+    ]),
+  ]);
+
+  const wsOffboarding = mkWorkspace('ws-bebo-lcos-offboarding', 'Offboarding Management', 'Account', '🔄', [
+    mkSubSpace('ss-off-list', 'Offboarding Requests', 'Offboarding Record', 'board', [
+      mkField('f-off-company',  'Customer Account',   'text',   true),
+      mkField('f-off-reason',   'Offboarding Reason', 'select', true),
+      mkField('f-off-lastDate', 'Last Service Date',  'date',   true),
+      mkField('f-off-devices',  'Total Device Count', 'number', true),
+    ]),
+    mkSubSpace('ss-off-assets', 'Asset Returns', 'Return Shipment', 'grid', [
+      mkField('f-ret-method',  'Return Method',         'select',   true),
+      mkField('f-ret-date',    'Pickup Date',           'date',     false),
+      mkField('f-ret-contact', 'Return Contact',        'text',     true),
+      mkField('f-ret-notes',   'Asset Condition Notes', 'longText', false),
+    ]),
+    mkSubSpace('ss-off-checklist', 'Access Revocation', 'Checklist Item', 'summary', [
+      mkField('f-chk-sso',      'SSO Revoked',        'checkbox', true),
+      mkField('f-chk-mdm',      'MDM Removed',        'checkbox', true),
+      mkField('f-chk-licenses', 'Licenses Released',  'checkbox', true),
+      mkField('f-chk-data',     'Data Wiped',         'checkbox', true),
+    ]),
+  ]);
+
+  const wsExchange = mkWorkspace('ws-bebo-lcos-exchange', 'Advanced Exchange', 'Exchange Order', '📦', [
+    mkSubSpace('ss-exc-orders', 'Exchange Orders', 'Order', 'board', [
+      mkField('f-exc-orderId', 'Order ID',      'text', true),
+      mkField('f-exc-company', 'Company',       'text', true),
+      mkField('f-exc-model',   'Device Model',  'text', true),
+      mkField('f-exc-serial',  'Serial Number', 'text', true),
+    ]),
+    mkSubSpace('ss-exc-form', 'Exchange Requests', 'Request', 'grid', [
+      mkField('f-exc-issue',    'Issue Description', 'longText', true),
+      mkField('f-exc-priority', 'Priority Level',    'select',   true),
+      mkField('f-exc-addr',     'Delivery Address',  'text',     true),
+      mkField('f-exc-recip',    'Recipient Name',    'text',     true),
+    ]),
+    mkSubSpace('ss-exc-returns', 'Return Tracking', 'Return', 'timeline', [
+      mkField('f-ret-trackNo',   'Tracking Number',   'text', true),
+      mkField('f-ret-dueDate',   'Return Due Date',   'date', true),
+      mkField('f-ret-carrier',   'Carrier',           'select', false),
+      mkField('f-ret-returned',  'Returned On',       'date', false),
+    ]),
+  ]);
+
+  const wsTickets = mkWorkspace('ws-bebo-lcos-tickets', 'Service Tickets', 'Ticket', '🎫', [
+    mkSubSpace('ss-tkt-list', 'Open Tickets', 'Ticket', 'board', [
+      mkField('f-tkt-id',       'Ticket ID', 'text',   true),
+      mkField('f-tkt-company',  'Company',   'text',   true),
+      mkField('f-tkt-subject',  'Subject',   'text',   true),
+      mkField('f-tkt-priority', 'Priority',  'select', true),
+    ]),
+    mkSubSpace('ss-tkt-convo', 'Conversations', 'Message', 'timeline', [
+      mkField('f-msg-from',     'From',          'text',     true),
+      mkField('f-msg-body',     'Message',       'longText', true),
+      mkField('f-msg-ts',       'Timestamp',     'datetime', true),
+      mkField('f-msg-internal', 'Internal Note', 'checkbox', false),
+    ]),
+    mkSubSpace('ss-tkt-sla', 'SLA Metrics', 'SLA Record', 'summary', [
+      mkField('f-sla-priority', 'Priority Level',      'select', true),
+      mkField('f-sla-first',    'First Response (hrs)', 'number', false),
+      mkField('f-sla-resolve',  'Resolution (hrs)',     'number', false),
+      mkField('f-sla-breach',   'SLA Breached',         'checkbox', false),
+    ]),
+  ]);
+
+  const flows = [
+    mkFlow('flow-lcos-new-onb',       'New Onboarding Submitted',        'Customer submits a new onboarding request',                                              ['step = Company Details', 'contact_email is set'],               'Notify assigned account manager and create kickoff task',                                         'ws-bebo-lcos-onboarding', 'ss-onb-wizard',    ['Type:Onboarding', 'Priority:High']),
+    mkFlow('flow-lcos-return-overdue', 'Device Return Overdue',           'Exchange device not returned within 5 business days',                                    ['return_due_days_remaining <= 0', 'returned_on is empty'],        'Alert customer via email and notify account manager for follow-up',                               'ws-bebo-lcos-exchange',   'ss-exc-returns',   ['Type:Exchange', 'Status:Overdue']),
+    mkFlow('flow-lcos-high-ticket',   'Critical Ticket Auto-Escalate',    'Support ticket submitted with Critical priority',                                         ['priority = Critical'],                                          'Auto-assign to senior agent and notify manager; SLA clock starts immediately',                    'ws-bebo-lcos-tickets',    'ss-tkt-list',      ['Priority:Critical', 'Type:Ticket']),
+    mkFlow('flow-lcos-sla-breach',    'SLA Breach Warning',               'High-priority ticket within 30 min of first-response SLA breach',                        ['priority = High', 'first_response_elapsed_hrs >= 1.5'],         'Send escalation alert to team lead with ticket details',                                          'ws-bebo-lcos-tickets',    'ss-tkt-sla',       ['SLA:Warning', 'Priority:High']),
+    mkFlow('flow-lcos-offboard-block', 'Offboarding Checklist Incomplete', 'Final submission attempted without all checklist items marked',                          ['checklist_complete = false', 'status = Confirm'],                'Block submission and prompt user to complete all access revocation items',                         'ws-bebo-lcos-offboarding', 'ss-off-checklist', ['Type:Offboarding', 'Status:Blocked']),
+  ];
+
+  const integrations = [
+    mkIntegration('int-lcos-sendgrid', 'tpl-custom-http', fmtDate(-30)),
+    mkIntegration('int-lcos-docusign', 'tpl-docusign',    fmtDate(-45)),
+    mkIntegration('int-lcos-qb',       'tpl-quickbooks',  fmtDate(-20)),
+  ];
+
+  const lcContacts = ['Sarah Chen', 'Michael Johnson', 'Emily Williams', 'Robert Brown', 'Laura Davis', 'Kevin Taylor'];
+  const lcDevices  = ['Dell Latitude 5540', 'MacBook Pro 14"', 'Surface Pro 9', 'HP EliteBook 840'];
+  const lcAgents   = ['Alex Torres', 'Morgan Li', 'Casey Adams'];
+
+  const onbRecords: RuntimeRecord[] = LIFECYCLE_COMPANIES.slice(0, 6).map((co, i) => {
+    const goLive = fmtDate(Math.floor(Math.random() * 30) + 7);
+    return mkRecord(`rec-lcos-onb-${i}`, `client-lcos-${i}`, 'ws-bebo-lcos-onboarding', 'ss-onb-list',
+      `${co} — Onboarding`, pick(['In Progress', 'Pending', 'Complete']),
+      undefined, fmtDate(-Math.floor(Math.random() * 14)), ['Type:Onboarding'],
+      { 'Company Name': co, 'Primary IT Contact': lcContacts[i % lcContacts.length], 'Device Count': Math.floor(Math.random() * 200 + 10), 'Target Go-Live': goLive });
+  });
+
+  const excRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+    const model = pick(lcDevices);
+    return mkRecord(`rec-lcos-exc-${i}`, `client-lcos-${i}`, 'ws-bebo-lcos-exchange', 'ss-exc-orders',
+      `EXC-${300 + i} — ${model}`, pick(['Processing', 'Shipped', 'Delivered']),
+      undefined, fmtDate(-i), ['Type:Exchange'],
+      { 'Order ID': `EXC-${300 + i}`, 'Company': LIFECYCLE_COMPANIES[i % LIFECYCLE_COMPANIES.length], 'Device Model': model, 'Serial Number': `SN-${String(9000 + i)}` });
+  });
+
+  const tktSubjects = ['Device not booting after exchange', 'Billing inquiry on last invoice', 'Onboarding blocked — SSO issue', 'MDM enrollment failure', 'Return label not received', 'Checklist item unclear'];
+  const tktRecords: RuntimeRecord[] = Array.from({ length: 6 }, (_, i) => {
+    const prio = pick(['High', 'Medium', 'Low']);
+    const cats = ['Technical', 'Billing', 'Exchange', 'Onboarding', 'Account'];
+    return mkRecord(`rec-lcos-tkt-${i}`, `client-lcos-${i % 6}`, 'ws-bebo-lcos-tickets', 'ss-tkt-list',
+      `TKT-2026-${5000 + i} — ${pick(cats)}`, pick(['Open', 'In Progress', 'Resolved']),
+      undefined, fmtDate(-Math.floor(Math.random() * 14)), ['Type:Ticket'],
+      { 'Ticket ID': `TKT-2026-${5000 + i}`, 'Company': LIFECYCLE_COMPANIES[i % LIFECYCLE_COMPANIES.length], 'Subject': tktSubjects[i % tktSubjects.length], 'Priority': prio });
+  });
+
+  const records = [...onbRecords, ...excRecords, ...tktRecords];
+  const clients = LIFECYCLE_COMPANIES.slice(0, 6).map((co, i) => mkClient(`client-lcos-${i}`, co, `LCOS-${1000 + i}`, ['Vertical:Lifecycle']));
+
+  return {
+    shellConfig: mkShellConfig('Account', 'Accounts', 'Lifecycle Workspace', 'Service Area', ['Submitted', 'In Progress', 'Awaiting Customer', 'Resolved', 'Closed', 'Escalated']),
+    workspaces: [wsOnboarding, wsOffboarding, wsExchange, wsTickets],
+    flows, integrations, records, clients,
+  };
+}
+
+// ─── Pick, Pack, Ship (Fulfillment) Payload ───────────────────────────
+
+export function buildFulfillmentPayload(): ScenarioApplyPayload {
+  const wsReceiving = mkWorkspace('ws-bebo-rf-receiving', 'Receiving & Inventory', 'SKU', '📥', [
+    mkSubSpace('ss-rf-recv', 'Receiving Queue', 'Receiving Record', 'board', [
+      mkField('f-rf-sku',       'SKU',              'text',   true),
+      mkField('f-rf-qty',       'Quantity',         'number', true),
+      mkField('f-rf-location',  'Assigned Location','text',   true),
+      mkField('f-rf-condition', 'Condition',        'select', true),
+    ]),
+    mkSubSpace('ss-rf-inventory', 'Inventory Catalog', 'Inventory Item', 'grid', [
+      mkField('f-inv-sku',       'SKU',                'text',   true),
+      mkField('f-inv-desc',      'Product Description','text',   true),
+      mkField('f-inv-qty-avail', 'Qty Available',      'number', true),
+      mkField('f-inv-qty-alloc', 'Qty Allocated',      'number', false),
+      mkField('f-inv-reorder',   'Reorder Point',      'number', false),
+    ]),
+    mkSubSpace('ss-rf-audit', 'Audit Trail', 'Audit Event', 'timeline', [
+      mkField('f-aud-user',   'User',         'text',     true),
+      mkField('f-aud-action', 'Action',       'text',     true),
+      mkField('f-aud-sku',    'Affected SKU', 'text',     false),
+      mkField('f-aud-ts',     'Timestamp',    'datetime', true),
+    ]),
+  ]);
+
+  const wsOrders = mkWorkspace('ws-bebo-rf-orders', 'Order Management', 'Order', '📋', [
+    mkSubSpace('ss-rf-orders', 'Orders', 'Order', 'board', [
+      mkField('f-ord-id',       'Order ID',       'text',   true),
+      mkField('f-ord-customer', 'Customer',       'text',   true),
+      mkField('f-ord-sku',      'SKUs',           'text',   true),
+      mkField('f-ord-method',   'Shipping Method','select', true),
+      mkField('f-ord-priority', 'Priority',       'select', false),
+    ]),
+    mkSubSpace('ss-rf-picklist', 'Pick Lists', 'Pick Order', 'grid', [
+      mkField('f-pick-orderId',   'Order ID',      'text',   true),
+      mkField('f-pick-location',  'Pick Location', 'text',   true),
+      mkField('f-pick-sku',       'SKU',           'text',   true),
+      mkField('f-pick-qty',       'Qty to Pick',   'number', true),
+      mkField('f-pick-scanned',   'Qty Scanned',   'number', false),
+    ]),
+    mkSubSpace('ss-rf-exceptions', 'Exception Queue', 'Exception', 'board', [
+      mkField('f-exc-type',       'Exception Type', 'select',   true),
+      mkField('f-exc-orderId',    'Order ID',       'text',     true),
+      mkField('f-exc-desc',       'Description',    'longText', true),
+      mkField('f-exc-resolution', 'Resolution',     'select',   false),
+    ]),
+  ]);
+
+  const wsPacking = mkWorkspace('ws-bebo-rf-shipping', 'Packing & Shipping', 'Shipment', '🚚', [
+    mkSubSpace('ss-rf-packing', 'Packing Station', 'Pack Record', 'grid', [
+      mkField('f-pack-orderId', 'Order ID',           'text',     true),
+      mkField('f-pack-box',     'Box Size',           'select',   true),
+      mkField('f-pack-weight',  'Actual Weight (lbs)','number',   true),
+      mkField('f-pack-valid',   'Items Validated',    'checkbox', true),
+    ]),
+    mkSubSpace('ss-rf-labels', 'Shipping Labels', 'Shipping Label', 'grid', [
+      mkField('f-lbl-orderId', 'Order ID',           'text',   true),
+      mkField('f-lbl-carrier', 'Carrier',            'select', true),
+      mkField('f-lbl-tracking','Tracking Number',    'text',   false),
+      mkField('f-lbl-eta',     'Estimated Delivery', 'date',   false),
+    ]),
+    mkSubSpace('ss-rf-tracker', 'Shipment Tracker', 'Shipment Event', 'timeline', [
+      mkField('f-trk-orderId',  'Order ID',   'text',     true),
+      mkField('f-trk-carrier',  'Carrier',    'text',     true),
+      mkField('f-trk-event',    'Event',      'text',     true),
+      mkField('f-trk-location', 'Location',   'text',     false),
+      mkField('f-trk-ts',       'Timestamp',  'datetime', true),
+    ]),
+  ]);
+
+  const flows = [
+    mkFlow('flow-rf-low-stock',    'Low Stock Alert',              'SKU inventory drops below reorder threshold',                   ['qty_available < reorder_point'],                      'Create purchase order draft and notify procurement team',                                          'ws-bebo-rf-receiving', 'ss-rf-inventory', ['Priority:Low-Stock', 'Type:Inventory']),
+    mkFlow('flow-rf-address-fail', 'Address Validation Failure',   'Order intake address fails validation check',                   ['address_valid = false'],                               'Route to exception queue — notify customer service for manual correction',                         'ws-bebo-rf-orders',   'ss-rf-exceptions', ['Type:Exception', 'Exception:Address']),
+    mkFlow('flow-rf-weight-flag',  'Weight Mismatch Flag',         'Packed box weight is outside expected range (+/- 15%)',         ['weight_deviation_pct > 15'],                           'Flag for quality inspection before label generation — hold shipment',                              'ws-bebo-rf-shipping', 'ss-rf-packing',   ['Type:QC', 'Exception:WeightMismatch']),
+    mkFlow('flow-rf-packed-label', 'Auto-Generate Shipping Label', 'Order passes packing validation and items are confirmed',       ['items_validated = true', 'weight_deviation_pct <= 15'],'Auto-generate prepaid shipping label and assign carrier via cost/speed rules',                     'ws-bebo-rf-shipping', 'ss-rf-labels',    ['Type:Shipping', 'Status:LabelReady']),
+  ];
+
+  const integrations = [
+    mkIntegration('int-rf-http', 'tpl-custom-http', fmtDate(-20)),
+    mkIntegration('int-rf-qb',   'tpl-quickbooks',  fmtDate(-35)),
+  ];
+
+  const invRecords: RuntimeRecord[] = FULFILLMENT_PRODUCTS.slice(0, 6).map((prod, i) => {
+    const qtyAvail = Math.floor(Math.random() * 500 + 50);
+    const reorder  = 100;
+    return mkRecord(`rec-rf-inv-${i}`, `client-rf-${i}`, 'ws-bebo-rf-receiving', 'ss-rf-inventory',
+      `SKU-${String(3000 + i)} — ${prod}`, qtyAvail < reorder ? 'Low Stock' : 'In Stock',
+      qtyAvail, fmtDate(-i), ['Type:Inventory'],
+      { 'SKU': `SKU-${String(3000 + i)}`, 'Product Description': prod, 'Qty Available': qtyAvail, 'Qty Allocated': Math.floor(qtyAvail * 0.3), 'Reorder Point': reorder });
+  });
+
+  const rfSteps = ['Receiving', 'Inventoried', 'Ordered', 'Picking', 'Packing', 'Shipped', 'Delivered'];
+  const orderRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) => {
+    const step = pick(rfSteps);
+    return mkRecord(`rec-rf-ord-${i}`, `client-rf-${i % 6}`, 'ws-bebo-rf-orders', 'ss-rf-orders',
+      `ORD-RF-${50000 + i} — ${step}`, step,
+      Math.floor(Math.random() * 50 + 1) * 100, fmtDate(-i), ['Type:Order'],
+      { 'Order ID': `ORD-RF-${50000 + i}`, 'Customer': COMPANIES[i % COMPANIES.length], 'SKUs': `SKU-${String(3000 + (i % 6))}`, 'Shipping Method': pick(['Standard', 'Expedite', 'Next Day']), 'Priority': pick(['Standard', 'Rush', 'Same-Day']) });
+  });
+
+  const shipRecords: RuntimeRecord[] = Array.from({ length: 5 }, (_, i) => {
+    const carrier  = pick(CARRIERS);
+    const tracking = `TRK-RF-${String(500000 + Math.floor(Math.random() * 99999))}`;
+    return mkRecord(`rec-rf-ship-${i}`, `client-rf-${i}`, 'ws-bebo-rf-shipping', 'ss-rf-labels',
+      `${carrier} — ORD-RF-${50000 + i}`, pick(['Label Generated', 'Picked Up', 'In Transit', 'Delivered']),
+      undefined, fmtDate(-i), ['Type:Shipment'],
+      { 'Order ID': `ORD-RF-${50000 + i}`, 'Carrier': carrier, 'Tracking Number': tracking, 'Estimated Delivery': fmtDate(Math.floor(Math.random() * 5) + 1) });
+  });
+
+  const records  = [...invRecords, ...orderRecords, ...shipRecords];
+  const rfClients = Array.from({ length: 6 }, (_, i) => mkClient(`client-rf-${i}`, COMPANIES[i], `RF-${2000 + i}`, ['Vertical:Fulfillment']));
+
+  return {
+    shellConfig: mkShellConfig('Order', 'Orders', 'Fulfillment Workspace', 'Operations Lane', ['Received', 'Inventoried', 'Ordered', 'Picking', 'Packing', 'Shipped', 'Delivered', 'Returned']),
+    workspaces: [wsReceiving, wsOrders, wsPacking],
+    flows, integrations, records, clients: rfClients,
+  };
+}
+
+// ─── Universal Enterprise Suite (8 Business Workspaces) ──────────────
+
+export function buildUniversalPayload(): ScenarioApplyPayload {
+  const wsOps = mkWorkspace('ws-univ-operations', 'Operations', 'Process', '⚙️', [
+    mkSubSpace('ss-ops-processes', 'Processes & Approvals', 'Process', 'board', [
+      mkField('f-ops-name',     'Process Name', 'text',   true),
+      mkField('f-ops-owner',    'Owner',        'text',   true),
+      mkField('f-ops-status',   'Status',       'select', true),
+      mkField('f-ops-priority', 'Priority',     'select', false),
+    ]),
+    mkSubSpace('ss-ops-vendors', 'Vendor Management', 'Vendor Contract', 'grid', [
+      mkField('f-vnd-name',     'Vendor Name',   'text',   true),
+      mkField('f-vnd-service',  'Service Type',  'text',   true),
+      mkField('f-vnd-contract', 'Contract End',  'date',   false),
+      mkField('f-vnd-amount',   'Annual Value',  'number', false),
+    ]),
+    mkSubSpace('ss-ops-facilities', 'Facilities', 'Facility', 'grid', [
+      mkField('f-fac-name',     'Location Name', 'text',   true),
+      mkField('f-fac-type',     'Type',          'select', false),
+      mkField('f-fac-capacity', 'Capacity',      'number', false),
+    ]),
+  ]);
+
+  const wsFinance = mkWorkspace('ws-univ-finance', 'Finance', 'Transaction', '💰', [
+    mkSubSpace('ss-fin-ledger', 'Ledger & Transactions', 'Transaction', 'grid', [
+      mkField('f-fin-date',     'Transaction Date', 'date',   true),
+      mkField('f-fin-desc',     'Description',      'text',   true),
+      mkField('f-fin-amount',   'Amount',           'number', true),
+      mkField('f-fin-category', 'Category',         'select', true),
+    ]),
+    mkSubSpace('ss-fin-invoices', 'Invoices', 'Invoice', 'board', [
+      mkField('f-finv-no',      'Invoice Number',  'text',   true),
+      mkField('f-finv-vendor',  'Vendor/Client',   'text',   true),
+      mkField('f-finv-amount',  'Amount',          'number', true),
+      mkField('f-finv-due',     'Due Date',        'date',   true),
+      mkField('f-finv-status',  'Status',          'select', true),
+    ]),
+    mkSubSpace('ss-fin-budgets', 'Budgets', 'Budget', 'summary', [
+      mkField('f-bud-dept',      'Department', 'select', true),
+      mkField('f-bud-period',    'Period',     'text',   true),
+      mkField('f-bud-allocated', 'Allocated',  'number', true),
+      mkField('f-bud-spent',     'Spent',      'number', false),
+    ]),
+  ]);
+
+  const wsHR = mkWorkspace('ws-univ-hr', 'Human Resources', 'Employee', '👥', [
+    mkSubSpace('ss-hr-employees', 'Employee Directory', 'Employee', 'grid', [
+      mkField('f-emp-name',   'Full Name',  'text',   true),
+      mkField('f-emp-dept',   'Department', 'select', true),
+      mkField('f-emp-title',  'Title',      'text',   true),
+      mkField('f-emp-start',  'Start Date', 'date',   false),
+      mkField('f-emp-status', 'Status',     'select', true),
+    ]),
+    mkSubSpace('ss-hr-offboarding', 'Offboarding Cases', 'Offboarding Case', 'board', [
+      mkField('f-hroff-emp',       'Employee',            'text',     true),
+      mkField('f-hroff-last',      'Last Day',            'date',     true),
+      mkField('f-hroff-reason',    'Reason',              'select',   false),
+      mkField('f-hroff-checklist', 'Checklist Complete',  'checkbox', false),
+    ]),
+    mkSubSpace('ss-hr-benefits', 'Benefits & PTO', 'Benefits Record', 'grid', [
+      mkField('f-ben-emp',     'Employee',        'text',   true),
+      mkField('f-ben-pto-bal', 'PTO Balance (days)', 'number', false),
+      mkField('f-ben-plan',    'Benefits Plan',   'select', false),
+    ]),
+  ]);
+
+  const wsMarketing = mkWorkspace('ws-univ-marketing', 'Marketing', 'Campaign', '📣', [
+    mkSubSpace('ss-mkt-campaigns', 'Campaigns', 'Campaign', 'board', [
+      mkField('f-cmp-name',    'Campaign Name', 'text',   true),
+      mkField('f-cmp-channel', 'Channel',       'select', true),
+      mkField('f-cmp-budget',  'Budget',        'number', false),
+      mkField('f-cmp-start',   'Start Date',    'date',   false),
+      mkField('f-cmp-status',  'Status',        'select', true),
+    ]),
+    mkSubSpace('ss-mkt-assets', 'Brand Assets', 'Asset', 'grid', [
+      mkField('f-ast-name',     'Asset Name', 'text',     true),
+      mkField('f-ast-type',     'Type',       'select',   true),
+      mkField('f-ast-approved', 'Approved',   'checkbox', false),
+    ]),
+    mkSubSpace('ss-mkt-analytics', 'Campaign Analytics', 'Analytics Record', 'summary', [
+      mkField('f-anl-campaign',     'Campaign',            'text',   true),
+      mkField('f-anl-impressions',  'Impressions',         'number', false),
+      mkField('f-anl-clicks',       'Clicks',              'number', false),
+      mkField('f-anl-conversions',  'Conversions',         'number', false),
+      mkField('f-anl-cpa',          'Cost Per Acquisition','number', false),
+    ]),
+  ]);
+
+  const wsSales = mkWorkspace('ws-univ-sales', 'Sales', 'Account', '📈', [
+    mkSubSpace('ss-sal-pipeline', 'Pipeline', 'Opportunity', 'board', [
+      mkField('f-sal-co',    'Company',       'text',   true),
+      mkField('f-sal-val',   'Deal Value',    'number', true),
+      mkField('f-sal-stage', 'Stage',         'select', true),
+      mkField('f-sal-owner', 'Sales Rep',     'text',   false),
+      mkField('f-sal-close', 'Expected Close','date',   false),
+    ]),
+    mkSubSpace('ss-sal-accounts', 'Accounts', 'Account', 'grid', [
+      mkField('f-acct-name',     'Account Name',             'text',   true),
+      mkField('f-acct-industry', 'Industry',                 'select', false),
+      mkField('f-acct-arr',      'ARR',                      'number', false),
+      mkField('f-acct-csm',      'Customer Success Manager', 'text',   false),
+    ]),
+    mkSubSpace('ss-sal-activities', 'Activities', 'Activity', 'timeline', [
+      mkField('f-sact-type',    'Type',    'select',   true),
+      mkField('f-sact-subject', 'Subject', 'text',     true),
+      mkField('f-sact-date',    'Date',    'datetime', true),
+      mkField('f-sact-account', 'Account', 'text',     false),
+    ]),
+  ]);
+
+  const wsLegal = mkWorkspace('ws-univ-legal', 'Legal', 'Contract', '⚖️', [
+    mkSubSpace('ss-leg-contracts', 'Contracts', 'Contract', 'grid', [
+      mkField('f-con-name',   'Contract Name',   'text',   true),
+      mkField('f-con-party',  'Counterparty',    'text',   true),
+      mkField('f-con-value',  'Contract Value',  'number', false),
+      mkField('f-con-exp',    'Expiration Date', 'date',   false),
+      mkField('f-con-status', 'Status',          'select', true),
+    ]),
+    mkSubSpace('ss-leg-compliance', 'Compliance', 'Compliance Item', 'board', [
+      mkField('f-cmp2-regulation', 'Regulation', 'text',   true),
+      mkField('f-cmp2-owner',      'Owner',      'text',   true),
+      mkField('f-cmp2-due',        'Due Date',   'date',   false),
+      mkField('f-cmp2-status',     'Status',     'select', true),
+    ]),
+    mkSubSpace('ss-leg-filings', 'Regulatory Filings', 'Filing', 'timeline', [
+      mkField('f-fil-name',   'Filing Name', 'text', true),
+      mkField('f-fil-agency', 'Agency',      'text', true),
+      mkField('f-fil-due',    'Due Date',    'date', true),
+      mkField('f-fil-filed',  'Filed Date',  'date', false),
+    ]),
+  ]);
+
+  const wsTechnology = mkWorkspace('ws-univ-technology', 'Technology', 'Project', '💻', [
+    mkSubSpace('ss-tec-projects', 'Projects', 'Project', 'board', [
+      mkField('f-prj-name',     'Project Name', 'text',   true),
+      mkField('f-prj-lead',     'Project Lead', 'text',   true),
+      mkField('f-prj-status',   'Status',       'select', true),
+      mkField('f-prj-deadline', 'Deadline',     'date',   false),
+      mkField('f-prj-priority', 'Priority',     'select', false),
+    ]),
+    mkSubSpace('ss-tec-assets', 'IT Assets', 'Asset', 'grid', [
+      mkField('f-itast-name',     'Asset Name',    'text',   true),
+      mkField('f-itast-type',     'Type',          'select', true),
+      mkField('f-itast-assignee', 'Assigned To',   'text',   false),
+      mkField('f-itast-serial',   'Serial Number', 'text',   false),
+      mkField('f-itast-warranty', 'Warranty Expiry','date',  false),
+    ]),
+    mkSubSpace('ss-tec-incidents', 'Incident Reports', 'Incident', 'board', [
+      mkField('f-inc-title',    'Title',        'text',   true),
+      mkField('f-inc-severity', 'Severity',     'select', true),
+      mkField('f-inc-reported', 'Reported By',  'text',   true),
+      mkField('f-inc-status',   'Status',       'select', true),
+    ]),
+  ]);
+
+  const wsSustainability = mkWorkspace('ws-univ-sustainability', 'Sustainability', 'Initiative', '🌱', [
+    mkSubSpace('ss-sus-initiatives', 'ESG Initiatives', 'Initiative', 'board', [
+      mkField('f-ini-name',     'Initiative Name', 'text',   true),
+      mkField('f-ini-category', 'Category',        'select', true),
+      mkField('f-ini-owner',    'Owner',            'text',   true),
+      mkField('f-ini-target',   'Target Date',      'date',   false),
+      mkField('f-ini-status',   'Status',           'select', true),
+    ]),
+    mkSubSpace('ss-sus-metrics', 'Carbon & Energy Metrics', 'Metric', 'grid', [
+      mkField('f-met-period', 'Period',       'text',   true),
+      mkField('f-met-scope',  'Scope',        'select', true),
+      mkField('f-met-co2',    'CO2e (tons)',  'number', false),
+      mkField('f-met-energy', 'Energy (MWh)', 'number', false),
+    ]),
+    mkSubSpace('ss-sus-reports', 'ESG Reports', 'Report', 'timeline', [
+      mkField('f-rep-title',     'Report Title',      'text', true),
+      mkField('f-rep-period',    'Reporting Period',  'text', true),
+      mkField('f-rep-published', 'Published Date',    'date', false),
+      mkField('f-rep-url',       'Report URL',        'text', false),
+    ]),
+  ]);
+
+  const flows = [
+    mkFlow('flow-univ-deal-won',        'Deal Won → Finance & CS',          'Sales opportunity stage changed to Closed Won',                    ['stage = Closed Won'],                              'Create invoice in Finance, notify CS to begin onboarding, track commission',           'ws-univ-sales',           'ss-sal-pipeline',    ['Cross:Sales→Finance', 'Type:DealWon']),
+    mkFlow('flow-univ-new-employee',    'New Hire → IT + HR',               'New employee record added to HR Directory with Active status',      ['status = Active', 'start_date is set'],            'Create IT asset request, provision accounts, send welcome email sequence',             'ws-univ-hr',              'ss-hr-employees',    ['Cross:HR→IT', 'Type:Onboarding']),
+    mkFlow('flow-univ-contract-expiry', 'Contract Expiry Warning',          'Legal contract expiring within 30 days',                           ['expiration_date_days <= 30', 'status = Active'],   'Notify legal team and contract owner with renewal task and draft renewal',             'ws-univ-legal',           'ss-leg-contracts',   ['Type:Legal', 'Status:Expiring']),
+    mkFlow('flow-univ-invoice-overdue', 'Overdue Invoice Escalation',       'Invoice past due date with no payment recorded',                   ['status = Sent', 'due_days_past > 0'],              'Escalate to Finance Director and send auto-reminder to customer',                     'ws-univ-finance',         'ss-fin-invoices',    ['Type:Finance', 'Status:Overdue']),
+    mkFlow('flow-univ-incident-p1',     'P1 Incident → War Room',           'Technology incident logged with P1/Critical severity',             ['severity = Critical'],                             'Page on-call lead, create war room channel, auto-update status page',                 'ws-univ-technology',      'ss-tec-incidents',   ['Priority:Critical', 'Type:Incident']),
+    mkFlow('flow-univ-esg-deadline',    'ESG Report Deadline',              'Sustainability report due within 14 days, not yet published',      ['due_date_days <= 14', 'published_date is empty'],  'Alert sustainability team and assign report completion task',                          'ws-univ-sustainability',  'ss-sus-reports',     ['Type:ESG', 'Status:Due']),
+  ];
+
+  const integrations = [
+    mkIntegration('int-univ-ds',   'tpl-docusign',    fmtDate(-60)),
+    mkIntegration('int-univ-qb',   'tpl-quickbooks',  fmtDate(-45)),
+    mkIntegration('int-univ-http', 'tpl-custom-http', fmtDate(-30)),
+  ];
+
+  const records: RuntimeRecord[] = [
+    mkRecord('rec-univ-ops-0', 'client-univ-0', 'ws-univ-operations',    'ss-ops-processes',     'Q2 Vendor Review Process',                'In Progress', undefined,  fmtDate(-5),   ['Dept:Operations'],     { 'Process Name': 'Q2 Vendor Review',              'Owner': 'Ops Director',      'Status': 'In Progress', 'Priority': 'Medium' }),
+    mkRecord('rec-univ-fin-0', 'client-univ-1', 'ws-univ-finance',       'ss-fin-invoices',      'INV-2026-001 — Acme Corp $12,500',        'Sent',        12500,       fmtDate(-10),  ['Dept:Finance'],        { 'Invoice Number': 'INV-2026-001',                'Vendor/Client': 'Acme Corp', 'Amount': 12500, 'Due Date': fmtDate(20), 'Status': 'Sent' }),
+    mkRecord('rec-univ-hr-0',  'client-univ-2', 'ws-univ-hr',            'ss-hr-employees',      'Jordan Kim — Technology',                 'Active',      undefined,  fmtDate(-90),  ['Dept:HR'],             { 'Full Name': 'Jordan Kim',                       'Department': 'Technology',   'Title': 'Senior Engineer', 'Start Date': fmtDate(-90), 'Status': 'Active' }),
+    mkRecord('rec-univ-mkt-0', 'client-univ-3', 'ws-univ-marketing',     'ss-mkt-campaigns',     'Q2 Product Launch Campaign',              'Active',      25000,       fmtDate(-14),  ['Dept:Marketing'],      { 'Campaign Name': 'Q2 Product Launch',            'Channel': 'Paid Social + Email', 'Budget': 25000, 'Start Date': fmtDate(-14), 'Status': 'Active' }),
+    mkRecord('rec-univ-sal-0', 'client-univ-4', 'ws-univ-sales',         'ss-sal-pipeline',      'TechStart Inc — $85,000 Deal',            'Proposal',    85000,       fmtDate(15),   ['Dept:Sales'],          { 'Company': 'TechStart Inc',                      'Deal Value': 85000, 'Stage': 'Proposal', 'Sales Rep': 'Marcus Lee', 'Expected Close': fmtDate(30) }),
+    mkRecord('rec-univ-leg-0', 'client-univ-5', 'ws-univ-legal',         'ss-leg-contracts',     'MSA — Redwood Solutions', 'Active',  120000, fmtDate(-180), ['Dept:Legal'], { 'Contract Name': 'Master Services Agreement', 'Counterparty': 'Redwood Solutions', 'Contract Value': 120000, 'Expiration Date': fmtDate(185), 'Status': 'Active' }),
+    mkRecord('rec-univ-tec-0', 'client-univ-6', 'ws-univ-technology',    'ss-tec-projects',      'Platform v2.0 Migration',                 'In Progress', undefined,  fmtDate(-30),  ['Dept:Technology'],     { 'Project Name': 'Platform v2.0 Migration',       'Project Lead': 'CTO', 'Status': 'In Progress', 'Deadline': fmtDate(60), 'Priority': 'High' }),
+    mkRecord('rec-univ-sus-0', 'client-univ-7', 'ws-univ-sustainability', 'ss-sus-initiatives',  'Carbon Neutral by 2030',                  'Active',      undefined,  fmtDate(-365), ['Dept:Sustainability'], { 'Initiative Name': 'Carbon Neutral by 2030',     'Category': 'Environmental', 'Owner': 'Sustainability Director', 'Target Date': fmtDate(1400), 'Status': 'Active' }),
+  ];
+
+  const deptClientNames = ['Operations Corp', 'Finance Group', 'People First HR', 'Brand Labs', 'Revenue Team', 'Legal Partners', 'Tech Division', 'Green Initiatives'];
+  const clients = deptClientNames.map((name, i) => mkClient(`client-univ-${i}`, name, `UNIV-${1000 + i}`, ['Universal:Enterprise']));
+
+  return {
+    shellConfig: mkShellConfig('Record', 'Records', 'Enterprise Workspace', 'Business Function', ['Draft', 'In Review', 'Active', 'Pending', 'Completed', 'Archived']),
+    workspaces: [wsOps, wsFinance, wsHR, wsMarketing, wsSales, wsLegal, wsTechnology, wsSustainability],
+    flows, integrations, records, clients,
+  };
+}
+
 // ─── Business Architecture Builders ──────────────────────────────────
 
 function buildPharmaBusinessFunctions(): BusinessFunction[] {
@@ -1190,6 +1717,8 @@ export function getPayloadForVertical(vertical: DemoVertical): ScenarioApplyPayl
     case 'logistics': return buildLogisticsPayload();
     case 'legal': return buildLegalPayload();
     case 'insurance': return buildInsurancePayload();
+    case 'lifecycle': return buildLifecyclePayload();
+    case 'fulfillment': return buildFulfillmentPayload();
   }
 }
 
@@ -1218,13 +1747,15 @@ export function classifyIntent(text: string): BeboIntent {
 
 // ─── Static Catalog ───────────────────────────────────────────────────
 
-export const VERTICAL_META: Record<DemoVertical, { label: string; icon: string; color: string; shortLabel: string }> = {
-  pharma: { label: 'Pharmaceutical / DSCSA', icon: '💊', color: '#8C5BF5', shortLabel: 'Pharma' },
-  sales: { label: 'Sales CRM', icon: '💰', color: '#10B981', shortLabel: 'Sales' },
-  healthcare: { label: 'Healthcare', icon: '🏥', color: '#3B82F6', shortLabel: 'Health' },
-  logistics: { label: 'Logistics', icon: '🚚', color: '#F59E0B', shortLabel: 'Logistics' },
-  legal: { label: 'Legal', icon: '⚖️', color: '#64748B', shortLabel: 'Legal' },
-  insurance: { label: 'Insurance', icon: '🛡️', color: '#EF4444', shortLabel: 'Insurance' },
+export const VERTICAL_META: Record<DemoVertical, { label: string; icon: string; color: string; shortLabel: string; tenantName: string; tenantLogo: string }> = {
+  pharma:      { label: 'Pharmaceutical / DSCSA',  icon: '💊', color: '#F97316', shortLabel: 'Pharma',      tenantName: 'CVS Pharmacy',           tenantLogo: 'https://upload.wikimedia.org/wikipedia/commons/f/f4/CVSPharmacyLogo2014.png' },
+  sales:       { label: 'Sales CRM',               icon: '💰', color: '#166534', shortLabel: 'Sales',       tenantName: 'Saleshood',              tenantLogo: 'https://image4.owler.com/logo/saleshood_owler_20220704_010918_original.png' },
+  healthcare:  { label: 'Healthcare',              icon: '🏥', color: '#0284C7', shortLabel: 'Health',      tenantName: "Cook Children's",        tenantLogo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Cook_Children%27s_Medical_Center_logo.svg/1280px-Cook_Children%27s_Medical_Center_logo.svg.png' },
+  logistics:   { label: 'Logistics',               icon: '🚚', color: '#0369A1', shortLabel: 'Logistics',   tenantName: 'Hellmann Worldwide',     tenantLogo: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Logo_Hellmann_Worldwide_Logistics.png' },
+  legal:       { label: 'Legal',                   icon: '⚖️', color: '#1B3A5C', shortLabel: 'Legal',       tenantName: 'Witherite Law Group',    tenantLogo: 'https://cdn.prod.website-files.com/6700445b076878fb60678d7a/67af6fd009c6d53795d688b3_Witherite%20Law%20Group%20%C2%AE%20white%20.avif' },
+  insurance:   { label: 'Insurance',               icon: '🛡️', color: '#1E293B', shortLabel: 'Insurance',   tenantName: 'Farmers Insurance',      tenantLogo: 'https://chambermaster.blob.core.windows.net/images/customers/314/members/3005/logos/MEMBER_PAGE_HEADER/farmers_horizontal_full_color_logo_png.png' },
+  lifecycle:   { label: 'Lifecycle Services',      icon: '🔄', color: '#6366F1', shortLabel: 'Lifecycle',   tenantName: 'LifecycleOS',            tenantLogo: '' },
+  fulfillment: { label: 'Fulfillment & Warehouse', icon: '📦', color: '#0891B2', shortLabel: 'Fulfillment', tenantName: 'Relentless Fulfillment', tenantLogo: 'https://cdn-ildpoef.nitrocdn.com/qWHnvrhJREiUMFZdGgGGyvsgiuoHGWxV/assets/images/optimized/rev-8bbf9f6/relentlessfulfillment.com/wp-content/uploads/2021/03/RF-Logo.png' },
 };
 
 const INTEGRATION_CATALOG: BeboCardIntegrationStatus['integrations'] = [
@@ -1239,12 +1770,14 @@ const INTEGRATION_CATALOG: BeboCardIntegrationStatus['integrations'] = [
 ];
 
 const WORKSPACE_KPI: Record<DemoVertical, { v1: string; v2: string; v3: string; wsCount: number; flowCount: number }> = {
-  pharma: { v1: '247 Serialized Batches', v2: '99.8% Compliance Rate', v3: '1 Pipeline Workspace', wsCount: 1, flowCount: 5 },
-  sales: { v1: '$2.4M Pipeline Value', v2: '34% Win Rate', v3: '183 Tracked Records', wsCount: 1, flowCount: 3 },
-  healthcare: { v1: '412 Patient Records', v2: '94% Appointment Show Rate', v3: '38 Visits Today', wsCount: 1, flowCount: 2 },
-  logistics: { v1: '891 Shipments Active', v2: '97.2% On-Time Rate', v3: '12 Alerts Today', wsCount: 1, flowCount: 2 },
-  legal: { v1: '94 Active Cases', v2: '$1.8M Billed YTD', v3: '8 Court Dates This Month', wsCount: 2, flowCount: 2 },
-  insurance: { v1: '318 Active Policies', v2: '$4.2M Annual Premium', v3: '27 Open Claims', wsCount: 2, flowCount: 2 },
+  pharma:      { v1: '247 Serialized Batches',  v2: '99.8% Compliance Rate',       v3: '1 Pipeline Workspace',        wsCount: 1, flowCount: 5 },
+  sales:       { v1: '$2.4M Pipeline Value',    v2: '34% Win Rate',                v3: '183 Tracked Records',         wsCount: 1, flowCount: 3 },
+  healthcare:  { v1: '412 Patient Records',     v2: '94% Appointment Show Rate',   v3: '38 Visits Today',             wsCount: 1, flowCount: 2 },
+  logistics:   { v1: '891 Shipments Active',    v2: '97.2% On-Time Rate',          v3: '12 Alerts Today',             wsCount: 1, flowCount: 2 },
+  legal:       { v1: '94 Active Cases',         v2: '$1.8M Billed YTD',            v3: '8 Court Dates This Month',    wsCount: 2, flowCount: 2 },
+  insurance:   { v1: '318 Active Policies',     v2: '$4.2M Annual Premium',        v3: '27 Open Claims',              wsCount: 2, flowCount: 2 },
+  lifecycle:   { v1: '47 Active Accounts',      v2: '99.2% SLA Compliance',        v3: '6 Open Exchanges',            wsCount: 4, flowCount: 5 },
+  fulfillment: { v1: '312 Orders In Process',   v2: '98.1% On-Time Rate',          v3: '24 Alerts Today',             wsCount: 3, flowCount: 4 },
 };
 
 // ─── Response Generator ───────────────────────────────────────────────
@@ -1449,24 +1982,28 @@ export function generateBeboResponse(userText: string, vertical: DemoVertical): 
 
 function getPersonasForVertical(v: DemoVertical): string[] {
   const map: Record<DemoVertical, string[]> = {
-    pharma: ['Manufacturer Serialization Lead', 'Distributor Receiver', 'Pharmacy Dispense Manager', 'Compliance Trace Analyst'],
-    sales: ['Sales Rep', 'Sales Manager', 'SDR', 'Account Executive'],
-    healthcare: ['Physician', 'Nurse', 'Front Desk Coordinator', 'Billing Specialist'],
-    logistics: ['Warehouse Manager', 'Picker / Packer', 'Shipping Coordinator', 'Procurement Officer'],
-    legal: ['Managing Partner', 'Attorney', 'Paralegal', 'Legal Secretary'],
-    insurance: ['Underwriter', 'Claims Adjuster', 'Policy Administrator', 'Customer Service Rep'],
+    pharma:      ['Manufacturer Serialization Lead', 'Distributor Receiver', 'Pharmacy Dispense Manager', 'Compliance Trace Analyst'],
+    sales:       ['Sales Rep', 'Sales Manager', 'SDR', 'Account Executive'],
+    healthcare:  ['Physician', 'Nurse', 'Front Desk Coordinator', 'Billing Specialist'],
+    logistics:   ['Warehouse Manager', 'Picker / Packer', 'Shipping Coordinator', 'Procurement Officer'],
+    legal:       ['Managing Partner', 'Attorney', 'Paralegal', 'Legal Secretary'],
+    insurance:   ['Underwriter', 'Claims Adjuster', 'Policy Administrator', 'Customer Service Rep'],
+    lifecycle:   ['IT Admin', 'Procurement / Ops', 'End User (Employee)', 'Account Manager'],
+    fulfillment: ['Warehouse Manager', 'Picker', 'Packer', 'Shipping Coordinator', 'Admin', 'Quality Inspector'],
   };
   return map[v];
 }
 
 function getStagesForVertical(v: DemoVertical): string[] {
   const map: Record<DemoVertical, string[]> = {
-    pharma: ['Serialized', 'Shipped to Distributor', 'Received by Distributor', 'Shipped to Pharmacy', 'Dispensed'],
-    sales: ['New Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'],
-    healthcare: ['Registered', 'Scheduled', 'In Progress', 'Completed', 'Follow-Up'],
-    logistics: ['Ordered', 'Received', 'Picking', 'Packed', 'Shipped', 'Delivered'],
-    legal: ['Intake', 'Engagement', 'Discovery', 'Litigation', 'Settlement', 'Closed'],
-    insurance: ['Application', 'Underwriting', 'Bound', 'Active', 'Renewal Pending'],
+    pharma:      ['Serialized', 'Shipped to Distributor', 'Received by Distributor', 'Shipped to Pharmacy', 'Dispensed'],
+    sales:       ['New Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'],
+    healthcare:  ['Registered', 'Scheduled', 'In Progress', 'Completed', 'Follow-Up'],
+    logistics:   ['Ordered', 'Received', 'Picking', 'Packed', 'Shipped', 'Delivered'],
+    legal:       ['Intake', 'Engagement', 'Discovery', 'Litigation', 'Settlement', 'Closed'],
+    insurance:   ['Application', 'Underwriting', 'Bound', 'Active', 'Renewal Pending'],
+    lifecycle:   ['Submitted', 'In Progress', 'Awaiting Customer', 'Resolved', 'Closed', 'Escalated'],
+    fulfillment: ['Received', 'Inventoried', 'Ordered', 'Picking', 'Packing', 'Shipped', 'Delivered', 'Returned'],
   };
   return map[v];
 }
@@ -1474,6 +2011,8 @@ function getStagesForVertical(v: DemoVertical): string[] {
 // ─── Scenario Switch Message ──────────────────────────────────────────
 
 const SCENARIO_INTROS: Record<DemoVertical, string> = {
+  lifecycle: `Switching to **🔄 Lifecycle Services** mode.\n\nI've pre-built a complete **LifecycleOS** workflow covering all 4 modules: **Customer Onboarding**, **Offboarding**, **Advanced Exchange**, and **Service Ticketing** — each with guided wizards, SLA tracking, and automation flows.\n\nReady to deploy the full scenario, or ask me to customize a module first?`,
+  fulfillment: `Switching to **📦 Fulfillment & Warehouse** mode.\n\nYour **Relentless Fulfillment** workspace covers the full pick-pack-ship lifecycle: **Receiving & Inventory**, **Order Management**, and **Packing & Shipping** — with AI-assisted box sizing, weight validation, carrier selection, and exception handling built in.\n\nApply the full scenario with one click, or ask me to configure the workflow first.`,
   pharma: `Switching to **💊 Pharmaceutical / DSCSA** mode.\n\nI have full knowledge of DSCSA serialization requirements, FDA track-and-trace compliance, and supply chain traceability from manufacturer through distributor to pharmacy.\n\nYour **Manufacturer Serialization**, **Distributor Verification**, and **Pharmacy Dispense Trace** workspaces are pre-built and ready to apply.`,
   sales: `Switching to **💰 Sales CRM** mode.\n\nI've pre-built a complete **Sales Pipeline** workspace with Lead tracking, Opportunity management, and Activity logging — plus 3 automation flows: Stale Lead Alert, Deal Won → Onboarding, and Proposal Follow-Up.\n\nReady to deploy to your CoreSpace instance?`,
   healthcare: `Switching to **🏥 Healthcare / Patient Care** mode.\n\nYour **Patient Care** workspace covers Appointments, Prescriptions, and Lab Results — with a No-Show Follow-Up automation and Critical Lab Alert pre-configured.\n\nApply it with one click, or ask me to customize first.`,

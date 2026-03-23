@@ -46,7 +46,7 @@ interface ChatMsg {
 
 // ─── Scenario Config ──────────────────────────────────────────────────
 
-const VERTICALS: DemoVertical[] = ['pharma', 'sales', 'healthcare', 'logistics', 'legal', 'insurance', 'lifecycle', 'fulfillment'];
+const VERTICALS: DemoVertical[] = ['pharma', 'sales', 'healthcare', 'logistics', 'legal', 'insurance', 'lifecycle', 'fulfillment', 'kitting'];
 
 const DEMO_QUICK_PROMPTS: Record<DemoVertical, string[]> = {
   pharma:      ['Build workspace architecture', 'Generate DSCSA records', 'Show Signal flows', 'Show Orbital integrations'],
@@ -57,6 +57,7 @@ const DEMO_QUICK_PROMPTS: Record<DemoVertical, string[]> = {
   insurance:   ['Build Policy Admin workspace',  'Generate policy data', 'Show claim automations', 'Show Orbital'],
   lifecycle:   ['Build Onboarding workspace', 'Generate service records', 'Show SLA automations', 'Show Orbital'],
   fulfillment: ['Build Pick-Pack-Ship workspace', 'Generate fulfillment data', 'Show automation flows', 'Show Orbital'],
+  kitting:     ['Build kitting workspace', 'Generate work order data', 'Show BOM automation flows', 'Show Orbital'],
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────
@@ -508,7 +509,17 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
       type: 'workspace_proposal',
       id: `card-universal-${Date.now()}`,
       industry: 'Universal Enterprise Suite',
-      workspaces: payload.workspaces.map(ws => ({ id: ws.id, name: ws.name, icon: ws.icon, subSpaceCount: ws.subSpaces?.length ?? 0, fieldCount: (ws.subSpaces ?? []).reduce((n, ss) => n + (ss.fields?.length ?? 0), 0) })),
+      workspaces: payload.workspaces.map(ws => ({
+        name: ws.name,
+        icon: ws.icon ?? '🗂️',
+        rootEntity: ws.rootEntity,
+        subSpaces: (ws.subSpaces ?? []).map(ss => ({
+          name: ss.name,
+          sourceEntity: ss.sourceEntity,
+          displayType: ss.displayType,
+          fieldCount: ss.builderFields?.length ?? 0,
+        })),
+      })),
       personas: ['Department Head', 'Team Member', 'Admin', 'Executive', 'Cross-Dept Collaborator'],
       lifecycleStages: ['Draft', 'In Review', 'Active', 'Pending', 'Completed', 'Archived'],
       flows: payload.flows.map(f => ({ name: f.name, trigger: f.signal, action: f.action })),

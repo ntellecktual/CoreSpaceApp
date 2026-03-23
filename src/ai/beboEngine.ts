@@ -22,7 +22,7 @@ import type {
 
 // ─── Public Types ────────────────────────────────────────────────────
 
-export type DemoVertical = 'pharma' | 'sales' | 'healthcare' | 'logistics' | 'legal' | 'insurance' | 'lifecycle' | 'fulfillment';
+export type DemoVertical = 'pharma' | 'sales' | 'healthcare' | 'logistics' | 'legal' | 'insurance' | 'lifecycle' | 'fulfillment' | 'kitting';
 
 export type BeboIntent =
   | 'build_workspace'
@@ -491,6 +491,46 @@ function generateFulfillmentData(count = 20) {
   return { headers, rows: rows.slice(0, 6), totalRows: count, csvContent: csv, jsonContent: json };
 }
 
+const KIT_PRODUCTS = [
+  'Phone Kit', 'Tablet Kit', 'Laptop Kit', 'Desktop Bundle',
+  'Accessory Bundle', 'Conference Room Kit', 'Remote Worker Kit', 'Developer Workstation Kit',
+];
+
+const KIT_COMPONENTS = [
+  'Smartphone', 'Tablet', 'Laptop', 'USB-C Charger', 'USB-C Cable', 'Protective Case',
+  'Screen Protector', 'Stylus', 'Power Adapter', 'Laptop Sleeve', 'Keyboard', 'Mouse',
+  'USB Hub', 'Webcam', 'Headset', 'Monitor',
+];
+
+const KIT_CLIENTS = [
+  'Nexus Electronics', 'Summit Tech Manufacturing', 'Apex Device Solutions',
+  'Pacific Systems Corp', 'Delta Components Inc.', 'Meridian Manufacturing Co.',
+  'Vertex Industries', 'Cascade Tech Partners',
+];
+
+function generateKittingData(count = 20) {
+  const headers = ['Work Order', 'Client', 'Kit SKU', 'Kit Qty', 'BOM Components', 'Stage', 'Assembled By', 'Ship Date'];
+  const stages  = ['Received', 'BOM Allocated', 'Work Order Created', 'Picking', 'Kitting', 'QC', 'Packed', 'Shipped'];
+  const techs   = ['J. Rivera', 'K. Thompson', 'M. Santos', 'T. Williams', 'A. Patel'];
+  const rows: string[][] = Array.from({ length: count }, (_, i) => {
+    const kitSku   = `KIT-${String(5000 + (i % KIT_PRODUCTS.length)).padStart(4, '0')}`;
+    const bomCount = Math.floor(Math.random() * 4) + 2;
+    return [
+      `WO-${String(10000 + i)}`,
+      KIT_CLIENTS[i % KIT_CLIENTS.length],
+      kitSku,
+      String(Math.floor(Math.random() * 500) + 100),
+      `${bomCount} components`,
+      pick(stages),
+      pick(techs),
+      fmtDate(Math.floor(Math.random() * 14) + 3),
+    ];
+  });
+  const csv  = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+  const json = JSON.stringify(rows.map(r => Object.fromEntries(headers.map((h, i2) => [h, r[i2]]))), null, 2);
+  return { headers, rows: rows.slice(0, 6), totalRows: count, csvContent: csv, jsonContent: json };
+}
+
 export function getDataForVertical(vertical: DemoVertical) {
   switch (vertical) {
     case 'pharma': return generatePharmaData();
@@ -501,6 +541,7 @@ export function getDataForVertical(vertical: DemoVertical) {
     case 'insurance': return generateInsuranceData();
     case 'lifecycle': return generateLifecycleData();
     case 'fulfillment': return generateFulfillmentData();
+    case 'kitting': return generateKittingData();
   }
 }
 
@@ -1659,6 +1700,168 @@ export function buildUniversalPayload(): ScenarioApplyPayload {
   };
 }
 
+// ─── Kitting (BOM-Driven Assembly) Payload ───────────────────────────
+
+export function buildKittingPayload(): ScenarioApplyPayload {
+  const wsReceiving = mkWorkspace('ws-bebo-kit-receiving', 'Component Receiving', 'Component', '📥', [
+    mkSubSpace('ss-kit-recv-queue', 'Receiving Queue', 'Received Item', 'board', [
+      mkField('f-kr-sku',       'SKU',            'text',   true),
+      mkField('f-kr-qty',       'Quantity',        'number', true),
+      mkField('f-kr-serial',    'Serial Numbers',  'text',   false),
+      mkField('f-kr-condition', 'Condition',       'select', true),
+      mkField('f-kr-location',  'Bin Location',    'text',   true),
+    ]),
+    mkSubSpace('ss-kit-components', 'Component Catalog', 'Component', 'grid', [
+      mkField('f-kc-sku',     'SKU',              'text',   true),
+      mkField('f-kc-name',    'Component Name',   'text',   true),
+      mkField('f-kc-qty',     'Qty On Hand',      'number', true),
+      mkField('f-kc-reorder', 'Reorder Point',    'number', false),
+      mkField('f-kc-loc',     'Primary Location', 'text',   false),
+    ]),
+    mkSubSpace('ss-kit-recv-audit', 'Receiving Audit', 'Audit Entry', 'timeline', [
+      mkField('f-ka-user',   'Received By', 'text',     true),
+      mkField('f-ka-sku',    'SKU',         'text',     true),
+      mkField('f-ka-action', 'Action',      'text',     true),
+      mkField('f-ka-ts',     'Timestamp',   'datetime', true),
+    ]),
+  ]);
+
+  const wsOrders = mkWorkspace('ws-bebo-kit-orders', 'Orders & BOM', 'Kit Order', '📋', [
+    mkSubSpace('ss-kit-intake', 'Order Intake', 'Client Order', 'board', [
+      mkField('f-ko-client',   'Client',     'text',   true),
+      mkField('f-ko-kitsku',   'Kit SKU',    'select', true),
+      mkField('f-ko-qty',      'Order Qty',  'number', true),
+      mkField('f-ko-shipdate', 'Ship Date',  'date',   true),
+      mkField('f-ko-status',   'Status',     'select', true),
+    ]),
+    mkSubSpace('ss-kit-bom', 'Bill of Materials', 'BOM Line', 'grid', [
+      mkField('f-bom-kitsku',  'Kit SKU',        'select', true),
+      mkField('f-bom-comp',    'Component',      'text',   true),
+      mkField('f-bom-compsku', 'Component SKU',  'text',   true),
+      mkField('f-bom-qty',     'Qty Per Kit',    'number', true),
+      mkField('f-bom-alt',     'Alt Component',  'text',   false),
+    ]),
+    mkSubSpace('ss-kit-workorders', 'Work Orders', 'Work Order', 'board', [
+      mkField('f-wo-id',     'Work Order ID', 'text',   true),
+      mkField('f-wo-kitsku', 'Kit SKU',       'text',   true),
+      mkField('f-wo-qty',    'Kit Qty',       'number', true),
+      mkField('f-wo-status', 'Status',        'select', true),
+      mkField('f-wo-due',    'Due Date',      'date',   false),
+    ]),
+  ]);
+
+  const wsProduction = mkWorkspace('ws-bebo-kit-production', 'Picking & Kitting', 'Kit', '🔧', [
+    mkSubSpace('ss-kit-picklist', 'Pick Lists', 'Pick Record', 'grid', [
+      mkField('f-pk-wo',       'Work Order',  'text',   true),
+      mkField('f-pk-item',     'Item',        'text',   true),
+      mkField('f-pk-location', 'Location',    'text',   true),
+      mkField('f-pk-qty',      'Qty to Pick', 'number', true),
+      mkField('f-pk-scanned',  'Qty Scanned', 'number', false),
+    ]),
+    mkSubSpace('ss-kit-station', 'Kitting Station', 'Kit Assembly', 'grid', [
+      mkField('f-ks-wo',      'Work Order',         'text',     true),
+      mkField('f-ks-kitid',   'Kit ID',             'text',     true),
+      mkField('f-ks-kitsku',  'Kit SKU',            'text',     true),
+      mkField('f-ks-tech',    'Kitting Technician', 'text',     true),
+      mkField('f-ks-serials', 'Serialized',         'checkbox', false),
+    ]),
+    mkSubSpace('ss-kit-assembly', 'Assembly Tracker', 'Assembly Step', 'timeline', [
+      mkField('f-at-kitid', 'Kit ID',       'text',     true),
+      mkField('f-at-step',  'Step',         'text',     true),
+      mkField('f-at-by',    'Performed By', 'text',     true),
+      mkField('f-at-ts',    'Timestamp',    'datetime', true),
+      mkField('f-at-notes', 'Notes',        'longText', false),
+    ]),
+  ]);
+
+  const wsQcShipping = mkWorkspace('ws-bebo-kit-qcship', 'QC & Shipping', 'Shipment', '🚚', [
+    mkSubSpace('ss-kit-qc', 'QC Queue', 'QC Record', 'board', [
+      mkField('f-qc-kitid',      'Kit ID',       'text',     true),
+      mkField('f-qc-orderId',    'Order ID',     'text',     true),
+      mkField('f-qc-inspection', 'Inspection',   'select',   true),
+      mkField('f-qc-inspector',  'Inspector',    'text',     true),
+      mkField('f-qc-defects',    'Defect Notes', 'longText', false),
+    ]),
+    mkSubSpace('ss-kit-labels', 'Shipping Labels', 'Shipping Label', 'grid', [
+      mkField('f-sl-orderid',  'Order ID',           'text',   true),
+      mkField('f-sl-carrier',  'Carrier',            'select', true),
+      mkField('f-sl-tracking', 'Tracking Number',    'text',   false),
+      mkField('f-sl-eta',      'Estimated Delivery', 'date',   false),
+    ]),
+    mkSubSpace('ss-kit-tracker', 'Shipment Tracker', 'Shipment Event', 'timeline', [
+      mkField('f-st-orderid',  'Order ID',  'text',     true),
+      mkField('f-st-carrier',  'Carrier',   'text',     true),
+      mkField('f-st-event',    'Event',     'text',     true),
+      mkField('f-st-location', 'Location',  'text',     false),
+      mkField('f-st-ts',       'Timestamp', 'datetime', true),
+    ]),
+  ]);
+
+  const flows = [
+    mkFlow('flow-kit-new-order',   'New Client Order → Work Order',    'Client order received and status set to Confirmed',         ['status = Confirmed'],                                   'Auto-create Work Order, validate BOM component availability, assign kitting technician',    'ws-bebo-kit-orders',      'ss-kit-intake',     ['Type:Order', 'Priority:Standard']),
+    mkFlow('flow-kit-low-stock',   'Component Low Stock Alert',         'Component inventory drops below reorder threshold',          ['qty_on_hand < reorder_point'],                          'Notify procurement team and auto-create purchase request for replenishment',                'ws-bebo-kit-receiving',   'ss-kit-components', ['Priority:LowStock', 'Type:Inventory']),
+    mkFlow('flow-kit-bom-short',   'BOM Component Shortage Block',      'Work order BOM check fails — component unavailable',         ['bom_check = failed'],                                   'Block work order from moving to Picking; assign to BOM Coordinator for resolution',        'ws-bebo-kit-orders',      'ss-kit-workorders', ['Type:Block', 'Exception:BOMShortage']),
+    mkFlow('flow-kit-qc-pass',     'QC Pass → Auto-Generate Label',     'Kit passes QC inspection',                                  ['inspection = Passed'],                                  'Auto-generate prepaid shipping label and assign carrier via cost/speed rules',             'ws-bebo-kit-qcship',      'ss-kit-qc',         ['Type:QC', 'Status:Passed']),
+    mkFlow('flow-kit-scan-update', 'Carrier Scan → Order Status Sync',  'Carrier milestone received (In Transit or Delivered)',       ['carrier_event = Delivered', 'carrier_event = In Transit'], 'Update client order status and notify the client contact via email',                  'ws-bebo-kit-qcship',      'ss-kit-tracker',    ['Type:Shipment', 'Status:Scan']),
+  ];
+
+  const integrations = [
+    mkIntegration('int-kit-http',     'tpl-custom-http', fmtDate(-25)),
+    mkIntegration('int-kit-qb',       'tpl-quickbooks',  fmtDate(-40)),
+    mkIntegration('int-kit-docusign', 'tpl-docusign',    fmtDate(-55)),
+  ];
+
+  const kitSkus    = KIT_PRODUCTS.slice(0, 5).map((_, i) => `KIT-${String(5000 + i)}`);
+  const woStatuses = ['Pending', 'Picking', 'Kitting', 'QC', 'Ready to Ship'];
+
+  const compRecords: RuntimeRecord[] = KIT_COMPONENTS.slice(0, 6).map((comp, i) => {
+    const qty     = Math.floor(Math.random() * 2000) + 200;
+    const reorder = 500;
+    return mkRecord(`rec-kit-comp-${i}`, `client-kit-${i % KIT_CLIENTS.length}`, 'ws-bebo-kit-receiving', 'ss-kit-components',
+      `SKU-KIT-${String(4000 + i)} — ${comp}`, qty < reorder ? 'Low Stock' : 'In Stock',
+      qty, fmtDate(-i), ['Type:Component'],
+      { 'SKU': `SKU-KIT-${String(4000 + i)}`, 'Component Name': comp, 'Qty On Hand': qty, 'Reorder Point': reorder, 'Primary Location': `A${i + 1}-B${(i % 3) + 1}` });
+  });
+
+  const orderRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) => {
+    const kitProd  = KIT_PRODUCTS[i % KIT_PRODUCTS.length];
+    const qty      = Math.floor(Math.random() * 900) + 100;
+    const statuses = ['Pending', 'Confirmed', 'Work Order Created', 'In Production', 'Shipped'];
+    const st       = pick(statuses);
+    return mkRecord(`rec-kit-ord-${i}`, `client-kit-${i % KIT_CLIENTS.length}`, 'ws-bebo-kit-orders', 'ss-kit-intake',
+      `ORD-KIT-${10000 + i} — ${kitProd}`, st,
+      qty * 45, fmtDate(-i), ['Type:KitOrder'],
+      { 'Client': KIT_CLIENTS[i % KIT_CLIENTS.length], 'Kit SKU': kitSkus[i % kitSkus.length], 'Order Qty': qty, 'Ship Date': fmtDate(Math.floor(Math.random() * 14) + 3), 'Status': st });
+  });
+
+  const woRecords: RuntimeRecord[] = Array.from({ length: 6 }, (_, i) => {
+    const kitProd = KIT_PRODUCTS[i % KIT_PRODUCTS.length];
+    const st      = pick(woStatuses);
+    return mkRecord(`rec-kit-wo-${i}`, `client-kit-${i % KIT_CLIENTS.length}`, 'ws-bebo-kit-orders', 'ss-kit-workorders',
+      `WO-${10000 + i} — ${kitProd}`, st,
+      undefined, fmtDate(-i), ['Type:WorkOrder'],
+      { 'Work Order ID': `WO-${10000 + i}`, 'Kit SKU': kitSkus[i % kitSkus.length], 'Kit Qty': Math.floor(Math.random() * 500) + 100, 'Status': st, 'Due Date': fmtDate(Math.floor(Math.random() * 10) + 2) });
+  });
+
+  const qcRecords: RuntimeRecord[] = Array.from({ length: 5 }, (_, i) => {
+    const insp = pick(['Passed', 'Passed', 'Passed', 'Failed', 'Pending']);
+    return mkRecord(`rec-kit-qc-${i}`, `client-kit-${i % KIT_CLIENTS.length}`, 'ws-bebo-kit-qcship', 'ss-kit-qc',
+      `KIT-ID-${9000 + i} — ${insp}`, insp,
+      undefined, fmtDate(-i), ['Type:QC'],
+      { 'Kit ID': `KIT-ID-${9000 + i}`, 'Order ID': `ORD-KIT-${10000 + i}`, 'Inspection': insp, 'Inspector': pick(['J. Rivera', 'K. Thompson', 'M. Santos']), 'Defect Notes': insp === 'Failed' ? 'Missing component — USB-C Cable' : '' });
+  });
+
+  const records = [...compRecords, ...orderRecords, ...woRecords, ...qcRecords];
+  const clients = KIT_CLIENTS.map((co, i) => mkClient(`client-kit-${i}`, co, `KIT-${3000 + i}`, ['Vertical:Kitting']));
+
+  return {
+    shellConfig: mkShellConfig('Kit Order', 'Kit Orders', 'Kitting Workspace', 'Production Stage',
+      ['Received', 'BOM Allocated', 'Work Order Created', 'Picking', 'Kitting', 'QC', 'Packed', 'Shipped']),
+    workspaces: [wsReceiving, wsOrders, wsProduction, wsQcShipping],
+    flows, integrations, records, clients,
+  };
+}
+
 // ─── Business Architecture Builders ──────────────────────────────────
 
 function buildPharmaBusinessFunctions(): BusinessFunction[] {
@@ -1719,6 +1922,7 @@ export function getPayloadForVertical(vertical: DemoVertical): ScenarioApplyPayl
     case 'insurance': return buildInsurancePayload();
     case 'lifecycle': return buildLifecyclePayload();
     case 'fulfillment': return buildFulfillmentPayload();
+    case 'kitting': return buildKittingPayload();
   }
 }
 
@@ -1756,6 +1960,7 @@ export const VERTICAL_META: Record<DemoVertical, { label: string; icon: string; 
   insurance:   { label: 'Insurance',               icon: '🛡️', color: '#1E293B', shortLabel: 'Insurance',   tenantName: 'Farmers Insurance',      tenantLogo: 'https://chambermaster.blob.core.windows.net/images/customers/314/members/3005/logos/MEMBER_PAGE_HEADER/farmers_horizontal_full_color_logo_png.png' },
   lifecycle:   { label: 'Lifecycle Services',      icon: '🔄', color: '#6366F1', shortLabel: 'Lifecycle',   tenantName: 'LifecycleOS',            tenantLogo: '' },
   fulfillment: { label: 'Fulfillment & Warehouse', icon: '📦', color: '#0891B2', shortLabel: 'Fulfillment', tenantName: 'Relentless Fulfillment', tenantLogo: 'https://cdn-ildpoef.nitrocdn.com/qWHnvrhJREiUMFZdGgGGyvsgiuoHGWxV/assets/images/optimized/rev-8bbf9f6/relentlessfulfillment.com/wp-content/uploads/2021/03/RF-Logo.png' },
+  kitting:     { label: 'Kitting & Assembly',       icon: '🔧', color: '#1E293B', shortLabel: 'Kitting',     tenantName: 'KittingRUs',             tenantLogo: 'https://images.squarespace-cdn.com/content/v1/633c89732363235190035dae/6663049b-b12c-4fbc-b95c-13abae62e166/MayTec_distributor_logo_engineering_manufacturing_product-development_industrial-services_Birmingham-AL.png' },
 };
 
 const INTEGRATION_CATALOG: BeboCardIntegrationStatus['integrations'] = [
@@ -1778,6 +1983,7 @@ const WORKSPACE_KPI: Record<DemoVertical, { v1: string; v2: string; v3: string; 
   insurance:   { v1: '318 Active Policies',     v2: '$4.2M Annual Premium',        v3: '27 Open Claims',              wsCount: 2, flowCount: 2 },
   lifecycle:   { v1: '47 Active Accounts',      v2: '99.2% SLA Compliance',        v3: '6 Open Exchanges',            wsCount: 4, flowCount: 5 },
   fulfillment: { v1: '312 Orders In Process',   v2: '98.1% On-Time Rate',          v3: '24 Alerts Today',             wsCount: 3, flowCount: 4 },
+  kitting:     { v1: '186 Active Work Orders',  v2: '99.1% QC Pass Rate',          v3: '14 Kits Shipped Today',       wsCount: 4, flowCount: 5 },
 };
 
 // ─── Response Generator ───────────────────────────────────────────────
@@ -1990,6 +2196,7 @@ function getPersonasForVertical(v: DemoVertical): string[] {
     insurance:   ['Underwriter', 'Claims Adjuster', 'Policy Administrator', 'Customer Service Rep'],
     lifecycle:   ['IT Admin', 'Procurement / Ops', 'End User (Employee)', 'Account Manager'],
     fulfillment: ['Warehouse Manager', 'Picker', 'Packer', 'Shipping Coordinator', 'Admin', 'Quality Inspector'],
+    kitting:     ['Receiving Agent', 'BOM Coordinator', 'Picker', 'Kitting Technician', 'QC Inspector', 'Shipping Coordinator'],
   };
   return map[v];
 }
@@ -2004,6 +2211,7 @@ function getStagesForVertical(v: DemoVertical): string[] {
     insurance:   ['Application', 'Underwriting', 'Bound', 'Active', 'Renewal Pending'],
     lifecycle:   ['Submitted', 'In Progress', 'Awaiting Customer', 'Resolved', 'Closed', 'Escalated'],
     fulfillment: ['Received', 'Inventoried', 'Ordered', 'Picking', 'Packing', 'Shipped', 'Delivered', 'Returned'],
+    kitting:     ['Received', 'BOM Allocated', 'Work Order Created', 'Picking', 'Kitting', 'QC', 'Packed', 'Shipped'],
   };
   return map[v];
 }
@@ -2011,6 +2219,7 @@ function getStagesForVertical(v: DemoVertical): string[] {
 // ─── Scenario Switch Message ──────────────────────────────────────────
 
 const SCENARIO_INTROS: Record<DemoVertical, string> = {
+  kitting: `Switching to **🔧 Kitting & Assembly** mode.\n\nI've pre-built a complete **KittingRUs** BOM-driven assembly environment: **Component Receiving**, **Orders & BOM Management**, **Picking & Kitting Station**, and **QC & Shipping** — end to end.\n\nWork orders auto-generate from client orders, BOM validation blocks short-stock jobs before they hit the floor, and passing QC auto-triggers shipping label creation.\n\nReady to deploy the full kitting scenario, or ask me to walk through the BOM workflow first?`,
   lifecycle: `Switching to **🔄 Lifecycle Services** mode.\n\nI've pre-built a complete **LifecycleOS** workflow covering all 4 modules: **Customer Onboarding**, **Offboarding**, **Advanced Exchange**, and **Service Ticketing** — each with guided wizards, SLA tracking, and automation flows.\n\nReady to deploy the full scenario, or ask me to customize a module first?`,
   fulfillment: `Switching to **📦 Fulfillment & Warehouse** mode.\n\nYour **Relentless Fulfillment** workspace covers the full pick-pack-ship lifecycle: **Receiving & Inventory**, **Order Management**, and **Packing & Shipping** — with AI-assisted box sizing, weight validation, carrier selection, and exception handling built in.\n\nApply the full scenario with one click, or ask me to configure the workflow first.`,
   pharma: `Switching to **💊 Pharmaceutical / DSCSA** mode.\n\nI have full knowledge of DSCSA serialization requirements, FDA track-and-trace compliance, and supply chain traceability from manufacturer through distributor to pharmacy.\n\nYour **Manufacturer Serialization**, **Distributor Verification**, and **Pharmacy Dispense Trace** workspaces are pre-built and ready to apply.`,

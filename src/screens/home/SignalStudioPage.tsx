@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useMemo, useState } from 'react';
 import { Platform, ScrollView, Text, TextInput, View, useWindowDimensions } from 'react-native';
 
-/* â”€â”€ Local sub-types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Local sub-types ────────────────────────────────────────────── */
 type ActionStepType =
   | 'notify_team' | 'update_field' | 'set_lifecycle_stage' | 'create_record'
   | 'call_webhook' | 'send_email' | 'add_tag' | 'remove_tag';
@@ -12,14 +12,14 @@ type FlowEventStatus = 'success' | 'failed' | 'skipped';
 interface FlowEvent { id: string; flowName: string; ts: string; status: FlowEventStatus; durationMs: number; note: string }
 
 const ACTION_STEP_LABELS: Record<ActionStepType, { icon: string; label: string; description: string; placeholder: string }> = {
-  notify_team:          { icon: 'ðŸ””', label: 'Notify the team',        description: 'Send a notification to a channel or person',           placeholder: 'e.g. #ops-channel or @manager' },
-  update_field:         { icon: 'âœï¸', label: 'Update a field',         description: 'Change a field value on the matching records',          placeholder: 'e.g. status = Approved' },
-  set_lifecycle_stage:  { icon: 'ðŸ”„', label: 'Move to a new stage',    description: 'Advance the record to the next stage in its workflow',  placeholder: 'e.g. In Review' },
-  create_record:        { icon: 'ðŸ“„', label: 'Create a new record',    description: 'Automatically create a record in a workspace',         placeholder: 'e.g. HR / Onboarding SubSpace' },
-  call_webhook:         { icon: 'ðŸŒ', label: 'Call an outside system', description: 'Send data to an external app or service',              placeholder: 'e.g. https://hooks.zapier.com/...' },
-  send_email:           { icon: 'âœ‰ï¸', label: 'Send an email',          description: 'Email a person or team automatically',                 placeholder: 'e.g. admin@company.com' },
-  add_tag:              { icon: 'ðŸ·ï¸', label: 'Add a tag',              description: 'Tag the matching records for easy filtering',           placeholder: 'e.g. High Priority' },
-  remove_tag:           { icon: 'ðŸ—‘ï¸', label: 'Remove a tag',           description: 'Remove a tag from the matching records',               placeholder: 'e.g. Pending Review' },
+  notify_team:          { icon: '🔔', label: 'Notify the team',        description: 'Send a notification to a channel or person',           placeholder: 'e.g. #ops-channel or @manager' },
+  update_field:         { icon: '✏️', label: 'Update a field',         description: 'Change a field value on the matching records',          placeholder: 'e.g. status = Approved' },
+  set_lifecycle_stage:  { icon: '🔄', label: 'Move to a new stage',    description: 'Advance the record to the next stage in its workflow',  placeholder: 'e.g. In Review' },
+  create_record:        { icon: '📄', label: 'Create a new record',    description: 'Automatically create a record in a workspace',         placeholder: 'e.g. HR / Onboarding SubSpace' },
+  call_webhook:         { icon: '🌐', label: 'Call an outside system', description: 'Send data to an external app or service',              placeholder: 'e.g. https://hooks.zapier.com/...' },
+  send_email:           { icon: '✉️', label: 'Send an email',          description: 'Email a person or team automatically',                 placeholder: 'e.g. admin@company.com' },
+  add_tag:              { icon: '🏷️', label: 'Add a tag',              description: 'Tag the matching records for easy filtering',           placeholder: 'e.g. High Priority' },
+  remove_tag:           { icon: '🗑️', label: 'Remove a tag',           description: 'Remove a tag from the matching records',               placeholder: 'e.g. Pending Review' },
 };
 
 const COND_OPS = ['equals', 'not equals', 'contains', 'starts with', '>', '<', '>=', '<=', 'is empty', 'is not empty'];
@@ -27,24 +27,24 @@ const COND_OPS = ['equals', 'not equals', 'contains', 'starts with', '>', '<', '
 function makeId() { return Math.random().toString(36).slice(2, 9); }
 
 const TRIGGER_CARDS = [
-  { type: 'event' as const,   icon: 'ðŸ“¬', title: 'Something happens to a record',         description: 'A record is created, updated, or changes status',                       color: '#8C5BF5' },
-  { type: 'schedule' as const, icon: 'â°', title: 'On a schedule',                         description: 'Run at a set time â€” hourly, daily, weekly, or custom',                   color: '#F59E0B' },
-  { type: 'webhook' as const,  icon: 'ðŸŒ', title: 'An outside system sends a message',     description: 'An external app triggers this signal via a webhook URL',                 color: '#22C55E' },
+  { type: 'event' as const,   icon: '📬', title: 'Something happens to a record',         description: 'A record is created, updated, or changes status',                       color: '#8C5BF5' },
+  { type: 'schedule' as const, icon: '⏰', title: 'On a schedule',                         description: 'Run at a set time — hourly, daily, weekly, or custom',                   color: '#F59E0B' },
+  { type: 'webhook' as const,  icon: '🌐', title: 'An outside system sends a message',     description: 'An external app triggers this signal via a webhook URL',                 color: '#22C55E' },
 ];
 
 const EVENT_PRESETS = [
-  { icon: 'ðŸ“¥', label: 'A new record is created',       value: 'A new record is created' },
-  { icon: 'âœï¸', label: 'A record field changes',         value: 'A record field changes value' },
-  { icon: 'ðŸ”„', label: 'A record moves to a new stage',  value: 'A record changes lifecycle stage' },
-  { icon: 'âš ï¸', label: 'A record is flagged as risky',   value: 'A record is marked high risk' },
-  { icon: 'ðŸ·ï¸', label: 'A tag is added to a record',    value: 'A tag is added to a record' },
+  { icon: '📥', label: 'A new record is created',       value: 'A new record is created' },
+  { icon: '✏️', label: 'A record field changes',         value: 'A record field changes value' },
+  { icon: '🔄', label: 'A record moves to a new stage',  value: 'A record changes lifecycle stage' },
+  { icon: '⚠️', label: 'A record is flagged as risky',   value: 'A record is marked high risk' },
+  { icon: '🏷️', label: 'A tag is added to a record',    value: 'A tag is added to a record' },
 ];
 
 const WIZARD_STEPS = [
   { num: 1, label: 'Where?',  question: 'Where should this signal watch?',         hint: 'Pick the workspace and section (SubSpace) this signal will monitor.' },
   { num: 2, label: 'When?',   question: 'What starts this signal?',                hint: 'Choose the event that kicks off this automation.' },
-  { num: 3, label: 'Ifâ€¦',     question: 'Only run this signal whenâ€¦',              hint: 'Add conditions so the signal only fires for specific records. Optional â€” you can skip this step.' },
-  { num: 4, label: 'Thenâ€¦',   question: 'What should happen automatically?',       hint: 'Choose one or more actions the system will take, in order.' },
+  { num: 3, label: 'If…',     question: 'Only run this signal when…',              hint: 'Add conditions so the signal only fires for specific records. Optional — you can skip this step.' },
+  { num: 4, label: 'Then…',   question: 'What should happen automatically?',       hint: 'Choose one or more actions the system will take, in order.' },
   { num: 5, label: 'Launch',  question: 'Name it and go live!',                    hint: 'Give your signal a name, add optional tags to scope it, then publish.' },
 ];
 
@@ -186,7 +186,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
     };
   }, [registerActions]);
 
-  // â”€â”€ Theme helpers â”€â”€
+  // ── Theme helpers ──
   const surface = mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.90)';
   const border = mode === 'night' ? 'rgba(140,91,245,0.18)' : 'rgba(140,91,245,0.15)';
   const textPrimary = mode === 'night' ? '#E8E4FF' : '#1a1030';
@@ -194,13 +194,13 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
   const accent = '#8C5BF5';
 
   const handlePublish = () => {
-    const chainStr = actionChain.map((s, i) => `${i + 1}. ${ACTION_STEP_LABELS[s.type].label}: ${s.config || '(not configured)'}`).join(' â†’ ');
+    const chainStr = actionChain.map((s, i) => `${i + 1}. ${ACTION_STEP_LABELS[s.type].label}: ${s.config || '(not configured)'}`).join(' → ');
     setAction(chainStr);
     const synthesized = condGroups.flatMap((g) => g.rows.filter((r) => r.field.trim()).map((r) => `${r.field.trim()} ${r.op} ${r.value.trim()}`));
     if (synthesized.length > 0) setRules(synthesized.join('; '));
     publish();
     auditLog?.logEntry({ action: 'publish', entityType: 'flow', entityId: name || 'draft', entityName: name || 'Unnamed Signal', after: { signal, action: chainStr, tags } });
-    addNotification?.({ type: 'flow-triggered', title: 'Signal Published âš¡', body: `"${name || 'Unnamed Signal'}" is now live and watching your workspace.`, severity: 'success' });
+    addNotification?.({ type: 'flow-triggered', title: 'Signal Published ⚡', body: `"${name || 'Unnamed Signal'}" is now live and watching your workspace.`, severity: 'success' });
     setSignalView('signals');
   };
 
@@ -216,20 +216,20 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
           </>
         )}
 
-        {/* â”€â”€ Top Tab Bar â”€â”€ */}
+        {/* ── Top Tab Bar ── */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' as any }}>
           <Pressable
             onPress={() => setSignalView('create')}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 10, paddingHorizontal: 18, borderRadius: 10, backgroundColor: signalView === 'create' ? accent : surface, borderWidth: 1, borderColor: signalView === 'create' ? accent : border }}
           >
-            <Text style={{ fontSize: 15 }}>âš¡</Text>
+            <Text style={{ fontSize: 15 }}>⚡</Text>
             <Text style={{ fontWeight: '700', fontSize: 14, color: signalView === 'create' ? '#fff' : textPrimary }}>Create a Signal</Text>
           </Pressable>
           <Pressable
             onPress={() => setSignalView('signals')}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 10, paddingHorizontal: 18, borderRadius: 10, backgroundColor: signalView === 'signals' ? accent : surface, borderWidth: 1, borderColor: signalView === 'signals' ? accent : border }}
           >
-            <Text style={{ fontSize: 15 }}>ðŸ“Š</Text>
+            <Text style={{ fontSize: 15 }}>📊</Text>
             <Text style={{ fontWeight: '700', fontSize: 14, color: signalView === 'signals' ? '#fff' : textPrimary }}>My Signals{flows.length > 0 ? ` (${flows.length})` : ''}</Text>
           </Pressable>
           <View style={{ flex: 1 }} />
@@ -237,18 +237,18 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
             onPress={() => { setAiFlowPanelOpen(true); if (!aiFlow.session) aiFlow.startSession('flow_builder'); }}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 9, paddingHorizontal: 14, borderRadius: 10, backgroundColor: 'rgba(140,91,245,0.12)', borderWidth: 1, borderColor: 'rgba(140,91,245,0.30)' }}
           >
-            <Text style={{ fontSize: 13 }}>âœ¦</Text>
+            <Text style={{ fontSize: 13 }}>✦</Text>
             <Text style={{ fontWeight: '700', fontSize: 13, color: accent }}>Ask Bebo to build it</Text>
           </Pressable>
         </View>
 
-        {/* â•â• CREATE A SIGNAL â€” GUIDED WIZARD â•â• */}
+        {/* ══ CREATE A SIGNAL — GUIDED WIZARD ══ */}
         {signalView === 'create' && (
           <View style={{ gap: 20 }}>
             {/* Hero heading */}
             <View style={{ gap: 4 }}>
               <Text style={{ fontSize: 26, fontWeight: '900', color: textPrimary, letterSpacing: -0.5 }}>Create a Signal</Text>
-              <Text style={{ fontSize: 14, color: textMuted, lineHeight: 20 }}>A Signal watches your workspace and automatically takes action when something happens â€” no coding required.</Text>
+              <Text style={{ fontSize: 14, color: textMuted, lineHeight: 20 }}>A Signal watches your workspace and automatically takes action when something happens — no coding required.</Text>
             </View>
 
             {/* Step progress bar */}
@@ -260,7 +260,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                   <React.Fragment key={s.num}>
                     <Pressable onPress={() => setWizardStep(s.num)} style={{ alignItems: 'center', gap: 4, minWidth: 56 }}>
                       <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: done ? '#22C55E' : active ? accent : surface, borderWidth: done ? 0 : 2, borderColor: active ? accent : border, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ fontSize: 13, fontWeight: '900', color: done || active ? '#fff' : textMuted }}>{done ? 'âœ“' : s.num}</Text>
+                        <Text style={{ fontSize: 13, fontWeight: '900', color: done || active ? '#fff' : textMuted }}>{done ? '✓' : s.num}</Text>
                       </View>
                       <Text style={{ fontSize: 10, fontWeight: active ? '800' : '500', color: active ? accent : done ? '#22C55E' : textMuted, textAlign: 'center' }}>{s.label}</Text>
                     </Pressable>
@@ -287,12 +287,12 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                 </View>
               </View>
 
-              {/* â”€â”€ STEP 1: Pick Workspace & SubSpace â”€â”€ */}
+              {/* ── STEP 1: Pick Workspace & SubSpace ── */}
               {wizardStep === 1 && (
                 <View style={{ padding: 20, gap: 20 }}>
                   <View style={{ gap: 10 }}>
                     <Text style={{ fontSize: 13, fontWeight: '700', color: textPrimary }}>Workspace</Text>
-                    <Text style={{ fontSize: 12, color: textMuted, marginTop: -6 }}>A workspace is a collection of records for a specific process â€” like "DSCSA Serialization" or "Employee Onboarding".</Text>
+                    <Text style={{ fontSize: 12, color: textMuted, marginTop: -6 }}>A workspace is a collection of records for a specific process — like "DSCSA Serialization" or "Employee Onboarding".</Text>
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, gap: 10 }}>
                       {builderWorkspaces.map((ws) => {
                         const isSelected = builderSelectedWsId === ws.id;
@@ -312,7 +312,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                   {builderSelectedWs ? (
                     <View style={{ gap: 10 }}>
                       <Text style={{ fontSize: 13, fontWeight: '700', color: textPrimary }}>SubSpace (Section)</Text>
-                      <Text style={{ fontSize: 12, color: textMuted, marginTop: -6 }}>A SubSpace is a smaller section inside the workspace â€” like a folder or category of records.</Text>
+                      <Text style={{ fontSize: 12, color: textMuted, marginTop: -6 }}>A SubSpace is a smaller section inside the workspace — like a folder or category of records.</Text>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, gap: 8 }}>
                         {builderSelectedWs.subSpaces.map((ss) => {
                           const isSelected = builderSelectedSsId === ss.id;
@@ -330,13 +330,13 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                     </View>
                   ) : (
                     <View style={{ backgroundColor: `${accent}08`, borderRadius: 10, padding: 14, borderWidth: 1, borderColor: `${accent}20` }}>
-                      <Text style={{ fontSize: 12, color: textMuted, textAlign: 'center' }}>ðŸ‘† Select a workspace above to see its sections</Text>
+                      <Text style={{ fontSize: 12, color: textMuted, textAlign: 'center' }}>👆 Select a workspace above to see its sections</Text>
                     </View>
                   )}
                 </View>
               )}
 
-              {/* â”€â”€ STEP 2: Pick Trigger â”€â”€ */}
+              {/* ── STEP 2: Pick Trigger ── */}
               {wizardStep === 2 && (
                 <View style={{ padding: 20, gap: 14 }}>
                   {TRIGGER_CARDS.map((tc) => {
@@ -356,7 +356,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                         </View>
                         {isSelected && (
                           <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: tc.color, alignItems: 'center', justifyContent: 'center' }}>
-                            <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>âœ“</Text>
+                            <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>✓</Text>
                           </View>
                         )}
                       </Pressable>
@@ -378,7 +378,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                           );
                         })}
                         <Pressable onPress={() => setSignal('')} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8, borderWidth: 1.5, borderColor: (!signal || EVENT_PRESETS.every((ep) => ep.value !== signal)) ? accent : border, backgroundColor: (!signal || EVENT_PRESETS.every((ep) => ep.value !== signal)) ? `${accent}12` : 'transparent' }}>
-                          <Text style={{ fontSize: 12, color: textMuted }}>âœï¸ Custom</Text>
+                          <Text style={{ fontSize: 12, color: textMuted }}>✏️ Custom</Text>
                         </Pressable>
                       </View>
                       {(!signal || EVENT_PRESETS.every((ep) => ep.value !== signal)) && (
@@ -430,16 +430,16 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                 </View>
               )}
 
-              {/* â”€â”€ STEP 3: Conditions (optional) â”€â”€ */}
+              {/* ── STEP 3: Conditions (optional) ── */}
               {wizardStep === 3 && (
                 <View style={{ padding: 20, gap: 16 }}>
                   <View style={{ backgroundColor: '#F59E0B18', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#F59E0B30' }}>
-                    <Text style={{ fontSize: 12, color: '#F59E0B', fontWeight: '600' }}>ðŸ’¡ This step is optional â€” tap "Next" to skip and run the signal every time without conditions.</Text>
+                    <Text style={{ fontSize: 12, color: '#F59E0B', fontWeight: '600' }}>💡 This step is optional — tap "Next" to skip and run the signal every time without conditions.</Text>
                   </View>
                   {condGroups.map((group, gi) => (
                     <View key={group.id} style={{ backgroundColor: `${accent}06`, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: border, gap: 12 }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' as any }}>
-                        <Text style={{ fontSize: 14, fontWeight: '800', color: textPrimary, flex: 1 }}>{gi === 0 ? 'Only run ifâ€¦' : 'And alsoâ€¦'}</Text>
+                        <Text style={{ fontSize: 14, fontWeight: '800', color: textPrimary, flex: 1 }}>{gi === 0 ? 'Only run if…' : 'And also…'}</Text>
                         <Pressable onPress={() => toggleCombinator(group.id)} style={{ paddingVertical: 5, paddingHorizontal: 10, borderRadius: 6, backgroundColor: accent }}>
                           <Text style={{ color: '#fff', fontWeight: '800', fontSize: 12 }}>{group.combinator === 'AND' ? 'All must match (AND)' : 'Any can match (OR)'}</Text>
                         </Pressable>
@@ -451,7 +451,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                       </View>
                       {group.rows.map((row, ri) => (
                         <View key={row.id} style={{ gap: 6 }}>
-                          {ri > 0 && <Text style={{ fontSize: 11, fontWeight: '700', color: accent, textAlign: 'center' }}>{group.combinator === 'AND' ? 'â€” AND â€”' : 'â€” OR â€”'}</Text>}
+                          {ri > 0 && <Text style={{ fontSize: 11, fontWeight: '700', color: accent, textAlign: 'center' }}>{group.combinator === 'AND' ? '— AND —' : '— OR —'}</Text>}
                           <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-end', flexWrap: 'wrap' as any }}>
                             <View style={{ flex: 2, minWidth: 100, gap: 3 }}>
                               <Text style={{ fontSize: 10, color: textMuted, fontWeight: '700' }}>FIELD TO CHECK</Text>
@@ -473,7 +473,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                             </View>
                             {group.rows.length > 1 && (
                               <Pressable onPress={() => removeCondRow(group.id, row.id)} style={{ paddingHorizontal: 8, paddingBottom: 6 }}>
-                                <Text style={{ color: '#EF4444', fontSize: 20, lineHeight: 24 }}>Ã—</Text>
+                                <Text style={{ color: '#EF4444', fontSize: 20, lineHeight: 24 }}>×</Text>
                               </Pressable>
                             )}
                           </View>
@@ -490,7 +490,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                 </View>
               )}
 
-              {/* â”€â”€ STEP 4: Actions â”€â”€ */}
+              {/* ── STEP 4: Actions ── */}
               {wizardStep === 4 && (
                 <View style={{ padding: 20, gap: 14 }}>
                   <Text style={{ fontSize: 13, color: textMuted, lineHeight: 18 }}>Choose one or more things that should happen automatically. They run in order, one after the other.</Text>
@@ -516,7 +516,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                           </View>
                           {actionChain.length > 1 && (
                             <Pressable onPress={() => removeActionStep(step.id)} style={{ paddingHorizontal: 8 }}>
-                              <Text style={{ color: '#EF4444', fontSize: 20, lineHeight: 24 }}>Ã—</Text>
+                              <Text style={{ color: '#EF4444', fontSize: 20, lineHeight: 24 }}>×</Text>
                             </Pressable>
                           )}
                         </View>
@@ -534,23 +534,23 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                 </View>
               )}
 
-              {/* â”€â”€ STEP 5: Name & Launch â”€â”€ */}
+              {/* ── STEP 5: Name & Launch ── */}
               {wizardStep === 5 && (
                 <View style={{ padding: 20, gap: 16 }}>
                   {/* Summary */}
                   <View style={{ backgroundColor: `${accent}08`, borderRadius: 12, padding: 16, gap: 8, borderWidth: 1, borderColor: `${accent}20` }}>
                     <Text style={{ fontSize: 13, fontWeight: '800', color: textPrimary }}>Your signal at a glance</Text>
                     {builderSelectedWs && (
-                      <Text style={{ fontSize: 12, color: textMuted }}>ðŸ“ <Text style={{ fontWeight: '700', color: textPrimary }}>{builderSelectedWs.name}</Text>{builderSelectedSsId ? ` â†’ ${builderSelectedWs.subSpaces.find((ss) => ss.id === builderSelectedSsId)?.name ?? ''}` : ''}</Text>
+                      <Text style={{ fontSize: 12, color: textMuted }}>📍 <Text style={{ fontWeight: '700', color: textPrimary }}>{builderSelectedWs.name}</Text>{builderSelectedSsId ? ` → ${builderSelectedWs.subSpaces.find((ss) => ss.id === builderSelectedSsId)?.name ?? ''}` : ''}</Text>
                     )}
                     {triggerType && (
                       <Text style={{ fontSize: 12, color: textMuted }}>
-                        {triggerType === 'event' ? 'ðŸ“¬' : triggerType === 'schedule' ? 'â°' : 'ðŸŒ'}{' '}
+                        {triggerType === 'event' ? '📬' : triggerType === 'schedule' ? '⏰' : '🌐'}{' '}
                         <Text style={{ fontWeight: '700', color: textPrimary }}>{TRIGGER_CARDS.find((t) => t.type === triggerType)?.title}</Text>
-                        {signal ? ` â€” "${signal}"` : ''}
+                        {signal ? ` — "${signal}"` : ''}
                       </Text>
                     )}
-                    {actionChain.length > 0 && <Text style={{ fontSize: 12, color: textMuted }}>âš¡ {actionChain.length} action{actionChain.length !== 1 ? 's' : ''}: {actionChain.map((a) => ACTION_STEP_LABELS[a.type].label).join(', ')}</Text>}
+                    {actionChain.length > 0 && <Text style={{ fontSize: 12, color: textMuted }}>⚡ {actionChain.length} action{actionChain.length !== 1 ? 's' : ''}: {actionChain.map((a) => ACTION_STEP_LABELS[a.type].label).join(', ')}</Text>}
                   </View>
 
                   <LabeledInput label="Signal name" helperText="Give this a short, clear name so you can find it later." value={name} onChangeText={setName} placeholder="e.g. Flag high-risk packages for review" />
@@ -558,7 +558,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
 
                   <Pressable onPress={toggleRunOnExisting} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 12, borderWidth: 1, borderColor: runOnExisting ? accent : border, backgroundColor: runOnExisting ? `${accent}10` : 'transparent' }}>
                     <View style={{ width: 22, height: 22, borderRadius: 4, backgroundColor: runOnExisting ? accent : 'transparent', borderWidth: 2, borderColor: runOnExisting ? accent : border, alignItems: 'center', justifyContent: 'center' }}>
-                      {runOnExisting && <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>âœ“</Text>}
+                      {runOnExisting && <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>✓</Text>}
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 13, fontWeight: '700', color: textPrimary }}>Also run on existing records</Text>
@@ -566,7 +566,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                     </View>
                   </Pressable>
 
-                  {!canPublishFlow && <View style={{ backgroundColor: '#EF444415', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#EF444430' }}><Text style={{ fontSize: 12, color: '#EF4444', fontWeight: '600' }}>âš ï¸ {deniedMessage('flow.publish')}</Text></View>}
+                  {!canPublishFlow && <View style={{ backgroundColor: '#EF444415', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#EF444430' }}><Text style={{ fontSize: 12, color: '#EF4444', fontWeight: '600' }}>⚠️ {deniedMessage('flow.publish')}</Text></View>}
                   {!!info && <Text style={styles.notice}>{info}</Text>}
 
                   <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' as any }}>
@@ -581,7 +581,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                       onPress={handlePublish}
                       style={{ flex: 2, minWidth: 180, paddingVertical: 12, borderRadius: 10, backgroundColor: canPublishFlow ? accent : border, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 }}
                     >
-                      <Text style={{ fontSize: 16 }}>âš¡</Text>
+                      <Text style={{ fontSize: 16 }}>⚡</Text>
                       <Text style={{ fontSize: 14, fontWeight: '800', color: '#fff' }}>Publish Signal</Text>
                     </Pressable>
                   </View>
@@ -590,7 +590,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                     onPress={() => { applyWarehouseServiceFlowPack(); addNotification?.({ type: 'system', title: 'Sample Pack Loaded', body: 'Sample supply chain signals loaded. Check My Signals to see them.', severity: 'success' }); }}
                     style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 9, paddingHorizontal: 14, borderRadius: 10, backgroundColor: 'rgba(140,91,245,0.08)', borderWidth: 1, borderColor: 'rgba(140,91,245,0.20)', alignSelf: 'flex-start' as any }}
                   >
-                    <Text style={{ fontSize: 12 }}>ðŸ“¥</Text>
+                    <Text style={{ fontSize: 12 }}>📥</Text>
                     <Text style={{ fontSize: 12, fontWeight: '600', color: accent }}>Load Sample Signal Pack</Text>
                   </Pressable>
                 </View>
@@ -601,21 +601,21 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
               {wizardStep > 1 && (
                 <Pressable onPress={() => setWizardStep((s) => s - 1)} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 10, paddingHorizontal: 18, borderRadius: 10, borderWidth: 1, borderColor: border }}>
-                  <Text style={{ fontSize: 13, color: textMuted }}>â†</Text>
+                  <Text style={{ fontSize: 13, color: textMuted }}>←</Text>
                   <Text style={{ fontSize: 14, fontWeight: '600', color: textMuted }}>Back</Text>
                 </Pressable>
               )}
               <View style={{ flex: 1 }} />
               {wizardStep < 5 && (
                 <Pressable onPress={() => setWizardStep((s) => s + 1)} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 10, paddingHorizontal: 22, borderRadius: 10, backgroundColor: accent }}>
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>{wizardStep === 3 ? 'Skip / Next â†’' : 'Next â†’'}</Text>
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>{wizardStep === 3 ? 'Skip / Next →' : 'Next →'}</Text>
                 </Pressable>
               )}
             </View>
           </View>
         )}
 
-        {/* â•â• MY SIGNALS â•â• */}
+        {/* ══ MY SIGNALS ══ */}
         {signalView === 'signals' && (
           <View style={{ gap: 20 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' as any }}>
@@ -624,7 +624,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                 <Text style={{ fontSize: 13, color: textMuted }}>All published and draft automation signals for your workspaces.</Text>
               </View>
               <Pressable onPress={() => setShowEventLog((v) => !v)} style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8, borderWidth: 1, borderColor: border, backgroundColor: showEventLog ? `${accent}10` : 'transparent' }}>
-                <Text style={{ fontSize: 12, fontWeight: '700', color: showEventLog ? accent : textMuted }}>ðŸ“‹ {showEventLog ? 'Show Signals' : 'Show Event Log'}</Text>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: showEventLog ? accent : textMuted }}>📋 {showEventLog ? 'Show Signals' : 'Show Event Log'}</Text>
               </Pressable>
             </View>
 
@@ -645,14 +645,14 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
               <View style={{ gap: 10 }}>
                 {flowEvents.length === 0 ? (
                   <View style={{ backgroundColor: surface, borderRadius: 12, padding: 24, borderWidth: 1, borderColor: border, alignItems: 'center', gap: 8 }}>
-                    <Text style={{ fontSize: 28 }}>ðŸ“‹</Text>
+                    <Text style={{ fontSize: 28 }}>📋</Text>
                     <Text style={{ fontSize: 14, fontWeight: '700', color: textPrimary }}>No events yet</Text>
                     <Text style={{ fontSize: 12, color: textMuted, textAlign: 'center' }}>Once your signals start running, each execution will appear here with its status and duration.</Text>
                   </View>
                 ) : (
                   flowEvents.map((evt) => {
                     const statusColor = evt.status === 'success' ? '#22C55E' : evt.status === 'failed' ? '#EF4444' : '#F59E0B';
-                    const statusIcon = evt.status === 'success' ? 'âœ…' : evt.status === 'failed' ? 'âŒ' : 'â­ï¸';
+                    const statusIcon = evt.status === 'success' ? '✅' : evt.status === 'failed' ? '❌' : '⏭️';
                     return (
                       <View key={evt.id} style={{ backgroundColor: surface, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: border, gap: 4 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -662,7 +662,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                             <Text style={{ color: statusColor, fontSize: 11, fontWeight: '700' }}>{evt.status.toUpperCase()}</Text>
                           </View>
                         </View>
-                        <Text style={{ fontSize: 12, color: textMuted }}>{evt.ts} Â· {evt.durationMs} ms</Text>
+                        <Text style={{ fontSize: 12, color: textMuted }}>{evt.ts} · {evt.durationMs} ms</Text>
                         <Text style={{ fontSize: 12, color: textMuted }}>{evt.note}</Text>
                       </View>
                     );
@@ -676,19 +676,19 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
               <>
                 {(builderSelectedWsId ? flowsForWorkspace : flows).length === 0 ? (
                   <View style={{ backgroundColor: surface, borderRadius: 16, padding: 32, borderWidth: 1, borderColor: border, alignItems: 'center', gap: 16 }}>
-                    <Text style={{ fontSize: 40 }}>âš¡</Text>
+                    <Text style={{ fontSize: 40 }}>⚡</Text>
                     <Text style={{ fontSize: 18, fontWeight: '900', color: textPrimary, textAlign: 'center' }}>No signals yet</Text>
                     <Text style={{ fontSize: 13, color: textMuted, textAlign: 'center', maxWidth: 360, lineHeight: 20 }}>Create your first signal to start automating your workspace, or load a sample pack to see how it works.</Text>
                     <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' as any, justifyContent: 'center' }}>
                       <Pressable onPress={() => setSignalView('create')} style={{ paddingVertical: 10, paddingHorizontal: 20, borderRadius: 10, backgroundColor: accent, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                        <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>âš¡ Create a Signal</Text>
+                        <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>⚡ Create a Signal</Text>
                       </Pressable>
                       <Pressable
                         disabled={!canPublishFlow}
                         onPress={() => { applyWarehouseServiceFlowPack(); addNotification?.({ type: 'system', title: 'Sample Pack Loaded', body: 'Sample supply chain signals loaded.', severity: 'success' }); }}
                         style={{ paddingVertical: 10, paddingHorizontal: 20, borderRadius: 10, backgroundColor: surface, borderWidth: 1, borderColor: border, flexDirection: 'row', alignItems: 'center', gap: 6 }}
                       >
-                        <Text style={{ color: textMuted, fontWeight: '600', fontSize: 13 }}>ðŸ“¥ Load Sample Pack</Text>
+                        <Text style={{ color: textMuted, fontWeight: '600', fontSize: 13 }}>📥 Load Sample Pack</Text>
                       </Pressable>
                     </View>
                   </View>
@@ -697,7 +697,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                     {(builderSelectedWsId ? flowsForWorkspace : flows).map((flow) => {
                       const ws = builderWorkspaces.find((w) => w.id === flow.workspaceId);
                       const ss = ws?.subSpaces.find((s) => s.id === flow.subSpaceId);
-                      const triggerIcon = flow.triggerType === 'schedule' ? 'â°' : flow.triggerType === 'webhook' ? 'ðŸŒ' : 'ðŸ“¬';
+                      const triggerIcon = flow.triggerType === 'schedule' ? '⏰' : flow.triggerType === 'webhook' ? '🌐' : '📬';
                       const statusColor = flow.status === 'active' ? '#22C55E' : '#F59E0B';
                       return (
                         <View key={flow.id} style={{ backgroundColor: surface, borderRadius: 14, borderWidth: 1, borderColor: border }}>
@@ -710,14 +710,14 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                           </View>
                           <View style={{ padding: 14, gap: 8 }}>
                             <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' as any }}>
-                              {ws && <View style={{ paddingVertical: 3, paddingHorizontal: 10, borderRadius: 12, backgroundColor: `${accent}12`, borderWidth: 1, borderColor: `${accent}25` }}><Text style={{ fontSize: 11, fontWeight: '700', color: accent }}>ðŸ“ {ws.name}</Text></View>}
-                              {ss && <View style={{ paddingVertical: 3, paddingHorizontal: 10, borderRadius: 12, backgroundColor: `${accent}08`, borderWidth: 1, borderColor: `${accent}18` }}><Text style={{ fontSize: 11, fontWeight: '600', color: textMuted }}>â†³ {ss.name}</Text></View>}
+                              {ws && <View style={{ paddingVertical: 3, paddingHorizontal: 10, borderRadius: 12, backgroundColor: `${accent}12`, borderWidth: 1, borderColor: `${accent}25` }}><Text style={{ fontSize: 11, fontWeight: '700', color: accent }}>📁 {ws.name}</Text></View>}
+                              {ss && <View style={{ paddingVertical: 3, paddingHorizontal: 10, borderRadius: 12, backgroundColor: `${accent}08`, borderWidth: 1, borderColor: `${accent}18` }}><Text style={{ fontSize: 11, fontWeight: '600', color: textMuted }}>↳ {ss.name}</Text></View>}
                             </View>
                             <Text style={{ fontSize: 12, color: textMuted }}>{flow.signal}</Text>
                             <View style={{ flexDirection: 'row', gap: 16, flexWrap: 'wrap' as any }}>
-                              <Text style={{ fontSize: 12, color: textMuted }}>ðŸ” <Text style={{ fontWeight: '700', color: textPrimary }}>{flow.totalRuns.toLocaleString()}</Text> runs</Text>
-                              <Text style={{ fontSize: 12, color: flow.failures7d > 0 ? '#EF4444' : textMuted }}>{flow.failures7d > 0 ? 'âš ï¸' : 'âœ…'} <Text style={{ fontWeight: '700', color: flow.failures7d > 0 ? '#EF4444' : textPrimary }}>{flow.failures7d}</Text> failures (7d)</Text>
-                              <Text style={{ fontSize: 12, color: textMuted }}>âš¡ avg {flow.avgTimeMs.toLocaleString()} ms</Text>
+                              <Text style={{ fontSize: 12, color: textMuted }}>🔁 <Text style={{ fontWeight: '700', color: textPrimary }}>{flow.totalRuns.toLocaleString()}</Text> runs</Text>
+                              <Text style={{ fontSize: 12, color: flow.failures7d > 0 ? '#EF4444' : textMuted }}>{flow.failures7d > 0 ? '⚠️' : '✅'} <Text style={{ fontWeight: '700', color: flow.failures7d > 0 ? '#EF4444' : textPrimary }}>{flow.failures7d}</Text> failures (7d)</Text>
+                              <Text style={{ fontSize: 12, color: textMuted }}>⚡ avg {flow.avgTimeMs.toLocaleString()} ms</Text>
                             </View>
                             {flow.lastRun && <Text style={{ fontSize: 11, color: textMuted }}>Last run: {new Date(flow.lastRun).toLocaleString()}</Text>}
                           </View>

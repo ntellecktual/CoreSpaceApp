@@ -13,6 +13,7 @@ import type {
   RuntimeRecord,
   SubSpaceBuilderField,
   ShellConfig,
+  ShellIntakeField,
   EndUserPersona,
   LifecycleStage,
   LifecycleTransition,
@@ -580,7 +581,10 @@ export function getDataForVertical(vertical: DemoVertical) {
 
 // ─── Scenario Apply Payload Builders ─────────────────────────────────
 
-function mkShellConfig(singular: string, plural: string, wsLabel: string, ssLabel: string, stages: string[]): Partial<ShellConfig> {
+function mkShellConfig(
+  singular: string, plural: string, wsLabel: string, ssLabel: string, stages: string[],
+  extra?: { collectionLabel?: string; collectionLabelPlural?: string; intakeFields?: ShellIntakeField[] },
+): Partial<ShellConfig> {
   const stageObjs: LifecycleStage[] = stages.map((s, i) => ({ id: `bebo-stage-${i}`, name: s }));
   const transitions: LifecycleTransition[] = stages.slice(0, -1).map((_, i) => ({
     id: `bebo-lt-${i}`,
@@ -595,6 +599,9 @@ function mkShellConfig(singular: string, plural: string, wsLabel: string, ssLabe
     lifecycleStages: stageObjs,
     defaultLifecycleStageId: stageObjs[0]?.id ?? '',
     lifecycleTransitions: transitions,
+    ...(extra?.collectionLabel ? { collectionLabel: extra.collectionLabel } : {}),
+    ...(extra?.collectionLabelPlural ? { collectionLabelPlural: extra.collectionLabelPlural } : {}),
+    ...(extra?.intakeFields ? { intakeFields: extra.intakeFields } : {}),
   };
 }
 
@@ -711,7 +718,15 @@ export function buildPharmaPayload(): ScenarioApplyPayload {
   const clients = batches.map((b, i) => mkClient(`client-batch-${i}`, `Batch ${b.name}`, `LOT-${b.lot}`, ['Vertical:Pharma']));
 
   return {
-    shellConfig: mkShellConfig('Serialized Batch', 'Serialized Batches', 'Supply Chain Workspace', 'Traceability SubSpace', ['Serialized', 'Shipped to Distributor', 'Received by Distributor', 'Shipped to Pharmacy', 'Received by Pharmacy', 'Dispensed', 'Exception Review']),
+    shellConfig: mkShellConfig('Serialized Batch', 'Serialized Batches', 'Supply Chain Workspace', 'Traceability SubSpace', ['Serialized', 'Shipped to Distributor', 'Received by Distributor', 'Shipped to Pharmacy', 'Received by Pharmacy', 'Dispensed', 'Exception Review'], {
+        collectionLabel: 'Batch', collectionLabelPlural: 'Batches',
+        intakeFields: [
+          { id: 'productName', label: 'Product Name', type: 'text', required: true },
+          { id: 'lotNumber', label: 'Lot Number', type: 'text', required: true },
+          { id: 'expirationDate', label: 'Expiration Date', type: 'date', required: true },
+          { id: 'cartonSerial', label: 'Carton Serial', type: 'text', required: false },
+        ],
+      }),
     workspaces: [ws], flows, integrations, records, clients,
   };
 }
@@ -798,7 +813,16 @@ export function buildSalesPayload(): ScenarioApplyPayload {
   const records = [...leadRecords, ...oppRecords, ...actRecords];
   const clients = COMPANIES.slice(0, 12).map((co, i) => mkClient(`client-sales-${i}`, co, `ACCT-${1000 + i}`, ['Vertical:Sales']));
   return {
-    shellConfig: mkShellConfig('Account', 'Accounts', 'Sales Workspace', 'Pipeline Stage', ['New Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost']),
+    shellConfig: mkShellConfig('Account', 'Accounts', 'Sales Workspace', 'Pipeline Stage', ['New Lead', 'Qualified', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'], {
+        collectionLabel: 'Account', collectionLabelPlural: 'Accounts',
+        intakeFields: [
+          { id: 'companyName', label: 'Company Name', type: 'text', required: true },
+          { id: 'contactName', label: 'Contact Name', type: 'text', required: true },
+          { id: 'email', label: 'Email', type: 'text', required: false },
+          { id: 'dealSize', label: 'Estimated Deal Size', type: 'number', required: false },
+          { id: 'leadSource', label: 'Lead Source', type: 'select', required: false, options: ['Inbound', 'Outbound', 'Referral', 'Event', 'Partner'] },
+        ],
+      }),
     workspaces: [wsPipeline], flows, integrations, records, clients,
   };
 }
@@ -888,7 +912,16 @@ export function buildHealthcarePayload(): ScenarioApplyPayload {
   const patientLasts = ['Anderson', 'Martinez', 'Thompson', 'Rivera', 'Clark', 'Lee'];
   const clients = Array.from({ length: 6 }, (_, i) => mkClient(`client-health-${i}`, `${patientFirsts[i]} ${patientLasts[i]}`, `PAT-${2000 + i}`, ['Vertical:Healthcare']));
   return {
-    shellConfig: mkShellConfig('Patient', 'Patients', 'Clinical Workspace', 'Care Area', ['Registered', 'Scheduled', 'In Progress', 'Completed', 'Follow-Up', 'Discharged']),
+    shellConfig: mkShellConfig('Patient', 'Patients', 'Clinical Workspace', 'Care Area', ['Registered', 'Scheduled', 'In Progress', 'Completed', 'Follow-Up', 'Discharged'], {
+        collectionLabel: 'Patient', collectionLabelPlural: 'Patients',
+        intakeFields: [
+          { id: 'patientName', label: 'Patient Name', type: 'text', required: true },
+          { id: 'dateOfBirth', label: 'Date of Birth', type: 'date', required: true },
+          { id: 'insuranceId', label: 'Insurance ID', type: 'text', required: false },
+          { id: 'primaryPhysician', label: 'Primary Physician', type: 'text', required: false },
+          { id: 'phone', label: 'Contact Phone', type: 'text', required: false },
+        ],
+      }),
     workspaces: [wsPatients], flows, integrations, records, clients,
   };
 }
@@ -962,7 +995,16 @@ export function buildLogisticsPayload(): ScenarioApplyPayload {
   const shippers = ['FastFreight Co', 'Global Shipping', 'Prime Logistics', 'Express Route', 'Swift Cargo', 'Alliance Transport'];
   const clients = Array.from({ length: 6 }, (_, i) => mkClient(`client-logistics-${i}`, shippers[i], `SHP-${3000 + i}`, ['Vertical:Logistics']));
   return {
-    shellConfig: mkShellConfig('Shipment', 'Shipments', 'Logistics Workspace', 'Operations Lane', ['Ordered', 'Received', 'Picking', 'Packed', 'Shipped', 'Delivered', 'Returned']),
+    shellConfig: mkShellConfig('Shipment', 'Shipments', 'Logistics Workspace', 'Operations Lane', ['Ordered', 'Received', 'Picking', 'Packed', 'Shipped', 'Delivered', 'Returned'], {
+        collectionLabel: 'Shipment', collectionLabelPlural: 'Shipments',
+        intakeFields: [
+          { id: 'shipperName', label: 'Shipper Name', type: 'text', required: true },
+          { id: 'origin', label: 'Origin', type: 'text', required: true },
+          { id: 'destination', label: 'Destination', type: 'text', required: true },
+          { id: 'weight', label: 'Weight (lbs)', type: 'number', required: false },
+          { id: 'carrier', label: 'Carrier', type: 'select', required: false, options: ['FedEx', 'UPS', 'DHL', 'USPS', 'Freight'] },
+        ],
+      }),
     workspaces: [wsFulfillment], flows, integrations, records, clients,
   };
 }
@@ -1100,7 +1142,16 @@ export function buildLegalPayload(): ScenarioApplyPayload {
   const records = [...caseRecords, ...deadlineRecords, ...docRecords, ...timeRecords, ...invoiceRecords];
   const clients = Array.from({ length: 8 }, (_, i) => mkClient(`client-legal-${i}`, `${legalFirst[i % legalFirst.length]} ${legalLast[i % legalLast.length]}`, `CASE-2026-${1000 + i}`, ['Vertical:Legal']));
   return {
-    shellConfig: mkShellConfig('Case', 'Cases', 'Legal Workspace', 'Practice Area', ['Intake', 'Engagement', 'Discovery', 'Litigation', 'Settlement', 'Closed', 'Archived']),
+    shellConfig: mkShellConfig('Case', 'Cases', 'Legal Workspace', 'Practice Area', ['Intake', 'Engagement', 'Discovery', 'Litigation', 'Settlement', 'Closed', 'Archived'], {
+        collectionLabel: 'Case', collectionLabelPlural: 'Cases',
+        intakeFields: [
+          { id: 'clientName', label: 'Client Name', type: 'text', required: true },
+          { id: 'caseType', label: 'Case Type', type: 'select', required: true, options: ['Civil Litigation', 'Corporate', 'Employment', 'Real Estate', 'IP', 'Regulatory'] },
+          { id: 'opposingParty', label: 'Opposing Party', type: 'text', required: false },
+          { id: 'jurisdiction', label: 'Court / Jurisdiction', type: 'text', required: false },
+          { id: 'filingDate', label: 'Filing Date', type: 'date', required: false },
+        ],
+      }),
     workspaces: [wsCases, wsBilling], flows, integrations, records, clients,
   };
 }
@@ -1255,7 +1306,15 @@ export function buildInsurancePayload(): ScenarioApplyPayload {
   const insNames = ['Lakewood Ins', 'Summit Coverage', 'Pinnacle Shield', 'Harbor Mutual', 'Eagle Assurance', 'Crestview Group', 'Meridian Ins', 'Horizon Union'];
   const clients = Array.from({ length: 8 }, (_, i) => mkClient(`client-ins-${i}`, insNames[i], `POL-${4000 + i}`, ['Vertical:Insurance']));
   return {
-    shellConfig: mkShellConfig('Policy', 'Policies', 'Insurance Workspace', 'Service Line', ['Application', 'Underwriting', 'Bound', 'Active', 'Renewal Pending', 'Lapsed', 'Cancelled']),
+    shellConfig: mkShellConfig('Policy', 'Policies', 'Insurance Workspace', 'Service Line', ['Application', 'Underwriting', 'Bound', 'Active', 'Renewal Pending', 'Lapsed', 'Cancelled'], {
+        collectionLabel: 'Policy', collectionLabelPlural: 'Policies',
+        intakeFields: [
+          { id: 'insuredName', label: 'Insured Name', type: 'text', required: true },
+          { id: 'coverageType', label: 'Coverage Type', type: 'select', required: true, options: ['Auto', 'Home', 'Life', 'Health', 'Commercial', 'Liability'] },
+          { id: 'effectiveDate', label: 'Effective Date', type: 'date', required: true },
+          { id: 'annualPremium', label: 'Annual Premium ($)', type: 'number', required: false },
+        ],
+      }),
     workspaces: [wsPolicies, wsClaims], flows, integrations, records, clients,
   };
 }
@@ -1482,7 +1541,16 @@ export function buildLifecyclePayload(): ScenarioApplyPayload {
   const clients = LIFECYCLE_COMPANIES.slice(0, 6).map((co, i) => mkClient(`client-lcos-${i}`, co, `LCOS-${1000 + i}`, ['Vertical:Lifecycle']));
 
   return {
-    shellConfig: mkShellConfig('Account', 'Accounts', 'Lifecycle Workspace', 'Service Area', ['Submitted', 'In Progress', 'Awaiting Customer', 'Resolved', 'Closed', 'Escalated']),
+    shellConfig: mkShellConfig('Account', 'Accounts', 'Lifecycle Workspace', 'Service Area', ['Submitted', 'In Progress', 'Awaiting Customer', 'Resolved', 'Closed', 'Escalated'], {
+        collectionLabel: 'Account', collectionLabelPlural: 'Accounts',
+        intakeFields: [
+          { id: 'companyName', label: 'Company Name', type: 'text', required: true },
+          { id: 'contactName', label: 'Primary Contact', type: 'text', required: true },
+          { id: 'email', label: 'Email', type: 'text', required: false },
+          { id: 'serviceTier', label: 'Service Tier', type: 'select', required: false, options: ['Starter', 'Professional', 'Enterprise', 'Premium'] },
+          { id: 'startDate', label: 'Contract Start Date', type: 'date', required: false },
+        ],
+      }),
     workspaces: [wsOnboarding, wsOffboarding, wsExchange, wsTickets],
     flows, integrations, records, clients,
   };
@@ -1657,7 +1725,15 @@ export function buildFulfillmentPayload(): ScenarioApplyPayload {
   const rfClients = Array.from({ length: 6 }, (_, i) => mkClient(`client-rf-${i}`, COMPANIES[i], `RF-${2000 + i}`, ['Vertical:Fulfillment']));
 
   return {
-    shellConfig: mkShellConfig('Order', 'Orders', 'Fulfillment Workspace', 'Operations Lane', ['Received', 'Inventoried', 'Ordered', 'Picking', 'Packing', 'Shipped', 'Delivered', 'Returned']),
+    shellConfig: mkShellConfig('Order', 'Orders', 'Fulfillment Workspace', 'Operations Lane', ['Received', 'Inventoried', 'Ordered', 'Picking', 'Packing', 'Shipped', 'Delivered', 'Returned'], {
+        collectionLabel: 'Order', collectionLabelPlural: 'Orders',
+        intakeFields: [
+          { id: 'customerName', label: 'Customer Name', type: 'text', required: true },
+          { id: 'shipToAddress', label: 'Ship-To Address', type: 'text', required: true },
+          { id: 'orderPriority', label: 'Order Priority', type: 'select', required: false, options: ['Standard', 'Expedite', 'Rush', 'Same-Day'] },
+          { id: 'requestedDate', label: 'Requested Ship Date', type: 'date', required: false },
+        ],
+      }),
     workspaces: [wsReceiving, wsOrders, wsPacking],
     flows, integrations, records, clients: rfClients,
   };
@@ -1701,7 +1777,15 @@ export function buildTenantScaffold(verticalPayload?: ScenarioApplyPayload): Sce
 
   return {
     shellConfig: mkShellConfig('Record', 'Records', 'Enterprise Workspace', 'Department',
-      ['Draft', 'Active', 'In Review', 'Completed', 'Archived']),
+      ['Draft', 'Active', 'In Review', 'Completed', 'Archived'], {
+        collectionLabel: 'Record', collectionLabelPlural: 'Records',
+        intakeFields: [
+          { id: 'title', label: 'Title', type: 'text', required: true },
+          { id: 'department', label: 'Department', type: 'select', required: true, options: ['Finance', 'HR', 'Marketing', 'Sales', 'Legal', 'IT', 'Sustainability'] },
+          { id: 'owner', label: 'Owner', type: 'text', required: false },
+          { id: 'priority', label: 'Priority', type: 'select', required: false, options: ['Low', 'Medium', 'High', 'Critical'] },
+        ],
+      }),
     workspaces: [wsOps, wsFinance, wsHR, wsMarketing, wsSales, wsLegal, wsIT, wsSustainability],
     flows,
     integrations: [],
@@ -2137,7 +2221,15 @@ export function buildKittingPayload(): ScenarioApplyPayload {
 
   return {
     shellConfig: mkShellConfig('Kit Order', 'Kit Orders', 'Kitting Floor', 'Production Stage',
-      ['Inbound Receiving', 'Client Order Intake', 'BOM & Allocation', 'Work Order Created', 'Picking', 'Kitting / Assembly', 'Pack & Label', 'Shipped to Client']),
+      ['Inbound Receiving', 'Client Order Intake', 'BOM & Allocation', 'Work Order Created', 'Picking', 'Kitting / Assembly', 'Pack & Label', 'Shipped to Client'], {
+        collectionLabel: 'Kit Order', collectionLabelPlural: 'Kit Orders',
+        intakeFields: [
+          { id: 'clientName', label: 'Client Name', type: 'text', required: true },
+          { id: 'kitModel', label: 'Kit Model', type: 'select', required: true, options: ['Galaxy Z Fold 7', 'Galaxy S25 Ultra', 'Galaxy A56', 'Galaxy Tab S10', 'Custom Kit'] },
+          { id: 'quantity', label: 'Quantity', type: 'number', required: true },
+          { id: 'requiredBy', label: 'Required By', type: 'date', required: false },
+        ],
+      }),
     workspaces: [wsReceiving, wsOrders, wsProduction, wsQcShip],
     flows, integrations, records, clients,
   };

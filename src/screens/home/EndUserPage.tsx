@@ -774,6 +774,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const subSpaceLabelPlural = subSpaceLabel.trim().replace(/s$/i, '') + 's'; // e.g. 'Case SubSpace' → 'Case SubSpaces'
   const collectionLabel = shellConfig.collectionLabel ?? 'Collection';
   const collectionLabelPlural = shellConfig.collectionLabelPlural ?? 'Collections';
+  const refPrefix = collectionLabel.replace(/\s+/g, '').slice(0, 4).toUpperCase();
   // Use subjectPlural (e.g. "Clients", "Patients") as the rail section noun — it's the most specific human term
   const clientSectionLabel = shellConfig.subjectPlural ?? collectionLabelPlural;
   const clientSectionLabelSingle = shellConfig.subjectSingular ?? collectionLabel;
@@ -1686,7 +1687,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             </View>
             <ScrollView style={{ padding: 20 }} contentContainerStyle={{ gap: 12, paddingBottom: 20 }}>
               {!canIntakeClient && <Text style={styles.notice}>{deniedMessage('client.intake')}</Text>}
-              <LabeledInput label={`${collectionLabel} Reference ID *`} value={caseRef} onChangeText={setCaseRef} placeholder={`REF-001`} autoCapitalize="characters" />
+              <LabeledInput label={`${collectionLabel} Reference ID *`} value={caseRef} onChangeText={setCaseRef} placeholder={`${refPrefix}-001`} autoCapitalize="characters" />
               {shellConfig.personas.length > 0 && (
                 <View style={{ gap: 6 }}>
                   <Text style={{ fontSize: 11, fontWeight: '600', color: dimColor }}>Persona</Text>

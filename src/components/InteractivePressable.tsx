@@ -9,10 +9,9 @@ function ensureInteractiveCSS() {
   const style = document.createElement('style');
   style.id = STYLE_ID;
   style.textContent = [
-    '[data-interactive] { cursor: pointer; transition: opacity 0.06s ease, filter 0.06s ease; }',
-    '[data-interactive]:hover { opacity: 0.88; filter: brightness(1.08); }',
-    '[data-interactive]:active { opacity: 0.70; }',
-    '[data-interactive]:focus-visible { outline: 2px solid rgba(140,91,245,0.6); outline-offset: 2px; border-radius: 8px; }',
+    '[data-interactive] { cursor: pointer; transition: opacity 0.08s ease, filter 0.08s ease, transform 0.10s ease; }',
+    '[data-interactive]:hover { opacity: 0.90; filter: brightness(1.06); }',
+    '[data-interactive]:active { opacity: 0.75; transform: scale(0.975); }',
     '[data-interactive]:focus-visible { outline: 2px solid rgba(140,91,245,0.6); outline-offset: 2px; border-radius: 8px; }',
   ].join('\n');
   document.head.appendChild(style);

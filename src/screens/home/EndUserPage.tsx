@@ -668,6 +668,37 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   /* ── NEW: Inject UX animations (once) ── */
   React.useEffect(() => { injectUxAnimations(); }, []);
 
+  /* ── NEW: Keyboard navigation (↑ / ↓ / Enter / Escape) ── */
+  const [kbFocusIdx, setKbFocusIdx] = useLocalState(-1);
+  React.useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); setKbFocusIdx((p: number) => Math.min(p + 1, filteredRecords.length - 1)); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); setKbFocusIdx((p: number) => Math.max(p - 1, 0)); }
+      else if (e.key === 'Enter' && kbFocusIdx >= 0 && kbFocusIdx < filteredRecords.length) {
+        e.preventDefault();
+        const rec = filteredRecords[kbFocusIdx];
+        trackRecentView(rec); setSelectedDrawerRecord(rec); setRecordDrawerVisible(true);
+      }
+      else if (e.key === 'Escape') {
+        if (recordDrawerVisible) { setRecordDrawerVisible(false); setSelectedDrawerRecord(null); }
+        else if (selectedRecordIds.size > 0) clearSelection();
+        else setKbFocusIdx(-1);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  });
+
+  /* ── Scroll keyboard-focused record into view ── */
+  React.useEffect(() => {
+    if (Platform.OS !== 'web' || kbFocusIdx < 0) return;
+    const el = document.getElementById(`rec-row-${kbFocusIdx}`);
+    if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [kbFocusIdx]);
+
   /* ── Auto-fill date / datetime fields when create modal opens ── */
   React.useEffect(() => {
     if (!createModalOpen || !activeForm) return;
@@ -697,6 +728,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   React.useEffect(() => {
     setSelectedRecordIds(new Set());
     setBatchMovedStage(null);
+    setKbFocusIdx(-1);
   }, [selectedSubSpaceId, selectedWorkspaceId]);
 
   /* ── NEW: Deep linking – read/write URL hash ── */
@@ -902,6 +934,18 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
       </View>
     );
   };
+
+  /* ── Status → border color lookup ── */
+  const statusBorderColorMap: Record<string, string> = {
+    Received: '#3B82F6', Serialized: '#3B82F6', Record: '#3B82F6',
+    Triage: '#F97316', Dispensed: '#F97316',
+    Repair: '#A855F7',
+    QC: '#EAB308', 'Received by Distributor': '#EAB308',
+    Shipped: '#22C55E', 'Shipped to Distributor': '#22C55E', 'Shipped to Pharmacy': '#22C55E',
+    Active: '#22C55E', 'Received by Pharmacy': '#22C55E',
+    Risk: '#EF4444', High: '#EF4444', Critical: '#EF4444', 'Exception Review': '#EF4444',
+  };
+  const getStatusBorderColor = (status: string) => statusBorderColorMap[status] ?? accentColor;
 
   /* ── Item title helper (industry-agnostic) ── */
   const getItemTitle = (c: (typeof clients)[number]) => {
@@ -1116,17 +1160,20 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           <View style={{ gap: 6, paddingTop: 6 }}>
             {/* ── Recent Activity — revamped ── */}
             {mergedTimeline.length > 0 && (
-              <View style={{ ...g(0.05), padding: 10, borderRadius: 10, gap: 8, borderWidth: 1, borderColor: acRgba(0.10) }}>
-                <Text style={{ fontSize: 10, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>RECENT ACTIVITY</Text>
+              <View style={{ ...g(0.05), padding: 10, borderRadius: 10, gap: 0, borderWidth: 1, borderColor: acRgba(0.10) }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor, marginBottom: 8 }}>RECENT ACTIVITY</Text>
                 {mergedTimeline.slice(0, 3).map((item, idx) => {
                   const actionIcon = item.status === 'Deleted' ? '🗑️' : item.status === 'Transitioned' ? '🔄' : item.status === 'create' || item.status === 'Created' ? '➕' : '📝';
+                  const isLast = idx === 2 || idx === mergedTimeline.length - 1;
                   return (
-                    <Pressable key={item.id} onPress={() => setTimelineModalOpen(true)} style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
-                      <View style={{ width: 24, alignItems: 'center' as any, gap: 2 }}>
-                        <Text style={{ fontSize: 12 }}>{actionIcon}</Text>
-                        {idx < 2 && <View style={{ width: 1, height: 16, backgroundColor: acRgba(0.15) }} />}
+                    <Pressable key={item.id} onPress={() => setTimelineModalOpen(true)} style={{ flexDirection: 'row', gap: 8, alignItems: 'stretch' as any, minHeight: 40 }}>
+                      <View style={{ width: 24, alignItems: 'center' as any }}>
+                        <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: acRgba(0.15), borderWidth: 1.5, borderColor: acRgba(0.30), alignItems: 'center' as any, justifyContent: 'center' as any, zIndex: 1 }}>
+                          <Text style={{ fontSize: 10 }}>{actionIcon}</Text>
+                        </View>
+                        {!isLast && <View style={{ width: 2, flex: 1, backgroundColor: acRgba(0.15), borderRadius: 1, marginVertical: 2 }} />}
                       </View>
-                      <View style={{ flex: 1, gap: 1 }}>
+                      <View style={{ flex: 1, gap: 1, paddingBottom: isLast ? 0 : 10 }}>
                         <Text style={{ fontSize: 10, fontWeight: '700', color: txtColor }} numberOfLines={1}>{item.title}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                           {chip(item.status)}
@@ -1136,7 +1183,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     </Pressable>
                   );
                 })}
-                <Pressable onPress={() => setTimelineModalOpen(true)} style={{ alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: acRgba(0.10), borderWidth: 1, borderColor: acRgba(0.18) }}>
+                <Pressable onPress={() => setTimelineModalOpen(true)} style={{ alignSelf: 'flex-start', marginTop: 8, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: acRgba(0.10), borderWidth: 1, borderColor: acRgba(0.18) }}>
                   <Text style={{ fontSize: 9, fontWeight: '700', color: accentColor }}>View all activity →</Text>
                 </Pressable>
               </View>
@@ -1242,27 +1289,41 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <Text style={{ fontSize: 14 }}>{kpi.icon}</Text>
-                  <Text style={{ fontSize: 22, fontWeight: '800', color: kpi.color, fontVariant: ['tabular-nums'] as any }}>{kpi.display}</Text>
+                  <Text {...(Platform.OS === 'web' ? { dataSet: { kpiValue: '' } } as any : {})} style={{ fontSize: 22, fontWeight: '800', color: kpi.color, fontVariant: ['tabular-nums'] as any }}>{kpi.display}</Text>
                   {kpi.label.startsWith('Total ') && sparkData.length > 1 && <Sparkline data={sparkData} width={48} height={18} color={accentColor} />}
                 </View>
                 <Text style={{ fontSize: 9, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase' as any, color: dimColor, marginTop: 4 }}>{kpi.label}</Text>
               </View>
             ))}
-            {/* Stage distribution pills inline */}
-            {Object.entries(stageDistribution).length > 0 && (
-              <View style={{ width: '100%' as any, flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
-                {Object.entries(stageDistribution).map(([stage, count]) => {
-                  const isHighlighted = stage === batchMovedStage;
-                  return (
-                    <View key={`sd-${stage}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 3, ...(isHighlighted ? { borderRadius: 10, borderWidth: 1.5, borderColor: accentColor, paddingHorizontal: 4, paddingVertical: 2, backgroundColor: accentSoft } as any : {}) }}>
-                      {chip(stage)}
-                      <Text style={{ fontSize: 10, color: isHighlighted ? accentColor : dimColor, fontWeight: isHighlighted ? '700' : '400' }}>{count}</Text>
-                      {isHighlighted && <Text style={{ fontSize: 9, color: accentColor, fontWeight: '700' }}>←</Text>}
-                    </View>
-                  );
-                })}
-              </View>
-            )}
+            {/* Stage distribution stacked bar */}
+            {Object.entries(stageDistribution).length > 0 && (() => {
+              const entries = Object.entries(stageDistribution);
+              const total = entries.reduce((s, [, c]) => s + c, 0) || 1;
+              return (
+                <View style={{ width: '100%' as any, gap: 6, marginTop: 6 }}>
+                  {/* Stacked bar */}
+                  <View style={{ flexDirection: 'row', height: 8, borderRadius: 4, overflow: 'hidden' as any, backgroundColor: subtleBg }}>
+                    {entries.map(([stage, count]) => (
+                      <View key={`bar-${stage}`} style={{ flex: count / total, backgroundColor: getStatusBorderColor(stage), ...(Platform.OS === 'web' ? { transition: 'flex 0.4s cubic-bezier(0.34,1.56,0.64,1)' } as any : {}) }} />
+                    ))}
+                  </View>
+                  {/* Legend */}
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                    {entries.map(([stage, count]) => {
+                      const isHighlighted = stage === batchMovedStage;
+                      return (
+                        <View key={`sd-${stage}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, ...(isHighlighted ? { borderRadius: 8, borderWidth: 1.5, borderColor: accentColor, paddingHorizontal: 5, paddingVertical: 2, backgroundColor: accentSoft } as any : {}) }}>
+                          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: getStatusBorderColor(stage) }} />
+                          <Text style={{ fontSize: 9, color: isHighlighted ? accentColor : dimColor, fontWeight: isHighlighted ? '700' : '500' }}>{stage}</Text>
+                          <Text style={{ fontSize: 9, fontWeight: '700', color: isHighlighted ? accentColor : txtColor }}>{count}</Text>
+                          {isHighlighted && <Text style={{ fontSize: 9, color: accentColor, fontWeight: '700' }}>←</Text>}
+                        </View>
+                      );
+                    })}
+                  </View>
+                </View>
+              );
+            })()}
           </View>
 
           {/* ── Workspace Banner (overview header) ── */}
@@ -1303,11 +1364,23 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
                 {recentlyViewed.map((rec) => (
                   <Pressable key={`rv-${rec.id}`} onPress={() => { setSelectedDrawerRecord(rec); setRecordDrawerVisible(true); }}
-                    style={{ ...g(0.05), padding: 12, width: 190, gap: 3, borderWidth: 1, borderColor: acRgba(0.14), ...(Platform.OS === 'web' ? { boxShadow: `0 2px 10px ${acRgba(0.10)}`, transition: 'box-shadow 0.2s, transform 0.15s' } as any : {}) }}
+                    style={{ ...g(0.05), padding: 12, width: 210, gap: 6, borderWidth: 1, borderColor: acRgba(0.14), borderLeftWidth: 3, borderLeftColor: getStatusBorderColor(rec.status), ...(Platform.OS === 'web' ? { boxShadow: `0 2px 10px ${acRgba(0.10)}`, transition: 'box-shadow 0.22s, transform 0.16s, border-color 0.18s' } as any : {}) }}
                     {...(Platform.OS === 'web' ? { dataSet: { scaleIn: '' } } : {})}
                   >
-                    <Text style={{ fontSize: 11, fontWeight: '700', color: txtColor }} numberOfLines={1}>{rec.title}</Text>
-                    <Text style={{ fontSize: 9, color: dimColor }}>{rec.status} • {formatDate(rec.date)}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      {rec.imageUri ? (
+                        <Image source={{ uri: rec.imageUri }} style={{ width: 28, height: 28, borderRadius: 6, flexShrink: 0 }} resizeMode="cover" />
+                      ) : (
+                        <View style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: `${getStatusBorderColor(rec.status)}22`, alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                          <Text style={{ fontSize: 12 }}>{rec.title.slice(0, 1).toUpperCase()}</Text>
+                        </View>
+                      )}
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: txtColor, flex: 1 }} numberOfLines={1}>{rec.title}</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      {chip(rec.status)}
+                      <Text style={{ fontSize: 9, color: dimColor }}>{formatDate(rec.date)}</Text>
+                    </View>
                   </Pressable>
                 ))}
               </ScrollView>
@@ -1468,16 +1541,28 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     <Pressable onPress={() => setSearchQuery('')}><Text style={{ fontSize: 12, color: dimColor }}>✕</Text></Pressable>
                   )}
                 </View>
-                {/* Status filter pills */}
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 4 }}>
-                  <Pressable onPress={() => setFilterStatus('')} style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: filterStatus === '' ? accentSoft : subtleBg, borderWidth: filterStatus === '' ? 1 : 0, borderColor: accentColor }}>
+                {/* Status filter chips */}
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 5 }}>
+                  <Pressable onPress={() => setFilterStatus('')}
+                    {...(Platform.OS === 'web' ? { dataSet: { filterChip: '' } } : {})}
+                    style={{ flexDirection: 'row', alignItems: 'center' as any, gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, backgroundColor: filterStatus === '' ? accentSoft : subtleBg, borderWidth: 1, borderColor: filterStatus === '' ? accentColor : subtleBorder }}>
                     <Text style={{ fontSize: 9, fontWeight: '700', color: filterStatus === '' ? '#FFF' : dimColor }}>All</Text>
+                    {filterStatus === '' && <Text style={{ fontSize: 10, color: '#FFF', fontWeight: '800' }}>·</Text>}
                   </Pressable>
-                  {Object.keys(stageDistribution).map((stage) => (
-                    <Pressable key={`filter-${stage}`} onPress={() => setFilterStatus(filterStatus === stage ? '' : stage)} style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: filterStatus === stage ? accentSoft : subtleBg, borderWidth: filterStatus === stage ? 1 : 0, borderColor: accentColor }}>
-                      <Text style={{ fontSize: 9, fontWeight: '700', color: filterStatus === stage ? '#FFF' : dimColor }}>{stage}</Text>
-                    </Pressable>
-                  ))}
+                  {Object.keys(stageDistribution).map((stage) => {
+                    const isActive = filterStatus === stage;
+                    const cnt = stageDistribution[stage] ?? 0;
+                    return (
+                      <Pressable key={`filter-${stage}`} onPress={() => setFilterStatus(isActive ? '' : stage)}
+                        {...(Platform.OS === 'web' ? { dataSet: { filterChip: '' } } : {})}
+                        style={{ flexDirection: 'row', alignItems: 'center' as any, gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, backgroundColor: isActive ? accentSoft : subtleBg, borderWidth: 1, borderColor: isActive ? accentColor : subtleBorder }}>
+                        <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: getStatusBorderColor(stage) }} />
+                        <Text style={{ fontSize: 9, fontWeight: '700', color: isActive ? '#FFF' : dimColor }}>{stage}</Text>
+                        <Text style={{ fontSize: 8, fontWeight: '600', color: isActive ? accentColor : `${dimColor}88` }}>{cnt}</Text>
+                        {isActive && <Text style={{ fontSize: 10, color: accentColor, fontWeight: '700' }}>✕</Text>}
+                      </Pressable>
+                    );
+                  })}
                 </ScrollView>
               </View>
 
@@ -1504,6 +1589,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
               )}
 
               {/* Record content */}
+              <View key={`cf-${selectedSubSpaceId}`} style={{ flex: 1 }} {...(Platform.OS === 'web' ? { dataSet: { crossfade: '' } } as any : {})}>
               {viewMode === 'board' ? (
                 <ScrollView style={{ flex: 1, padding: 10 }}>
                   <BoardView
@@ -1550,11 +1636,25 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     </div>
                   )}
                   <ScrollView nativeID="eu-record-list" style={{ flex: 1, padding: 10 }} showsVerticalScrollIndicator={false}>
-                    {filteredRecords.length === 0 && <Text style={{ fontSize: 12, color: dimColor, padding: 12 }}>{searchQuery || filterStatus ? 'No matching records.' : `No records in this ${subSpaceLabel.toLowerCase()}.`}</Text>}
-                    {filteredRecords.map((rec) => {
+                    {filteredRecords.length === 0 && (
+                      <View {...(Platform.OS === 'web' ? { dataSet: { emptyState: '' } } : {})} style={{ alignItems: 'center' as any, justifyContent: 'center' as any, paddingVertical: 48, gap: 10 }}>
+                        <Text style={{ fontSize: 36 }}>{searchQuery || filterStatus ? '🔍' : '📂'}</Text>
+                        <Text style={{ fontSize: 14, fontWeight: '700', color: txtColor }}>{searchQuery || filterStatus ? 'No matching records' : `No records yet`}</Text>
+                        <Text style={{ fontSize: 12, color: dimColor, textAlign: 'center' as any, maxWidth: 260 }}>
+                          {searchQuery || filterStatus ? 'Try adjusting your search or clearing filters.' : `Add your first record to this ${subSpaceLabel.toLowerCase()} to get started.`}
+                        </Text>
+                        {(searchQuery || filterStatus) && (
+                          <Pressable onPress={() => { setSearchQuery(''); setFilterStatus(''); }} style={{ marginTop: 4, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8, backgroundColor: accentSoft, borderWidth: 1, borderColor: acRgba(0.25) }}>
+                            <Text style={{ fontSize: 11, fontWeight: '700', color: accentColor }}>Clear Filters</Text>
+                          </Pressable>
+                        )}
+                      </View>
+                    )}
+                    {filteredRecords.map((rec, _recIdx) => {
                       const isSelected = selectedRecordIds.has(rec.id);
+                      const isKbFocused = _recIdx === kbFocusIdx;
                       return (
-                        <View key={rec.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                        <View key={rec.id} nativeID={`rec-row-${_recIdx}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                           {/* Per-row checkbox (web only) */}
                           {Platform.OS === 'web' && (
                             <div
@@ -1569,7 +1669,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                               if (selectedRecordIds.size > 0) { toggleRecordSelection(rec.id); return; }
                               trackRecentView(rec); setSelectedDrawerRecord(rec); setRecordDrawerVisible(true);
                             }}
-                            style={{ flex: 1, ...g(0.05), padding: 14, gap: 8, ...(isSelected ? { borderColor: `${accentColor}BB`, borderWidth: 1.5, backgroundColor: `${accentColor}0A` } as any : {}), ...(Platform.OS === 'web' ? { boxShadow: '0 2px 12px rgba(0,0,0,0.10)', transition: 'box-shadow 0.2s, transform 0.15s' } as any : {}) }}
+                            style={{ flex: 1, ...g(0.05), padding: 14, gap: 8, borderLeftWidth: 3.5, borderLeftColor: getStatusBorderColor(rec.status), ...(isSelected ? { borderColor: `${accentColor}BB`, borderWidth: 1.5, borderLeftWidth: 3.5, borderLeftColor: getStatusBorderColor(rec.status), backgroundColor: `${accentColor}0A` } as any : {}), ...(isKbFocused ? { outline: `2px solid ${accentColor}`, outlineOffset: -2 } as any : {}), ...(Platform.OS === 'web' ? { boxShadow: '0 2px 12px rgba(0,0,0,0.10)', transition: 'box-shadow 0.2s, transform 0.15s, border-left-color 0.2s, outline-color 0.15s' } as any : {}) }}
                             {...(Platform.OS === 'web' ? { dataSet: { animateIn: '' } } : {})}
                           >
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -1613,13 +1713,16 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                 </View>
               )}
             </View>
+            </View>
           )}
 
           {/* If no subspaces exist at all */}
           {visibleSubSpaces.length === 0 && (
-            <View style={{ flex: 1, alignItems: 'center' as any, justifyContent: 'center' as any, padding: 20 }}>
-              <Text style={{ fontSize: 14, color: dimColor, textAlign: 'center' as any }}>
-                No {subSpaceLabel.toLowerCase()} configured for this workspace yet.{'\n'}Load a template from Workspace Creator to get started.
+            <View {...(Platform.OS === 'web' ? { dataSet: { emptyState: '' } } : {})} style={{ flex: 1, alignItems: 'center' as any, justifyContent: 'center' as any, padding: 30, gap: 12 }}>
+              <Text style={{ fontSize: 42 }}>🗂️</Text>
+              <Text style={{ fontSize: 16, fontWeight: '700', color: txtColor }}>No {subSpaceLabel.toLowerCase()} configured</Text>
+              <Text style={{ fontSize: 12, color: dimColor, textAlign: 'center' as any, maxWidth: 300, lineHeight: 18 }}>
+                This workspace doesn't have any {subSpaceLabelPlural.toLowerCase()} yet.{'\n'}Load a template from Workspace Creator to get started.
               </Text>
             </View>
           )}
@@ -1756,14 +1859,15 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                   <Text style={{ fontSize: 14, color: dimColor }}>✕</Text>
                 </Pressable>
               </View>
-              {/* ── Tab Bar ── */}
-              <View style={{ flexDirection: 'row', gap: 4, marginBottom: -1 }}>
+              {/* ── Tab Bar — segmented rail ── */}
+              <View style={{ flexDirection: 'row', gap: 0, marginBottom: -1, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: 3, marginHorizontal: 0, marginTop: 6 }}>
                 {(['form', 'import', 'scan'] as const).map((tab) => {
-                  const labels: Record<typeof tab, string> = { form: '📋 Form', import: '📥 Import CSV/JSON', scan: '🔲 QR Code' };
+                  const tabMeta: Record<typeof tab, { icon: string; label: string }> = { form: { icon: '📝', label: 'Form' }, import: { icon: '📥', label: 'Import' }, scan: { icon: '📷', label: 'Scan' } };
                   const active = createTab === tab;
                   return (
-                    <Pressable key={tab} onPress={() => setCreateTab(tab)} style={{ paddingHorizontal: 12, paddingVertical: 8, borderTopLeftRadius: 8, borderTopRightRadius: 8, backgroundColor: active ? 'rgba(255,255,255,0.07)' : 'transparent', borderBottomWidth: active ? 2 : 0, borderBottomColor: accentColor }}>
-                      <Text style={{ fontSize: 12, fontWeight: active ? '700' : '500', color: active ? accentColor : dimColor }}>{labels[tab]}</Text>
+                    <Pressable key={tab} onPress={() => setCreateTab(tab)} style={{ flex: 1, flexDirection: 'row', alignItems: 'center' as any, justifyContent: 'center' as any, gap: 6, paddingVertical: 8, borderRadius: 8, backgroundColor: active ? acRgba(0.20) : 'transparent', borderWidth: active ? 1 : 0, borderColor: active ? acRgba(0.35) : 'transparent', ...(Platform.OS === 'web' ? { transition: 'all 0.18s ease' } as any : {}) }}>
+                      <Text style={{ fontSize: 14 }}>{tabMeta[tab].icon}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: active ? '700' : '500', color: active ? accentColor : dimColor }}>{tabMeta[tab].label}</Text>
                     </Pressable>
                   );
                 })}
@@ -1947,27 +2051,29 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                 ) : csvPreviewRows.length > 0 ? (
                   <View style={{ gap: 6 }}>
                     <Text style={{ fontSize: 11, fontWeight: '700', color: dimColor }}>PREVIEW — first {csvPreviewRows.length} rows</Text>
+                    <View style={{ borderRadius: 10, borderWidth: 1, borderColor: acRgba(0.15), overflow: 'hidden' as any }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator>
-                      <View style={{ gap: 4 }}>
+                      <View style={{ gap: 0 }}>
                         {/* Headers */}
-                        <View style={{ flexDirection: 'row', gap: 8 }}>
+                        <View style={{ flexDirection: 'row', gap: 0, backgroundColor: acRgba(0.12), borderBottomWidth: 1, borderBottomColor: acRgba(0.18) }}>
                           {Object.keys(csvPreviewRows[0]).map((h) => (
-                            <View key={h} style={{ minWidth: 90, backgroundColor: accentSoft, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 3 }}>
-                              <Text style={{ fontSize: 10, fontWeight: '700', color: accentColor }}>{h}</Text>
+                            <View key={h} style={{ minWidth: 100, paddingHorizontal: 10, paddingVertical: 7 }}>
+                              <Text style={{ fontSize: 10, fontWeight: '800', color: accentColor, letterSpacing: 0.5, textTransform: 'uppercase' as any }}>{h}</Text>
                             </View>
                           ))}
                         </View>
                         {csvPreviewRows.map((row, ri) => (
-                          <View key={ri} style={{ flexDirection: 'row', gap: 8 }}>
+                          <View key={ri} style={{ flexDirection: 'row', gap: 0, backgroundColor: ri % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.05)', borderBottomWidth: ri < csvPreviewRows.length - 1 ? 1 : 0, borderBottomColor: 'rgba(255,255,255,0.04)' }}>
                             {Object.values(row).map((v, vi) => (
-                              <View key={vi} style={{ minWidth: 90, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 3, backgroundColor: 'rgba(255,255,255,0.04)' }}>
-                                <Text style={{ fontSize: 10, color: dimColor }} numberOfLines={1}>{v}</Text>
+                              <View key={vi} style={{ minWidth: 100, paddingHorizontal: 10, paddingVertical: 6 }}>
+                                <Text style={{ fontSize: 10, color: txtColor }} numberOfLines={1}>{v}</Text>
                               </View>
                             ))}
                           </View>
                         ))}
                       </View>
                     </ScrollView>
+                    </View>
                   </View>
                 ) : null}
                 <Pressable
@@ -2233,10 +2339,10 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             </View>
             <ScrollView style={{ padding: 20 }} contentContainerStyle={{ paddingBottom: 20 }}>
               {mergedTimeline.length === 0 && (
-                <View style={{ alignItems: 'center' as any, paddingVertical: 40, gap: 8 }}>
-                  <Text style={{ fontSize: 28 }}>📭</Text>
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: dimColor }}>No activity recorded yet</Text>
-                  <Text style={{ fontSize: 11, color: `${dimColor}88` }}>Create records or update statuses to see timeline events.</Text>
+                <View {...(Platform.OS === 'web' ? { dataSet: { emptyState: '' } } : {})} style={{ alignItems: 'center' as any, paddingVertical: 50, gap: 10 }}>
+                  <Text style={{ fontSize: 40 }}>📭</Text>
+                  <Text style={{ fontSize: 15, fontWeight: '700', color: txtColor }}>No activity recorded yet</Text>
+                  <Text style={{ fontSize: 12, color: dimColor, textAlign: 'center' as any, maxWidth: 280, lineHeight: 18 }}>Create records or update statuses to see timeline events appear here.</Text>
                 </View>
               )}
               {mergedTimeline.map((entry, idx) => {

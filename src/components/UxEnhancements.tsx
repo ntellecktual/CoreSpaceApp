@@ -212,8 +212,20 @@ export function injectUxAnimations() {
     [data-animate-stagger] > *:nth-child(n+9) { animation-delay: 400ms; }
 
     [data-kpi-animate] { animation: cs-count-up 0.5s ease both; }
+    [data-kpi-value] { display: inline-block; animation: cs-kpi-pop 0.6s cubic-bezier(0.34,1.56,0.64,1) both; }
+    [data-kpi-value]:nth-child(1) { animation-delay: 0.05s; }
+    [data-kpi-value]:nth-child(2) { animation-delay: 0.12s; }
+    [data-kpi-value]:nth-child(3) { animation-delay: 0.18s; }
+    [data-kpi-value]:nth-child(4) { animation-delay: 0.24s; }
+    @keyframes cs-kpi-pop { 0% { opacity: 0; transform: scale(0.6) translateY(10px); } 60% { opacity: 1; transform: scale(1.08) translateY(-2px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
     [data-scale-in] { animation: cs-scale-in 0.3s ease both; }
     [data-slide-in] { animation: cs-slide-in 0.3s ease both; }
+    [data-status-border] { border-left: 3.5px solid var(--status-color, rgba(140,91,245,0.5)); }
+    [data-empty-state] { animation: cs-empty-bounce 0.6s ease both; }
+    @keyframes cs-empty-bounce { 0% { opacity: 0; transform: scale(0.85) translateY(16px); } 60% { opacity: 1; transform: scale(1.04) translateY(-4px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+    [data-filter-chip] { animation: cs-scale-in 0.2s ease both; transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease; }
+    [data-filter-chip]:hover { transform: translateY(-1px); }
+    [data-crossfade] { animation: cs-fade-in 0.25s ease both; }
 
     /* DnD styles */
     [data-dnd-dragging] { opacity: 0.5; transform: scale(0.95); transition: opacity 0.15s, transform 0.15s; }
@@ -254,11 +266,44 @@ export function injectUxAnimations() {
 
     /* Card hover lift */
     .cs-card-hover {
-      transition: box-shadow 0.2s ease, transform 0.18s ease;
+      transition: box-shadow 0.2s ease, transform 0.18s ease, border-color 0.18s ease;
     }
     .cs-card-hover:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+    }
+
+    /* Record card with status border */
+    .cs-record-card {
+      transition: box-shadow 0.2s ease, transform 0.16s ease, border-color 0.16s ease;
+      border-left: 3.5px solid var(--status-color, rgba(140,91,245,0.4));
+    }
+    .cs-record-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.16);
+      border-left-color: var(--status-color, rgba(140,91,245,0.7));
+    }
+
+    /* CSV table styling */
+    .cs-csv-header { font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .cs-csv-row:nth-child(even) { background: rgba(255,255,255,0.03); }
+    .cs-csv-row:nth-child(odd) { background: rgba(255,255,255,0.06); }
+    .cs-csv-row { transition: background 0.12s ease; }
+    .cs-csv-row:hover { background: rgba(140,91,245,0.08) !important; }
+
+    /* Recently viewed card enhancement */
+    .cs-recent-card {
+      transition: box-shadow 0.2s ease, transform 0.16s ease, border-color 0.16s ease;
+    }
+    .cs-recent-card:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+      border-color: rgba(140,91,245,0.4) !important;
+    }
+
+    /* Stage distribution bar segment */
+    .cs-stage-segment {
+      transition: flex 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
     }
 
     /* Input focus glow */

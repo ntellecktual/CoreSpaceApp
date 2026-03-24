@@ -44,6 +44,7 @@ import {
   WorkflowChainDefinition,
   WorkspaceDefinition,
 } from '../types';
+import { DemoVertical, getPayloadForVertical, VERTICAL_META } from '../ai/beboEngine';
 
 const STORAGE_KEY = 'corespace.crm.v6';
 const COSMOS_SHADOW_KEY = 'corespace.cosmos.shadow.v1';
@@ -332,6 +333,53 @@ function createBlankTenantData(): AppData {
   };
 }
 
+// ─── Pre-made Tenant Seeding ────────────────────────────────────────
+
+const PREMADE_PALETTES: Record<string, readonly [string, string, string, string, string, string, string, string]> = {
+  fulfillment: ['#0A1628', '#0F1D32', '#3B82F6', '#60A5FA', '#10B981', '#F59E0B', '#EF4444', '#152238'],
+  pharma:      ['#1A0E14', '#261420', '#F43F5E', '#FB7185', '#8B5CF6', '#F59E0B', '#EF4444', '#1F1018'],
+  legal:       ['#0F1C5C', '#162269', '#C9A84C', '#E8C96A', '#2ECC71', '#E8A838', '#E74C3C', '#141E5C'],
+  sales:       ['#0A1A0F', '#0F261A', '#22C55E', '#4ADE80', '#3B82F6', '#F59E0B', '#EF4444', '#0D1F14'],
+  insurance:   ['#0F0F14', '#181B22', '#6366F1', '#818CF8', '#22C55E', '#F59E0B', '#EF4444', '#141620'],
+  logistics:   ['#0A1628', '#0F1D32', '#3B82F6', '#60A5FA', '#10B981', '#F59E0B', '#EF4444', '#152238'],
+  healthcare:  ['#0A1628', '#0F1D32', '#3B82F6', '#60A5FA', '#10B981', '#F59E0B', '#EF4444', '#152238'],
+};
+
+const PREMADE_VERTICALS: DemoVertical[] = ['fulfillment', 'pharma', 'legal', 'sales', 'insurance', 'logistics', 'healthcare'];
+
+function buildPreSeededTenants(): TenantRecord[] {
+  return PREMADE_VERTICALS.map((vertical) => {
+    const meta = VERTICAL_META[vertical];
+    const palette = PREMADE_PALETTES[vertical];
+    const payload = getPayloadForVertical(vertical);
+    const data = createBlankTenantData();
+
+    data.shellConfig = { ...data.shellConfig, ...payload.shellConfig };
+    data.workspaces = payload.workspaces;
+    data.flows = payload.flows;
+    data.integrations = payload.integrations;
+    data.records = payload.records;
+    if (payload.clients) data.clients = payload.clients;
+    if (payload.businessFunctions) data.businessFunctions = payload.businessFunctions;
+
+    return {
+      id: `tenant-${vertical}`,
+      name: meta.tenantName,
+      branding: normalizeTenantBranding({
+        logoUri: meta.tenantLogo,
+        industryVertical: vertical,
+        brandColors: [palette[0], palette[1], palette[2]],
+        accentSecondary: palette[3],
+        successColor: palette[4],
+        warningColor: palette[5],
+        dangerColor: palette[6],
+        surfaceColor: palette[7],
+      }),
+      data,
+    };
+  });
+}
+
 function stripGlobalAuthFields(data: AppData): AppData {
   return {
     ...data,
@@ -422,13 +470,14 @@ function normalizeData(parsed: Partial<AppData> & { activeRole?: string }): AppD
 }
 
 export function AppStateProvider({ children }: { children: React.ReactNode }) {
-  const [tenantRecords, setTenantRecords] = useState<TenantRecord[]>([
+  const [tenantRecords, setTenantRecords] = useState<TenantRecord[]>(() => [
     {
       id: DEFAULT_TENANT_ID,
       name: DEFAULT_TENANT_NAME,
       branding: normalizeTenantBranding(),
       data: createBlankTenantData(),
     },
+    ...buildPreSeededTenants(),
   ]);
   const [activeTenantId, setActiveTenantId] = useState(DEFAULT_TENANT_ID);
   const [users, setUsers] = useState<AuthUser[]>([]);

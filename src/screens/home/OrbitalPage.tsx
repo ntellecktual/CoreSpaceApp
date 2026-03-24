@@ -114,8 +114,8 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
   };
 
   const publisherBadge = (publisher: string) => (
-    <View style={{ backgroundColor: publisher === 'corespace' ? '#8C5BF5' : '#6B7280', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2, marginLeft: 6 }}>
-      <Text style={{ fontSize: 10, fontWeight: '700', color: '#FFF' }}>
+    <View style={{ backgroundColor: publisher === 'corespace' ? '#8C5BF5' : '#6B7280', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, marginLeft: 8 }}>
+      <Text style={{ fontSize: 11, fontWeight: '700', color: '#FFF', letterSpacing: 0.3 }}>
         {publisher === 'corespace' ? 'CoreSpace' : 'Org'}
       </Text>
     </View>
@@ -127,7 +127,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
     const mappingFields = selectedTemplate.fields.filter((f) => f.layer === 'mapping');
 
     return (
-      <ScrollView style={styles.sectionBody} contentContainerStyle={{ padding: 16, gap: 16 }}>
+      <ScrollView style={styles.sectionBody} contentContainerStyle={{ padding: compact ? 16 : 24, gap: 20 }}>
         {guidedMode && (
           <HintStrip
             steps={orbitalSteps}
@@ -135,28 +135,64 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
           />
         )}
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-          <Pressable onPress={() => { setView('catalog'); setInfo(''); }}>
-            <Text style={{ color: '#8C5BF5', fontSize: 14, fontWeight: '600' }}>← Back to Marketplace</Text>
-          </Pressable>
-        </View>
+        <Pressable onPress={() => { setView('catalog'); setInfo(''); }}>
+          <Text style={{ color: '#8C5BF5', fontSize: 14, fontWeight: '600' }}>← Back to Marketplace</Text>
+        </Pressable>
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-          <Text style={{ fontSize: 28 }}>{selectedTemplate.icon}</Text>
-          <View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={[styles.sectionTitle, { marginBottom: 0 }]}>{selectedTemplate.name}</Text>
+        {/* Template Hero Header */}
+        <View style={{
+          flexDirection: 'row', alignItems: 'center', gap: 16, padding: 20, borderRadius: 16,
+          backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(255,255,255,0.04)',
+          borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(140,91,245,0.20)',
+        } as any}>
+          <View style={{
+            width: 56, height: 56, borderRadius: 16, backgroundColor: 'rgba(140,91,245,0.12)',
+            alignItems: 'center', justifyContent: 'center',
+            borderWidth: 1, borderColor: 'rgba(140,91,245,0.25)',
+          } as any}>
+            <Text style={{ fontSize: 30 }}>{selectedTemplate.icon}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
+              <Text style={{ fontWeight: '800', fontSize: 20, color: mode === 'day' ? '#1E293B' : '#F1F5F9', letterSpacing: -0.3 }}>{selectedTemplate.name}</Text>
               {publisherBadge(selectedTemplate.publisher)}
             </View>
-            <Text style={styles.sectionDetail}>{selectedTemplate.vendor} · v{selectedTemplate.version}</Text>
+            <Text style={{ fontSize: 13, color: '#9CA3AF', marginTop: 2 }}>{selectedTemplate.vendor} · v{selectedTemplate.version}</Text>
+          </View>
+          {/* Step indicator */}
+          <View style={{ flexDirection: 'row', gap: 6 }}>
+            {['Connection', 'Mapping', 'Activate'].map((step, i) => (
+              <View key={step} style={{ alignItems: 'center', gap: 3 }}>
+                <View style={{
+                  width: 28, height: 28, borderRadius: 14,
+                  backgroundColor: i < 2 ? 'rgba(140,91,245,0.15)' : 'rgba(34,197,94,0.15)',
+                  alignItems: 'center', justifyContent: 'center',
+                  borderWidth: 1.5, borderColor: i < 2 ? '#8C5BF5' : '#22C55E',
+                } as any}>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: i < 2 ? '#8C5BF5' : '#22C55E' }}>{i + 1}</Text>
+                </View>
+                <Text style={{ fontSize: 9, color: '#9CA3AF', fontWeight: '600' }}>{step}</Text>
+              </View>
+            ))}
           </View>
         </View>
 
         {/* Layer 1: Connection Config */}
-        <Card title="Layer 1 — Connection">
-          <Text style={[styles.sectionDetail, { marginBottom: 8 }]}>
-            Credentials and endpoint configuration to establish the connection.
-          </Text>
+        <View style={{
+          backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(255,255,255,0.03)',
+          borderRadius: 16, padding: 20, gap: 14,
+          borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(140,91,245,0.15)',
+          borderLeftWidth: 3, borderLeftColor: '#8C5BF5',
+        } as any}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: 'rgba(140,91,245,0.12)', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 16 }}>🔑</Text>
+            </View>
+            <View>
+              <Text style={{ fontWeight: '700', fontSize: 16, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>Layer 1 — Connection</Text>
+              <Text style={{ fontSize: 12, color: '#9CA3AF' }}>Credentials and endpoint configuration to establish the connection.</Text>
+            </View>
+          </View>
           {connectionFields.map((field) => (
             <ConfigFieldInput
               key={field.key}
@@ -164,15 +200,27 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
               value={configDraft[field.key] ?? ''}
               onChange={(v) => updateConfigField(field.key, v)}
               styles={styles}
+              mode={mode}
             />
           ))}
-        </Card>
+        </View>
 
         {/* Layer 2: Semantic Mapping */}
-        <Card title="Layer 2 — Semantic Mapping">
-          <Text style={[styles.sectionDetail, { marginBottom: 8 }]}>
-            Map your workspace fields to integration inputs and outputs.
-          </Text>
+        <View style={{
+          backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(255,255,255,0.03)',
+          borderRadius: 16, padding: 20, gap: 14,
+          borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(59,130,246,0.15)',
+          borderLeftWidth: 3, borderLeftColor: '#3B82F6',
+        } as any}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: 'rgba(59,130,246,0.12)', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 16 }}>🔗</Text>
+            </View>
+            <View>
+              <Text style={{ fontWeight: '700', fontSize: 16, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>Layer 2 — Semantic Mapping</Text>
+              <Text style={{ fontSize: 12, color: '#9CA3AF' }}>Map your workspace fields to integration inputs and outputs.</Text>
+            </View>
+          </View>
           {mappingFields.map((field) => (
             <ConfigFieldInput
               key={field.key}
@@ -180,48 +228,88 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
               value={mappingDraft[field.key] ?? ''}
               onChange={(v) => updateMappingField(field.key, v)}
               styles={styles}
+              mode={mode}
             />
           ))}
-        </Card>
+        </View>
 
-        {/* Actions & Triggers Preview */}
-        <Card title="Available Actions">
-          {selectedTemplate.actions.map((a) => (
-            <View key={a.key} style={{ marginBottom: 8 }}>
-              <Text style={{ fontWeight: '700', color: mode === 'day' ? '#1E293B' : '#F1F5F9', fontSize: 13 }}>{a.label}</Text>
-              <Text style={[styles.sectionDetail, { fontSize: 12 }]}>{a.description}</Text>
+        {/* Actions & Triggers — side by side on wider screens */}
+        <View style={{ flexDirection: compact ? 'column' : 'row', gap: 16 }}>
+          <View style={{
+            flex: 1, backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(255,255,255,0.03)',
+            borderRadius: 16, padding: 20, gap: 12,
+            borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(34,197,94,0.15)',
+          } as any}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 16 }}>⚡</Text>
+              <Text style={{ fontWeight: '700', fontSize: 15, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>Available Actions</Text>
+              <View style={{ backgroundColor: 'rgba(34,197,94,0.15)', borderRadius: 8, paddingHorizontal: 7, paddingVertical: 2 }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#22C55E' }}>{selectedTemplate.actions.length}</Text>
+              </View>
             </View>
-          ))}
-        </Card>
+            {selectedTemplate.actions.map((a) => (
+              <View key={a.key} style={{ backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.03)', borderRadius: 10, padding: 12, gap: 3 }}>
+                <Text style={{ fontWeight: '700', color: mode === 'day' ? '#1E293B' : '#F1F5F9', fontSize: 14 }}>{a.label}</Text>
+                <Text style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 17 }}>{a.description}</Text>
+              </View>
+            ))}
+          </View>
 
-        <Card title="Available Triggers">
-          {selectedTemplate.triggers.map((t) => (
-            <View key={t.key} style={{ marginBottom: 8 }}>
-              <Text style={{ fontWeight: '700', color: mode === 'day' ? '#1E293B' : '#F1F5F9', fontSize: 13 }}>{t.label}</Text>
-              <Text style={[styles.sectionDetail, { fontSize: 12 }]}>{t.description}</Text>
+          <View style={{
+            flex: 1, backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(255,255,255,0.03)',
+            borderRadius: 16, padding: 20, gap: 12,
+            borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(59,130,246,0.15)',
+          } as any}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 16 }}>📡</Text>
+              <Text style={{ fontWeight: '700', fontSize: 15, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>Available Triggers</Text>
+              <View style={{ backgroundColor: 'rgba(59,130,246,0.15)', borderRadius: 8, paddingHorizontal: 7, paddingVertical: 2 }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#60A5FA' }}>{selectedTemplate.triggers.length}</Text>
+              </View>
             </View>
-          ))}
-        </Card>
+            {selectedTemplate.triggers.map((t) => (
+              <View key={t.key} style={{ backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.03)', borderRadius: 10, padding: 12, gap: 3 }}>
+                <Text style={{ fontWeight: '700', color: mode === 'day' ? '#1E293B' : '#F1F5F9', fontSize: 14 }}>{t.label}</Text>
+                <Text style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 17 }}>{t.description}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
 
         {selectedTemplate.prewiredSignals && selectedTemplate.prewiredSignals.length > 0 && (
-          <Card title="Pre-Wired Signals">
-            <Text style={[styles.sectionDetail, { marginBottom: 8 }]}>
+          <View style={{
+            backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(255,255,255,0.03)',
+            borderRadius: 16, padding: 20, gap: 12,
+            borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(140,91,245,0.15)',
+          } as any}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 16 }}>⚡</Text>
+              <Text style={{ fontWeight: '700', fontSize: 15, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>Pre-Wired Signals</Text>
+            </View>
+            <Text style={{ fontSize: 12, color: '#9CA3AF' }}>
               These Signal Studio flows will be auto-registered upon activation.
             </Text>
             {selectedTemplate.prewiredSignals.map((s) => (
-              <View key={s.key} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6, gap: 8 }}>
-                <Text style={{ fontSize: 11, color: '#8C5BF5', fontWeight: '700' }}>⚡</Text>
-                <Text style={{ fontSize: 12, color: mode === 'day' ? '#1E293B' : '#F1F5F9', fontWeight: '600' }}>{s.label}</Text>
+              <View key={s.key} style={{
+                flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10,
+                backgroundColor: 'rgba(140,91,245,0.06)', borderRadius: 10,
+              }}>
+                <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: 'rgba(140,91,245,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 12 }}>⚡</Text>
+                </View>
+                <Text style={{ fontSize: 13, color: mode === 'day' ? '#1E293B' : '#F1F5F9', fontWeight: '600', flex: 1 }}>{s.label}</Text>
                 {s.customerEditable && (
-                  <Text style={{ fontSize: 10, color: '#6B7280', fontStyle: 'italic' }}>editable</Text>
+                  <View style={{ backgroundColor: 'rgba(245,158,11,0.15)', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 }}>
+                    <Text style={{ fontSize: 10, color: '#F59E0B', fontWeight: '600' }}>Editable</Text>
+                  </View>
                 )}
               </View>
             ))}
-          </Card>
+          </View>
         )}
 
         {!!info && (
-          <Text style={{ color: '#EF4444', fontSize: 12, fontWeight: '600', textAlign: 'center' }}>{info}</Text>
+          <Text style={{ color: '#EF4444', fontSize: 13, fontWeight: '600', textAlign: 'center' }}>{info}</Text>
         )}
 
         <Pressable
@@ -245,9 +333,12 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
               });
             }
           }}
-          style={[styles.primaryButton, { alignSelf: 'center', marginTop: 8, paddingHorizontal: 32 }]}
+          style={{
+            alignSelf: 'center', marginTop: 4, paddingHorizontal: 40, paddingVertical: 14,
+            backgroundColor: '#22C55E', borderRadius: 14,
+          }}
         >
-          <Text style={styles.primaryButtonText}>Activate Integration</Text>
+          <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: 16 }}>🚀  Activate Integration</Text>
         </Pressable>
       </ScrollView>
     );
@@ -258,33 +349,40 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
     <View style={{ flex: 1, flexDirection: compact ? 'column' : 'row' }}>
       {/* ── Left Nav ─────────────────────────────────────────────── */}
       {!compact && (
-        <View style={[styles.adminSidebar, { width: 220, borderRightWidth: 1, borderRightColor: mode === 'day' ? '#E2E8F0' : '#334155' }]}>
-          <ScrollView contentContainerStyle={{ paddingVertical: 12 }}>
-            {sidebarSections.map((sec) => (
-              <Pressable
-                key={sec.key}
-                onPress={() => { toggleSection(sec.key); setView(sec.key === 'catalog' ? 'catalog' : 'active'); }}
-                style={[
-                  styles.dashboardNavItem,
-                  view === (sec.key === 'catalog' ? 'catalog' : 'active') && styles.dashboardNavItemActive,
-                ]}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                  <Text style={[styles.dashboardNavItemText, view === (sec.key === 'catalog' ? 'catalog' : 'active') && styles.dashboardNavItemTextActive]}>
-                    {sec.label}
-                  </Text>
-                  <View style={{ backgroundColor: '#8C5BF5', borderRadius: 10, minWidth: 22, height: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 }}>
-                    <Text style={{ color: '#FFF', fontSize: 11, fontWeight: '700' }}>{sec.count}</Text>
+        <View style={[styles.adminSidebar, { width: 230, borderRightWidth: 1, borderRightColor: mode === 'day' ? '#E2E8F0' : '#334155' }]}>
+          <ScrollView contentContainerStyle={{ paddingVertical: 14, gap: 4, paddingHorizontal: 8 }}>
+            {sidebarSections.map((sec) => {
+              const isActive = view === (sec.key === 'catalog' ? 'catalog' : 'active');
+              return (
+                <Pressable
+                  key={sec.key}
+                  onPress={() => { toggleSection(sec.key); setView(sec.key === 'catalog' ? 'catalog' : 'active'); }}
+                  style={{
+                    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+                    paddingHorizontal: 14, paddingVertical: 11, borderRadius: 10,
+                    backgroundColor: isActive ? (mode === 'day' ? 'rgba(140,91,245,0.08)' : 'rgba(140,91,245,0.15)') : 'transparent',
+                  }}
+                >
+                  <Text style={{
+                    fontSize: 14, fontWeight: isActive ? '700' : '500',
+                    color: isActive ? '#8C5BF5' : (mode === 'day' ? '#475569' : '#9CA3AF'),
+                  }}>{sec.label}</Text>
+                  <View style={{
+                    backgroundColor: isActive ? '#8C5BF5' : (mode === 'day' ? '#E2E8F0' : '#334155'),
+                    borderRadius: 10, minWidth: 24, height: 24,
+                    alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6,
+                  }}>
+                    <Text style={{ color: isActive ? '#FFF' : '#9CA3AF', fontSize: 12, fontWeight: '700' }}>{sec.count}</Text>
                   </View>
-                </View>
-              </Pressable>
-            ))}
+                </Pressable>
+              );
+            })}
           </ScrollView>
         </View>
       )}
 
       {/* ── Content ──────────────────────────────────────────────── */}
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 16 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: compact ? 16 : 24, gap: 18 }}>
         {guidedMode && (
           <HintStrip
             steps={orbitalSteps}
@@ -293,59 +391,74 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
         )}
 
         {compact && (
-          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 4 }}>
             {(['catalog', 'active'] as const).map((v) => (
               <Pressable
                 key={v}
                 onPress={() => setView(v)}
-                style={[
-                  styles.pillButton,
-                  view === v && styles.pillButtonActive,
-                ]}
+                style={{
+                  flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 10,
+                  backgroundColor: view === v ? '#8C5BF5' : (mode === 'day' ? '#F1F5F9' : 'rgba(255,255,255,0.06)'),
+                  borderWidth: 1, borderColor: view === v ? '#8C5BF5' : (mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.10)'),
+                } as any}
               >
-                <Text style={[styles.pillButtonText, view === v && styles.pillButtonTextActive]}>
-                  {v === 'catalog' ? 'Marketplace' : 'Active'}
-                </Text>
+                <Text style={{
+                  fontSize: 14, fontWeight: view === v ? '700' : '500',
+                  color: view === v ? '#FFFFFF' : (mode === 'day' ? '#475569' : '#9CA3AF'),
+                }}>{v === 'catalog' ? 'Marketplace' : 'Active'}</Text>
               </Pressable>
             ))}
           </View>
         )}
 
         {!!info && (
-          <Text style={{ color: info.includes('denied') || info.includes('Missing') ? '#EF4444' : '#22C55E', fontSize: 12, fontWeight: '600' }}>{info}</Text>
+          <Text style={{ color: info.includes('denied') || info.includes('Missing') ? '#EF4444' : '#22C55E', fontSize: 13, fontWeight: '600' }}>{info}</Text>
         )}
 
         {/* ── Catalog View ───────────────────────────────────────── */}
         {view === 'catalog' && (
           <>
-            <View style={{ flexDirection: compact ? 'column' : 'row', gap: 10, alignItems: compact ? 'stretch' : 'center', marginBottom: 4 }}>
+            {/* Search + category filters */}
+            <View style={{ flexDirection: compact ? 'column' : 'row', gap: 12, alignItems: compact ? 'stretch' : 'center' }}>
               <TextInput
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 placeholder="Search integrations..."
                 placeholderTextColor="#9CA3AF"
-                style={[styles.textInput, { flex: 1, minWidth: 200 }]}
+                style={[styles.textInput, { flex: 1, minWidth: 200, fontSize: 14, paddingVertical: 11, borderRadius: 12 }]}
               />
-              <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
+              <View style={{ flexDirection: 'row', gap: 7, flexWrap: 'wrap' }}>
                 <Pressable
                   onPress={() => setCategoryFilter(null)}
-                  style={[styles.pillButton, !categoryFilter && styles.pillButtonActive]}
+                  style={{
+                    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
+                    backgroundColor: !categoryFilter ? '#8C5BF5' : (mode === 'day' ? '#F1F5F9' : 'rgba(255,255,255,0.06)'),
+                    borderWidth: 1, borderColor: !categoryFilter ? '#8C5BF5' : (mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.10)'),
+                  } as any}
                 >
-                  <Text style={[styles.pillButtonText, !categoryFilter && styles.pillButtonTextActive]}>All</Text>
+                  <Text style={{ fontSize: 13, fontWeight: !categoryFilter ? '700' : '500', color: !categoryFilter ? '#FFF' : (mode === 'day' ? '#475569' : '#9CA3AF') }}>All</Text>
                 </Pressable>
-                {categories.map((cat) => (
-                  <Pressable
-                    key={cat}
-                    onPress={() => setCategoryFilter(categoryFilter === cat ? null : cat)}
-                    style={[styles.pillButton, categoryFilter === cat && styles.pillButtonActive]}
-                  >
-                    <Text style={[styles.pillButtonText, categoryFilter === cat && styles.pillButtonTextActive]}>{cat}</Text>
-                  </Pressable>
-                ))}
+                {categories.map((cat) => {
+                  const active = categoryFilter === cat;
+                  return (
+                    <Pressable
+                      key={cat}
+                      onPress={() => setCategoryFilter(active ? null : cat)}
+                      style={{
+                        paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
+                        backgroundColor: active ? '#8C5BF5' : (mode === 'day' ? '#F1F5F9' : 'rgba(255,255,255,0.06)'),
+                        borderWidth: 1, borderColor: active ? '#8C5BF5' : (mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.10)'),
+                      } as any}
+                    >
+                      <Text style={{ fontSize: 13, fontWeight: active ? '700' : '500', color: active ? '#FFF' : (mode === 'day' ? '#475569' : '#9CA3AF') }}>{cat}</Text>
+                    </Pressable>
+                  );
+                })}
               </View>
             </View>
 
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+            {/* Template cards grid */}
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
               {filteredTemplates.map((tpl) => (
                 <TemplateCard
                   key={tpl.id}
@@ -371,9 +484,12 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
             </View>
 
             {filteredTemplates.length === 0 && (
-              <Text style={[styles.sectionDetail, { textAlign: 'center', marginTop: 40 }]}>
-                No integrations match your search.
-              </Text>
+              <View style={{ alignItems: 'center', marginTop: 48, gap: 10 }}>
+                <Text style={{ fontSize: 36 }}>🔍</Text>
+                <Text style={{ fontSize: 15, fontWeight: '600', color: mode === 'day' ? '#475569' : '#9CA3AF', textAlign: 'center' }}>
+                  No integrations match your search.
+                </Text>
+              </View>
             )}
           </>
         )}
@@ -382,18 +498,27 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
         {view === 'active' && (
           <>
             {activeIntegrations.length === 0 ? (
-              <View style={{ alignItems: 'center', marginTop: 40, gap: 12 }}>
-                <Text style={{ fontSize: 40 }}>🛰️</Text>
-                <Text style={[styles.sectionTitle, { textAlign: 'center' }]}>No Active Integrations</Text>
-                <Text style={[styles.sectionDetail, { textAlign: 'center', maxWidth: 400 }]}>
+              <View style={{ alignItems: 'center', marginTop: 48, gap: 14 }}>
+                <View style={{
+                  width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(140,91,245,0.10)',
+                  alignItems: 'center', justifyContent: 'center',
+                  borderWidth: 2, borderColor: 'rgba(140,91,245,0.20)',
+                } as any}>
+                  <Text style={{ fontSize: 36 }}>🛰️</Text>
+                </View>
+                <Text style={{ fontWeight: '700', fontSize: 18, color: mode === 'day' ? '#1E293B' : '#F1F5F9', textAlign: 'center' }}>No Active Integrations</Text>
+                <Text style={{ fontSize: 14, color: '#9CA3AF', textAlign: 'center', maxWidth: 420, lineHeight: 20 }}>
                   Browse the Marketplace to activate your first integration and connect external services to your workspace.
                 </Text>
-                <Pressable onPress={() => setView('catalog')} style={[styles.primaryButton, { marginTop: 8 }]}>
-                  <Text style={styles.primaryButtonText}>Browse Marketplace</Text>
+                <Pressable
+                  onPress={() => setView('catalog')}
+                  style={{ backgroundColor: '#8C5BF5', borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12, marginTop: 4 }}
+                >
+                  <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 15 }}>Browse Marketplace</Text>
                 </Pressable>
               </View>
             ) : (
-              <View style={{ gap: 12 }}>
+              <View style={{ gap: 14 }}>
                 {activeIntegrations.map((activation) => {
                   const tpl = getTemplateForActivation(activation);
                   return (
@@ -443,30 +568,32 @@ function ConfigFieldInput({
   value,
   onChange,
   styles,
+  mode,
 }: {
   field: IntegrationFieldDef;
   value: string;
   onChange: (v: string) => void;
   styles: any;
+  mode: string;
 }) {
   return (
-    <View style={{ marginBottom: 10 }}>
-      <Text style={[styles.inputLabel, { marginBottom: 2 }]}>
+    <View style={{ marginBottom: 6 }}>
+      <Text style={{ fontWeight: '600', fontSize: 14, color: mode === 'day' ? '#1E293B' : '#F1F5F9', marginBottom: 3 }}>
         {field.label}{field.required && <Text style={{ color: '#EF4444' }}> *</Text>}
       </Text>
       {field.instruction && (
-        <Text style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 4 }}>{field.instruction}</Text>
+        <Text style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 5, lineHeight: 17 }}>{field.instruction}</Text>
       )}
       {field.type === 'boolean' ? (
         <Pressable
           onPress={() => onChange(value === 'true' ? 'false' : 'true')}
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 }}
         >
           <View
             style={{
-              width: 20,
-              height: 20,
-              borderRadius: 4,
+              width: 22,
+              height: 22,
+              borderRadius: 6,
               borderWidth: 2,
               borderColor: value === 'true' ? '#8C5BF5' : '#9CA3AF',
               backgroundColor: value === 'true' ? '#8C5BF5' : 'transparent',
@@ -474,22 +601,23 @@ function ConfigFieldInput({
               justifyContent: 'center',
             }}
           >
-            {value === 'true' && <Text style={{ color: '#FFF', fontSize: 12, fontWeight: '700' }}>✓</Text>}
+            {value === 'true' && <Text style={{ color: '#FFF', fontSize: 13, fontWeight: '700' }}>✓</Text>}
           </View>
-          <Text style={{ fontSize: 13, color: '#9CA3AF' }}>{value === 'true' ? 'Enabled' : 'Disabled'}</Text>
+          <Text style={{ fontSize: 14, color: value === 'true' ? (mode === 'day' ? '#1E293B' : '#F1F5F9') : '#9CA3AF' }}>{value === 'true' ? 'Enabled' : 'Disabled'}</Text>
         </Pressable>
       ) : field.type === 'select' && field.options ? (
-        <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
+        <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
           {field.options.map((opt) => (
             <Pressable
               key={opt}
               onPress={() => onChange(opt)}
-              style={[
-                styles.pillButton,
-                value === opt && styles.pillButtonActive,
-              ]}
+              style={{
+                paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
+                backgroundColor: value === opt ? '#8C5BF5' : (mode === 'day' ? '#F1F5F9' : 'rgba(255,255,255,0.06)'),
+                borderWidth: 1, borderColor: value === opt ? '#8C5BF5' : (mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.10)'),
+              } as any}
             >
-              <Text style={[styles.pillButtonText, value === opt && styles.pillButtonTextActive]}>{opt}</Text>
+              <Text style={{ fontSize: 13, fontWeight: value === opt ? '700' : '500', color: value === opt ? '#FFF' : (mode === 'day' ? '#475569' : '#9CA3AF') }}>{opt}</Text>
             </Pressable>
           ))}
         </View>
@@ -500,14 +628,14 @@ function ConfigFieldInput({
           placeholder={field.example ?? ''}
           placeholderTextColor="#9CA3AF"
           secureTextEntry={field.type === 'secret'}
-          style={[styles.textInput, { fontSize: 13 }]}
+          style={[styles.textInput, { fontSize: 14, paddingVertical: 11, borderRadius: 10 }]}
         />
       )}
       {field.impactStatement && (
-        <Text style={{ fontSize: 10, color: '#F59E0B', marginTop: 3, fontStyle: 'italic' }}>⚠ {field.impactStatement}</Text>
+        <Text style={{ fontSize: 11, color: '#F59E0B', marginTop: 4, fontStyle: 'italic' }}>⚠ {field.impactStatement}</Text>
       )}
       {field.validationHint && (
-        <Text style={{ fontSize: 10, color: '#6B7280', marginTop: 2 }}>{field.validationHint}</Text>
+        <Text style={{ fontSize: 11, color: '#6B7280', marginTop: 3 }}>{field.validationHint}</Text>
       )}
     </View>
   );
@@ -535,42 +663,48 @@ function TemplateCard({
   return (
     <View
       style={{
-        width: compact ? '100%' : 300,
+        width: compact ? '100%' : 320,
         backgroundColor: mode === 'day' ? '#FFFFFF' : '#1E293B',
-        borderRadius: 12,
-        padding: 16,
+        borderRadius: 16,
+        padding: 20,
         borderWidth: 1,
         borderColor: mode === 'day' ? '#E2E8F0' : '#334155',
-        gap: 8,
+        gap: 12,
+        overflow: 'hidden' as const,
       }}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <Text style={{ fontSize: 28 }}>{template.icon}</Text>
+      {/* Accent top stripe */}
+      <View style={{ position: 'absolute' as const, top: 0, left: 0, right: 0, height: 3, backgroundColor: '#8C5BF5', borderTopLeftRadius: 16, borderTopRightRadius: 16 }} />
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <View style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: mode === 'day' ? '#F1F5F9' : 'rgba(140,91,245,0.10)', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 26 }}>{template.icon}</Text>
+        </View>
         <View style={{ flex: 1 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={{ fontWeight: '700', fontSize: 15, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
+            <Text style={{ fontWeight: '800', fontSize: 17, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>
               {template.name}
             </Text>
             {publisherBadge(template.publisher)}
           </View>
-          <Text style={{ fontSize: 11, color: '#9CA3AF' }}>{template.vendor}</Text>
+          <Text style={{ fontSize: 12, color: '#9CA3AF', marginTop: 1 }}>{template.vendor}</Text>
         </View>
       </View>
 
-      <Text style={{ fontSize: 12, color: mode === 'day' ? '#475569' : '#CBD5E1', lineHeight: 17 }} numberOfLines={2}>
+      <Text style={{ fontSize: 14, color: mode === 'day' ? '#475569' : '#CBD5E1', lineHeight: 20 }} numberOfLines={2}>
         {template.description}
       </Text>
 
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-        <View style={{ backgroundColor: mode === 'day' ? '#F1F5F9' : '#334155', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
-          <Text style={{ fontSize: 10, color: '#8C5BF5', fontWeight: '600' }}>{template.category}</Text>
+        <View style={{ backgroundColor: mode === 'day' ? '#F1F5F9' : '#334155', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 }}>
+          <Text style={{ fontSize: 11, color: '#8C5BF5', fontWeight: '700', letterSpacing: 0.3 }}>{template.category}</Text>
         </View>
-        <Text style={{ fontSize: 10, color: '#9CA3AF' }}>
+        <Text style={{ fontSize: 12, color: '#9CA3AF' }}>
           {template.actions.length} action{template.actions.length !== 1 ? 's' : ''} · {template.triggers.length} trigger{template.triggers.length !== 1 ? 's' : ''}
         </Text>
         {(template.prewiredSignals?.length ?? 0) > 0 && (
-          <View style={{ backgroundColor: '#8C5BF520', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
-            <Text style={{ fontSize: 10, color: '#8C5BF5', fontWeight: '700' }}>
+          <View style={{ backgroundColor: '#8C5BF520', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 }}>
+            <Text style={{ fontSize: 11, color: '#8C5BF5', fontWeight: '700' }}>
               ⚡ {template.prewiredSignals!.length} signal{template.prewiredSignals!.length !== 1 ? 's' : ''}
             </Text>
           </View>
@@ -579,28 +713,28 @@ function TemplateCard({
 
       {/* Business object context chips */}
       {businessObjectContext && businessObjectContext.length > 0 && (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
-          <Text style={{ fontSize: 9, color: '#9CA3AF', fontWeight: '600' }}>Works with:</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <Text style={{ fontSize: 11, color: '#9CA3AF', fontWeight: '600' }}>Works with:</Text>
           {businessObjectContext.map((obj, i) => (
-            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: `${obj.color ?? '#8C5BF5'}18`, borderRadius: 5, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 1, borderColor: `${obj.color ?? '#8C5BF5'}33` }}>
-              {!!obj.icon && <Text style={{ fontSize: 9 }}>{obj.icon}</Text>}
-              <Text style={{ fontSize: 9, fontWeight: '700', color: obj.color ?? '#8C5BF5' }}>{obj.name}</Text>
+            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: `${obj.color ?? '#8C5BF5'}18`, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: `${obj.color ?? '#8C5BF5'}33` }}>
+              {!!obj.icon && <Text style={{ fontSize: 11 }}>{obj.icon}</Text>}
+              <Text style={{ fontSize: 11, fontWeight: '700', color: obj.color ?? '#8C5BF5' }}>{obj.name}</Text>
             </View>
           ))}
         </View>
       )}
 
-      <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
+      <View style={{ flexDirection: 'row', gap: 8, marginTop: 4 }}>
         {activated ? (
-          <View style={{ backgroundColor: '#22C55E20', borderRadius: 6, paddingHorizontal: 12, paddingVertical: 6, flex: 1, alignItems: 'center' }}>
-            <Text style={{ color: '#22C55E', fontWeight: '700', fontSize: 12 }}>✓ Activated</Text>
+          <View style={{ backgroundColor: '#22C55E18', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 10, flex: 1, alignItems: 'center', borderWidth: 1, borderColor: '#22C55E33' }}>
+            <Text style={{ color: '#22C55E', fontWeight: '800', fontSize: 14 }}>✓ Activated</Text>
           </View>
         ) : (
           <Pressable
             onPress={onActivate}
-            style={[styles.primaryButton, { flex: 1, alignItems: 'center' }]}
+            style={{ flex: 1, alignItems: 'center', backgroundColor: '#8C5BF5', borderRadius: 12, paddingVertical: 12 }}
           >
-            <Text style={styles.primaryButtonText}>Activate</Text>
+            <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 15 }}>Activate</Text>
           </Pressable>
         )}
       </View>
@@ -648,61 +782,64 @@ function ActivationCard({
   const testIcon = testResult === 'testing' ? '⏳' : testResult === 'ok' ? '✅' : testResult === 'fail' ? '❌' : '🔌';
   const testLabel = testResult === 'testing' ? 'Testing…' : testResult === 'ok' ? 'Connected' : testResult === 'fail' ? 'Failed' : 'Test Connection';
   const testColor = testResult === 'ok' ? '#22C55E' : testResult === 'fail' ? '#EF4444' : undefined;
+  const sc = statusColor(activation.status);
 
   return (
     <View
       style={{
-        backgroundColor: mode === 'day' ? '#FFFFFF' : '#1E293B',
-        borderRadius: 12,
-        padding: 16,
+        backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(30,41,59,0.85)',
+        borderRadius: 16,
+        padding: 20,
         borderWidth: 1,
-        borderColor: mode === 'day' ? '#E2E8F0' : '#334155',
-        gap: 10,
+        borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.08)',
+        gap: 14,
       }}
     >
       {/* Header */}
-      <Pressable onPress={() => setExpanded(!expanded)} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <Text style={{ fontSize: 24 }}>{template?.icon ?? '🔗'}</Text>
+      <Pressable onPress={() => setExpanded(!expanded)} style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: mode === 'day' ? '#F1F5F9' : 'rgba(140,91,245,0.10)', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 24 }}>{template?.icon ?? '🔗'}</Text>
+        </View>
         <View style={{ flex: 1 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Text style={{ fontWeight: '700', fontSize: 15, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <Text style={{ fontWeight: '800', fontSize: 17, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>
               {template?.name ?? activation.templateId}
             </Text>
             {template && publisherBadge(template.publisher)}
           </View>
-          <Text style={{ fontSize: 11, color: '#9CA3AF' }}>
+          <Text style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
             v{activation.templateVersion} · Activated {new Date(activation.activatedAt).toLocaleDateString()}
           </Text>
         </View>
 
         {/* Status Badge */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: statusColor(activation.status) }} />
-          <Text style={{ fontSize: 12, fontWeight: '600', color: statusColor(activation.status), textTransform: 'capitalize' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: `${sc}18`, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}>
+          <View style={{ width: 9, height: 9, borderRadius: 5, backgroundColor: sc }} />
+          <Text style={{ fontSize: 13, fontWeight: '700', color: sc, textTransform: 'capitalize' }}>
             {activation.status}
           </Text>
         </View>
       </Pressable>
 
       {/* Metrics Row */}
-      <View style={{ flexDirection: 'row', gap: 16 }}>
+      <View style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap' }}>
         <MetricPill label="Total Calls" value={String(activation.totalCalls)} mode={mode} />
         <MetricPill label="Errors" value={String(activation.errorCount)} mode={mode} color={activation.errorCount > 0 ? '#EF4444' : undefined} />
-        <MetricPill label="Shutoff At" value={`${activation.autoShutoffThreshold} errors`} mode={mode} />
+        <MetricPill label="Shutoff At" value={`${activation.autoShutoffThreshold} err`} mode={mode} />
       </View>
 
       {/* Expanded Details */}
       {expanded && (
-        <View style={{ gap: 8, marginTop: 4 }}>
+        <View style={{ gap: 10, marginTop: 2 }}>
           {template && (
-            <View style={{ gap: 4 }}>
-              <Text style={{ fontWeight: '600', fontSize: 12, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>Connection Config</Text>
+            <View style={{ gap: 6, backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.03)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.06)' }}>
+              <Text style={{ fontWeight: '700', fontSize: 13, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>🔑 Connection Config</Text>
               {Object.entries(activation.connectionConfig).map(([k, v]) => {
                 const fieldDef = template.fields.find((f) => f.key === k);
                 return (
-                  <View key={k} style={{ flexDirection: 'row', gap: 6 }}>
-                    <Text style={{ fontSize: 11, color: '#9CA3AF', width: 140 }}>{fieldDef?.label ?? k}:</Text>
-                    <Text style={{ fontSize: 11, color: mode === 'day' ? '#475569' : '#CBD5E1' }}>
+                  <View key={k} style={{ flexDirection: 'row', gap: 8 }}>
+                    <Text style={{ fontSize: 13, color: '#9CA3AF', width: 140, fontWeight: '500' }}>{fieldDef?.label ?? k}:</Text>
+                    <Text style={{ fontSize: 13, color: mode === 'day' ? '#475569' : '#CBD5E1' }}>
                       {fieldDef?.type === 'secret' ? '••••••••' : v}
                     </Text>
                   </View>
@@ -711,14 +848,14 @@ function ActivationCard({
             </View>
           )}
           {Object.keys(activation.mappingConfig).length > 0 && template && (
-            <View style={{ gap: 4 }}>
-              <Text style={{ fontWeight: '600', fontSize: 12, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>Semantic Mapping</Text>
+            <View style={{ gap: 6, backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.03)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.06)' }}>
+              <Text style={{ fontWeight: '700', fontSize: 13, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>🔗 Semantic Mapping</Text>
               {Object.entries(activation.mappingConfig).map(([k, v]) => {
                 const fieldDef = template.fields.find((f) => f.key === k);
                 return (
-                  <View key={k} style={{ flexDirection: 'row', gap: 6 }}>
-                    <Text style={{ fontSize: 11, color: '#9CA3AF', width: 140 }}>{fieldDef?.label ?? k}:</Text>
-                    <Text style={{ fontSize: 11, color: mode === 'day' ? '#475569' : '#CBD5E1' }}>{v}</Text>
+                  <View key={k} style={{ flexDirection: 'row', gap: 8 }}>
+                    <Text style={{ fontSize: 13, color: '#9CA3AF', width: 140, fontWeight: '500' }}>{fieldDef?.label ?? k}:</Text>
+                    <Text style={{ fontSize: 13, color: mode === 'day' ? '#475569' : '#CBD5E1' }}>{v}</Text>
                   </View>
                 );
               })}
@@ -726,7 +863,7 @@ function ActivationCard({
           )}
 
           {activation.disabledReason && (
-            <Text style={{ fontSize: 11, color: '#EF4444', fontStyle: 'italic' }}>
+            <Text style={{ fontSize: 13, color: '#EF4444', fontStyle: 'italic' }}>
               Disabled: {activation.disabledReason}
             </Text>
           )}
@@ -734,50 +871,53 @@ function ActivationCard({
       )}
 
       {/* Action Buttons */}
-      <View style={{ flexDirection: 'row', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
+      <View style={{ flexDirection: 'row', gap: 10, marginTop: 2, flexWrap: 'wrap' }}>
         {activation.status === 'active' && (
-          <Pressable onPress={onPause} style={[styles.secondaryButton, { paddingHorizontal: 14 }]}>
-            <Text style={styles.secondaryButtonText}>Pause</Text>
+          <Pressable onPress={onPause} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.12)', backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.04)' }}>
+            <Text style={{ fontSize: 14, color: mode === 'day' ? '#475569' : '#CBD5E1', fontWeight: '600' }}>⏸ Pause</Text>
           </Pressable>
         )}
         {(activation.status === 'paused' || activation.status === 'error') && (
-          <Pressable onPress={onResume} style={[styles.primaryButton, { paddingHorizontal: 14 }]}>
-            <Text style={styles.primaryButtonText}>Resume</Text>
+          <Pressable onPress={onResume} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, backgroundColor: '#8C5BF5' }}>
+            <Text style={{ fontSize: 14, color: '#FFF', fontWeight: '700' }}>▶ Resume</Text>
           </Pressable>
         )}
         <Pressable
           onPress={onTest}
           disabled={testResult === 'testing'}
-          style={[styles.secondaryButton, { paddingHorizontal: 14, borderColor: testColor ?? undefined }]}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: testColor ?? (mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.12)'), backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.04)' }}
         >
-          <Text style={[styles.secondaryButtonText, testColor ? { color: testColor } : {}]}>
+          <Text style={{ fontSize: 14, fontWeight: '600', color: testColor ?? (mode === 'day' ? '#475569' : '#CBD5E1') }}>
             {testIcon} {testLabel}
           </Text>
         </Pressable>
-        <Pressable onPress={handleToggleLog} style={[styles.secondaryButton, { paddingHorizontal: 14 }]}>
-          <Text style={styles.secondaryButtonText}>{showLog ? '▲ Hide Log' : '📋 Event Log'}</Text>
+        <Pressable onPress={handleToggleLog} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.12)', backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.04)' }}>
+          <Text style={{ fontSize: 14, color: mode === 'day' ? '#475569' : '#CBD5E1', fontWeight: '600' }}>{showLog ? '▲ Hide Log' : '📋 Event Log'}</Text>
         </Pressable>
-        <Pressable onPress={onRemove} style={[styles.secondaryButton, { paddingHorizontal: 14, borderColor: '#EF4444' }]}>
-          <Text style={[styles.secondaryButtonText, { color: '#EF4444' }]}>Remove</Text>
+        <Pressable onPress={onRemove} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: '#EF444466', backgroundColor: '#EF444412' }}>
+          <Text style={{ fontSize: 14, color: '#EF4444', fontWeight: '600' }}>🗑 Remove</Text>
         </Pressable>
       </View>
 
       {/* Event Log */}
       {showLog && (
-        <View style={{ gap: 6, marginTop: 4 }}>
-          <Text style={{ fontWeight: '700', fontSize: 12, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>Event Log</Text>
-          {(integrationLog ?? []).map((evt) => {
+        <View style={{ gap: 8, marginTop: 4, backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.03)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.06)' }}>
+          <Text style={{ fontWeight: '700', fontSize: 14, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>📋 Event Log</Text>
+          {(integrationLog ?? []).map((evt, idx) => {
             const c = evt.status === 'ok' ? '#22C55E' : evt.status === 'warn' ? '#F59E0B' : '#EF4444';
             return (
-              <View key={evt.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}>
-                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: c, flexShrink: 0 }} />
-                <Text style={{ fontSize: 11, color: '#9CA3AF', width: 70, flexShrink: 0 }}>{evt.ts}</Text>
-                <Text style={{ fontSize: 11, color: mode === 'day' ? '#475569' : '#CBD5E1', flex: 1 }}>{evt.event}</Text>
+              <View key={evt.id} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 5 }}>
+                <View style={{ alignItems: 'center', gap: 2, width: 14, paddingTop: 4 }}>
+                  <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: c }} />
+                  {idx < (integrationLog?.length ?? 0) - 1 && <View style={{ width: 2, height: 16, backgroundColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.08)' }} />}
+                </View>
+                <Text style={{ fontSize: 12, color: '#9CA3AF', width: 72, flexShrink: 0, fontWeight: '500' }}>{evt.ts}</Text>
+                <Text style={{ fontSize: 13, color: mode === 'day' ? '#475569' : '#CBD5E1', flex: 1, lineHeight: 18 }}>{evt.event}</Text>
               </View>
             );
           })}
           {!integrationLog?.length && (
-            <Text style={{ fontSize: 11, color: '#9CA3AF' }}>No events recorded yet for this integration.</Text>
+            <Text style={{ fontSize: 13, color: '#9CA3AF' }}>No events recorded yet for this integration.</Text>
           )}
         </View>
       )}
@@ -787,9 +927,9 @@ function ActivationCard({
 
 function MetricPill({ label, value, mode, color }: { label: string; value: string; mode: string; color?: string }) {
   return (
-    <View style={{ backgroundColor: mode === 'day' ? '#F1F5F9' : '#334155', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4, alignItems: 'center' }}>
-      <Text style={{ fontSize: 14, fontWeight: '700', color: color ?? (mode === 'day' ? '#1E293B' : '#F1F5F9') }}>{value}</Text>
-      <Text style={{ fontSize: 9, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</Text>
+    <View style={{ backgroundColor: mode === 'day' ? '#F1F5F9' : 'rgba(51,65,85,0.6)', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 8, alignItems: 'center', minWidth: 72 }}>
+      <Text style={{ fontSize: 20, fontWeight: '800', color: color ?? (mode === 'day' ? '#1E293B' : '#F1F5F9'), letterSpacing: -0.3 }}>{value}</Text>
+      <Text style={{ fontSize: 11, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>{label}</Text>
     </View>
   );
 }

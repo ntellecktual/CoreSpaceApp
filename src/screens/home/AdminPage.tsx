@@ -133,7 +133,7 @@ const adminWalkthroughSteps: AdminWalkthroughStep[] = [
 export function AdminPage({ guidedMode, registerActions, auditLog, addNotification, accentPalette }: GuidedPageProps) {
   const { styles, mode } = useUiTheme();
   const { width: windowWidth } = useWindowDimensions();
-  const [adminTab, setAdminTab] = useState<'workspace' | 'shell' | 'role' | 'governance' | 'forms' | 'architecture'>('workspace');
+  const [adminTab, setAdminTab] = useState<'workspace' | 'shell' | 'role' | 'governance' | 'forms' | 'architecture'>('shell');
   const [workspacePane, setWorkspacePane] = useState<'workspace' | 'subspaces'>('workspace');
   const [workspaceBuilderPanelOpen, setWorkspaceBuilderPanelOpen] = useState(true);
   const [draggedFieldType, setDraggedFieldType] = useState<SubSpaceBuilderFieldType | null>(null);
@@ -148,14 +148,14 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const [showCreateModeBanner, setShowCreateModeBanner] = useState(true);
   const [signalHintFieldId, setSignalHintFieldId] = useState<string | null>(null);
   const [expandedAdminSections, setExpandedAdminSections] = useState<Record<string, boolean>>({
-    architecture: false,
-    workspace: true,
-    shell: false,
+    shell: true,
+    workspace: false,
     forms: false,
     role: false,
     governance: false,
-    ai: false,
+    architecture: false,
   });
+  const [beboFabOpen, setBeboFabOpen] = useState(false);
   const { can, deniedMessage } = useRbac();
   const {
     workspaces,
@@ -330,12 +330,14 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
 
   const adminNavSections = [
     {
-      key: 'architecture',
-      label: 'Business Architecture',
-      description: 'Define departments and objects — the layer above workspaces that organises your whole operation.',
+      key: 'shell',
+      label: 'Language & Intake',
+      description: 'Start here — name your records, build intake forms, define personas, and map lifecycle stages.',
       items: [
-        { label: 'Departments & Objects', detail: 'Build and manage your business hierarchy', onPress: () => setAdminTab('architecture') },
-        { label: 'Architecture Terminology', detail: 'Rename departments, objects, and collections', onPress: () => { setAdminTab('shell'); setShellPane('labels'); } },
+        { label: 'App Terminology', detail: 'Rename records, workspaces, and SubSpaces', onPress: () => { setAdminTab('shell'); setShellPane('labels'); } },
+        { label: 'Intake Form Builder', detail: 'Define the fields new records start with', onPress: () => { setAdminTab('shell'); setShellPane('intake'); } },
+        { label: 'User Personas', detail: 'Create workflow personas and scope them', onPress: () => { setAdminTab('shell'); setShellPane('personas'); } },
+        { label: 'Lifecycle Stages', detail: 'Define stages and stage-to-stage transitions', onPress: () => { setAdminTab('shell'); setShellPane('lifecycle'); } },
       ],
     },
     {
@@ -345,17 +347,6 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
       items: [
         { label: 'Configure Workspace', detail: 'Name, entity, and route', onPress: () => { setAdminTab('workspace'); setWorkspacePane('workspace'); } },
         { label: 'SubSpace Lanes & Fields', detail: 'Create lanes and assign tracked fields', onPress: () => { setAdminTab('workspace'); setWorkspacePane('subspaces'); } },
-      ],
-    },
-    {
-      key: 'shell',
-      label: 'Language & Intake',
-      description: 'Set terminology, intake forms, personas, and lifecycle stages.',
-      items: [
-        { label: 'App Terminology', detail: 'Rename records, workspaces, and SubSpaces', onPress: () => { setAdminTab('shell'); setShellPane('labels'); } },
-        { label: 'Intake Form Builder', detail: 'Define the fields new records start with', onPress: () => { setAdminTab('shell'); setShellPane('intake'); } },
-        { label: 'User Personas', detail: 'Create workflow personas and scope them', onPress: () => { setAdminTab('shell'); setShellPane('personas'); } },
-        { label: 'Lifecycle Stages', detail: 'Define stages and stage-to-stage transitions', onPress: () => { setAdminTab('shell'); setShellPane('lifecycle'); } },
       ],
     },
     {
@@ -388,11 +379,12 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
       ],
     },
     {
-      key: 'ai',
-      label: 'Bebo',
-      description: 'Tell Bebo what you need and it builds workspaces, SubSpaces, and fields for you automatically.',
+      key: 'architecture',
+      label: 'Business Architecture',
+      description: 'Define departments and objects — the layer above workspaces that organises your whole operation.',
       items: [
-        { label: 'Bebo Workspace Builder', detail: 'Describe your workspace and let Bebo build it', onPress: () => { setAiPanelOpen(true); if (!aiWs.session) aiWs.startSession('workspace_builder'); } },
+        { label: 'Departments & Objects', detail: 'Build and manage your business hierarchy', onPress: () => setAdminTab('architecture') },
+        { label: 'Architecture Terminology', detail: 'Rename departments, objects, and collections', onPress: () => { setAdminTab('shell'); setShellPane('labels'); } },
       ],
     },
   ];
@@ -1759,73 +1751,111 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
 
       {adminTab === 'governance' && <Card title="" blurred>
         <View nativeID="wt-setup-health">
-        <Text style={styles.bodyText}>Your setup report card. Review workspace completeness, identify SubSpaces missing forms or relationships, and resolve all warnings before your team goes live.</Text>
 
-        <View style={styles.listCard}>
-          <Text style={styles.listTitle}>Setup Overview</Text>
-          <Text style={styles.metaText}>Total Workspaces: {insights.totalWorkspaces}</Text>
-          <Text style={styles.metaText}>Total SubSpaces: {insights.totalSubSpaces}</Text>
-          <Text style={styles.metaText}>Routes configured: {insights.workspacesWithRoutes} of {insights.totalWorkspaces} workspaces</Text>
-          <Text style={styles.metaText}>SubSpaces with relationship rules: {insights.subSpacesWithRelationship}</Text>
-          <Text style={styles.metaText}>SubSpaces with form coverage: {insights.subSpacesWithForms}</Text>
-          <Text style={styles.metaText}>Published automation flows: {insights.publishedFlows}</Text>
-        </View>
+        {/* ── Health Score Dashboard ── */}
+        {(() => {
+          const warnings = insights.findings.filter((f) => f.level === 'warning').length;
+          const passes = insights.findings.filter((f) => f.level !== 'warning').length;
+          const total = insights.findings.length || 1;
+          const score = Math.round((passes / total) * 100);
+          const scoreColor = score >= 80 ? '#22C55E' : score >= 50 ? '#F59E0B' : '#EF4444';
+          return (
+            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16, alignItems: 'stretch' }}>
+              {/* Score Ring */}
+              <View style={{ width: 120, borderRadius: 14, padding: 16, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: `${scoreColor}30`, backgroundColor: `${scoreColor}0A` }}>
+                <Text style={{ fontSize: 36, fontWeight: '800', color: scoreColor }}>{score}</Text>
+                <Text style={{ fontSize: 11, fontWeight: '600', color: scoreColor, marginTop: 2 }}>Health</Text>
+                <Text style={{ fontSize: 10, color: mode === 'night' ? 'rgba(241,232,255,0.45)' : 'rgba(0,0,0,0.4)', marginTop: 2 }}>{warnings === 0 ? 'Go-Live Ready' : `${warnings} warning${warnings !== 1 ? 's' : ''}`}</Text>
+              </View>
 
-        <View style={styles.listCard}>
-          <Text style={styles.listTitle}>Form Coverage Analysis</Text>
-          <Text style={styles.metaText}>Each SubSpace needs at least one form or Form Builder fields so end users have a data capture screen.</Text>
-          {insights.selectedWorkspaceSubSpacesMissingForms.length === 0 ? (
-            <Text style={styles.metaText}>All SubSpaces in this workspace have form coverage from Form Builder details.</Text>
-          ) : (
-            <>
-              <Text style={styles.metaText}>SubSpaces missing forms:</Text>
+              {/* KPI Tiles */}
+              <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                {[
+                  { icon: '📦', val: insights.totalWorkspaces, label: 'Workspaces', color: ac },
+                  { icon: '🗂️', val: insights.totalSubSpaces, label: 'SubSpaces', color: '#6366F1' },
+                  { icon: '🔗', val: insights.workspacesWithRoutes, label: 'Routes', color: '#8B5CF6' },
+                  { icon: '🤝', val: insights.subSpacesWithRelationship, label: 'Relationships', color: '#EC4899' },
+                  { icon: '📝', val: insights.subSpacesWithForms, label: 'Form Coverage', color: '#14B8A6' },
+                  { icon: '⚡', val: insights.publishedFlows, label: 'Flows', color: '#F59E0B' },
+                ].map((kpi, i) => (
+                  <View key={i} style={{ flex: 1, minWidth: 100, borderRadius: 10, padding: 10, borderWidth: 1, borderColor: `${kpi.color}20`, backgroundColor: `${kpi.color}08` }}>
+                    <Text style={{ fontSize: 14, marginBottom: 2 }}>{kpi.icon}</Text>
+                    <Text style={{ fontSize: 18, fontWeight: '800', color: mode === 'night' ? '#F1E8FF' : '#1A1230' }}>{kpi.val}</Text>
+                    <Text style={{ fontSize: 10, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)' }}>{kpi.label}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          );
+        })()}
+
+        {/* ── Form Coverage Strip ── */}
+        <View style={{ borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230' }}>📝 Form Coverage</Text>
+            {insights.selectedWorkspaceSubSpacesMissingForms.length === 0
+              ? <View style={{ backgroundColor: 'rgba(34,197,94,0.12)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}><Text style={{ fontSize: 10, fontWeight: '700', color: '#22C55E' }}>ALL COVERED</Text></View>
+              : <View style={{ backgroundColor: 'rgba(239,68,68,0.12)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}><Text style={{ fontSize: 10, fontWeight: '700', color: '#EF4444' }}>{insights.selectedWorkspaceSubSpacesMissingForms.length} MISSING</Text></View>
+            }
+          </View>
+          {/* Coverage Bar */}
+          {(() => {
+            const total = Math.max(insights.totalSubSpaces, 1);
+            const covered = insights.subSpacesWithForms;
+            const pct = Math.round((covered / total) * 100);
+            return (
+              <>
+                <View style={{ height: 6, borderRadius: 3, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', marginBottom: 6, overflow: 'hidden' }}>
+                  <View style={{ height: 6, borderRadius: 3, width: `${pct}%` as any, backgroundColor: pct === 100 ? '#22C55E' : ac }} />
+                </View>
+                <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)' }}>{covered} of {total} SubSpaces ({pct}%)</Text>
+              </>
+            );
+          })()}
+          {insights.selectedWorkspaceSubSpacesMissingForms.length > 0 && (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
               {insights.selectedWorkspaceSubSpacesMissingForms.map((item) => (
-                <Text key={`${item.workspaceId}-${item.subSpaceId}`} style={styles.notice}>
-                  • {item.subSpaceName}
-                </Text>
+                <View key={`${item.workspaceId}-${item.subSpaceId}`} style={{ borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: 'rgba(239,68,68,0.08)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.2)' }}>
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: '#EF4444' }}>⚠ {item.subSpaceName}</Text>
+                </View>
               ))}
-            </>
+            </View>
           )}
         </View>
 
-        <Text style={styles.listTitle}>Action Items</Text>
-        <Text style={styles.metaText}>Fix warnings first — they block a clean go-live. Green checks mean that area is complete.</Text>
-        {insights.findings.map((finding) => (
-          <View key={`${finding.key}-${finding.text}`} style={styles.listCard}>
-            <Text style={finding.level === 'warning' ? styles.notice : styles.metaText}>
-              {finding.level === 'warning' ? '⚠ ' : '✓ '}
-              {finding.text}
-            </Text>
-            {finding.level === 'warning' && finding.key === 'orphanForms' && (
-              <Text style={styles.metaText}>
-                Fix note: This means old form links are broken. A form points to a Workspace/SubSpace that was deleted or renamed.
-                Form Builder details still work for valid SubSpaces, but remove orphan links in your saved data to keep governance clean.
-              </Text>
-            )}
-            {finding.level === 'warning' && finding.key === 'subspacesWithoutForms' && (
-              <Text style={styles.metaText}>
-                Fix note: This SubSpace has no explicit form and no Form Builder fields yet.
-                Open Workspace Design → SubSpace Lanes & Fields, select that SubSpace, and add fields from the palette to create its details form.
-              </Text>
-            )}
-            {finding.level === 'warning' && finding.key === 'missingRelationships' && (
-              <Text style={styles.metaText}>
-                Fix note: This related SubSpace needs a relationship rule so records connect correctly to the workspace core entity. Open Workspace Design → SubSpace Lanes & Fields and fill in the Relationship Rule field.
-              </Text>
-            )}
-            {finding.level === 'warning' && (
-              <View style={styles.inlineRow}>
-                <Pressable style={styles.secondaryButton} onPress={() => goToFindingFix(finding.key)}>
-                  <Text style={styles.secondaryButtonText}>Go Fix</Text>
-                </Pressable>
+        {/* ── Findings ── */}
+        <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230', marginBottom: 8 }}>Action Items</Text>
+        <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)', marginBottom: 10 }}>Resolve warnings before go-live. Green items are complete.</Text>
+        <View style={{ gap: 8, marginBottom: 16 }}>
+          {insights.findings.map((finding) => {
+            const isWarn = finding.level === 'warning';
+            const borderColor = isWarn ? 'rgba(239,68,68,0.25)' : 'rgba(34,197,94,0.25)';
+            const bgColor = isWarn ? 'rgba(239,68,68,0.05)' : 'rgba(34,197,94,0.05)';
+            return (
+              <View key={`${finding.key}-${finding.text}`} style={{ borderRadius: 10, padding: 12, borderWidth: 1, borderColor, backgroundColor: bgColor }}>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}>
+                  <Text style={{ fontSize: 14, marginTop: 1 }}>{isWarn ? '⚠️' : '✅'}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 12, fontWeight: '600', color: isWarn ? '#EF4444' : '#22C55E' }}>{finding.text}</Text>
+                    {isWarn && finding.key === 'orphanForms' && <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.45)' : 'rgba(0,0,0,0.4)', marginTop: 3 }}>Old form links are broken — remove orphan references to keep governance clean.</Text>}
+                    {isWarn && finding.key === 'subspacesWithoutForms' && <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.45)' : 'rgba(0,0,0,0.4)', marginTop: 3 }}>Open Workspace Design → SubSpace Lanes & Fields and add palette fields to create data forms.</Text>}
+                    {isWarn && finding.key === 'missingRelationships' && <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.45)' : 'rgba(0,0,0,0.4)', marginTop: 3 }}>Open Workspace Design and fill in the Relationship Rule field so records connect to the core entity.</Text>}
+                  </View>
+                  {isWarn && (
+                    <Pressable onPress={() => goToFindingFix(finding.key)} style={{ borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: acRgba(0.12) }}>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: ac }}>Fix →</Text>
+                    </Pressable>
+                  )}
+                </View>
               </View>
-            )}
-          </View>
-        ))}
+            );
+          })}
+        </View>
 
-        <View style={{ marginTop: 16 }}>
-          <Text style={styles.listTitle}>Audit Log</Text>
-          <Text style={styles.metaText}>Track all workspace and platform changes in one timeline.</Text>
+        {/* ── Audit Log ── */}
+        <View style={{ borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
+          <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230', marginBottom: 4 }}>📋 Audit Log</Text>
+          <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.45)' : 'rgba(0,0,0,0.4)', marginBottom: 8 }}>All workspace and platform changes in one timeline.</Text>
           <AuditLogViewer
             entries={auditLog?.entries ?? []}
             filterEntity={auditLog?.filterEntity}
@@ -2564,83 +2594,103 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
       </Card>}
 
       {adminTab === 'role' && <Card title="" blurred>
-        <Text style={styles.bodyText}>Create roles and define exactly what each one can see and do. Assign permissions, scope access to specific workspaces, save permission snapshots as reusable templates, and audit changes between template versions.</Text>
-
-        {/* ── RBAC status banner ── */}
-        <View style={[styles.inlineRow, { flexWrap: 'nowrap', alignItems: 'center', gap: 10, marginBottom: 4 }]}>
-          <View style={[
-            styles.listCard,
-            { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 12, marginBottom: 0 },
-            canManageWorkspace ? { borderColor: 'rgba(46,204,113,0.40)', backgroundColor: 'rgba(46,204,113,0.08)' } : { borderColor: 'rgba(231,76,60,0.40)', backgroundColor: 'rgba(231,76,60,0.08)' },
-          ]}>
-            <Text style={{ fontSize: 18 }}>{canManageWorkspace ? '🛡️' : '🔒'}</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.listTitle, { fontSize: 13 }]}>
-                {currentUser ? currentUser.fullName : 'Anonymous'}
-                {isSuperAdmin ? '  ·  Super Admin' : canManageWorkspace ? '  ·  Admin' : '  ·  No admin access'}
-              </Text>
-              {currentUser && (
-                <Text style={[styles.metaText, { marginTop: 0 }]}>
-                  {currentUser.email}  ·  Role: {data.roles.find((r) => r.id === currentUser.roleId)?.name ?? 'Unassigned'}
-                </Text>
-              )}
-              {!canManageWorkspace && (
-                <Text style={[styles.notice, { marginTop: 2 }]}>You do not have permission to manage access &amp; permissions.</Text>
-              )}
+        {/* ── RBAC Dashboard Header ── */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
+          {[
+            { icon: canManageWorkspace ? '🛡️' : '🔒', label: currentUser ? currentUser.fullName : 'Anonymous', sub: isSuperAdmin ? 'Super Admin' : canManageWorkspace ? 'Admin' : 'No admin access', color: canManageWorkspace ? '#2ECC71' : '#E74C3C' },
+            { icon: '👥', label: `${roles.length} Role${roles.length !== 1 ? 's' : ''}`, sub: 'Active profiles', color: ac },
+            { icon: '🔑', label: `${permissions.length} Permission${permissions.length !== 1 ? 's' : ''}`, sub: selectedRole ? `on "${selectedRole.name}"` : 'Select a role', color: '#F59E0B' },
+            { icon: '📂', label: `${policyWorkspaces.length} Workspace${policyWorkspaces.length !== 1 ? 's' : ''}`, sub: workspaceScope === 'all' ? 'All accessible' : `${workspaceIds.length} scoped`, color: '#6366F1' },
+          ].map((kpi, i) => (
+            <View key={i} style={{ flex: 1, minWidth: 140, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: `${kpi.color}30`, backgroundColor: `${kpi.color}0C` }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <Text style={{ fontSize: 20 }}>{kpi.icon}</Text>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230' }}>{kpi.label}</Text>
+              </View>
+              <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.55)' : 'rgba(0,0,0,0.5)' }}>{kpi.sub}</Text>
             </View>
-          </View>
+          ))}
         </View>
 
-        <View style={styles.inlineRow}>
-          <Pressable style={[styles.pill, rolePane === 'roles' && styles.pillActive]} onPress={() => setRolePane('roles')}>
-            <Text style={[styles.pillText, rolePane === 'roles' && styles.pillTextActive]}>Role Manager</Text>
-          </Pressable>
-          <Pressable style={[styles.pill, rolePane === 'permissions' && styles.pillActive]} onPress={() => setRolePane('permissions')}>
-            <Text style={[styles.pillText, rolePane === 'permissions' && styles.pillTextActive]}>Permission Map</Text>
-          </Pressable>
-          <Pressable style={[styles.pill, rolePane === 'scope' && styles.pillActive]} onPress={() => setRolePane('scope')}>
-            <Text style={[styles.pillText, rolePane === 'scope' && styles.pillTextActive]}>Workspace Scope</Text>
-          </Pressable>
-          <Pressable style={[styles.pill, rolePane === 'templates' && styles.pillActive]} onPress={() => setRolePane('templates')}>
-            <Text style={[styles.pillText, rolePane === 'templates' && styles.pillTextActive]}>Policy Templates</Text>
-          </Pressable>
-          <Pressable style={[styles.pill, rolePane === 'diff' && styles.pillActive]} onPress={() => setRolePane('diff')}>
-            <Text style={[styles.pillText, rolePane === 'diff' && styles.pillTextActive]}>Template Diff & Audit</Text>
-          </Pressable>
+        {!canManageWorkspace && (
+          <View style={{ borderRadius: 10, padding: 12, marginBottom: 12, backgroundColor: 'rgba(231,76,60,0.08)', borderWidth: 1, borderColor: 'rgba(231,76,60,0.3)' }}>
+            <Text style={{ fontSize: 13, color: '#E74C3C', fontWeight: '600' }}>⚠ You do not have permission to manage access & permissions.</Text>
+          </View>
+        )}
+
+        {/* ── Sub-tab Navigation ── */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 16, borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(102,74,154,0.12)' }}>
+          {([
+            { key: 'roles' as const, icon: '👤', label: 'Roles' },
+            { key: 'permissions' as const, icon: '🔑', label: 'Permissions' },
+            { key: 'scope' as const, icon: '🎯', label: 'Scope' },
+            { key: 'templates' as const, icon: '📋', label: 'Templates' },
+            { key: 'diff' as const, icon: '🔍', label: 'Diff & Audit' },
+          ]).map(({ key, icon, label }, idx) => {
+            const isActive = rolePane === key;
+            return (
+              <Pressable
+                key={key}
+                onPress={() => setRolePane(key)}
+                style={{
+                  flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+                  paddingVertical: 10, paddingHorizontal: 8, gap: 5, minWidth: 100,
+                  backgroundColor: isActive ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                  borderRightWidth: idx < 4 ? 1 : 0,
+                  borderRightColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(102,74,154,0.10)',
+                }}
+              >
+                <Text style={{ fontSize: 13 }}>{icon}</Text>
+                <Text style={{ fontSize: 12, fontWeight: isActive ? '800' : '600', color: isActive ? ac : mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)' }}>{label}</Text>
+              </Pressable>
+            );
+          })}
         </View>
 
         {rolePane === 'roles' && (
           <>
-            <View style={styles.inlineRow}>
-              {roles.map((role) => (
-                <Pressable key={role.id} onPress={() => setSelectedRoleId(role.id)} style={[styles.pill, selectedRoleId === role.id && styles.pillActive]}>
-                  <Text style={[styles.pillText, selectedRoleId === role.id && styles.pillTextActive]}>{role.name}</Text>
-                </Pressable>
-              ))}
+            {/* ── Role Cards Grid ── */}
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
+              {roles.map((role) => {
+                const isSelected = selectedRoleId === role.id;
+                const members = data.users.filter((u) => u.roleId === role.id);
+                return (
+                  <Pressable key={role.id} onPress={() => setSelectedRoleId(role.id)} style={{
+                    minWidth: 180, flex: 1, borderRadius: 12, padding: 14,
+                    borderWidth: isSelected ? 2 : 1,
+                    borderColor: isSelected ? ac : mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                    backgroundColor: isSelected ? acRgba(0.08) : mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                  }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: isSelected ? acRgba(0.2) : 'rgba(107,114,128,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 14 }}>👤</Text>
+                      </View>
+                      <Text style={{ fontSize: 14, fontWeight: '700', color: isSelected ? ac : mode === 'night' ? '#F1E8FF' : '#1A1230', flex: 1 }}>{role.name}</Text>
+                    </View>
+                    <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)', marginBottom: 4 }}>{role.description || 'No description'}</Text>
+                    <View style={{ flexDirection: 'row', gap: 12 }}>
+                      <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.4)' : 'rgba(0,0,0,0.35)' }}>👥 {members.length} member{members.length !== 1 ? 's' : ''}</Text>
+                    </View>
+                  </Pressable>
+                );
+              })}
             </View>
 
-            <LabeledInput label="New Role Name" helperText="Permission profile name" value={newRoleName} onChangeText={setNewRoleName} placeholder="Example: Assembly Supervisor" />
-            <Text style={styles.metaText}>Easy example role: Receiving Coordinator (can intake and record, cannot publish flows).</Text>
-            <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={createRole}>
-              <Text style={styles.secondaryButtonText}>Create Role</Text>
-            </Pressable>
-          </>
-        )}
+            {/* ── Create New Role ── */}
+            <View style={{ borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)', marginBottom: 12 }}>
+              <Text style={[styles.listTitle, { fontSize: 13, marginBottom: 8 }]}>Create New Role</Text>
+              <LabeledInput label="Role Name" helperText="Permission profile name" value={newRoleName} onChangeText={setNewRoleName} placeholder="Example: Assembly Supervisor" />
+              <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={createRole}>
+                <Text style={styles.secondaryButtonText}>+ Create Role</Text>
+              </Pressable>
+            </View>
 
-        {selectedRole && (
-          <>
-            {rolePane === 'roles' && (
-              <>
-                <View style={styles.separator} />
+            {/* ── Selected Role Detail ── */}
+            {selectedRole && (
+              <View style={{ borderRadius: 12, padding: 14, borderWidth: 1, borderColor: acRgba(0.2), backgroundColor: acRgba(0.04) }}>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: ac, marginBottom: 10 }}>Edit: {selectedRole.name}</Text>
                 <LabeledInput label="Role Name" helperText="Example: Line Lead" value={roleName} onChangeText={setRoleName} placeholder="Example: Distributor Verification Lead" />
-                <LabeledInput
-                  label="Role Description"
-                  helperText="Example: Reviews incoming quality and signs off handoff"
-                  value={roleDescription}
-                  onChangeText={setRoleDescription}
-                  placeholder="Describe responsibilities and limits for this role"
-                  multiline
-                />
+                <LabeledInput label="Role Description" helperText="Example: Reviews incoming quality" value={roleDescription} onChangeText={setRoleDescription} placeholder="Describe responsibilities" multiline />
                 <View style={styles.inlineRow}>
                   <Pressable nativeID="wt-save-role" disabled={!canManageWorkspace} style={[styles.primaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={() => { saveRole(); auditLog?.logEntry({ action: 'update', entityType: 'role', entityId: selectedRoleId ?? 'new', entityName: roleName || newRoleName || 'Unnamed Role', after: { detail: 'Saved role policy' } }); addNotification?.({ type: 'system', title: 'Role Saved', body: `Role "${roleName || newRoleName || 'Unnamed Role'}" permissions have been saved.`, severity: 'success' }); }}>
                     <Text style={styles.primaryButtonText}>Save Role</Text>
@@ -2649,313 +2699,266 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     <Text style={styles.secondaryButtonText}>Delete Role</Text>
                   </Pressable>
                 </View>
-              </>
+              </View>
             )}
+          </>
+        )}
 
-            {rolePane === 'templates' && (
-              <>
-                <Text style={styles.metaText}>Policy Templates</Text>
-                <Text style={styles.metaText}>Save the current permission set as a reusable template, clone existing templates, or create new versions for audit and rollback.</Text>
-                <View style={styles.inlineRow}>
-              {templates.map((template) => (
-                <View key={template.id} style={styles.listCard}>
-                  <Text style={styles.listTitle}>{template.name} (v{template.version})</Text>
-                  {!!template.description && <Text style={styles.metaText}>{template.description}</Text>}
-                  <Text style={styles.metaText}>Source: {template.source}</Text>
-                  <Text style={styles.metaText}>Lineage: {template.lineageId}</Text>
-                  {template.parentTemplateId && <Text style={styles.metaText}>Parent: {template.parentTemplateId}</Text>}
-                  {template.changeNote && <Text style={styles.metaText}>Change Note: {template.changeNote}</Text>}
-                  <Text style={styles.metaText}>Mode: {diffFromTemplateId === template.id ? 'Base' : diffToTemplateId === template.id ? 'Compare' : 'Unselected'}</Text>
-                  <View style={styles.inlineRow}>
-                    <Pressable
-                      disabled={!canManageWorkspace}
-                      style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                      onPress={() => applyTemplate(template.id)}
-                    >
-                      <Text style={styles.secondaryButtonText}>Apply</Text>
-                    </Pressable>
-                    <Pressable
-                      disabled={!canManageWorkspace}
-                      style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                      onPress={() => cloneTemplate(template.id)}
-                    >
-                      <Text style={styles.secondaryButtonText}>Clone</Text>
-                    </Pressable>
-                    <Pressable
-                      disabled={!canManageWorkspace}
-                      style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                      onPress={() => createTemplateVersion(template.id)}
-                    >
-                      <Text style={styles.secondaryButtonText}>New Version</Text>
-                    </Pressable>
-                    <Pressable
-                      disabled={!canManageWorkspace}
-                      style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                      onPress={() => compareTemplateToLatest(template.id)}
-                    >
-                      <Text style={styles.secondaryButtonText}>Diff vs Latest</Text>
-                    </Pressable>
-                    <Pressable
-                      disabled={!canManageWorkspace}
-                      style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                      onPress={() => setDiffFromTemplateId(template.id)}
-                    >
-                      <Text style={styles.secondaryButtonText}>Set Base</Text>
-                    </Pressable>
-                    <Pressable
-                      disabled={!canManageWorkspace}
-                      style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                      onPress={() => setDiffToTemplateId(template.id)}
-                    >
-                      <Text style={styles.secondaryButtonText}>Set Compare</Text>
-                    </Pressable>
-                    {template.source === 'custom' && (
-                      <Pressable
-                        disabled={!canManageWorkspace}
-                        style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                        onPress={() => removeCustomTemplate(template.id)}
-                      >
-                        <Text style={styles.secondaryButtonText}>Delete</Text>
-                      </Pressable>
-                    )}
-                  </View>
-                </View>
-              ))}
-              <Pressable
-                disabled={!canManageWorkspace}
-                style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                onPress={clearPermissions}
-              >
-                <Text style={styles.secondaryButtonText}>Clear</Text>
-              </Pressable>
-              <Pressable
-                disabled={!canManageWorkspace}
-                style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                onPress={runSelectedTemplateDiff}
-              >
-                <Text style={styles.secondaryButtonText}>Run Diff</Text>
-              </Pressable>
-                </View>
-
-                <Text style={styles.metaText}>Template Lineage Viewer</Text>
-                {templateLineages.map((lineage) => (
-                  <View key={lineage.lineageId} style={styles.listCard}>
-                    <Text style={styles.listTitle}>{lineage.name}</Text>
-                    <Text style={styles.metaText}>Lineage: {lineage.lineageId}</Text>
-                    <Text style={styles.metaText}>Versions: {lineage.totalVersions} • Latest: v{lineage.latestVersion}</Text>
-                    {lineage.versions[lineage.versions.length - 1]?.changeNote && (
-                      <Text style={styles.metaText}>Latest note: {lineage.versions[lineage.versions.length - 1]?.changeNote}</Text>
-                    )}
-                    <View style={styles.inlineRow}>
-                      {lineage.versions.map((versionItem) => {
-                        const isLatest = versionItem.version === lineage.latestVersion;
-                        return (
-                          <Pressable
-                            key={versionItem.id}
-                            disabled={!canManageWorkspace}
-                            onPress={() => applyTemplate(versionItem.id)}
-                            style={[styles.pill, isLatest && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                          >
-                            <Text style={[styles.pillText, isLatest && styles.pillTextActive]}>
-                              v{versionItem.version}{isLatest ? ' • latest' : ''}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
+        {selectedRole && rolePane === 'permissions' && (
+          <>
+            {/* ── Members Badge ── */}
+            <View style={{ borderRadius: 10, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: acRgba(0.15), backgroundColor: acRgba(0.04) }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230' }}>Members in "{selectedRole.name}"</Text>
+                {isEditingOwnRole && <View style={{ backgroundColor: acRgba(0.15), borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}><Text style={{ fontSize: 10, color: ac, fontWeight: '700' }}>YOUR ROLE</Text></View>}
+              </View>
+              {membersInRole.length === 0 ? (
+                <Text style={{ fontSize: 12, color: mode === 'night' ? 'rgba(241,232,255,0.45)' : 'rgba(0,0,0,0.4)' }}>No members assigned.</Text>
+              ) : (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                  {membersInRole.map((member) => (
+                    <View key={member.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}>
+                      <Text style={{ fontSize: 13 }}>{member.isSuperAdmin ? '👑' : '👤'}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: '600', color: mode === 'night' ? '#F1E8FF' : '#1A1230' }}>{member.fullName}{member.id === currentUser?.id ? ' (you)' : ''}</Text>
                     </View>
-                  </View>
-                ))}
+                  ))}
+                </View>
+              )}
+            </View>
 
-                <LabeledInput label="Save as Template Name" helperText="Example: Receiving Team Basic Access" value={templateName} onChangeText={setTemplateName} placeholder="Example: Assembly Supervisor Baseline" />
-                <LabeledInput
-                  label="Template Description"
-                  helperText="Example: Use for new receiving team members"
-                  value={templateDescription}
-                  onChangeText={setTemplateDescription}
-                  placeholder="Describe when teams should use this template"
-                  multiline
-                />
-                <Pressable
-                  disabled={!canManageWorkspace}
-                  style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                  onPress={saveAsTemplate}
-                >
-                  <Text style={styles.secondaryButtonText}>Save Template</Text>
-                </Pressable>
-              </>
-            )}
-
-            {rolePane === 'diff' && (
-              <>
-                <Text style={styles.metaText}>Selected Base: {diffFromTemplateId || 'None'} • Compare: {diffToTemplateId || 'None'}</Text>
-
-                {templateDiff && (
-                  <View style={styles.listCard}>
-                <Text style={styles.listTitle}>Template Diff • {templateDiff.fromTemplateName} vs {templateDiff.toTemplateName}</Text>
-                <Text style={styles.metaText}>Lineage: {templateDiff.lineageId}</Text>
-                <Text style={styles.metaText}>Compared: v{templateDiff.fromVersion} → v{templateDiff.toVersion}</Text>
-
-                <Text style={styles.metaText}>Added in compare version</Text>
-                {templateDiff.addedInTarget.length === 0 && <Text style={styles.metaText}>None</Text>}
-                {templateDiff.addedInTarget.map((permission) => (
-                  <Text key={`add-${permission}`} style={styles.notice}>+ {permission}</Text>
-                ))}
-
-                <Text style={styles.metaText}>Missing in compare version</Text>
-                {templateDiff.removedFromTarget.length === 0 && <Text style={styles.metaText}>None</Text>}
-                {templateDiff.removedFromTarget.map((permission) => (
-                  <Text key={`remove-${permission}`} style={styles.metaText}>- {permission}</Text>
-                ))}
-
-                <LabeledInput
-                  label="Promotion Note"
-                  helperText="Example: Added flow publish permission for plant supervisors"
-                  value={promotionNote}
-                  onChangeText={setPromotionNote}
-                  placeholder="Document why this version is being promoted"
-                  multiline
-                />
-
-                <Pressable
-                  disabled={!canManageWorkspace || !promotionNote.trim()}
-                  style={[styles.secondaryButton, (!canManageWorkspace || !promotionNote.trim()) && styles.buttonDisabled]}
-                  onPress={promoteCompareAsNewVersion}
-                >
-                  <Text style={styles.secondaryButtonText}>Promote Version</Text>
-                </Pressable>
-
-                <Pressable
-                  disabled={!canManageWorkspace}
-                  style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                  onPress={clearTemplateDiff}
-                >
-                  <Text style={styles.secondaryButtonText}>Close Diff</Text>
-                </Pressable>
-                  </View>
-                )}
-              </>
-            )}
-
-            {rolePane === 'permissions' && (
-              <>
-                <Text style={styles.metaText}>Permission Map</Text>
-                <Text style={styles.metaText}>Toggle individual permissions on or off for the selected role. Each permission controls a specific capability in the app.</Text>
-
-                {/* ── Who is in this role ── */}
-                <View style={[styles.listCard, { paddingVertical: 10, marginBottom: 4 }]}>
-                  <View style={[styles.inlineRow, { gap: 6, alignItems: 'center', marginBottom: 6 }]}>
-                    <Text style={[styles.listTitle, { fontSize: 13 }]}>Members assigned to "{selectedRole?.name}"</Text>
-                    {isEditingOwnRole && <Text style={{ fontSize: 11, color: ac, fontWeight: '700' }}>← your role</Text>}
-                  </View>
-                  {membersInRole.length === 0 ? (
-                    <Text style={styles.metaText}>No members currently assigned to this role.</Text>
-                  ) : (
-                    membersInRole.map((member) => (
-                      <View key={member.id} style={[styles.inlineRow, { gap: 8, alignItems: 'center', paddingVertical: 4 }]}>
-                        <Text style={{ fontSize: 15 }}>{member.isSuperAdmin ? '👑' : '👤'}</Text>
-                        <View style={{ flex: 1 }}>
-                          <Text style={[styles.listTitle, { fontSize: 12 }]}>
-                            {member.fullName}{member.id === currentUser?.id ? '  (you)' : ''}
-                          </Text>
-                          <Text style={[styles.metaText, { marginTop: 0 }]}>{member.email}</Text>
-                        </View>
-                        {member.isSuperAdmin && <Text style={{ fontSize: 11, color: '#E8C96A', fontWeight: '700' }}>Super Admin</Text>}
+            {/* ── Permission Cards ── */}
+            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230', marginBottom: 8 }}>Permission Map</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              {permissionCatalog.map((permission) => {
+                const enabled = permissions.includes(permission.action);
+                return (
+                  <Pressable
+                    key={permission.action}
+                    disabled={!canManageWorkspace}
+                    onPress={() => togglePermission(permission.action)}
+                    style={{
+                      minWidth: 200, flex: 1, borderRadius: 10, padding: 12,
+                      borderWidth: 1,
+                      borderColor: enabled ? `${ac}40` : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                      backgroundColor: enabled ? acRgba(0.08) : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+                      opacity: !canManageWorkspace ? 0.5 : 1,
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: enabled ? ac : mode === 'night' ? '#F1E8FF' : '#1A1230' }}>{permission.label}</Text>
+                      <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: enabled ? ac : 'rgba(107,114,128,0.25)', alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 11, color: '#fff', fontWeight: '700' }}>{enabled ? '✓' : ''}</Text>
                       </View>
-                    ))
-                  )}
+                    </View>
+                    <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)' }}>{permission.detail}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </>
+        )}
+
+        {selectedRole && rolePane === 'scope' && (
+          <>
+            {/* ── Members Badge (same as permissions) ── */}
+            <View style={{ borderRadius: 10, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: acRgba(0.15), backgroundColor: acRgba(0.04) }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230' }}>Members in "{selectedRole.name}"</Text>
+                {isEditingOwnRole && <View style={{ backgroundColor: acRgba(0.15), borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}><Text style={{ fontSize: 10, color: ac, fontWeight: '700' }}>YOUR ROLE</Text></View>}
+              </View>
+              {membersInRole.length === 0 ? (
+                <Text style={{ fontSize: 12, color: mode === 'night' ? 'rgba(241,232,255,0.45)' : 'rgba(0,0,0,0.4)' }}>No members assigned.</Text>
+              ) : (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                  {membersInRole.map((member) => (
+                    <View key={member.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}>
+                      <Text style={{ fontSize: 13 }}>{member.isSuperAdmin ? '👑' : '👤'}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: '600', color: mode === 'night' ? '#F1E8FF' : '#1A1230' }}>{member.fullName}{member.id === currentUser?.id ? ' (you)' : ''}</Text>
+                    </View>
+                  ))}
                 </View>
+              )}
+            </View>
 
-                {permissionCatalog.map((permission) => {
-                  const enabled = permissions.includes(permission.action);
-                  return (
-                    <Pressable
-                      key={permission.action}
-                      disabled={!canManageWorkspace}
-                      style={[styles.listCard, enabled && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                      onPress={() => togglePermission(permission.action)}
-                    >
-                      <Text style={styles.listTitle}>{permission.label}</Text>
-                      <Text style={styles.metaText}>{permission.detail}</Text>
-                    </Pressable>
-                  );
-                })}
-              </>
-            )}
+            {/* ── Scope Selector ── */}
+            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230', marginBottom: 8 }}>Workspace Access Scope</Text>
+            <View style={{ flexDirection: 'row', gap: 10, marginBottom: 12 }}>
+              {([
+                { key: 'all' as const, icon: '🌐', label: 'All Workspaces', sub: 'Unrestricted access to every workspace' },
+                { key: 'selected' as const, icon: '🎯', label: 'Selected Only', sub: 'Limit to specific workspaces below' },
+              ]).map(({ key, icon, label, sub }) => {
+                const isActive = workspaceScope === key;
+                return (
+                  <Pressable
+                    key={key}
+                    disabled={!canManageWorkspace}
+                    onPress={() => setWorkspaceScope(key)}
+                    style={{
+                      flex: 1, borderRadius: 12, padding: 14,
+                      borderWidth: isActive ? 2 : 1,
+                      borderColor: isActive ? ac : mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                      backgroundColor: isActive ? acRgba(0.08) : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+                      opacity: !canManageWorkspace ? 0.5 : 1,
+                    }}
+                  >
+                    <Text style={{ fontSize: 20, marginBottom: 4 }}>{icon}</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: isActive ? ac : mode === 'night' ? '#F1E8FF' : '#1A1230' }}>{label}</Text>
+                    <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)', marginTop: 2 }}>{sub}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
 
-            {rolePane === 'scope' && (
-              <>
-                <Text style={styles.metaText}>Workspace Scope</Text>
-                <Text style={styles.metaText}>Limit which workspaces this role can access. Choose "All Workspaces" for unrestricted access, or "Selected Workspaces" to pick specific ones.</Text>
-
-                {/* ── Who is in this role ── */}
-                <View style={[styles.listCard, { paddingVertical: 10, marginBottom: 4 }]}>
-                  <View style={[styles.inlineRow, { gap: 6, alignItems: 'center', marginBottom: 6 }]}>
-                    <Text style={[styles.listTitle, { fontSize: 13 }]}>Members assigned to "{selectedRole?.name}"</Text>
-                    {isEditingOwnRole && <Text style={{ fontSize: 11, color: ac, fontWeight: '700' }}>← your role</Text>}
-                  </View>
-                  {membersInRole.length === 0 ? (
-                    <Text style={styles.metaText}>No members currently assigned to this role.</Text>
-                  ) : (
-                    membersInRole.map((member) => (
-                      <View key={member.id} style={[styles.inlineRow, { gap: 8, alignItems: 'center', paddingVertical: 4 }]}>
-                        <Text style={{ fontSize: 15 }}>{member.isSuperAdmin ? '👑' : '👤'}</Text>
-                        <View style={{ flex: 1 }}>
-                          <Text style={[styles.listTitle, { fontSize: 12 }]}>
-                            {member.fullName}{member.id === currentUser?.id ? '  (you)' : ''}
-                          </Text>
-                          <Text style={[styles.metaText, { marginTop: 0 }]}>{member.email}</Text>
-                        </View>
-                        {member.isSuperAdmin && <Text style={{ fontSize: 11, color: '#E8C96A', fontWeight: '700' }}>Super Admin</Text>}
-                      </View>
-                    ))
-                  )}
-                </View>
-                <View style={styles.inlineRow}>
-              <Pressable
-                disabled={!canManageWorkspace}
-                style={[styles.pill, workspaceScope === 'all' && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                onPress={() => setWorkspaceScope('all')}
-              >
-                <Text style={[styles.pillText, workspaceScope === 'all' && styles.pillTextActive]}>All Workspaces</Text>
-              </Pressable>
-              <Pressable
-                disabled={!canManageWorkspace}
-                style={[styles.pill, workspaceScope === 'selected' && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                onPress={() => setWorkspaceScope('selected')}
-              >
-                <Text style={[styles.pillText, workspaceScope === 'selected' && styles.pillTextActive]}>Selected Workspaces</Text>
-              </Pressable>
-                </View>
-
-                {workspaceScope === 'selected' && (
-                  <View style={styles.inlineRow}>
+            {workspaceScope === 'selected' && (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
                 {policyWorkspaces.map((workspaceItem) => {
                   const selected = workspaceIds.includes(workspaceItem.id);
                   return (
                     <Pressable
                       key={workspaceItem.id}
                       disabled={!canManageWorkspace}
-                      style={[styles.pill, selected && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
                       onPress={() => toggleWorkspace(workspaceItem.id)}
+                      style={{
+                        borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10,
+                        borderWidth: 1,
+                        borderColor: selected ? `${ac}40` : mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                        backgroundColor: selected ? acRgba(0.10) : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+                        opacity: !canManageWorkspace ? 0.5 : 1,
+                      }}
                     >
-                      <Text style={[styles.pillText, selected && styles.pillTextActive]}>{workspaceItem.name}</Text>
+                      <Text style={{ fontSize: 13, fontWeight: selected ? '700' : '500', color: selected ? ac : mode === 'night' ? '#F1E8FF' : '#1A1230' }}>{selected ? '✓ ' : ''}{workspaceItem.name}</Text>
                     </Pressable>
                   );
                 })}
-                  </View>
-                )}
+              </View>
+            )}
 
+            <View style={styles.inlineRow}>
+              <Pressable disabled={!canManageWorkspace} style={[styles.primaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={() => { saveRole(); auditLog?.logEntry({ action: 'update', entityType: 'role', entityId: selectedRoleId ?? 'new', entityName: roleName || newRoleName || 'Unnamed Role', after: { detail: 'Saved role policy (scope)' } }); addNotification?.({ type: 'system', title: 'Role Saved', body: `Role "${roleName || newRoleName || 'Unnamed Role'}" scope has been saved.`, severity: 'success' }); }}>
+                <Text style={styles.primaryButtonText}>Save Role</Text>
+              </Pressable>
+              <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={() => { removeRole(); auditLog?.logEntry({ action: 'delete', entityType: 'role', entityId: selectedRoleId ?? '', entityName: roleName || 'Unnamed Role', after: { detail: 'Deleted role (scope)' } }); addNotification?.({ type: 'system', title: 'Role Deleted', body: `Role "${roleName || 'Unnamed Role'}" has been removed.`, severity: 'warning' }); }}>
+                <Text style={styles.secondaryButtonText}>Delete Role</Text>
+              </Pressable>
+            </View>
+          </>
+        )}
+
+        {selectedRole && rolePane === 'templates' && (
+          <>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230', marginBottom: 8 }}>Policy Templates</Text>
+            <Text style={{ fontSize: 12, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)', marginBottom: 12 }}>Save permission snapshots as reusable templates. Clone, version, and diff them for audit and rollback.</Text>
+
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+              {templates.map((template) => (
+                <View key={template.id} style={{ minWidth: 260, flex: 1, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                    <Text style={{ fontSize: 14 }}>📋</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230', flex: 1 }}>{template.name}</Text>
+                    <View style={{ backgroundColor: acRgba(0.12), borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
+                      <Text style={{ fontSize: 10, color: ac, fontWeight: '700' }}>v{template.version}</Text>
+                    </View>
+                  </View>
+                  {!!template.description && <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)', marginBottom: 6 }}>{template.description}</Text>}
+                  <Text style={{ fontSize: 10, color: mode === 'night' ? 'rgba(241,232,255,0.35)' : 'rgba(0,0,0,0.3)', marginBottom: 8 }}>Source: {template.source}  ·  Lineage: {template.lineageId}</Text>
+                  {template.changeNote && <Text style={{ fontSize: 10, color: mode === 'night' ? 'rgba(241,232,255,0.35)' : 'rgba(0,0,0,0.3)', marginBottom: 8 }}>Note: {template.changeNote}</Text>}
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                    {([
+                      { label: 'Apply', onPress: () => applyTemplate(template.id) },
+                      { label: 'Clone', onPress: () => cloneTemplate(template.id) },
+                      { label: 'New Version', onPress: () => createTemplateVersion(template.id) },
+                      { label: 'Diff vs Latest', onPress: () => compareTemplateToLatest(template.id) },
+                      { label: 'Set Base', onPress: () => setDiffFromTemplateId(template.id) },
+                      { label: 'Set Compare', onPress: () => setDiffToTemplateId(template.id) },
+                    ]).map((btn) => (
+                      <Pressable key={btn.label} disabled={!canManageWorkspace} onPress={btn.onPress} style={{ borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)', opacity: !canManageWorkspace ? 0.5 : 1 }}>
+                        <Text style={{ fontSize: 11, fontWeight: '600', color: mode === 'night' ? 'rgba(241,232,255,0.7)' : 'rgba(0,0,0,0.6)' }}>{btn.label}</Text>
+                      </Pressable>
+                    ))}
+                    {template.source === 'custom' && (
+                      <Pressable disabled={!canManageWorkspace} onPress={() => removeCustomTemplate(template.id)} style={{ borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: 'rgba(239,68,68,0.1)', opacity: !canManageWorkspace ? 0.5 : 1 }}>
+                        <Text style={{ fontSize: 11, fontWeight: '600', color: '#EF4444' }}>Delete</Text>
+                      </Pressable>
+                    )}
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.inlineRow}>
+              <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={clearPermissions}>
+                <Text style={styles.secondaryButtonText}>Clear</Text>
+              </Pressable>
+              <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={runSelectedTemplateDiff}>
+                <Text style={styles.secondaryButtonText}>Run Diff</Text>
+              </Pressable>
+            </View>
+
+            {/* ── Lineage Viewer ── */}
+            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230', marginTop: 14, marginBottom: 8 }}>Template Lineage</Text>
+            {templateLineages.map((lineage) => (
+              <View key={lineage.lineageId} style={{ borderRadius: 12, padding: 14, marginBottom: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230' }}>{lineage.name}</Text>
+                <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.45)' : 'rgba(0,0,0,0.4)', marginBottom: 6 }}>{lineage.totalVersions} version{lineage.totalVersions !== 1 ? 's' : ''} · Latest: v{lineage.latestVersion}</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {lineage.versions.map((versionItem) => {
+                    const isLatest = versionItem.version === lineage.latestVersion;
+                    return (
+                      <Pressable key={versionItem.id} disabled={!canManageWorkspace} onPress={() => applyTemplate(versionItem.id)} style={{ borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: isLatest ? acRgba(0.3) : mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', backgroundColor: isLatest ? acRgba(0.08) : 'transparent', opacity: !canManageWorkspace ? 0.5 : 1 }}>
+                        <Text style={{ fontSize: 12, fontWeight: isLatest ? '700' : '500', color: isLatest ? ac : mode === 'night' ? 'rgba(241,232,255,0.6)' : 'rgba(0,0,0,0.5)' }}>v{versionItem.version}{isLatest ? ' · latest' : ''}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </View>
+            ))}
+
+            {/* ── Save as Template ── */}
+            <View style={{ borderRadius: 12, padding: 14, marginTop: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)' }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230', marginBottom: 8 }}>Save Current as Template</Text>
+              <LabeledInput label="Template Name" helperText="Example: Receiving Team Basic Access" value={templateName} onChangeText={setTemplateName} placeholder="Template name" />
+              <LabeledInput label="Template Description" helperText="Example: Use for new receiving team members" value={templateDescription} onChangeText={setTemplateDescription} placeholder="Describe usage" multiline />
+              <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={saveAsTemplate}>
+                <Text style={styles.secondaryButtonText}>Save Template</Text>
+              </Pressable>
+            </View>
+          </>
+        )}
+
+        {selectedRole && rolePane === 'diff' && (
+          <>
+            <Text style={{ fontSize: 12, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)', marginBottom: 10 }}>Base: {diffFromTemplateId || 'None'} · Compare: {diffToTemplateId || 'None'}</Text>
+
+            {templateDiff && (
+              <View style={{ borderRadius: 12, padding: 16, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: mode === 'night' ? '#F1E8FF' : '#1A1230', marginBottom: 8 }}>Diff: {templateDiff.fromTemplateName} → {templateDiff.toTemplateName}</Text>
+                <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.45)' : 'rgba(0,0,0,0.4)', marginBottom: 12 }}>Lineage: {templateDiff.lineageId} · v{templateDiff.fromVersion} → v{templateDiff.toVersion}</Text>
+
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#22C55E', marginBottom: 4 }}>+ Added</Text>
+                {templateDiff.addedInTarget.length === 0 ? <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.4)' : 'rgba(0,0,0,0.35)', marginBottom: 8 }}>None</Text> : templateDiff.addedInTarget.map((p) => <Text key={`a-${p}`} style={{ fontSize: 12, color: '#22C55E', marginBottom: 2 }}>+ {p}</Text>)}
+
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#EF4444', marginTop: 8, marginBottom: 4 }}>- Removed</Text>
+                {templateDiff.removedFromTarget.length === 0 ? <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.4)' : 'rgba(0,0,0,0.35)', marginBottom: 8 }}>None</Text> : templateDiff.removedFromTarget.map((p) => <Text key={`r-${p}`} style={{ fontSize: 12, color: '#EF4444', marginBottom: 2 }}>- {p}</Text>)}
+
+                <LabeledInput label="Promotion Note" helperText="Document why this version is being promoted" value={promotionNote} onChangeText={setPromotionNote} placeholder="Promotion note" multiline />
                 <View style={styles.inlineRow}>
-                  <Pressable disabled={!canManageWorkspace} style={[styles.primaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={() => { saveRole(); auditLog?.logEntry({ action: 'update', entityType: 'role', entityId: selectedRoleId ?? 'new', entityName: roleName || newRoleName || 'Unnamed Role', after: { detail: 'Saved role policy (template)' } }); addNotification?.({ type: 'system', title: 'Role Saved', body: `Role "${roleName || newRoleName || 'Unnamed Role'}" permissions have been saved.`, severity: 'success' }); }}>
-                    <Text style={styles.primaryButtonText}>Save Role</Text>
+                  <Pressable disabled={!canManageWorkspace || !promotionNote.trim()} style={[styles.primaryButton, (!canManageWorkspace || !promotionNote.trim()) && styles.buttonDisabled]} onPress={promoteCompareAsNewVersion}>
+                    <Text style={styles.primaryButtonText}>Promote Version</Text>
                   </Pressable>
-                  <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={() => { removeRole(); auditLog?.logEntry({ action: 'delete', entityType: 'role', entityId: selectedRoleId ?? '', entityName: roleName || 'Unnamed Role', after: { detail: 'Deleted role (template)' } }); addNotification?.({ type: 'system', title: 'Role Deleted', body: `Role "${roleName || 'Unnamed Role'}" has been removed.`, severity: 'warning' }); }}>
-                    <Text style={styles.secondaryButtonText}>Delete Role</Text>
+                  <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={clearTemplateDiff}>
+                    <Text style={styles.secondaryButtonText}>Close Diff</Text>
                   </Pressable>
                 </View>
-              </>
+              </View>
             )}
           </>
+        )}
+
+        {!selectedRole && rolePane !== 'roles' && (
+          <View style={{ padding: 24, alignItems: 'center' }}>
+            <Text style={{ fontSize: 32, marginBottom: 8 }}>👤</Text>
+            <Text style={{ fontSize: 14, fontWeight: '600', color: mode === 'night' ? 'rgba(241,232,255,0.6)' : 'rgba(0,0,0,0.5)', textAlign: 'center' }}>Select a role from the Roles tab to manage permissions, scope, and templates.</Text>
+          </View>
         )}
 
         {!!roleMessage && <Text style={styles.notice}>{roleMessage}</Text>}
@@ -3169,6 +3172,32 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
         </div>
       )}
 
+      {/* ── Floating Bebo FAB ── */}
+      {!aiPanelOpen && Platform.OS === 'web' && (
+        <Pressable
+          onPress={() => { setAiPanelOpen(true); setBeboFabOpen(true); if (!aiWs.session) aiWs.startSession('workspace_builder'); }}
+          style={{
+            position: 'absolute' as any,
+            bottom: guidedMode && !walkthroughOpen ? 80 : 24,
+            right: 24,
+            zIndex: 9998,
+            width: 56,
+            height: 56,
+            borderRadius: 28,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: ac,
+            shadowColor: ac,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.4,
+            shadowRadius: 12,
+            elevation: 8,
+          }}
+        >
+          <Text style={{ fontSize: 26 }}>🤖</Text>
+        </Pressable>
+      )}
+
       {aiPanelOpen && (
         <AiChatPanel
           session={aiWs.session}
@@ -3176,11 +3205,11 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
           onSend={aiWs.sendMessage}
           onApply={aiWs.proposal ? aiWs.applyProposal : undefined}
           onDiscard={aiWs.proposal ? aiWs.discardProposal : undefined}
-          onClose={() => setAiPanelOpen(false)}
+          onClose={() => { setAiPanelOpen(false); setBeboFabOpen(false); }}
           hasProposal={!!aiWs.proposal}
           applyLabel="Apply Workspace"
           discardLabel="Discard"
-          title="Bebo Workspace Builder"
+          title={`Bebo · ${adminContentHeaders[adminTab]?.title ?? 'Workspace Builder'}`}
         />
       )}
     </>

@@ -227,6 +227,10 @@ export function injectUxAnimations() {
     [data-filter-chip]:hover { transform: translateY(-1px); }
     [data-crossfade] { animation: cs-fade-in 0.25s ease both; }
 
+    /* Drawer slide-in & backdrop */
+    @keyframes cs-drawer-slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes cs-drawer-backdrop { from { opacity: 0; } to { opacity: 1; } }
+
     /* DnD styles */
     [data-dnd-dragging] { opacity: 0.5; transform: scale(0.95); transition: opacity 0.15s, transform 0.15s; }
     [data-dnd-over] { border-color: rgba(140,91,245,0.6) !important; background-color: rgba(140,91,245,0.08) !important; transition: border-color 0.15s, background-color 0.15s; }

@@ -605,6 +605,19 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
               <Text style={{ color: accent, fontSize: 10, fontWeight: '700' }}>{VERTICAL_META[vertical].tenantName}</Text>
             </View>
           )}
+          {/* Org Layer button — not a template, lives in the header title row */}
+          <TouchableOpacity
+            onPress={handleUniversalSuite}
+            activeOpacity={0.75}
+            style={{
+              width: 28, height: 28, borderRadius: 8,
+              backgroundColor: isDark ? 'rgba(124,58,237,0.18)' : 'rgba(124,58,237,0.12)',
+              borderWidth: 1, borderColor: 'rgba(124,58,237,0.35)',
+              alignItems: 'center', justifyContent: 'center',
+            } as any}
+          >
+            <Text style={{ fontSize: 14 }}>🌐</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Scenario tabs */}
@@ -632,20 +645,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
                 </TouchableOpacity>
               );
             })}
-            {/* Universal Suite chip */}
-            <TouchableOpacity
-              onPress={handleUniversalSuite}
-              activeOpacity={0.8}
-              style={{
-                flexDirection: 'row', alignItems: 'center', gap: 4,
-                backgroundColor: '#7C3AED',
-                borderWidth: 1, borderColor: '#7C3AED',
-                borderRadius: 7, paddingHorizontal: 9, paddingVertical: 5,
-              } as any}
-            >
-              <Text style={{ fontSize: 12 }}>🌐</Text>
-              <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '700' }}>Universal</Text>
-            </TouchableOpacity>
+            {/* Universal chip removed — not a template. Org layer button lives in header title row. */}
           </View>
         </ScrollView>
       </View>

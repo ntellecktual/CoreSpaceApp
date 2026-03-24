@@ -781,13 +781,13 @@ export function buildSalesPayload(): ScenarioApplyPayload {
     );
   });
   const actTypes = ['Call', 'Email', 'Meeting', 'Demo', 'Proposal Sent', 'Follow-Up'];
-  const actSubjects = ['Intro call with VP Sales', 'Follow-up on proposal', 'Product demo', 'Contract review discussion', 'Quarterly business review', 'Renewal negotiation'];
-  const actRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+  const actSubjects = ['Intro call with VP Sales', 'Follow-up on proposal', 'Product demo', 'Contract review discussion', 'Quarterly business review', 'Renewal negotiation', 'Technical deep-dive', 'Pricing walkthrough', 'Onboarding kickoff', 'Executive sponsor intro'];
+  const actRecords: RuntimeRecord[] = Array.from({ length: 12 }, (_, i) => {
     const actType = pick(actTypes);
-    const actDate = fmtDate(-Math.floor(Math.random() * 14));
+    const actDate = fmtDate(-Math.floor(Math.random() * 21));
     return mkRecord(
-      `rec-sales-act-${i}`, `client-sales-${i}`, 'ws-bebo-sales', 'ss-activities',
-      `${actType} — ${COMPANIES[i]}`, 'Completed',
+      `rec-sales-act-${i}`, `client-sales-${i % 12}`, 'ws-bebo-sales', 'ss-activities',
+      `${actType} — ${COMPANIES[i % 12]}`, pick(['Completed', 'Scheduled', 'Cancelled']),
       undefined, actDate, ['Type:Activity'], {
         'Activity Type': actType,
         'Subject': pick(actSubjects),
@@ -849,15 +849,15 @@ export function buildHealthcarePayload(): ScenarioApplyPayload {
       },
     );
   });
-  const medications = ['Lisinopril 10mg', 'Metformin 500mg', 'Atorvastatin 20mg', 'Omeprazole 20mg', 'Sertraline 50mg', 'Amlodipine 5mg'];
-  const rxRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+  const medications = ['Lisinopril 10mg', 'Metformin 500mg', 'Atorvastatin 20mg', 'Omeprazole 20mg', 'Sertraline 50mg', 'Amlodipine 5mg', 'Levothyroxine 75mcg', 'Albuterol Inhaler', 'Gabapentin 300mg', 'Losartan 50mg'];
+  const rxRecords: RuntimeRecord[] = Array.from({ length: 10 }, (_, i) => {
     const med = pick(medications);
-    const dosage = pick(['1 tablet daily', '2 tablets daily', '1 tablet twice daily', 'As needed']);
+    const dosage = pick(['1 tablet daily', '2 tablets daily', '1 tablet twice daily', 'As needed', '1 tablet at bedtime']);
     const startD = fmtDate(-Math.floor(Math.random() * 90));
     const endD = fmtDate(Math.floor(Math.random() * 180) + 30);
     return mkRecord(
-      `rec-health-rx-${i}`, `client-health-${i}`, 'ws-bebo-health', 'ss-rx',
-      `${med} — PAT-${String(1000 + i)}`, 'Active',
+      `rec-health-rx-${i}`, `client-health-${i % 6}`, 'ws-bebo-health', 'ss-rx',
+      `${med} — PAT-${String(1000 + (i % 6))}`, pick(['Active', 'Active', 'Active', 'Discontinued', 'Refill Needed']),
       undefined, startD, ['Type:Prescription'], {
         'Medication': med,
         'Dosage': dosage,
@@ -866,15 +866,15 @@ export function buildHealthcarePayload(): ScenarioApplyPayload {
       },
     );
   });
-  const testNames = ['CBC', 'Comprehensive Metabolic Panel', 'Lipid Panel', 'Hemoglobin A1c', 'Thyroid Panel', 'Urinalysis'];
-  const labRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+  const testNames = ['CBC', 'Comprehensive Metabolic Panel', 'Lipid Panel', 'Hemoglobin A1c', 'Thyroid Panel', 'Urinalysis', 'Vitamin D Level', 'PSA', 'Liver Function Panel', 'Iron Studies'];
+  const labRecords: RuntimeRecord[] = Array.from({ length: 10 }, (_, i) => {
     const testName = pick(testNames);
     const result = pick(['Normal', 'Slightly Elevated', 'Within Range', 'Borderline High', 'Low', 'Critical']);
     const labDate = fmtDate(-Math.floor(Math.random() * 30));
     const flag = result === 'Critical' ? 'Critical' : result === 'Slightly Elevated' || result === 'Borderline High' ? 'Abnormal' : 'Normal';
     return mkRecord(
-      `rec-health-lab-${i}`, `client-health-${i}`, 'ws-bebo-health', 'ss-labs',
-      `${testName} — PAT-${String(1000 + i)}`, 'Completed',
+      `rec-health-lab-${i}`, `client-health-${i % 6}`, 'ws-bebo-health', 'ss-labs',
+      `${testName} — PAT-${String(1000 + (i % 6))}`, 'Completed',
       undefined, labDate, ['Type:Lab'], {
         'Test Name': testName,
         'Result': result,
@@ -936,11 +936,11 @@ export function buildLogisticsPayload(): ScenarioApplyPayload {
       },
     );
   });
-  const receivingRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
+  const receivingRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) => {
     const expDate = fmtDate(Math.floor(Math.random() * 14) + 1);
     return mkRecord(
-      `rec-logistics-recv-${i}`, `client-logistics-${i}`, 'ws-bebo-logistics', 'ss-receiving',
-      `PO-${40000 + i} — ${pick(suppliers)}`, pick(['Pending', 'In Transit', 'Received']),
+      `rec-logistics-recv-${i}`, `client-logistics-${i % 6}`, 'ws-bebo-logistics', 'ss-receiving',
+      `PO-${40000 + i} — ${pick(suppliers)}`, pick(['Pending', 'In Transit', 'Received', 'Inspecting', 'Put Away']),
       undefined, expDate, ['Type:Receiving'], {
         'PO Number': `PO-${40000 + i}`,
         'Supplier': pick(suppliers),
@@ -949,10 +949,10 @@ export function buildLogisticsPayload(): ScenarioApplyPayload {
       },
     );
   });
-  const pickRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => mkRecord(
-    `rec-logistics-pick-${i}`, `client-logistics-${i}`, 'ws-bebo-logistics', 'ss-pick-pack',
-    `ORD-${20000 + i} — Pick Request`, pick(['Queued', 'Picking', 'Packed', 'Ready']),
-    undefined, fmtDate(-Math.floor(Math.random() * 3)), ['Type:PickPack'], {
+  const pickRecords: RuntimeRecord[] = Array.from({ length: 10 }, (_, i) => mkRecord(
+    `rec-logistics-pick-${i}`, `client-logistics-${i % 6}`, 'ws-bebo-logistics', 'ss-pick-pack',
+    `ORD-${20000 + i} — Pick Request`, pick(['Queued', 'Picking', 'Packed', 'Ready', 'Shipped']),
+    undefined, fmtDate(-Math.floor(Math.random() * 5)), ['Type:PickPack'], {
       'Order ID': `ORD-${20000 + i}`,
       'Priority': pick(['Standard', 'Expedite', 'Rush', 'Same-Day']),
       'Items Count': Math.floor(Math.random() * 20 + 1),
@@ -1391,7 +1391,94 @@ export function buildLifecyclePayload(): ScenarioApplyPayload {
       { 'Ticket ID': `TKT-2026-${5000 + i}`, 'Company': LIFECYCLE_COMPANIES[i % LIFECYCLE_COMPANIES.length], 'Subject': tktSubjects[i % tktSubjects.length], 'Priority': prio });
   });
 
-  const records = [...onbRecords, ...excRecords, ...tktRecords];
+  // ── Wizard Progress (ss-onb-wizard) ──
+  const wizardSteps = ['Company Details', 'Device Enrollment', 'MDM Configuration', 'SSO Provisioning', 'User Acceptance Testing', 'Go-Live Sign-Off'];
+  const wizardRecords: RuntimeRecord[] = wizardSteps.flatMap((step, si) =>
+    LIFECYCLE_COMPANIES.slice(0, 3).map((co, ci) => {
+      const done = si < 3 + ci;
+      return mkRecord(`rec-lcos-wiz-${si}-${ci}`, `client-lcos-${ci}`, 'ws-bebo-lcos-onboarding', 'ss-onb-wizard',
+        `${co} — ${step}`, done ? 'Complete' : si === 3 + ci ? 'In Progress' : 'Pending',
+        undefined, done ? fmtDate(-14 + si * 2) : undefined, ['Type:WizardStep'],
+        { 'Step Name': step, 'Step Status': done ? 'Complete' : si === 3 + ci ? 'In Progress' : 'Pending', 'Completed': done ? fmtDate(-14 + si * 2) : '', 'Step Notes': done ? `${step} completed for ${co}` : '' });
+    })
+  );
+
+  // ── Device Configuration (ss-onb-devices) ──
+  const devTypes = ['Dell Latitude 5540', 'MacBook Pro 14"', 'Surface Pro 9', 'HP EliteBook 840', 'iPad Pro 12.9"'];
+  const mdmPlatforms = ['Intune', 'Jamf Pro', 'VMware WS1', 'Kandji'];
+  const deviceRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) => {
+    const devType = pick(devTypes);
+    const mdm = pick(mdmPlatforms);
+    return mkRecord(`rec-lcos-dev-${i}`, `client-lcos-${i % 6}`, 'ws-bebo-lcos-onboarding', 'ss-onb-devices',
+      `${devType} × ${Math.floor(Math.random() * 50 + 5)} — ${mdm}`, pick(['Configured', 'Pending', 'Enrolled']),
+      undefined, fmtDate(-Math.floor(Math.random() * 10)), ['Type:DeviceConfig'],
+      { 'Device Type': devType, 'MDM Platform': mdm, 'Count': Math.floor(Math.random() * 50 + 5), 'Special Requirements': pick(['None', 'Kiosk mode required', 'VPN pre-configured', 'Custom certificates', 'BitLocker enforced']) });
+  });
+
+  // ── Offboarding Requests (ss-off-list) ──
+  const offReasons = ['Contract Ended', 'Merger / Acquisition', 'Downsizing', 'Vendor Switch', 'Budget Reduction'];
+  const offRecords: RuntimeRecord[] = LIFECYCLE_COMPANIES.slice(2, 7).map((co, i) =>
+    mkRecord(`rec-lcos-off-${i}`, `client-lcos-${(i + 2) % 6}`, 'ws-bebo-lcos-offboarding', 'ss-off-list',
+      `${co} — Offboarding`, pick(['Submitted', 'In Progress', 'Complete']),
+      undefined, fmtDate(-Math.floor(Math.random() * 20)), ['Type:Offboarding'],
+      { 'Customer Account': co, 'Offboarding Reason': pick(offReasons), 'Last Service Date': fmtDate(Math.floor(Math.random() * 30)), 'Total Device Count': Math.floor(Math.random() * 100 + 10) })
+  );
+
+  // ── Asset Returns (ss-off-assets) ──
+  const retMethods = ['UPS Prepaid Label', 'FedEx Pickup', 'On-Site Collection', 'Customer Drop-Off'];
+  const assetRecords: RuntimeRecord[] = Array.from({ length: 6 }, (_, i) =>
+    mkRecord(`rec-lcos-asset-${i}`, `client-lcos-${(i + 2) % 6}`, 'ws-bebo-lcos-offboarding', 'ss-off-assets',
+      `Return #${i + 1} — ${pick(retMethods)}`, pick(['Scheduled', 'Picked Up', 'Received', 'Processed']),
+      undefined, fmtDate(-Math.floor(Math.random() * 14)), ['Type:AssetReturn'],
+      { 'Return Method': pick(retMethods), 'Pickup Date': fmtDate(Math.floor(Math.random() * 7) + 1), 'Return Contact': pick(lcContacts), 'Asset Condition Notes': pick(['Good condition', 'Minor cosmetic wear', 'Missing charger', 'Screen protector cracked', 'All accessories included']) })
+  );
+
+  // ── Access Revocation Checklist (ss-off-checklist) ──
+  const checklistRecords: RuntimeRecord[] = LIFECYCLE_COMPANIES.slice(2, 7).map((co, i) =>
+    mkRecord(`rec-lcos-chk-${i}`, `client-lcos-${(i + 2) % 6}`, 'ws-bebo-lcos-offboarding', 'ss-off-checklist',
+      `${co} — Access Revocation`, i < 2 ? 'Complete' : 'In Progress',
+      undefined, fmtDate(-Math.floor(Math.random() * 10)), ['Type:Checklist'],
+      { 'SSO Revoked': i < 3 ? 'Yes' : 'No', 'MDM Removed': i < 2 ? 'Yes' : 'No', 'Licenses Released': i < 4 ? 'Yes' : 'No', 'Data Wiped': i < 2 ? 'Yes' : 'No' })
+  );
+
+  // ── Exchange Requests (ss-exc-form) ──
+  const excIssues = ['Cracked display after drop', 'Battery draining within 2 hours', 'Keyboard keys unresponsive', 'Trackpad ghost clicking', 'USB-C port not charging', 'Blue screen on boot'];
+  const excFormRecords: RuntimeRecord[] = Array.from({ length: 5 }, (_, i) =>
+    mkRecord(`rec-lcos-excf-${i}`, `client-lcos-${i % 6}`, 'ws-bebo-lcos-exchange', 'ss-exc-form',
+      `EXR-${400 + i} — ${pick(['High', 'Medium', 'Standard'])} Priority`, pick(['Submitted', 'Approved', 'Processing', 'Shipped']),
+      undefined, fmtDate(-Math.floor(Math.random() * 10)), ['Type:ExchangeRequest'],
+      { 'Issue Description': pick(excIssues), 'Priority Level': pick(['High', 'Medium', 'Standard']), 'Delivery Address': `${100 + i * 10} Enterprise Blvd, Suite ${200 + i}`, 'Recipient Name': pick(lcContacts) })
+  );
+
+  // ── Return Tracking (ss-exc-returns) ──
+  const excReturnRecords: RuntimeRecord[] = Array.from({ length: 5 }, (_, i) => {
+    const returned = i < 3;
+    return mkRecord(`rec-lcos-excr-${i}`, `client-lcos-${i % 6}`, 'ws-bebo-lcos-exchange', 'ss-exc-returns',
+      `EXC-${300 + i} Return — ${returned ? 'Received' : 'Pending'}`, returned ? 'Returned' : 'Awaiting Return',
+      undefined, fmtDate(-i * 2), ['Type:ReturnTracking'],
+      { 'Tracking Number': `TRK-EXC-${700000 + i}`, 'Return Due Date': fmtDate(i < 2 ? -1 : 5 + i), 'Carrier': pick(['FedEx', 'UPS', 'USPS']), 'Returned On': returned ? fmtDate(-i * 2) : '' });
+  });
+
+  // ── Conversations (ss-tkt-convo) ──
+  const msgBodies = ['Hi, I submitted an exchange request but haven\'t received a prepaid label yet.', 'We\'ve sent the label to your email — please check spam.', 'Got it, thank you! I\'ll ship it out today.', 'Our MDM enrollment is failing on 3 devices — error code 0x80070005.', 'This is an access permissions issue. I\'ve escalated to our Intune admin.', 'Follow-up: all 3 devices now show enrolled. Issue resolved.'];
+  const convoRecords: RuntimeRecord[] = Array.from({ length: 6 }, (_, i) =>
+    mkRecord(`rec-lcos-msg-${i}`, `client-lcos-${Math.floor(i / 3) % 6}`, 'ws-bebo-lcos-tickets', 'ss-tkt-convo',
+      `TKT-2026-${5000 + Math.floor(i / 3)} — ${i % 2 === 0 ? 'Customer' : 'Agent'}`, 'Sent',
+      undefined, fmtDate(-7 + i), ['Type:Message'],
+      { 'From': i % 2 === 0 ? pick(lcContacts) : pick(lcAgents), 'Message': msgBodies[i], 'Timestamp': fmtDate(-7 + i), 'Internal Note': i % 3 === 2 ? 'Yes' : 'No' })
+  );
+
+  // ── SLA Metrics (ss-tkt-sla) ──
+  const slaRecords: RuntimeRecord[] = ['Critical', 'High', 'Medium', 'Low'].map((prio, i) => {
+    const firstResp = prio === 'Critical' ? 0.5 : prio === 'High' ? 2 : prio === 'Medium' ? 4 : 8;
+    const resolution = prio === 'Critical' ? 4 : prio === 'High' ? 8 : prio === 'Medium' ? 24 : 48;
+    return mkRecord(`rec-lcos-sla-${i}`, `client-lcos-${i}`, 'ws-bebo-lcos-tickets', 'ss-tkt-sla',
+      `SLA — ${prio} Priority`, i === 0 ? 'Breached' : 'Met',
+      undefined, fmtDate(-i), ['Type:SLA'],
+      { 'Priority Level': prio, 'First Response (hrs)': firstResp + (i === 0 ? 1.5 : 0), 'Resolution (hrs)': resolution + (i === 0 ? 6 : 0), 'SLA Breached': i === 0 ? 'Yes' : 'No' });
+  });
+
+  const records = [...onbRecords, ...wizardRecords, ...deviceRecords, ...excRecords, ...excFormRecords, ...excReturnRecords, ...offRecords, ...assetRecords, ...checklistRecords, ...tktRecords, ...convoRecords, ...slaRecords];
   const clients = LIFECYCLE_COMPANIES.slice(0, 6).map((co, i) => mkClient(`client-lcos-${i}`, co, `LCOS-${1000 + i}`, ['Vertical:Lifecycle']));
 
   return {
@@ -1510,7 +1597,63 @@ export function buildFulfillmentPayload(): ScenarioApplyPayload {
       { 'Order ID': `ORD-RF-${50000 + i}`, 'Carrier': carrier, 'Tracking Number': tracking, 'Estimated Delivery': fmtDate(Math.floor(Math.random() * 5) + 1) });
   });
 
-  const records  = [...invRecords, ...orderRecords, ...shipRecords];
+  // ── Receiving Queue (ss-rf-recv) ──
+  const rfUsers = ['Alex Kim', 'Pat Warren', 'Jordan Liu', 'Casey Brooks'];
+  const recvRecords: RuntimeRecord[] = Array.from({ length: 6 }, (_, i) => {
+    const prod = pick(FULFILLMENT_PRODUCTS);
+    const sku = `SKU-${String(3000 + i)}`;
+    return mkRecord(`rec-rf-recv-${i}`, `client-rf-${i % 6}`, 'ws-bebo-rf-receiving', 'ss-rf-recv',
+      `${sku} — ${prod} (Qty ${Math.floor(Math.random() * 200 + 20)})`, pick(['Pending Inspection', 'Accepted', 'Rejected', 'Put Away']),
+      undefined, fmtDate(-Math.floor(Math.random() * 10)), ['Type:Receiving'],
+      { 'SKU': sku, 'Quantity': Math.floor(Math.random() * 200 + 20), 'Assigned Location': `Aisle ${i + 1}-Rack ${pick(['A', 'B', 'C'])}`, 'Condition': pick(['New', 'Refurbished', 'Damaged', 'Inspecting']) });
+  });
+
+  // ── Audit Trail (ss-rf-audit) ──
+  const auditActions = ['Stock Received', 'Location Moved', 'Cycle Count Adjusted', 'Reorder Triggered', 'SKU Deactivated', 'Qty Corrected'];
+  const auditRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) =>
+    mkRecord(`rec-rf-aud-${i}`, `client-rf-${i % 6}`, 'ws-bebo-rf-receiving', 'ss-rf-audit',
+      `${pick(auditActions)} — SKU-${3000 + (i % 6)}`, 'Logged',
+      undefined, fmtDate(-i), ['Type:Audit'],
+      { 'User': pick(rfUsers), 'Action': pick(auditActions), 'Affected SKU': `SKU-${3000 + (i % 6)}`, 'Timestamp': fmtDate(-i) })
+  );
+
+  // ── Pick Lists (ss-rf-picklist) ──
+  const picklistRecords: RuntimeRecord[] = Array.from({ length: 6 }, (_, i) => {
+    const qtyPick = Math.floor(Math.random() * 20 + 2);
+    const qtyScan = i < 4 ? qtyPick : Math.floor(qtyPick * 0.6);
+    return mkRecord(`rec-rf-pick-${i}`, `client-rf-${i % 6}`, 'ws-bebo-rf-orders', 'ss-rf-picklist',
+      `ORD-RF-${50000 + i} — Pick Line`, i < 4 ? 'Complete' : 'In Progress',
+      undefined, fmtDate(-i), ['Type:Pick'],
+      { 'Order ID': `ORD-RF-${50000 + i}`, 'Pick Location': `Zone ${pick(['A', 'B', 'C'])}-Aisle ${i + 1}`, 'SKU': `SKU-${3000 + (i % 6)}`, 'Qty to Pick': qtyPick, 'Qty Scanned': qtyScan });
+  });
+
+  // ── Exception Queue (ss-rf-exceptions) ──
+  const excTypes = ['Address Invalid', 'SKU Mismatch', 'Damaged in Warehouse', 'Short Ship', 'Customer Cancel'];
+  const exceptionRecords: RuntimeRecord[] = Array.from({ length: 5 }, (_, i) =>
+    mkRecord(`rec-rf-exc-${i}`, `client-rf-${i % 6}`, 'ws-bebo-rf-orders', 'ss-rf-exceptions',
+      `EXC-${60000 + i} — ${pick(excTypes)}`, pick(['Open', 'Investigating', 'Resolved', 'Escalated']),
+      undefined, fmtDate(-Math.floor(Math.random() * 7)), ['Type:Exception'],
+      { 'Exception Type': pick(excTypes), 'Order ID': `ORD-RF-${50000 + i}`, 'Description': pick(['Customer-reported address change after label generated', 'Wrong SKU picked — requires re-pick', 'Pallet tipped — 3 units damaged', 'Only 8 of 12 units available', 'Customer requested cancellation before ship']), 'Resolution': pick(['Pending', 'Re-pick Issued', 'Replacement Sent', 'Refunded', 'Address Corrected']) })
+  );
+
+  // ── Packing Station (ss-rf-packing) ──
+  const packRecords: RuntimeRecord[] = Array.from({ length: 5 }, (_, i) =>
+    mkRecord(`rec-rf-pack-${i}`, `client-rf-${i % 6}`, 'ws-bebo-rf-shipping', 'ss-rf-packing',
+      `ORD-RF-${50000 + i} — Pack Station`, pick(['Packed', 'Validating', 'Sealed']),
+      undefined, fmtDate(-i), ['Type:Packing'],
+      { 'Order ID': `ORD-RF-${50000 + i}`, 'Box Size': pick(['Small (12×10×6)', 'Medium (18×14×10)', 'Large (24×18×14)']), 'Actual Weight (lbs)': +(Math.random() * 30 + 2).toFixed(1), 'Items Validated': i < 4 ? 'Yes' : 'No' })
+  );
+
+  // ── Shipment Tracker (ss-rf-tracker) ──
+  const trackerEvents = ['Label Created', 'Picked Up', 'In Transit — Regional Hub', 'Out for Delivery', 'Delivered'];
+  const trackerRecords: RuntimeRecord[] = Array.from({ length: 6 }, (_, i) =>
+    mkRecord(`rec-rf-trk-${i}`, `client-rf-${i % 6}`, 'ws-bebo-rf-shipping', 'ss-rf-tracker',
+      `ORD-RF-${50000 + Math.floor(i / 2)} — ${trackerEvents[i % trackerEvents.length]}`, trackerEvents[i % trackerEvents.length],
+      undefined, fmtDate(-5 + i), ['Type:ShipmentEvent'],
+      { 'Order ID': `ORD-RF-${50000 + Math.floor(i / 2)}`, 'Carrier': pick(CARRIERS), 'Event': trackerEvents[i % trackerEvents.length], 'Location': pick(['Memphis, TN', 'Louisville, KY', 'Dallas, TX', 'Chicago, IL', 'Customer Address']), 'Timestamp': fmtDate(-5 + i) })
+  );
+
+  const records  = [...invRecords, ...orderRecords, ...shipRecords, ...recvRecords, ...auditRecords, ...picklistRecords, ...exceptionRecords, ...packRecords, ...trackerRecords];
   const rfClients = Array.from({ length: 6 }, (_, i) => mkClient(`client-rf-${i}`, COMPANIES[i], `RF-${2000 + i}`, ['Vertical:Fulfillment']));
 
   return {
@@ -1871,15 +2014,15 @@ export function buildKittingPayload(): ScenarioApplyPayload {
     mkRecord(`rec-kit-wo-${i}`, `client-kit-${i % KIT_CLIENTS.length}`, 'ws-kit-orders', 'ss-kit-workorders',
       `${w.id} — ${w.name}`, w.status, undefined, fmtDate(-i),
       ['Type:WorkOrder'],
-      { 'Work Order ID': w.id, 'Client': w.client, 'Kit SKU': w.sku, 'Kit Name': w.name, 'Kit Qty': w.qty, 'BOM Validated': w.status !== 'Work Order Created', 'Status': w.status, 'Assigned Technician': w.tech, 'Due Date': w.due })
+      { 'Work Order ID': w.id, 'Client': w.client, 'Kit SKU': w.sku, 'Kit Name': w.name, 'Kit Qty': w.qty, 'BOM Validated': w.status !== 'Work Order Created' ? 'Yes' : 'No', 'Status': w.status, 'Assigned Technician': w.tech, 'Due Date': w.due })
   );
 
   // Kitting Station: active assembly records for WO-10234 (T-Mobile Z Fold 7 × 200)
   const stationRecords: RuntimeRecord[] = [
-    mkRecord('rec-kit-sta-0', 'client-kit-0', 'ws-kit-production', 'ss-kit-station', 'KIT-1001 — Samsung Z Fold 7 Kit', 'Complete',   undefined, fmtDate(-1), ['Type:KitBuild'], { 'Work Order': 'WO-10234', 'Kit ID': 'KIT-1001', 'Kit SKU': KIT_SKUS[0], 'Kit Name': KIT_PRODUCTS[0], 'Kitting Technician': 'J. Rivera',   'Components Assembled': 12, 'Serials Assigned': true,  'Assembly Status': 'Complete'   }),
-    mkRecord('rec-kit-sta-1', 'client-kit-0', 'ws-kit-production', 'ss-kit-station', 'KIT-1002 — Samsung Z Fold 7 Kit', 'Complete',   undefined, fmtDate(-1), ['Type:KitBuild'], { 'Work Order': 'WO-10234', 'Kit ID': 'KIT-1002', 'Kit SKU': KIT_SKUS[0], 'Kit Name': KIT_PRODUCTS[0], 'Kitting Technician': 'J. Rivera',   'Components Assembled': 12, 'Serials Assigned': true,  'Assembly Status': 'Complete'   }),
-    mkRecord('rec-kit-sta-2', 'client-kit-0', 'ws-kit-production', 'ss-kit-station', 'KIT-1003 — Samsung Z Fold 7 Kit', 'In Progress',undefined, fmtDate(0),  ['Type:KitBuild'], { 'Work Order': 'WO-10237', 'Kit ID': 'KIT-1003', 'Kit SKU': KIT_SKUS[0], 'Kit Name': KIT_PRODUCTS[0], 'Kitting Technician': 'T. Williams', 'Components Assembled': 8,  'Serials Assigned': false, 'Assembly Status': 'In Progress'}),
-    mkRecord('rec-kit-sta-3', 'client-kit-1', 'ws-kit-production', 'ss-kit-station', 'KIT-2001 — iPhone 16 Pro Max Kit','In Progress',undefined, fmtDate(0),  ['Type:KitBuild'], { 'Work Order': 'WO-10235', 'Kit ID': 'KIT-2001', 'Kit SKU': KIT_SKUS[1], 'Kit Name': KIT_PRODUCTS[1], 'Kitting Technician': 'K. Thompson', 'Components Assembled': 5,  'Serials Assigned': false, 'Assembly Status': 'In Progress'}),
+    mkRecord('rec-kit-sta-0', 'client-kit-0', 'ws-kit-production', 'ss-kit-station', 'KIT-1001 — Samsung Z Fold 7 Kit', 'Complete',   undefined, fmtDate(-1), ['Type:KitBuild'], { 'Work Order': 'WO-10234', 'Kit ID': 'KIT-1001', 'Kit SKU': KIT_SKUS[0], 'Kit Name': KIT_PRODUCTS[0], 'Kitting Technician': 'J. Rivera',   'Components Assembled': 12, 'Serials Assigned': 'Yes', 'Assembly Status': 'Complete'   }),
+    mkRecord('rec-kit-sta-1', 'client-kit-0', 'ws-kit-production', 'ss-kit-station', 'KIT-1002 — Samsung Z Fold 7 Kit', 'Complete',   undefined, fmtDate(-1), ['Type:KitBuild'], { 'Work Order': 'WO-10234', 'Kit ID': 'KIT-1002', 'Kit SKU': KIT_SKUS[0], 'Kit Name': KIT_PRODUCTS[0], 'Kitting Technician': 'J. Rivera',   'Components Assembled': 12, 'Serials Assigned': 'Yes', 'Assembly Status': 'Complete'   }),
+    mkRecord('rec-kit-sta-2', 'client-kit-0', 'ws-kit-production', 'ss-kit-station', 'KIT-1003 — Samsung Z Fold 7 Kit', 'In Progress',undefined, fmtDate(0),  ['Type:KitBuild'], { 'Work Order': 'WO-10237', 'Kit ID': 'KIT-1003', 'Kit SKU': KIT_SKUS[0], 'Kit Name': KIT_PRODUCTS[0], 'Kitting Technician': 'T. Williams', 'Components Assembled': 8,  'Serials Assigned': 'No',  'Assembly Status': 'In Progress'}),
+    mkRecord('rec-kit-sta-3', 'client-kit-1', 'ws-kit-production', 'ss-kit-station', 'KIT-2001 — iPhone 16 Pro Max Kit','In Progress',undefined, fmtDate(0),  ['Type:KitBuild'], { 'Work Order': 'WO-10235', 'Kit ID': 'KIT-2001', 'Kit SKU': KIT_SKUS[1], 'Kit Name': KIT_PRODUCTS[1], 'Kitting Technician': 'K. Thompson', 'Components Assembled': 5,  'Serials Assigned': 'No',  'Assembly Status': 'In Progress'}),
   ];
 
   // QC Records — matches QC & Shipping Screen
@@ -1894,18 +2037,102 @@ export function buildKittingPayload(): ScenarioApplyPayload {
     mkRecord(`rec-kit-qc-${i}`, `client-kit-${i % KIT_CLIENTS.length}`, 'ws-kit-qcship', 'ss-kit-qc',
       `${q.kitId} — ${q.result}`, q.result, undefined, fmtDate(-i),
       ['Type:QC'],
-      { 'Kit ID': q.kitId, 'Work Order': q.wo, 'Kit SKU': q.sku, 'Inspector': q.inspector, 'Inspection Result': q.result, 'Defects Found': q.defects, 'Inspection Date': fmtDate(-i), 'Rework Required': q.rework })
+      { 'Kit ID': q.kitId, 'Work Order': q.wo, 'Kit SKU': q.sku, 'Inspector': q.inspector, 'Inspection Result': q.result, 'Defects Found': q.defects, 'Inspection Date': fmtDate(-i), 'Rework Required': q.rework ? 'Yes' : 'No' })
   );
 
   // Shipping Labels for completed orders
   const labelRecords: RuntimeRecord[] = [
     mkRecord('rec-kit-lbl-0', 'client-kit-0', 'ws-kit-qcship', 'ss-kit-labels', 'ORD-10234 — UPS Ground', 'Generated', undefined, fmtDate(-1), ['Type:Label'],
-      { 'Order ID': 'PO-TM-10234', 'Kit ID': 'KIT-1001', 'Carrier': 'UPS', 'Service Level': 'Ground', 'Tracking Number': '1Z999AA10123456784', 'Label Generated': true, 'Created Date': fmtDate(-1), 'Estimated Delivery': fmtDate(5) }),
+      { 'Order ID': 'PO-TM-10234', 'Kit ID': 'KIT-1001', 'Carrier': 'UPS', 'Service Level': 'Ground', 'Tracking Number': '1Z999AA10123456784', 'Label Generated': 'Yes', 'Created Date': fmtDate(-1), 'Estimated Delivery': fmtDate(5) }),
     mkRecord('rec-kit-lbl-1', 'client-kit-5', 'ws-kit-qcship', 'ss-kit-labels', 'ORD-10241 — FedEx 2Day', 'Generated', undefined, fmtDate(-2), ['Type:Label'],
-      { 'Order ID': 'PO-USC-10241', 'Kit ID': 'KIT-3001', 'Carrier': 'FedEx', 'Service Level': '2-Day Air', 'Tracking Number': '7489489230002845523', 'Label Generated': true, 'Created Date': fmtDate(-2), 'Estimated Delivery': fmtDate(1) }),
+      { 'Order ID': 'PO-USC-10241', 'Kit ID': 'KIT-3001', 'Carrier': 'FedEx', 'Service Level': '2-Day Air', 'Tracking Number': '7489489230002845523', 'Label Generated': 'Yes', 'Created Date': fmtDate(-2), 'Estimated Delivery': fmtDate(1) }),
   ];
 
-  const records = [...catalogRecords, ...orderRecords, ...bomRecords, ...woRecords, ...stationRecords, ...qcRecords, ...labelRecords];
+  // ── Receiving Queue (ss-kit-recv-queue) ──
+  const kitTechs = ['J. Rivera', 'K. Thompson', 'M. Santos', 'T. Williams', 'A. Patel', 'D. Nguyen'];
+  const recvQueueRecords: RuntimeRecord[] = KIT_COMPONENTS.slice(0, 6).map((comp, i) =>
+    mkRecord(`rec-kit-rq-${i}`, 'client-kit-0', 'ws-kit-receiving', 'ss-kit-recv-queue',
+      `PO-RECV-${8000 + i} — ${comp}`, pick(['Inspecting', 'Accepted', 'Put Away']),
+      undefined, fmtDate(-Math.floor(Math.random() * 7)), ['Type:Receiving'],
+      { 'PO Number': `PO-RECV-${8000 + i}`, 'SKU': KIT_COMP_SKUS[i], 'Component Name': comp, 'Qty Received': Math.floor(Math.random() * 300 + 100), 'Serial Numbers': i === 0 ? 'SN-ZF7-100001 → SN-ZF7-100500' : '', 'Condition': pick(['New', 'Inspecting', 'Accepted']), 'Bin Location': `A${i + 1}-B${Math.ceil((i + 1) / 3)}`, 'Received By': pick(kitTechs), 'Received Date': fmtDate(-Math.floor(Math.random() * 7)) })
+  );
+
+  // ── Receiving Log (ss-kit-recv-log) ──
+  const recvLogActions = ['Received & Counted', 'Inspected — Passed', 'Binned', 'Inspected — Rejected (2 units)', 'Recounted — Adjusted +3'];
+  const recvLogRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) =>
+    mkRecord(`rec-kit-rl-${i}`, 'client-kit-0', 'ws-kit-receiving', 'ss-kit-recv-log',
+      `PO-RECV-${8000 + (i % 6)} — ${pick(recvLogActions)}`, 'Logged',
+      undefined, fmtDate(-7 + i), ['Type:ReceivingLog'],
+      { 'PO Number': `PO-RECV-${8000 + (i % 6)}`, 'SKU': KIT_COMP_SKUS[i % 12], 'Component': KIT_COMPONENTS[i % 12], 'Quantity': Math.floor(Math.random() * 300 + 100), 'Received By': pick(kitTechs), 'Action': pick(recvLogActions), 'Timestamp': fmtDate(-7 + i), 'Notes': pick(['Standard receipt — no issues', 'Minor packaging tear, units intact', 'Qty mismatch resolved', '']) })
+  );
+
+  // ── BOM Allocation (ss-kit-allocation) ──
+  const allocRecords: RuntimeRecord[] = KIT_COMPONENTS.slice(0, 8).map((comp, i) => {
+    const required = 200;
+    const avail = compOnHand[i];
+    const shortage = Math.max(0, required - avail);
+    return mkRecord(`rec-kit-alloc-${i}`, 'client-kit-0', 'ws-kit-orders', 'ss-kit-allocation',
+      `WO-10234 — ${comp}`, shortage > 0 ? 'Shortage' : 'Allocated',
+      undefined, fmtDate(-3), ['Type:Allocation'],
+      { 'Work Order': 'WO-10234', 'Kit SKU': KIT_SKUS[0], 'Component SKU': KIT_COMP_SKUS[i], 'Component Name': comp, 'Required Qty': required, 'Available Qty': avail, 'Shortage Qty': shortage, 'Allocation Status': shortage > 0 ? 'Shortage' : 'Allocated' });
+  });
+
+  // ── Pick Lists (ss-kit-picklist) ──
+  const pickListRecords: RuntimeRecord[] = KIT_COMPONENTS.slice(0, 8).map((comp, i) => {
+    const qtyPick = 200;
+    const qtyScan = i < 5 ? 200 : Math.floor(Math.random() * 100 + 50);
+    return mkRecord(`rec-kit-pk-${i}`, 'client-kit-0', 'ws-kit-production', 'ss-kit-picklist',
+      `WO-10234 — Pick ${comp}`, i < 5 ? 'Complete' : 'In Progress',
+      undefined, fmtDate(-2), ['Type:Pick'],
+      { 'Work Order': 'WO-10234', 'Component': comp, 'Component SKU': KIT_COMP_SKUS[i], 'Bin Location': `A${i + 1}-B${Math.ceil((i + 1) / 3)}`, 'Qty to Pick': qtyPick, 'Qty Scanned': qtyScan, 'Picker': pick(kitTechs), 'Scan Status': i < 5 ? 'Complete' : 'In Progress' });
+  });
+
+  // ── Scan & Pick Events (ss-kit-scan-log) ──
+  const scanLogRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) =>
+    mkRecord(`rec-kit-sc-${i}`, 'client-kit-0', 'ws-kit-production', 'ss-kit-scan-log',
+      `WO-10234 — Scan ${KIT_COMPONENTS[i % 12]}`, 'Logged',
+      undefined, fmtDate(-2 + Math.floor(i / 4)), ['Type:ScanEvent'],
+      { 'Work Order': 'WO-10234', 'Component': KIT_COMPONENTS[i % 12], 'Bin': `A${(i % 12) + 1}-B${Math.ceil(((i % 12) + 1) / 3)}`, 'Qty Scanned': Math.floor(Math.random() * 50 + 10), 'Scanned By': pick(kitTechs), 'Scan Time': fmtDate(-2 + Math.floor(i / 4)), 'Verified': i < 6 ? 'Yes' : 'No' })
+  );
+
+  // ── Assembly Log (ss-kit-assembly-log) ──
+  const assemblySteps = ['Unbox device', 'Attach S Pen holster', 'Insert SIM eject tool', 'Place foam tray', 'Add charger & cable', 'Apply protective film', 'Place accessories bag', 'Insert documentation', 'Close & seal box', 'Apply anti-static bag', 'Place retail insert', 'Final visual check'];
+  const assemblyLogRecords: RuntimeRecord[] = assemblySteps.slice(0, 8).map((step, i) =>
+    mkRecord(`rec-kit-al-${i}`, 'client-kit-0', 'ws-kit-production', 'ss-kit-assembly-log',
+      `KIT-1001 — ${step}`, 'Complete',
+      undefined, fmtDate(-1), ['Type:AssemblyStep'],
+      { 'Kit ID': 'KIT-1001', 'Step': step, 'Component': KIT_COMPONENTS[i % 12], 'Performed By': 'J. Rivera', 'Timestamp': fmtDate(-1), 'Notes': i === 0 ? 'IMEI verified: 353456789012345' : '' })
+  );
+
+  // ── Pack & Label Station (ss-kit-pack) ──
+  const packKitRecords: RuntimeRecord[] = [
+    mkRecord('rec-kit-pk-s0', 'client-kit-0', 'ws-kit-qcship', 'ss-kit-pack', 'KIT-1001 — Packed', 'Packed', undefined, fmtDate(-1), ['Type:Pack'],
+      { 'Kit ID': 'KIT-1001', 'Order ID': 'PO-TM-10234', 'Kit SKU': KIT_SKUS[0], 'Box Dimensions': '14×8×6 in', 'Weight (lbs)': 2.8, 'Pack Date': fmtDate(-1), 'Label Type': 'UPS Ground', 'Packed By': 'T. Williams' }),
+    mkRecord('rec-kit-pk-s1', 'client-kit-0', 'ws-kit-qcship', 'ss-kit-pack', 'KIT-1002 — Packed', 'Packed', undefined, fmtDate(-1), ['Type:Pack'],
+      { 'Kit ID': 'KIT-1002', 'Order ID': 'PO-TM-10234', 'Kit SKU': KIT_SKUS[0], 'Box Dimensions': '14×8×6 in', 'Weight (lbs)': 2.7, 'Pack Date': fmtDate(-1), 'Label Type': 'UPS Ground', 'Packed By': 'T. Williams' }),
+    mkRecord('rec-kit-pk-s2', 'client-kit-5', 'ws-kit-qcship', 'ss-kit-pack', 'KIT-3001 — Packed', 'Packed', undefined, fmtDate(-2), ['Type:Pack'],
+      { 'Kit ID': 'KIT-3001', 'Order ID': 'PO-USC-10241', 'Kit SKU': KIT_SKUS[2], 'Box Dimensions': '12×10×4 in', 'Weight (lbs)': 2.1, 'Pack Date': fmtDate(-2), 'Label Type': 'FedEx 2-Day Air', 'Packed By': 'A. Patel' }),
+    mkRecord('rec-kit-pk-s3', 'client-kit-6', 'ws-kit-qcship', 'ss-kit-pack', 'KIT-4001 — Packed', 'Packed', undefined, fmtDate(-1), ['Type:Pack'],
+      { 'Kit ID': 'KIT-4001', 'Order ID': 'PO-BM-10240', 'Kit SKU': KIT_SKUS[7], 'Box Dimensions': '16×12×6 in', 'Weight (lbs)': 3.4, 'Pack Date': fmtDate(-1), 'Label Type': 'FedEx Express', 'Packed By': 'D. Nguyen' }),
+  ];
+
+  // ── Shipment Tracker (ss-kit-shipment-tracker) ──
+  const kitShipEvents = [
+    { orderId: 'PO-USC-10241', kitId: 'KIT-3001', carrier: 'FedEx', event: 'Label Created',          location: 'Dallas, TX',     ts: -3 },
+    { orderId: 'PO-USC-10241', kitId: 'KIT-3001', carrier: 'FedEx', event: 'Picked Up',              location: 'Dallas, TX',     ts: -2 },
+    { orderId: 'PO-USC-10241', kitId: 'KIT-3001', carrier: 'FedEx', event: 'In Transit — Regional Hub', location: 'Memphis, TN', ts: -1 },
+    { orderId: 'PO-USC-10241', kitId: 'KIT-3001', carrier: 'FedEx', event: 'Delivered',              location: 'Chicago, IL',    ts: 0  },
+    { orderId: 'PO-TM-10234',  kitId: 'KIT-1001', carrier: 'UPS',   event: 'Label Created',          location: 'Dallas, TX',     ts: -1 },
+    { orderId: 'PO-TM-10234',  kitId: 'KIT-1001', carrier: 'UPS',   event: 'Picked Up',              location: 'Dallas, TX',     ts: 0  },
+  ];
+  const shipTrackerRecords: RuntimeRecord[] = kitShipEvents.map((e, i) =>
+    mkRecord(`rec-kit-st-${i}`, `client-kit-${i < 4 ? 5 : 0}`, 'ws-kit-qcship', 'ss-kit-shipment-tracker',
+      `${e.orderId} — ${e.event}`, e.event,
+      undefined, fmtDate(e.ts), ['Type:ShipmentEvent'],
+      { 'Order ID': e.orderId, 'Kit ID': e.kitId, 'Carrier': e.carrier, 'Event': e.event, 'Location': e.location, 'Timestamp': fmtDate(e.ts), 'Status Update Sent': (e.event === 'Delivered' || e.event === 'Out for Delivery') ? 'Yes' : 'No' })
+  );
+
+  const records = [...catalogRecords, ...orderRecords, ...bomRecords, ...woRecords, ...stationRecords, ...qcRecords, ...labelRecords, ...recvQueueRecords, ...recvLogRecords, ...allocRecords, ...pickListRecords, ...scanLogRecords, ...assemblyLogRecords, ...packKitRecords, ...shipTrackerRecords];
   const clients = KIT_CLIENTS.map((co, i) => mkClient(`client-kit-${i}`, co, `CARR-${2000 + i}`, ['Vertical:Kitting', 'Type:Carrier']));
 
   return {

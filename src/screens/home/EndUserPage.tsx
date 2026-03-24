@@ -276,11 +276,11 @@ const fmtUnits = (v: number) => formatUnitCount(v);
 const glass = (opacity = 0.06, themeMode: 'day' | 'night' = 'night'): any => {
   const isDay = themeMode === 'day';
   return {
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: isDay ? `rgba(0,0,0,${opacity + 0.06})` : `rgba(255,255,255,${opacity + 0.04})`,
-    backgroundColor: isDay ? `rgba(255,255,255,0.82)` : `rgba(10,14,24,0.72)`,
-    ...(Platform.OS === 'web' ? { backdropFilter: 'blur(18px)', boxShadow: isDay ? '0 2px 20px rgba(102,74,154,0.10)' : '0 2px 20px rgba(0,0,0,0.22)' } : {}),
+    backgroundColor: isDay ? `rgba(255,255,255,0.85)` : `rgba(10,14,24,0.74)`,
+    ...(Platform.OS === 'web' ? { backdropFilter: 'blur(20px)', boxShadow: isDay ? '0 2px 24px rgba(102,74,154,0.12)' : '0 2px 24px rgba(0,0,0,0.26)' } : {}),
   };
 };
 
@@ -1018,10 +1018,10 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
       )}
 
       {/* ── Main 3-column shell ── */}
-      <View style={{ flex: 1, flexDirection: isCompact ? 'column' : 'row', padding: 10, gap: 10, overflow: 'hidden' as any }}>
+      <View style={{ flex: 1, flexDirection: isCompact ? 'column' : 'row', padding: 14, gap: 12, overflow: 'hidden' as any }}>
 
         {/* ═══════════════ LEFT RAIL ═══════════════ */}
-        <View style={[g(), { width: isCompact ? '100%' as any : leftRailCollapsed ? 52 : 240, padding: leftRailCollapsed ? 6 : 10, gap: 6, overflow: 'hidden' as any, ...(Platform.OS === 'web' ? { transition: 'width 0.25s ease' } as any : {}) }]}>
+        <View style={[g(), { width: isCompact ? '100%' as any : leftRailCollapsed ? 52 : 248, padding: leftRailCollapsed ? 6 : 12, gap: 8, overflow: 'hidden' as any, ...(Platform.OS === 'web' ? { transition: 'width 0.25s ease', boxShadow: '0 2px 16px rgba(0,0,0,0.12)' } as any : {}) }]}>
           {/* Collapse toggle */}
           {!isCompact && (
             <Pressable onPress={() => setLeftRailCollapsed((c) => !c)} style={{ alignSelf: leftRailCollapsed ? 'center' as any : 'flex-end' as any, padding: 4, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.06)' }}>
@@ -1052,7 +1052,9 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             </View>
           ) : (<>
           {/* Item selector (compact) */}
-          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>{clientSectionLabel.toUpperCase()}</Text>
+          <View style={{ borderRadius: 10, paddingVertical: 6, paddingHorizontal: 10, backgroundColor: acRgba(0.06), borderWidth: 1, borderColor: acRgba(0.12) }}>
+            <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>{clientSectionLabel.toUpperCase()}</Text>
+          </View>
           <ScrollView nativeID="eu-batch-list" style={{ maxHeight: isCompact ? 80 : 140 }} showsVerticalScrollIndicator={false}>
             {clients.length === 0 && <Text style={{ fontSize: 11, color: dimColor }}>No {clientSectionLabel.toLowerCase()} yet</Text>}
             {clients.map((c) => {
@@ -1061,8 +1063,8 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
               return (
                 <Pressable key={c.id} onPress={() => setSelectedClientId(c.id)}
                   style={{ flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, marginBottom: 3, backgroundColor: sel ? accentSoft : 'transparent', borderWidth: sel ? 1 : 0, borderColor: sel ? accentColor : 'transparent' }}>
-                  <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: sel ? accentColor : `${accentColor}2A`, alignItems: 'center' as any, justifyContent: 'center' as any, flexShrink: 0 }}>
-                    <Text style={{ fontSize: 9, fontWeight: '800', color: sel ? accentTextColor : accentColor }}>{initials}</Text>
+                  <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: sel ? accentColor : `${accentColor}2A`, alignItems: 'center' as any, justifyContent: 'center' as any, flexShrink: 0, ...(Platform.OS === 'web' && sel ? { boxShadow: `0 2px 8px ${acRgba(0.35)}` } as any : {}) }}>
+                    <Text style={{ fontSize: 10, fontWeight: '800', color: sel ? accentTextColor : accentColor }}>{initials}</Text>
                   </View>
                   <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? '#FFFFFF' : dimColor, flex: 1 }} numberOfLines={1}>{getItemTitle(c)}</Text>
                 </Pressable>
@@ -1070,12 +1072,14 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             })}
           </ScrollView>
 
-          <Pressable nativeID="eu-new-batch" onPress={() => setIntakeModalOpen(true)} style={{ paddingVertical: 7, paddingHorizontal: 10, borderRadius: 10, backgroundColor: accentColor, alignItems: 'center' as any }}>
+          <Pressable nativeID="eu-new-batch" onPress={() => setIntakeModalOpen(true)} style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 10, backgroundColor: accentColor, alignItems: 'center' as any, ...(Platform.OS === 'web' ? { boxShadow: `0 4px 14px ${acRgba(0.35)}` } as any : {}) }}>
             <Text style={{ fontSize: 11, fontWeight: '700', color: accentTextColor }}>+ New {clientSectionLabelSingle}</Text>
           </Pressable>
 
           {/* SubSpace list (clickable) */}
-          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>{subSpaceLabelPlural}</Text>
+          <View style={{ borderRadius: 10, paddingVertical: 6, paddingHorizontal: 10, backgroundColor: acRgba(0.06), borderWidth: 1, borderColor: acRgba(0.12) }}>
+            <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>{subSpaceLabelPlural}</Text>
+          </View>
           <ScrollView nativeID="eu-subspace-list" style={{ maxHeight: isCompact ? 100 : 160 }} showsVerticalScrollIndicator={false}>
             {visibleSubSpaces.length === 0 && <Text style={{ fontSize: 11, color: dimColor }}>No {subSpaceLabel.toLowerCase()} visible</Text>}
             {visibleSubSpaces.map((ss, ssIdx) => {
@@ -1131,11 +1135,11 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
         </View>
 
         {/* ═══════════════ CENTER STAGE ═══════════════ */}
-        <View style={[g(), { flex: 1, overflow: 'hidden' as any }]}>
+        <View style={[g(), { flex: 1, overflow: 'hidden' as any, ...(Platform.OS === 'web' ? { boxShadow: '0 2px 20px rgba(0,0,0,0.14)' } as any : {}) }]}>
 
           {/* ── Department → Workspace Navigator ── */}
           {businessFunctions.length > 0 && (
-            <View style={{ borderBottomWidth: 1, borderBottomColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.01)' }}>
+            <View style={{ borderBottomWidth: 1, borderBottomColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)' }}>
               {/* Row 1: Department tabs */}
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ borderBottomWidth: 1, borderBottomColor: mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' }}>
                 <View style={{ flexDirection: 'row', gap: 2, paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4 }}>
@@ -1203,23 +1207,23 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           </View>
 
           {/* ── KPI Strip with Sparklines ── */}
-          <View nativeID="eu-kpi-strip" style={{ flexDirection: 'row', gap: 8, padding: 12, borderBottomWidth: 1, borderBottomColor: mode === 'day' ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)', flexWrap: 'wrap' }}
+          <View nativeID="eu-kpi-strip" style={{ flexDirection: 'row', gap: 10, padding: 14, borderBottomWidth: 1, borderBottomColor: mode === 'day' ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)', flexWrap: 'wrap' }}
             {...(Platform.OS === 'web' ? { dataSet: { animateStagger: '' } } : {})}
           >
             {[
-              { label: objectLabelPlural, value: totalRecords, color: txtColor },
-              { label: lifecycleStages.length > 0 ? 'Life Stages' : 'Stages', value: lifecycleStages.length > 0 ? lifecycleStages.length : Object.keys(stageDistribution).length, color: mode === 'day' ? '#16A34A' : '#86EFAC' },
-              { label: subSpaceLabelPlural, value: visibleSubSpaces.length, color: mode === 'day' ? '#7C3AED' : '#C4B5FD' },
-              { label: exceptionCount > 0 ? 'Alerts' : 'On Track', value: exceptionCount > 0 ? exceptionCount : allRecordsForWorkspace.filter((r) => r.status !== 'Exception Review').length, color: exceptionCount > 0 ? '#EF4444' : (mode === 'day' ? '#16A34A' : '#86EFAC') },
+              { label: objectLabelPlural, value: totalRecords, color: txtColor, tint: acRgba(0.08), border: acRgba(0.18) },
+              { label: lifecycleStages.length > 0 ? 'Life Stages' : 'Stages', value: lifecycleStages.length > 0 ? lifecycleStages.length : Object.keys(stageDistribution).length, color: mode === 'day' ? '#16A34A' : '#86EFAC', tint: mode === 'day' ? 'rgba(22,163,74,0.07)' : 'rgba(134,239,172,0.08)', border: mode === 'day' ? 'rgba(22,163,74,0.18)' : 'rgba(134,239,172,0.20)' },
+              { label: subSpaceLabelPlural, value: visibleSubSpaces.length, color: mode === 'day' ? '#7C3AED' : '#C4B5FD', tint: mode === 'day' ? 'rgba(124,58,237,0.06)' : 'rgba(196,181,253,0.08)', border: mode === 'day' ? 'rgba(124,58,237,0.16)' : 'rgba(196,181,253,0.20)' },
+              { label: exceptionCount > 0 ? 'Alerts' : 'On Track', value: exceptionCount > 0 ? exceptionCount : allRecordsForWorkspace.filter((r) => r.status !== 'Exception Review').length, color: exceptionCount > 0 ? '#EF4444' : (mode === 'day' ? '#16A34A' : '#86EFAC'), tint: exceptionCount > 0 ? 'rgba(239,68,68,0.08)' : (mode === 'day' ? 'rgba(22,163,74,0.07)' : 'rgba(134,239,172,0.08)'), border: exceptionCount > 0 ? 'rgba(239,68,68,0.22)' : (mode === 'day' ? 'rgba(22,163,74,0.16)' : 'rgba(134,239,172,0.18)') },
             ].map((kpi) => (
-              <View key={kpi.label} style={{ flex: 1, minWidth: 80, alignItems: 'center' as any, padding: 8, borderRadius: 10, backgroundColor: mode === 'day' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)' }}
+              <View key={kpi.label} style={{ flex: 1, minWidth: 85, alignItems: 'center' as any, padding: 10, borderRadius: 14, backgroundColor: kpi.tint, borderWidth: 1, borderColor: kpi.border, ...(Platform.OS === 'web' ? { backdropFilter: 'blur(12px)', boxShadow: `0 2px 10px ${acRgba(0.08)}` } : {}) }}
                 {...(Platform.OS === 'web' ? { dataSet: { kpiAnimate: '' } } : {})}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Text style={{ fontSize: 22, fontWeight: '800', color: kpi.color, fontVariant: ['tabular-nums'] as any }}>{kpi.value}</Text>
+                  <Text style={{ fontSize: 24, fontWeight: '800', color: kpi.color, fontVariant: ['tabular-nums'] as any }}>{kpi.value}</Text>
                   {kpi.label === 'Records' && sparkData.length > 1 && <Sparkline data={sparkData} width={50} height={20} color={accentColor} />}
                 </View>
-                <Text style={{ fontSize: 9, fontWeight: '600', letterSpacing: 0.5, textTransform: 'uppercase' as any, color: dimColor, marginTop: 2 }}>{kpi.label}</Text>
+                <Text style={{ fontSize: 9, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase' as any, color: dimColor, marginTop: 3 }}>{kpi.label}</Text>
               </View>
             ))}
             {/* Stage distribution pills inline */}
@@ -1243,11 +1247,11 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           {!selectedSubSpaceId && workspace && (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12, paddingTop: 10, paddingBottom: 4 }}>
               {workspace.icon ? (
-                <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: `${accentColor}22`, alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: `${accentColor}22`, alignItems: 'center' as any, justifyContent: 'center' as any, borderWidth: 1, borderColor: acRgba(0.18), ...(Platform.OS === 'web' ? { boxShadow: `0 2px 8px ${acRgba(0.15)}` } as any : {}) }}>
                   <Text style={{ fontSize: 22 }}>{workspace.icon}</Text>
                 </View>
               ) : (
-                <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: `${accentColor}22`, alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: `${accentColor}22`, alignItems: 'center' as any, justifyContent: 'center' as any, borderWidth: 1, borderColor: acRgba(0.18), ...(Platform.OS === 'web' ? { boxShadow: `0 2px 8px ${acRgba(0.15)}` } as any : {}) }}>
                   <Text style={{ fontSize: 18, fontWeight: '800', color: accentColor }}>{(workspaceStepTitles[workspace.id] ?? workspace.name).slice(0, 2)}</Text>
                 </View>
               )}
@@ -1277,7 +1281,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
                 {recentlyViewed.map((rec) => (
                   <Pressable key={`rv-${rec.id}`} onPress={() => { setSelectedDrawerRecord(rec); setRecordDrawerVisible(true); }}
-                    style={{ ...g(0.04), padding: 10, width: 180, gap: 2 }}
+                    style={{ ...g(0.05), padding: 12, width: 190, gap: 3, borderWidth: 1, borderColor: acRgba(0.14), ...(Platform.OS === 'web' ? { boxShadow: `0 2px 10px ${acRgba(0.10)}`, transition: 'box-shadow 0.2s, transform 0.15s' } as any : {}) }}
                     {...(Platform.OS === 'web' ? { dataSet: { scaleIn: '' } } : {})}
                   >
                     <Text style={{ fontSize: 11, fontWeight: '700', color: txtColor }} numberOfLines={1}>{rec.title}</Text>
@@ -1351,7 +1355,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                 })();
                 return (
                   <Pressable key={ss.id} onPress={() => setSelectedSubSpaceId(ss.id)}
-                    style={{ width: isCompact ? '100%' as any : '48%' as any, ...g(0.04), padding: 16, gap: 8 }}
+                    style={{ width: isCompact ? '100%' as any : '48%' as any, ...g(0.04), padding: 16, gap: 8, ...(Platform.OS === 'web' ? { boxShadow: `0 2px 14px ${acRgba(0.10)}`, transition: 'box-shadow 0.2s, transform 0.15s' } as any : {}) }}
                     {...(Platform.OS === 'web' ? { dataSet: { scaleIn: '' } } : {})}>
                     {/* Card header: icon + name + count badge */}
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -1421,7 +1425,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                   <Pressable onPress={exportPdf} style={{ paddingHorizontal: 8, paddingVertical: 5, borderRadius: 8, backgroundColor: subtleBg, borderWidth: 1, borderColor: subtleBorder }}>
                     <Text style={{ fontSize: 9, fontWeight: '700', color: dimColor }}>Print</Text>
                   </Pressable>
-                  <Pressable nativeID="eu-create-record" onPress={() => setCreateModalOpen(true)} style={{ paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8, backgroundColor: accentColor }}>
+                  <Pressable nativeID="eu-create-record" onPress={() => setCreateModalOpen(true)} style={{ paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8, backgroundColor: accentColor, ...(Platform.OS === 'web' ? { boxShadow: `0 3px 12px ${acRgba(0.35)}` } as any : {}) }}>
                     <Text style={{ fontSize: 10, fontWeight: '700', color: accentTextColor }}>+ Record</Text>
                   </Pressable>
                 </View>
@@ -1543,7 +1547,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                               if (selectedRecordIds.size > 0) { toggleRecordSelection(rec.id); return; }
                               trackRecentView(rec); setSelectedDrawerRecord(rec); setRecordDrawerVisible(true);
                             }}
-                            style={{ flex: 1, ...g(0.03), padding: 12, gap: 6, ...(isSelected ? { borderColor: `${accentColor}BB`, borderWidth: 1.5, backgroundColor: `${accentColor}0A` } as any : {}) }}
+                            style={{ flex: 1, ...g(0.05), padding: 14, gap: 8, ...(isSelected ? { borderColor: `${accentColor}BB`, borderWidth: 1.5, backgroundColor: `${accentColor}0A` } as any : {}), ...(Platform.OS === 'web' ? { boxShadow: '0 2px 12px rgba(0,0,0,0.10)', transition: 'box-shadow 0.2s, transform 0.15s' } as any : {}) }}
                             {...(Platform.OS === 'web' ? { dataSet: { animateIn: '' } } : {})}
                           >
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -1560,13 +1564,13 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                         </View>
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                           {rec.amount != null && (
-                            <View style={{ gap: 1 }}>
+                            <View style={{ gap: 1, backgroundColor: mode === 'day' ? 'rgba(22,163,74,0.06)' : 'rgba(134,239,172,0.06)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
                               <Text style={{ fontSize: 9, color: dimColor, textTransform: 'uppercase' as any }}>Amount</Text>
                               <Text style={{ fontSize: 12, fontWeight: '600', color: mode === 'day' ? '#16A34A' : '#86EFAC' }}>{fmtAmount(rec.amount)}</Text>
                             </View>
                           )}
                           {Object.entries(rec.data).slice(0, 4).map(([key, val]) => (
-                          <View key={`d-${rec.id}-${key}`} style={{ gap: 1 }}>
+                          <View key={`d-${rec.id}-${key}`} style={{ gap: 1, backgroundColor: subtleBg, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
                             <Text style={{ fontSize: 9, color: dimColor, textTransform: 'uppercase' as any }}>{key}</Text>
                             <Text style={{ fontSize: 11, color: txtColor }}>{typeof val === 'number' ? (isPharmWorkspace ? val.toLocaleString() : fmtMoney(val)) : String(val)}</Text>
                           </View>
@@ -1673,10 +1677,10 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
       {/* ═══════════════ INTAKE MODAL ═══════════════ */}
       <Modal transparent visible={intakeModalOpen} animationType="fade" onRequestClose={() => setIntakeModalOpen(false)}>
         <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => setIntakeModalOpen(false)}>
-          <Pressable onPress={() => {}} style={{ width: 440, maxWidth: '92%' as any, maxHeight: '85%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any }}>
-            <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Pressable onPress={() => {}} style={{ width: 440, maxWidth: '92%' as any, maxHeight: '85%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any, ...(Platform.OS === 'web' ? { boxShadow: `0 8px 40px ${acRgba(0.22)}, 0 2px 12px rgba(0,0,0,0.4)` } as any : {}) }}>
+            <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: acRgba(0.12), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: acRgba(0.06) }}>
               <Text style={{ fontSize: 16, fontWeight: '800', color: '#FFFFFF' }}>New {subjectSingular}</Text>
-              <Pressable onPress={() => setIntakeModalOpen(false)} style={{ padding: 6 }}>
+              <Pressable onPress={() => setIntakeModalOpen(false)} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
                 <Text style={{ fontSize: 14, color: dimColor }}>✕</Text>
               </Pressable>
             </View>
@@ -1721,12 +1725,12 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
       {/* ═══════════════ CREATE RECORD MODAL ═══════════════ */}
       <Modal transparent visible={createModalOpen} animationType="fade" onRequestClose={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); setCustomTags([]); setCustomTagInput(''); }}>
         <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); setCustomTags([]); setCustomTagInput(''); }}>
-          <Pressable onPress={() => {}} style={{ width: 520, maxWidth: '94%' as any, maxHeight: '88%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any }}>
+          <Pressable onPress={() => {}} style={{ width: 520, maxWidth: '94%' as any, maxHeight: '88%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any, ...(Platform.OS === 'web' ? { boxShadow: `0 8px 40px ${acRgba(0.22)}, 0 2px 12px rgba(0,0,0,0.4)` } as any : {}) }}>
             {/* ── Modal Header ── */}
-            <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 0, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' }}>
+            <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 0, borderBottomWidth: 1, borderBottomColor: acRgba(0.12), backgroundColor: acRgba(0.06) }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12 }}>
                 <Text style={{ fontSize: 16, fontWeight: '800', color: '#FFFFFF' }}>Create Record</Text>
-                <Pressable onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); setCustomTags([]); setCustomTagInput(''); }} style={{ padding: 6 }}>
+                <Pressable onPress={() => { setCreateModalOpen(false); setCreateTab('form'); setCsvText(''); setCsvPreviewRows([]); setCsvImportError(''); setBarcodeInput(''); setBarcodeApplied(false); setBarcodeDatasetResult(null); setQrCodeData(''); setFdaSelectedDrug(null); setCustomTags([]); setCustomTagInput(''); }} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
                   <Text style={{ fontSize: 14, color: dimColor }}>✕</Text>
                 </Pressable>
               </View>
@@ -2191,10 +2195,10 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
       {/* ═══════════════ TIMELINE MODAL ═══════════════ */}
       <Modal transparent visible={timelineModalOpen} animationType="fade" onRequestClose={() => setTimelineModalOpen(false)}>
         <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => setTimelineModalOpen(false)}>
-          <Pressable onPress={() => {}} style={{ width: 520, maxWidth: '92%' as any, maxHeight: '80%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any }}>
-            <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Pressable onPress={() => {}} style={{ width: 520, maxWidth: '92%' as any, maxHeight: '80%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any, ...(Platform.OS === 'web' ? { boxShadow: `0 8px 40px ${acRgba(0.22)}, 0 2px 12px rgba(0,0,0,0.4)` } as any : {}) }}>
+            <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: acRgba(0.12), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: acRgba(0.06) }}>
               <Text style={{ fontSize: 16, fontWeight: '800', color: '#FFFFFF' }}>Activity Timeline</Text>
-              <Pressable onPress={() => setTimelineModalOpen(false)} style={{ padding: 6 }}><Text style={{ fontSize: 14, color: dimColor }}>✕</Text></Pressable>
+              <Pressable onPress={() => setTimelineModalOpen(false)} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center' as any, justifyContent: 'center' as any }}><Text style={{ fontSize: 14, color: dimColor }}>✕</Text></Pressable>
             </View>
             <ScrollView style={{ padding: 16 }} contentContainerStyle={{ gap: 8, paddingBottom: 16 }}>
               {mergedTimeline.length === 0 && <Text style={{ fontSize: 12, color: dimColor }}>No activity recorded yet.</Text>}
@@ -2217,10 +2221,10 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
       {/* ═══════════════ SIGNAL FLOWS MODAL ═══════════════ */}
       <Modal transparent visible={flowsModalOpen} animationType="fade" onRequestClose={() => setFlowsModalOpen(false)}>
         <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => setFlowsModalOpen(false)}>
-          <Pressable onPress={() => {}} style={{ width: 480, maxWidth: '92%' as any, maxHeight: '80%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any }}>
-            <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Pressable onPress={() => {}} style={{ width: 480, maxWidth: '92%' as any, maxHeight: '80%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any, ...(Platform.OS === 'web' ? { boxShadow: `0 8px 40px ${acRgba(0.22)}, 0 2px 12px rgba(0,0,0,0.4)` } as any : {}) }}>
+            <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: acRgba(0.12), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: acRgba(0.06) }}>
               <Text style={{ fontSize: 16, fontWeight: '800', color: '#FFFFFF' }}>Signal Flows</Text>
-              <Pressable onPress={() => setFlowsModalOpen(false)} style={{ padding: 6 }}><Text style={{ fontSize: 14, color: dimColor }}>✕</Text></Pressable>
+              <Pressable onPress={() => setFlowsModalOpen(false)} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center' as any, justifyContent: 'center' as any }}><Text style={{ fontSize: 14, color: dimColor }}>✕</Text></Pressable>
             </View>
             <ScrollView style={{ padding: 16 }} contentContainerStyle={{ gap: 8, paddingBottom: 16 }}>
               {wsFlows.length === 0 && <Text style={{ fontSize: 12, color: dimColor }}>No flows connected to this workspace.</Text>}

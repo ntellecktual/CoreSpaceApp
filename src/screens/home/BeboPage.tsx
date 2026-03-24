@@ -1,7 +1,7 @@
 /**
- * BeboPage — Conference-grade CEO Demo Experience
- * Six industry verticals, inline AI chat, rich card rendering,
- * and one-click workspace/data apply to the live app state.
+ * BeboPage — Seamless AI Chat Experience
+ * Friendly, intuitive interface with industry verticals, inline AI chat,
+ * rich card rendering, and one-click workspace/data apply.
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -10,10 +10,10 @@ import {
   ScrollView,
   Text,
   TextInput,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
+import { InteractivePressable as Pressable } from '../../components/InteractivePressable';
 import { useAppState } from '../../context/AppStateContext';
 import { useUiTheme } from '../../context/UiThemeContext';
 import {
@@ -49,8 +49,14 @@ interface ChatMsg {
 
 const VERTICALS: DemoVertical[] = ['pharma', 'sales', 'healthcare', 'logistics', 'legal', 'insurance', 'lifecycle', 'fulfillment', 'kitting'];
 
+// Friendly labels a first-time user would understand
+const FRIENDLY_LABELS: Record<DemoVertical, string> = {
+  pharma: 'Pharmacy', sales: 'Sales', healthcare: 'Healthcare', logistics: 'Shipping',
+  legal: 'Legal', insurance: 'Insurance', lifecycle: 'Services', fulfillment: 'Warehouse', kitting: 'Assembly',
+};
+
 const DEMO_QUICK_PROMPTS: Record<DemoVertical, string[]> = {
-  pharma:      ['Build workspace architecture', 'Generate DSCSA records', 'Show Signal flows', 'Show Orbital integrations'],
+  pharma:      ['Apply full scenario now', 'Generate sample data', 'Show Signal flows', 'Show Orbital integrations'],
   sales:       ['Build Sales Pipeline workspace', 'Generate deal data', 'Show automation flows', 'Show Orbital'],
   healthcare:  ['Build Patient Care workspace',  'Generate patient data', 'Show automation flows', 'Show Orbital'],
   logistics:   ['Build Fulfillment workspace',   'Generate shipment data','Show automation flows', 'Show Orbital'],
@@ -83,9 +89,9 @@ function downloadFile(content: string, filename: string, mime: string) {
 function MarkdownText({ text, bodyColor, subtleColor }: { text: string; bodyColor: string; subtleColor: string }) {
   const lines = text.split('\n');
   return (
-    <View style={{ gap: 2 }}>
+    <View style={{ gap: 3 }}>
       {lines.map((line, i) => {
-        if (!line.trim()) return <View key={i} style={{ height: 4 }} />;
+        if (!line.trim()) return <View key={i} style={{ height: 6 }} />;
         const parts: React.ReactNode[] = [];
         let rem = line;
         let k = 0;
@@ -100,7 +106,7 @@ function MarkdownText({ text, bodyColor, subtleColor }: { text: string; bodyColo
             break;
           }
         }
-        return <Text key={i} style={{ fontSize: 14, lineHeight: 22 }}>{parts}</Text>;
+        return <Text key={i} style={{ fontSize: 15, lineHeight: 24 }}>{parts}</Text>;
       })}
     </View>
   );
@@ -118,24 +124,24 @@ function WorkspaceProposalCard({
 }) {
   const totalSS = card.workspaces.reduce((a, w) => a + w.subSpaces.length, 0);
   return (
-    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 12, padding: 14, marginTop: 10, gap: 10 } as any}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <View style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: `${accent}22`, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontSize: 15 }}>🗂️</Text>
+    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 14 } as any}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: `${accent}22`, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 18 }}>🗂️</Text>
         </View>
-        <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 13, flex: 1 }}>{card.industry} — Workspace Blueprint</Text>
+        <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 15, flex: 1 }}>{card.industry} — Workspace Blueprint</Text>
       </View>
 
       {/* Workspaces */}
-      <View style={{ gap: 7 }}>
+      <View style={{ gap: 8 }}>
         {card.workspaces.map((ws, wi) => (
-          <View key={wi} style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: 9, gap: 5 }}>
-            <Text style={{ color: '#E8E4FF', fontWeight: '600', fontSize: 12 }}>{ws.icon} {ws.name}</Text>
-            <Text style={{ color: 'rgba(232,228,255,0.45)', fontSize: 10 }}>Root Entity: {ws.rootEntity}</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 2 }}>
+          <View key={wi} style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 12, gap: 6 }}>
+            <Text style={{ color: '#E8E4FF', fontWeight: '700', fontSize: 14 }}>{ws.icon} {ws.name}</Text>
+            <Text style={{ color: 'rgba(232,228,255,0.50)', fontSize: 12 }}>Root Entity: {ws.rootEntity}</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 2 }}>
               {ws.subSpaces.map((ss, si) => (
-                <View key={si} style={{ backgroundColor: `${accent}18`, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
-                  <Text style={{ color: accent, fontSize: 9, fontWeight: '600' }}>{ss.name} · {ss.fieldCount}f · {ss.displayType}</Text>
+                <View key={si} style={{ backgroundColor: `${accent}18`, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
+                  <Text style={{ color: accent, fontSize: 11, fontWeight: '600' }}>{ss.name} · {ss.fieldCount} fields · {ss.displayType}</Text>
                 </View>
               ))}
             </View>
@@ -144,7 +150,7 @@ function WorkspaceProposalCard({
       </View>
 
       {/* Stats row */}
-      <View style={{ flexDirection: 'row', gap: 20 }}>
+      <View style={{ flexDirection: 'row', gap: 20, justifyContent: 'center', paddingVertical: 6 }}>
         {[
           { label: 'Workspaces', v: card.workspaces.length },
           { label: 'SubSpaces', v: totalSS },
@@ -152,27 +158,26 @@ function WorkspaceProposalCard({
           { label: 'Stages', v: card.lifecycleStages.length },
           { label: 'Flows', v: card.flows.length },
         ].map((m, i) => (
-          <View key={i} style={{ alignItems: 'center' }}>
-            <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: 15 }}>{m.v}</Text>
-            <Text style={{ color: 'rgba(232,228,255,0.45)', fontSize: 9 }}>{m.label}</Text>
+          <View key={i} style={{ alignItems: 'center', gap: 2 }}>
+            <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: 18 }}>{m.v}</Text>
+            <Text style={{ color: 'rgba(232,228,255,0.50)', fontSize: 11 }}>{m.label}</Text>
           </View>
         ))}
       </View>
 
       {/* Apply button */}
-      <TouchableOpacity
+      <Pressable
         onPress={() => !applied && onApply(card.applyPayload)}
-        activeOpacity={applied ? 1 : 0.8}
         style={{
           backgroundColor: applied ? 'rgba(34,197,94,0.16)' : accent,
           borderWidth: 1, borderColor: applied ? '#22C55E' : 'transparent',
-          borderRadius: 8, paddingVertical: 10, alignItems: 'center',
+          borderRadius: 12, paddingVertical: 14, alignItems: 'center',
         } as any}
       >
-        <Text style={{ color: applied ? '#22C55E' : '#FFFFFF', fontWeight: '700', fontSize: 13 }}>
+        <Text style={{ color: applied ? '#22C55E' : '#FFFFFF', fontWeight: '700', fontSize: 15 }}>
           {applied ? '✅  Applied to CoreSpace' : 'Apply Full Scenario  →'}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }
@@ -181,40 +186,42 @@ function DataPreviewCard({ card, accent, vertical }: { card: BeboCardDataPreview
   const [fmt, setFmt] = useState<'csv' | 'json'>('csv');
   const slug = VERTICAL_META[vertical].shortLabel.toLowerCase();
   return (
-    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 12, padding: 14, marginTop: 10, gap: 10 } as any}>
+    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 12 } as any}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 12, flex: 1 }}>{card.title}</Text>
-        <Text style={{ color: 'rgba(232,228,255,0.4)', fontSize: 10 }}>{card.totalRows} records</Text>
+        <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14, flex: 1 }}>{card.title}</Text>
+        <View style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 }}>
+          <Text style={{ color: 'rgba(232,228,255,0.5)', fontSize: 12, fontWeight: '600' }}>{card.totalRows} records</Text>
+        </View>
       </View>
 
       {/* Format toggle */}
-      <View style={{ flexDirection: 'row', gap: 5 }}>
+      <View style={{ flexDirection: 'row', gap: 6, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: 3, alignSelf: 'flex-start' }}>
         {(['csv', 'json'] as const).map(f => (
-          <TouchableOpacity key={f} onPress={() => setFmt(f)}
-            style={{ backgroundColor: fmt === f ? accent : 'rgba(255,255,255,0.07)', borderRadius: 5, paddingHorizontal: 9, paddingVertical: 3 }}>
-            <Text style={{ color: fmt === f ? '#FFFFFF' : 'rgba(232,228,255,0.5)', fontSize: 10, fontWeight: '700', textTransform: 'uppercase' }}>{f}</Text>
-          </TouchableOpacity>
+          <Pressable key={f} onPress={() => setFmt(f)}
+            style={{ backgroundColor: fmt === f ? accent : 'transparent', borderRadius: 8, paddingHorizontal: 14, paddingVertical: 6 }}>
+            <Text style={{ color: fmt === f ? '#FFFFFF' : 'rgba(232,228,255,0.5)', fontSize: 12, fontWeight: '700', textTransform: 'uppercase' as any }}>{f}</Text>
+          </Pressable>
         ))}
       </View>
 
       {/* CSV preview table */}
       {fmt === 'csv' && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ borderRadius: 6 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ borderRadius: 10 }}>
           <View>
-            <View style={{ flexDirection: 'row', backgroundColor: `${accent}22`, paddingVertical: 4, borderRadius: 4 }}>
+            <View style={{ flexDirection: 'row', backgroundColor: `${accent}22`, paddingVertical: 6, borderRadius: 6 }}>
               {card.headers.slice(0, 5).map((h, i) => (
-                <Text key={i} style={{ color: accent, fontSize: 9, fontWeight: '700', width: 115, paddingHorizontal: 6 }}>{h}</Text>
+                <Text key={i} style={{ color: accent, fontSize: 11, fontWeight: '700', width: 125, paddingHorizontal: 8 }}>{h}</Text>
               ))}
             </View>
             {card.rows.slice(0, 4).map((row, ri) => (
-              <View key={ri} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)', paddingVertical: 4 }}>
+              <View key={ri} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)', paddingVertical: 6 }}>
                 {row.slice(0, 5).map((cell, ci) => (
-                  <Text key={ci} numberOfLines={1} style={{ color: 'rgba(232,228,255,0.60)', fontSize: 9, width: 115, paddingHorizontal: 6 }}>{cell}</Text>
+                  <Text key={ci} numberOfLines={1} style={{ color: 'rgba(232,228,255,0.65)', fontSize: 11, width: 125, paddingHorizontal: 8 }}>{cell}</Text>
                 ))}
               </View>
             ))}
-            <Text style={{ color: 'rgba(232,228,255,0.30)', fontSize: 9, paddingTop: 4, paddingHorizontal: 6 }}>
-              Showing 4 of {card.totalRows} rows · {card.headers.length} cols
+            <Text style={{ color: 'rgba(232,228,255,0.35)', fontSize: 11, paddingTop: 6, paddingHorizontal: 8 }}>
+              Showing 4 of {card.totalRows} rows · {card.headers.length} columns
             </Text>
           </View>
         </ScrollView>
@@ -222,27 +229,27 @@ function DataPreviewCard({ card, accent, vertical }: { card: BeboCardDataPreview
 
       {/* JSON preview */}
       {fmt === 'json' && (
-        <ScrollView style={{ maxHeight: 110, backgroundColor: 'rgba(0,0,0,0.20)', borderRadius: 6, padding: 8 }} showsVerticalScrollIndicator={false}>
-          <Text style={{ color: 'rgba(232,228,255,0.60)', fontSize: 9, fontFamily: 'monospace' }}>
+        <ScrollView style={{ maxHeight: 120, backgroundColor: 'rgba(0,0,0,0.20)', borderRadius: 10, padding: 10 }} showsVerticalScrollIndicator={false}>
+          <Text style={{ color: 'rgba(232,228,255,0.65)', fontSize: 11, fontFamily: 'monospace' }}>
             {card.jsonContent.slice(0, 500)}{card.jsonContent.length > 500 ? '\n…' : ''}
           </Text>
         </ScrollView>
       )}
 
       {/* Actions */}
-      <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
-        <TouchableOpacity onPress={() => downloadFile(card.csvContent, `corespace-${slug}.csv`, 'text/csv')}
-          style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 6, paddingHorizontal: 9, paddingVertical: 5 }}>
-          <Text style={{ color: 'rgba(232,228,255,0.65)', fontSize: 10, fontWeight: '600' }}>⬇ CSV</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => downloadFile(card.jsonContent, `corespace-${slug}.json`, 'application/json')}
-          style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 6, paddingHorizontal: 9, paddingVertical: 5 }}>
-          <Text style={{ color: 'rgba(232,228,255,0.65)', fontSize: 10, fontWeight: '600' }}>⬇ JSON</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => downloadFile(card.csvContent, `corespace-${slug}.csv`, 'text/csv')}
-          style={{ backgroundColor: `${accent}22`, borderWidth: 1, borderColor: `${accent}55`, borderRadius: 6, paddingHorizontal: 9, paddingVertical: 5 } as any}>
-          <Text style={{ color: accent, fontSize: 10, fontWeight: '600' }}>🌐 Import to Cosmograph</Text>
-        </TouchableOpacity>
+      <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+        <Pressable onPress={() => downloadFile(card.csvContent, `corespace-${slug}.csv`, 'text/csv')}
+          style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 }}>
+          <Text style={{ color: 'rgba(232,228,255,0.70)', fontSize: 12, fontWeight: '600' }}>⬇ CSV</Text>
+        </Pressable>
+        <Pressable onPress={() => downloadFile(card.jsonContent, `corespace-${slug}.json`, 'application/json')}
+          style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 }}>
+          <Text style={{ color: 'rgba(232,228,255,0.70)', fontSize: 12, fontWeight: '600' }}>⬇ JSON</Text>
+        </Pressable>
+        <Pressable onPress={() => downloadFile(card.csvContent, `corespace-${slug}.csv`, 'text/csv')}
+          style={{ backgroundColor: `${accent}22`, borderWidth: 1, borderColor: `${accent}55`, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 } as any}>
+          <Text style={{ color: accent, fontSize: 12, fontWeight: '600' }}>🌐 Import to Cosmograph</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -250,24 +257,24 @@ function DataPreviewCard({ card, accent, vertical }: { card: BeboCardDataPreview
 
 function IntegrationStatusCard({ card, accent }: { card: BeboCardIntegrationStatus; accent: string }) {
   return (
-    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 12, padding: 14, marginTop: 10, gap: 10 } as any}>
-      <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 12 }}>Orbital Integration Status</Text>
-      <View style={{ gap: 7 }}>
+    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 12 } as any}>
+      <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>🔗 Orbital Integrations</Text>
+      <View style={{ gap: 8 }}>
         {card.integrations.map((intg, i) => (
-          <View key={i} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: 9, gap: 9 }}>
-            <Text style={{ fontSize: 16 }}>{intg.icon}</Text>
+          <View key={i} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 12, gap: 10 }}>
+            <Text style={{ fontSize: 20 }}>{intg.icon}</Text>
             <View style={{ flex: 1 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Text style={{ color: '#E8E4FF', fontWeight: '600', fontSize: 11 }}>{intg.name}</Text>
-                <View style={{ backgroundColor: intg.status === 'active' ? 'rgba(34,197,94,0.18)' : 'rgba(255,255,255,0.08)', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1 }}>
-                  <Text style={{ color: intg.status === 'active' ? '#22C55E' : 'rgba(232,228,255,0.40)', fontSize: 8, fontWeight: '700', textTransform: 'uppercase' }}>{intg.status}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Text style={{ color: '#E8E4FF', fontWeight: '700', fontSize: 13 }}>{intg.name}</Text>
+                <View style={{ backgroundColor: intg.status === 'active' ? 'rgba(34,197,94,0.18)' : 'rgba(255,255,255,0.08)', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 }}>
+                  <Text style={{ color: intg.status === 'active' ? '#22C55E' : 'rgba(232,228,255,0.45)', fontSize: 10, fontWeight: '700', textTransform: 'uppercase' as any }}>{intg.status}</Text>
                 </View>
               </View>
-              <Text style={{ color: 'rgba(232,228,255,0.40)', fontSize: 9 }}>
+              <Text style={{ color: 'rgba(232,228,255,0.45)', fontSize: 11, marginTop: 2 }}>
                 {intg.status === 'active' ? `${intg.lastSync} · ${intg.eventsToday} events today` : `${intg.category} · Ready to activate`}
               </Text>
             </View>
-            {intg.status === 'active' && <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: '#22C55E' }} />}
+            {intg.status === 'active' && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#22C55E' }} />}
           </View>
         ))}
       </View>
@@ -284,52 +291,51 @@ function SignalFlowsCard({
   accent: string;
 }) {
   return (
-    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 12, padding: 14, marginTop: 10, gap: 10 } as any}>
-      <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 12 }}>⚡ Signal Studio Flows</Text>
-      <View style={{ gap: 8 }}>
+    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 12 } as any}>
+      <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>⚡ Automation Flows</Text>
+      <View style={{ gap: 10 }}>
         {card.flows.map((fl, i) => (
-          <View key={i} style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: 9, gap: 5 }}>
-            <Text style={{ color: '#E8E4FF', fontWeight: '600', fontSize: 11 }}>{fl.name}</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
-              <View style={{ backgroundColor: 'rgba(59,130,246,0.18)', borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1 }}>
-                <Text style={{ color: '#60A5FA', fontSize: 8, fontWeight: '700' }}>TRIGGER</Text>
+          <View key={i} style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 12, gap: 6 }}>
+            <Text style={{ color: '#E8E4FF', fontWeight: '700', fontSize: 13 }}>{fl.name}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+              <View style={{ backgroundColor: 'rgba(59,130,246,0.18)', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 }}>
+                <Text style={{ color: '#60A5FA', fontSize: 10, fontWeight: '700' }}>TRIGGER</Text>
               </View>
-              <Text style={{ color: 'rgba(232,228,255,0.55)', fontSize: 10, flex: 1 }}>{fl.trigger}</Text>
+              <Text style={{ color: 'rgba(232,228,255,0.60)', fontSize: 12, flex: 1 }}>{fl.trigger}</Text>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 5 }}>
-              <View style={{ backgroundColor: `${accent}22`, borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1, marginTop: 1 }}>
-                <Text style={{ color: accent, fontSize: 8, fontWeight: '700' }}>ACTION</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 6 }}>
+              <View style={{ backgroundColor: `${accent}22`, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2, marginTop: 1 }}>
+                <Text style={{ color: accent, fontSize: 10, fontWeight: '700' }}>ACTION</Text>
               </View>
-              <Text style={{ color: 'rgba(232,228,255,0.55)', fontSize: 10, flex: 1, lineHeight: 15 }}>{fl.action}</Text>
+              <Text style={{ color: 'rgba(232,228,255,0.60)', fontSize: 12, flex: 1, lineHeight: 18 }}>{fl.action}</Text>
             </View>
-            <Text style={{ color: 'rgba(232,228,255,0.30)', fontSize: 9 }}>{fl.runsToday} runs today</Text>
+            <Text style={{ color: 'rgba(232,228,255,0.35)', fontSize: 11 }}>{fl.runsToday} runs today</Text>
           </View>
         ))}
       </View>
-      <TouchableOpacity
+      <Pressable
         onPress={() => !applied && onApply(card.applyPayload)}
-        activeOpacity={applied ? 1 : 0.8}
-        style={{ backgroundColor: applied ? 'rgba(34,197,94,0.16)' : `${accent}dd`, borderWidth: 1, borderColor: applied ? '#22C55E' : 'transparent', borderRadius: 8, paddingVertical: 9, alignItems: 'center' } as any}
+        style={{ backgroundColor: applied ? 'rgba(34,197,94,0.16)' : `${accent}dd`, borderWidth: 1, borderColor: applied ? '#22C55E' : 'transparent', borderRadius: 12, paddingVertical: 12, alignItems: 'center' } as any}
       >
-        <Text style={{ color: applied ? '#22C55E' : '#FFFFFF', fontWeight: '700', fontSize: 11 }}>
+        <Text style={{ color: applied ? '#22C55E' : '#FFFFFF', fontWeight: '700', fontSize: 13 }}>
           {applied ? '✅  Flows Published' : '⚡  Publish All Flows'}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }
 
 function StatsCard({ card, accent }: { card: BeboCardStats; accent: string }) {
   return (
-    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 12, padding: 14, marginTop: 10, gap: 10 } as any}>
-      <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 12 }}>📊 Platform Analytics</Text>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}>
+    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 12 } as any}>
+      <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>📊 Platform Analytics</Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
         {card.stats.map((s, i) => (
-          <View key={i} style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: 10, minWidth: 120, flex: 1, gap: 3 }}>
-            <Text style={{ fontSize: 16 }}>{s.icon}</Text>
-            <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: 18, letterSpacing: -0.5 }}>{s.value}</Text>
-            <Text style={{ color: 'rgba(232,228,255,0.50)', fontSize: 10 }}>{s.label}</Text>
-            {s.delta && <Text style={{ color: s.positive ? '#22C55E' : '#F87171', fontSize: 9, fontWeight: '600' }}>{s.positive ? '↑' : '↓'} {s.delta}</Text>}
+          <View key={i} style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: 14, minWidth: 130, flex: 1, gap: 4 }}>
+            <Text style={{ fontSize: 20 }}>{s.icon}</Text>
+            <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: 22, letterSpacing: -0.5 }}>{s.value}</Text>
+            <Text style={{ color: 'rgba(232,228,255,0.55)', fontSize: 12 }}>{s.label}</Text>
+            {s.delta && <Text style={{ color: s.positive ? '#22C55E' : '#F87171', fontSize: 11, fontWeight: '600' }}>{s.positive ? '↑' : '↓'} {s.delta}</Text>}
           </View>
         ))}
       </View>
@@ -346,40 +352,40 @@ function ArchitectureCard({
   accent: string;
 }) {
   return (
-    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 16, gap: 12, borderWidth: 1, borderColor: `${accent}30` }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Text style={{ fontSize: 18 }}>🏗️</Text>
+    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: 18, gap: 14, borderWidth: 1, borderColor: `${accent}30` }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <Text style={{ fontSize: 22 }}>🏗️</Text>
         <View style={{ flex: 1 }}>
-          <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>Business Architecture</Text>
-          <Text style={{ color: '#9CA3AF', fontSize: 11 }}>{card.industry}</Text>
+          <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 16 }}>Business Architecture</Text>
+          <Text style={{ color: '#9CA3AF', fontSize: 12 }}>{card.industry}</Text>
         </View>
-        <View style={{ backgroundColor: `${accent}20`, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
-          <Text style={{ color: accent, fontSize: 10, fontWeight: '700' }}>{card.functions.length} department{card.functions.length !== 1 ? 's' : ''}</Text>
+        <View style={{ backgroundColor: `${accent}20`, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 }}>
+          <Text style={{ color: accent, fontSize: 12, fontWeight: '700' }}>{card.functions.length} dept{card.functions.length !== 1 ? 's' : ''}</Text>
         </View>
       </View>
 
       {card.functions.map((fn) => (
-        <View key={fn.fnId} style={{ borderLeftWidth: 3, borderLeftColor: fn.color, paddingLeft: 12, gap: 6 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Text style={{ fontSize: 14 }}>{fn.icon}</Text>
-            <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 13 }}>{fn.name}</Text>
+        <View key={fn.fnId} style={{ borderLeftWidth: 3, borderLeftColor: fn.color, paddingLeft: 14, gap: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Text style={{ fontSize: 16 }}>{fn.icon}</Text>
+            <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 15 }}>{fn.name}</Text>
           </View>
           {!!fn.description && (
-            <Text style={{ color: '#9CA3AF', fontSize: 11 }}>{fn.description}</Text>
+            <Text style={{ color: '#9CA3AF', fontSize: 12 }}>{fn.description}</Text>
           )}
-          <View style={{ gap: 4 }}>
+          <View style={{ gap: 6 }}>
             {fn.objects.map((obj, oi) => (
-              <View key={oi} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, backgroundColor: `${fn.color}10`, borderRadius: 8, padding: 8 }}>
-                <Text style={{ fontSize: 16 }}>{obj.icon}</Text>
-                <View style={{ flex: 1, gap: 2 }}>
-                  <Text style={{ color: '#E8E4FF', fontWeight: '600', fontSize: 12 }}>{obj.name} <Text style={{ color: '#9CA3AF', fontWeight: '400' }}>({obj.namePlural})</Text></Text>
-                  {!!obj.description && <Text style={{ color: '#9CA3AF', fontSize: 10 }}>{obj.description}</Text>}
+              <View key={oi} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: `${fn.color}10`, borderRadius: 10, padding: 10 }}>
+                <Text style={{ fontSize: 18 }}>{obj.icon}</Text>
+                <View style={{ flex: 1, gap: 3 }}>
+                  <Text style={{ color: '#E8E4FF', fontWeight: '600', fontSize: 13 }}>{obj.name} <Text style={{ color: '#9CA3AF', fontWeight: '400' }}>({obj.namePlural})</Text></Text>
+                  {!!obj.description && <Text style={{ color: '#9CA3AF', fontSize: 11 }}>{obj.description}</Text>}
                   {obj.workspaceNames.length > 0 && (
-                    <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap', marginTop: 2 }}>
-                      <Text style={{ color: '#6B7280', fontSize: 9, alignSelf: 'center' }}>Links to:</Text>
+                    <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap', marginTop: 3 }}>
+                      <Text style={{ color: '#6B7280', fontSize: 10, alignSelf: 'center' }}>Links to:</Text>
                       {obj.workspaceNames.map((wn, wi) => (
-                        <View key={wi} style={{ backgroundColor: `${fn.color}20`, borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1 }}>
-                          <Text style={{ color: fn.color, fontSize: 9, fontWeight: '600' }}>{wn}</Text>
+                        <View key={wi} style={{ backgroundColor: `${fn.color}20`, borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 }}>
+                          <Text style={{ color: fn.color, fontSize: 10, fontWeight: '600' }}>{wn}</Text>
                         </View>
                       ))}
                     </View>
@@ -391,14 +397,14 @@ function ArchitectureCard({
         </View>
       ))}
 
-      <TouchableOpacity
+      <Pressable
         onPress={() => !applied && onApply(card.applyPayload)}
-        style={{ backgroundColor: applied ? '#22C55E' : accent, borderRadius: 8, paddingVertical: 10, alignItems: 'center' }}
+        style={{ backgroundColor: applied ? '#22C55E' : accent, borderRadius: 12, paddingVertical: 14, alignItems: 'center' }}
       >
-        <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 13 }}>
+        <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 15 }}>
           {applied ? '✅  Architecture Applied' : 'Apply Architecture  →'}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }
@@ -584,68 +590,66 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     <View style={{ flex: 1, backgroundColor: pal.bg }}>
 
       {/* ── Sticky Header ── */}
-      <View style={{ backgroundColor: pal.headerBg, borderBottomWidth: 1, borderBottomColor: pal.headerBorder, paddingTop: 10, paddingBottom: 8, paddingHorizontal: compact ? 10 : 18, gap: 8, backdropFilter: 'blur(20px)', zIndex: 10 } as any}>
+      <View style={{ backgroundColor: pal.headerBg, borderBottomWidth: 1, borderBottomColor: pal.headerBorder, paddingTop: 14, paddingBottom: 10, paddingHorizontal: compact ? 12 : 22, gap: 10, backdropFilter: 'blur(20px)', zIndex: 10 } as any}>
 
         {/* Title row */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <View style={{ width: 30, height: 30, borderRadius: 9, backgroundColor: `${accent}22`, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: `${accent}44` } as any}>
-            <Text style={{ fontSize: 16 }}>✦</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <View style={{ width: 42, height: 42, borderRadius: 21, backgroundColor: `${accent}22`, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: `${accent}55` } as any}>
+            <Text style={{ fontSize: 22 }}>✦</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ color: isDark ? '#FFFFFF' : '#1E1535', fontWeight: '800', fontSize: 14, letterSpacing: -0.3 }}>Bebo AI</Text>
-            <Text style={{ color: pal.subtleText, fontSize: 10 }}>Ask anything · Build workspaces, flows & data instantly</Text>
+            <Text style={{ color: isDark ? '#FFFFFF' : '#1E1535', fontWeight: '800', fontSize: 18, letterSpacing: -0.3 }}>Bebo AI</Text>
+            <Text style={{ color: pal.subtleText, fontSize: 12, lineHeight: 16 }}>Your AI assistant — ask anything or pick an industry below</Text>
           </View>
           {!!VERTICAL_META[vertical].tenantLogo && (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)' } as any}>
-              <Image source={{ uri: VERTICAL_META[vertical].tenantLogo }} style={{ width: 48, height: 16, resizeMode: 'contain' } as any} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)' } as any}>
+              <Image source={{ uri: VERTICAL_META[vertical].tenantLogo }} style={{ width: 52, height: 18, resizeMode: 'contain' } as any} />
             </View>
           )}
           {!VERTICAL_META[vertical].tenantLogo && !!VERTICAL_META[vertical].tenantName && (
-            <View style={{ backgroundColor: `${accent}18`, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1, borderColor: `${accent}30` } as any}>
-              <Text style={{ color: accent, fontSize: 10, fontWeight: '700' }}>{VERTICAL_META[vertical].tenantName}</Text>
+            <View style={{ backgroundColor: `${accent}18`, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderColor: `${accent}30` } as any}>
+              <Text style={{ color: accent, fontSize: 12, fontWeight: '700' }}>{VERTICAL_META[vertical].tenantName}</Text>
             </View>
           )}
-          {/* Org Layer button — not a template, lives in the header title row */}
-          <TouchableOpacity
-            onPress={handleUniversalSuite}
-            activeOpacity={0.75}
-            style={{
-              width: 28, height: 28, borderRadius: 8,
-              backgroundColor: isDark ? 'rgba(124,58,237,0.18)' : 'rgba(124,58,237,0.12)',
-              borderWidth: 1, borderColor: 'rgba(124,58,237,0.35)',
-              alignItems: 'center', justifyContent: 'center',
-            } as any}
-          >
-            <Text style={{ fontSize: 14 }}>🌐</Text>
-          </TouchableOpacity>
         </View>
 
-        {/* Scenario tabs */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -3 }}>
-          <View style={{ flexDirection: 'row', gap: 5, paddingHorizontal: 3 }}>
+        {/* Scenario tabs — friendly labels, bigger pills */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -4 }}>
+          <View style={{ flexDirection: 'row', gap: 6, paddingHorizontal: 4 }}>
             {VERTICALS.map(v => {
               const meta = VERTICAL_META[v];
               const active = v === vertical;
               const hasApplied = appliedVerticals.has(v);
               return (
-                <TouchableOpacity
+                <Pressable
                   key={v}
                   onPress={() => v !== vertical && switchVertical(v)}
-                  activeOpacity={0.8}
                   style={{
-                    flexDirection: 'row', alignItems: 'center', gap: 4,
+                    flexDirection: 'row', alignItems: 'center', gap: 6,
                     backgroundColor: active ? meta.color : pal.chipBg,
                     borderWidth: 1, borderColor: active ? meta.color : pal.chipBorder,
-                    borderRadius: 7, paddingHorizontal: 9, paddingVertical: 5,
+                    borderRadius: 10, paddingHorizontal: 12, paddingVertical: 7,
                   } as any}
                 >
-                  <Text style={{ fontSize: 12 }}>{meta.icon}</Text>
-                  <Text style={{ color: active ? '#FFFFFF' : pal.subtleText, fontSize: 10, fontWeight: active ? '700' : '500' }}>{meta.shortLabel}</Text>
-                  {hasApplied && <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: '#22C55E' }} />}
-                </TouchableOpacity>
+                  <Text style={{ fontSize: 14 }}>{meta.icon}</Text>
+                  <Text style={{ color: active ? '#FFFFFF' : pal.subtleText, fontSize: 13, fontWeight: active ? '700' : '500' }}>{FRIENDLY_LABELS[v]}</Text>
+                  {hasApplied && <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#22C55E' }} />}
+                </Pressable>
               );
             })}
-            {/* Universal chip removed — not a template. Org layer button lives in header title row. */}
+            {/* Org layer button — inline with vertical tabs for discoverability */}
+            <Pressable
+              onPress={handleUniversalSuite}
+              style={{
+                flexDirection: 'row', alignItems: 'center', gap: 6,
+                backgroundColor: isDark ? 'rgba(124,58,237,0.14)' : 'rgba(124,58,237,0.08)',
+                borderWidth: 1, borderColor: 'rgba(124,58,237,0.30)',
+                borderRadius: 10, paddingHorizontal: 12, paddingVertical: 7,
+              } as any}
+            >
+              <Text style={{ fontSize: 14 }}>🌐</Text>
+              <Text style={{ color: isDark ? '#A78BFA' : '#7C3AED', fontSize: 13, fontWeight: '600' }}>Org Layer</Text>
+            </Pressable>
           </View>
         </ScrollView>
       </View>
@@ -654,26 +658,28 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
       <ScrollView
         ref={scrollRef}
         style={{ flex: 1 }}
-        contentContainerStyle={{ padding: compact ? 10 : 18, gap: 10, paddingBottom: 16 }}
+        contentContainerStyle={{ padding: compact ? 12 : 22, gap: 14, paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
       >
         {messages.map(msg => (
-          <View key={msg.id} style={{ alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start', gap: 3 }}>
+          <View key={msg.id} style={{ alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start', gap: 4 }}>
             {msg.role === 'user' ? (
-              <View style={{ backgroundColor: accent, borderRadius: 14, borderBottomRightRadius: 4, paddingHorizontal: 14, paddingVertical: 10, maxWidth: compact ? '88%' : 560 }}>
-                <Text style={{ color: '#FFFFFF', fontSize: 14, lineHeight: 22 }}>{msg.text}</Text>
+              <View style={{ backgroundColor: accent, borderRadius: 18, borderBottomRightRadius: 6, paddingHorizontal: 18, paddingVertical: 14, maxWidth: compact ? '88%' : 560 }}>
+                <Text style={{ color: '#FFFFFF', fontSize: 15, lineHeight: 23 }}>{msg.text}</Text>
               </View>
             ) : (
-              <View style={{ maxWidth: compact ? '97%' : Math.min(windowWidth - 56, 700), gap: 0 }}>
-                {/* Bot label */}
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 5 }}>
-                  <Text style={{ fontSize: 13 }}>🤖</Text>
-                  <Text style={{ color: accent, fontSize: 10, fontWeight: '700' }}>Bebo</Text>
-                  <Text style={{ color: pal.subtleText, fontSize: 9 }}>{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+              <View style={{ maxWidth: compact ? '97%' : Math.min(windowWidth - 56, 720), gap: 0 }}>
+                {/* Bot label row */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 6 }}>
+                  <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: `${accent}22`, alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontSize: 11 }}>✦</Text>
+                  </View>
+                  <Text style={{ color: accent, fontSize: 12, fontWeight: '700' }}>Bebo</Text>
+                  <Text style={{ color: pal.subtleText, fontSize: 10 }}>{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
                 </View>
 
                 {/* Bubble */}
-                <View style={{ backgroundColor: pal.msgBg, borderWidth: 1, borderColor: pal.msgBorder, borderRadius: 14, borderTopLeftRadius: 4, padding: 13, gap: 5 } as any}>
+                <View style={{ backgroundColor: pal.msgBg, borderWidth: 1, borderColor: pal.msgBorder, borderRadius: 18, borderTopLeftRadius: 6, padding: 18, gap: 6 } as any}>
                   <MarkdownText text={msg.text} bodyColor={pal.bodyText} subtleColor={pal.subtleText} />
                   {msg.cards.map(card => (
                     <CardRenderer
@@ -687,19 +693,18 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
                   ))}
                 </View>
 
-                {/* Quick replies */}
+                {/* Quick replies — larger, more obvious */}
                 {msg.quickReplies.length > 0 && (
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 6 }}>
-                    <View style={{ flexDirection: 'row', gap: 5, paddingRight: 6 }}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
+                    <View style={{ flexDirection: 'row', gap: 7, paddingRight: 8 }}>
                       {msg.quickReplies.map((qr, qi) => (
-                        <TouchableOpacity
+                        <Pressable
                           key={qi}
                           onPress={() => sendMessage(qr)}
-                          activeOpacity={0.75}
-                          style={{ backgroundColor: pal.chipBg, borderWidth: 1, borderColor: `${accent}44`, borderRadius: 20, paddingHorizontal: 11, paddingVertical: 5 } as any}
+                          style={{ backgroundColor: pal.chipBg, borderWidth: 1, borderColor: `${accent}44`, borderRadius: 22, paddingHorizontal: 14, paddingVertical: 8 } as any}
                         >
-                          <Text style={{ color: accent, fontSize: 11, fontWeight: '600' }}>{qr}</Text>
-                        </TouchableOpacity>
+                          <Text style={{ color: accent, fontSize: 13, fontWeight: '600' }}>{qr}</Text>
+                        </Pressable>
                       ))}
                     </View>
                   </ScrollView>
@@ -709,46 +714,54 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
           </View>
         ))}
 
-        {/* Thinking indicator */}
+        {/* Thinking indicator — animated bouncing dots */}
         {isThinking && (
-          <View style={{ alignItems: 'flex-start', gap: 5 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 4 }}>
-              <Text style={{ fontSize: 13 }}>🤖</Text>
-              <Text style={{ color: accent, fontSize: 10, fontWeight: '700' }}>Bebo</Text>
+          <View style={{ alignItems: 'flex-start', gap: 6 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 5 }}>
+              <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: `${accent}22`, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 11 }}>✦</Text>
+              </View>
+              <Text style={{ color: accent, fontSize: 12, fontWeight: '700' }}>Bebo</Text>
             </View>
-            <View style={{ backgroundColor: pal.msgBg, borderWidth: 1, borderColor: pal.msgBorder, borderRadius: 14, borderTopLeftRadius: 4, paddingHorizontal: 14, paddingVertical: 11, flexDirection: 'row', gap: 5, alignItems: 'center' } as any}>
+            <View style={{ backgroundColor: pal.msgBg, borderWidth: 1, borderColor: pal.msgBorder, borderRadius: 18, borderTopLeftRadius: 6, paddingHorizontal: 18, paddingVertical: 14, flexDirection: 'row', gap: 6, alignItems: 'center' } as any}>
               {[0, 1, 2].map(i => (
-                <View key={i} style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: accent, opacity: 0.5 + i * 0.15 }} />
+                <View key={i} style={{
+                  width: 9, height: 9, borderRadius: 5, backgroundColor: accent,
+                  animationName: 'cs-bebo-dot-bounce',
+                  animationDuration: '1.2s',
+                  animationTimingFunction: 'ease-in-out',
+                  animationIterationCount: 'infinite',
+                  animationDelay: `${i * 0.15}s`,
+                } as any} />
               ))}
             </View>
           </View>
         )}
       </ScrollView>
 
-      {/* ── Input Bar ── */}
-      <View style={{ backgroundColor: pal.headerBg, borderTopWidth: 1, borderTopColor: pal.headerBorder, padding: compact ? 10 : 14, gap: 8, backdropFilter: 'blur(20px)' } as any}>
-        {/* Quick prompt chips */}
+      {/* ── Input Bar — prominent, ChatGPT-like ── */}
+      <View style={{ backgroundColor: pal.headerBg, borderTopWidth: 1, borderTopColor: pal.headerBorder, padding: compact ? 12 : 16, gap: 10, backdropFilter: 'blur(20px)' } as any}>
+        {/* Quick prompt chips — bigger and more inviting */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={{ flexDirection: 'row', gap: 5 }}>
+          <View style={{ flexDirection: 'row', gap: 7 }}>
             {DEMO_QUICK_PROMPTS[vertical].map((qa, i) => (
-              <TouchableOpacity
+              <Pressable
                 key={i}
                 onPress={() => sendMessage(qa)}
-                activeOpacity={0.75}
-                style={{ backgroundColor: pal.chipBg, borderWidth: 1, borderColor: pal.chipBorder, borderRadius: 6, paddingHorizontal: 9, paddingVertical: 4 } as any}
+                style={{ backgroundColor: pal.chipBg, borderWidth: 1, borderColor: pal.chipBorder, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 7 } as any}
               >
-                <Text style={{ color: pal.subtleText, fontSize: 10, fontWeight: '500' }}>{qa}</Text>
-              </TouchableOpacity>
+                <Text style={{ color: pal.subtleText, fontSize: 12, fontWeight: '500' }}>{qa}</Text>
+              </Pressable>
             ))}
           </View>
         </ScrollView>
 
         {/* Text input + send */}
-        <View style={{ flexDirection: 'row', gap: 7, alignItems: 'center' }}>
+        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
           <TextInput
             value={input}
             onChangeText={setInput}
-            placeholder={`Ask Bebo about ${VERTICAL_META[vertical].label}…`}
+            placeholder={`What would you like to build?`}
             placeholderTextColor={pal.placeholder}
             onSubmitEditing={() => sendMessage(input)}
             returnKeyType="send"
@@ -758,29 +771,28 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
               backgroundColor: pal.inputBg,
               borderWidth: 1,
               borderColor: pal.inputBorder,
-              borderRadius: 10,
-              paddingHorizontal: 13,
-              paddingVertical: 9,
+              borderRadius: 14,
+              paddingHorizontal: 16,
+              paddingVertical: 13,
               color: pal.inputText,
-              fontSize: 14,
+              fontSize: 15,
               outline: 'none',
             } as any}
           />
-          <TouchableOpacity
+          <Pressable
             onPress={() => sendMessage(input)}
             disabled={!input.trim() || isThinking}
-            activeOpacity={0.8}
             style={{
-              width: 40,
-              height: 40,
-              borderRadius: 10,
+              width: 48,
+              height: 48,
+              borderRadius: 14,
               backgroundColor: input.trim() && !isThinking ? accent : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Text style={{ fontSize: 17, color: input.trim() && !isThinking ? '#FFFFFF' : pal.subtleText }}>→</Text>
-          </TouchableOpacity>
+            <Text style={{ fontSize: 20, color: input.trim() && !isThinking ? '#FFFFFF' : pal.subtleText }}>↑</Text>
+          </Pressable>
         </View>
       </View>
     </View>

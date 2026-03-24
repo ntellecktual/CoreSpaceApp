@@ -231,6 +231,12 @@ export function injectUxAnimations() {
     @keyframes cs-drawer-slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
     @keyframes cs-drawer-backdrop { from { opacity: 0; } to { opacity: 1; } }
 
+    /* Bebo AI thinking dots bounce */
+    @keyframes cs-bebo-dot-bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+
     /* DnD styles */
     [data-dnd-dragging] { opacity: 0.5; transform: scale(0.95); transition: opacity 0.15s, transform 0.15s; }
     [data-dnd-over] { border-color: rgba(140,91,245,0.6) !important; background-color: rgba(140,91,245,0.08) !important; transition: border-color 0.15s, background-color 0.15s; }

@@ -1,5 +1,5 @@
 [build]
-  command   = "npx expo export --platform web && cp _headers dist/_headers && cp _redirects dist/_redirects"
+  command   = "echo skip"
   publish   = "dist"
 
 [build.environment]

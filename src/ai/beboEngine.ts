@@ -575,8 +575,8 @@ export function getDataForVertical(vertical: DemoVertical) {
     case 'legal': return generateLegalData();
     case 'insurance': return generateInsuranceData();
     case 'lifecycle': return generateLifecycleData();
-    case 'fulfillment': return generateFulfillmentData();
-    case 'kitting': return generateKittingData();
+    case 'fulfillment': return generateKittingData();
+    case 'kitting': return generateFulfillmentData();
   }
 }
 
@@ -2204,8 +2204,8 @@ export function getPayloadForVertical(vertical: DemoVertical): ScenarioApplyPayl
     case 'legal': return buildLegalPayload();
     case 'insurance': return buildInsurancePayload();
     case 'lifecycle': return buildLifecyclePayload();
-    case 'fulfillment': return buildFulfillmentPayload();
-    case 'kitting': return buildKittingPayload();
+    case 'fulfillment': return buildKittingPayload();
+    case 'kitting': return buildFulfillmentPayload();
   }
 }
 
@@ -2265,8 +2265,8 @@ const WORKSPACE_KPI: Record<DemoVertical, { v1: string; v2: string; v3: string; 
   legal:       { v1: '94 Active Cases',         v2: '$1.8M Billed YTD',            v3: '8 Court Dates This Month',    wsCount: 2, flowCount: 2 },
   insurance:   { v1: '318 Active Policies',     v2: '$4.2M Annual Premium',        v3: '27 Open Claims',              wsCount: 2, flowCount: 2 },
   lifecycle:   { v1: '47 Active Accounts',      v2: '99.2% SLA Compliance',        v3: '6 Open Exchanges',            wsCount: 4, flowCount: 5 },
-  fulfillment: { v1: '312 Orders In Process',   v2: '98.1% On-Time Rate',          v3: '24 Alerts Today',             wsCount: 3, flowCount: 4 },
-  kitting:     { v1: '4 Active Work Orders',     v2: '99.4% QC Pass Rate',          v3: '1,200 Kits Shipped MTD',      wsCount: 4, flowCount: 7 },
+  fulfillment: { v1: '4 Active Work Orders',     v2: '99.4% QC Pass Rate',          v3: '1,200 Kits Shipped MTD',      wsCount: 4, flowCount: 7 },
+  kitting:     { v1: '312 Orders In Process',   v2: '98.1% On-Time Rate',          v3: '24 Alerts Today',             wsCount: 3, flowCount: 4 },
 };
 
 // ─── Response Generator ───────────────────────────────────────────────
@@ -2493,8 +2493,8 @@ function getStagesForVertical(v: DemoVertical): string[] {
     legal:       ['Intake', 'Engagement', 'Discovery', 'Litigation', 'Settlement', 'Closed'],
     insurance:   ['Application', 'Underwriting', 'Bound', 'Active', 'Renewal Pending'],
     lifecycle:   ['Submitted', 'In Progress', 'Awaiting Customer', 'Resolved', 'Closed', 'Escalated'],
-    fulfillment: ['Received', 'Inventoried', 'Ordered', 'Picking', 'Packing', 'Shipped', 'Delivered', 'Returned'],
-    kitting:     ['Inbound Receiving', 'Client Order Intake', 'BOM & Allocation', 'Work Order Created', 'Picking', 'Kitting / Assembly', 'Pack & Label', 'Shipped to Client'],
+    fulfillment: ['Inbound Receiving', 'Client Order Intake', 'BOM & Allocation', 'Work Order Created', 'Picking', 'Kitting / Assembly', 'Pack & Label', 'Shipped to Client'],
+    kitting:     ['Received', 'Inventoried', 'Ordered', 'Picking', 'Packing', 'Shipped', 'Delivered', 'Returned'],
   };
   return map[v];
 }
@@ -2502,9 +2502,9 @@ function getStagesForVertical(v: DemoVertical): string[] {
 // ─── Scenario Switch Message ──────────────────────────────────────────
 
 const SCENARIO_INTROS: Record<DemoVertical, string> = {
-  kitting: `Switching to **🔧 Kitting & Assembly** mode.\n\nPre-built for **KittingRUs** with a live **Samsung Galaxy Z Fold 7 → T-Mobile** scenario: 200-unit kit orders moving through **Inbound Receiving → Client Order Intake → BOM & Allocation → Work Order Created → Picking → Kitting / Assembly → Pack & Label → Shipped to Client**.\n\nEach kit contains 12 BOM components: device, 45W charger, USB-C cable, S Pen, Care+ docs, quick start guide, SIM tool, retail insert, anti-static bag, foam tray, protective film, and accessories bag.\n\n**4 workspaces · 16 total subspaces · 7 signal flows** wired end-to-end. Ready to deploy or walk through any stage?`,
+  kitting: `Switching to **🔧 Kitting & Assembly** mode.\n\nYour **KittingRUs** workspace covers the full pick-pack-ship lifecycle: **Receiving & Inventory**, **Order Management**, and **Packing & Shipping** — with AI-assisted box sizing, weight validation, carrier selection, and exception handling built in.\n\nApply the full scenario with one click, or ask me to configure the workflow first.`,
   lifecycle: `Switching to **🔄 Lifecycle Services** mode.\n\nI've pre-built a complete **LifecycleOS** workflow covering all 4 modules: **Customer Onboarding**, **Offboarding**, **Advanced Exchange**, and **Service Ticketing** — each with guided wizards, SLA tracking, and automation flows.\n\nReady to deploy the full scenario, or ask me to customize a module first?`,
-  fulfillment: `Switching to **📦 Fulfillment & Warehouse** mode.\n\nYour **Relentless Fulfillment** workspace covers the full pick-pack-ship lifecycle: **Receiving & Inventory**, **Order Management**, and **Packing & Shipping** — with AI-assisted box sizing, weight validation, carrier selection, and exception handling built in.\n\nApply the full scenario with one click, or ask me to configure the workflow first.`,
+  fulfillment: `Switching to **📦 Fulfillment & Warehouse** mode.\n\nPre-built for **Relentless Fulfillment** with a live **Samsung Galaxy Z Fold 7 → T-Mobile** scenario: 200-unit kit orders moving through **Inbound Receiving → Client Order Intake → BOM & Allocation → Work Order Created → Picking → Kitting / Assembly → Pack & Label → Shipped to Client**.\n\nEach kit contains 12 BOM components: device, 45W charger, USB-C cable, S Pen, Care+ docs, quick start guide, SIM tool, retail insert, anti-static bag, foam tray, protective film, and accessories bag.\n\n**4 workspaces · 16 total subspaces · 7 signal flows** wired end-to-end. Ready to deploy or walk through any stage?`,
   pharma: `Switching to **💊 Pharmaceutical / DSCSA** mode.\n\nI have full knowledge of DSCSA serialization requirements, FDA track-and-trace compliance, and supply chain traceability from manufacturer through distributor to pharmacy.\n\nYour **Manufacturer Serialization**, **Distributor Verification**, and **Pharmacy Dispense Trace** workspaces are pre-built and ready to apply.`,
   sales: `Switching to **💰 Sales CRM** mode.\n\nI've pre-built a complete **Sales Pipeline** workspace with Lead tracking, Opportunity management, and Activity logging — plus 3 automation flows: Stale Lead Alert, Deal Won → Onboarding, and Proposal Follow-Up.\n\nReady to deploy to your CoreSpace instance?`,
   healthcare: `Switching to **🏥 Healthcare / Patient Care** mode.\n\nYour **Patient Care** workspace covers Appointments, Prescriptions, and Lab Results — with a No-Show Follow-Up automation and Critical Lab Alert pre-configured.\n\nApply it with one click, or ask me to customize first.`,

@@ -57,8 +57,8 @@ const DEMO_QUICK_PROMPTS: Record<DemoVertical, string[]> = {
   legal:       ['Build Case Management workspace','Generate case data',   'Show deadline automations','Show Orbital'],
   insurance:   ['Build Policy Admin workspace',  'Generate policy data', 'Show claim automations', 'Show Orbital'],
   lifecycle:   ['Build Onboarding workspace', 'Generate service records', 'Show SLA automations', 'Show Orbital'],
-  fulfillment: ['Build Pick-Pack-Ship workspace', 'Generate fulfillment data', 'Show automation flows', 'Show Orbital'],
-  kitting:     ['Build kitting workspace', 'Generate work order data', 'Show BOM automation flows', 'Show Orbital'],
+  fulfillment: ['Build kitting workspace', 'Generate work order data', 'Show BOM automation flows', 'Show Orbital'],
+  kitting:     ['Build Pick-Pack-Ship workspace', 'Generate fulfillment data', 'Show automation flows', 'Show Orbital'],
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────

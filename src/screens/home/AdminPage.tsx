@@ -345,7 +345,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
       label: 'Workspace Design',
       description: 'Build your operational core, SubSpaces, and data fields.',
       items: [
-        { label: 'Configure Workspace', detail: 'Name, entity, and route', onPress: () => { setAdminTab('workspace'); setWorkspacePane('workspace'); } },
+        { label: 'Configure Workspace', detail: 'Name, entity, and route', onPress: () => { setAdminTab('workspace'); setWorkspacePane('workspace'); setWizardStep(1); } },
         { label: 'SubSpace Lanes & Fields', detail: 'Create lanes and assign tracked fields', onPress: () => { setAdminTab('workspace'); setWorkspacePane('subspaces'); } },
       ],
     },
@@ -670,12 +670,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
     }
   }, [isCreatingWorkspace]);
 
-  useEffect(() => {
-    if (hasWorkspace && wizardStep === 1) {
-      setWizardStep(2);
-      setWorkspacePane('subspaces');
-    }
-  }, [hasWorkspace, wizardStep]);
+  // Auto-advance removed — let users stay on step 1 to create multiple workspaces
+  // before drilling into sections/fields. The workspace picker on step 1 already
+  // lets them select a workspace and manually navigate forward.
 
   useEffect(() => {
     const saveDraftLabel =
@@ -2286,307 +2283,498 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
       </Card>}
 
       {adminTab === 'shell' && <Card title="" blurred>
-        <Text style={styles.bodyText}>Customize the words your team sees across the app, build the intake form that starts every new record, define user personas, and set up lifecycle stages. No coding needed.</Text>
+        {/* ── Shell Header ── */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+          <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: acRgba(0.14), alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ fontSize: 18 }}>⚙️</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: mode === 'night' ? '#fff' : '#1a1030', fontSize: 17, fontWeight: '800' }}>Language & Intake Designer</Text>
+            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 17 }}>Customize terminology, intake forms, personas, and lifecycle stages — no coding needed.</Text>
+          </View>
+        </View>
         {!canManageWorkspace && <Text style={styles.notice}>{deniedMessage('workspace.manage')}</Text>}
 
-        <View style={styles.inlineRow}>
-          <Pressable style={[styles.pill, shellPane === 'labels' && styles.pillActive]} onPress={() => setShellPane('labels')}>
-            <Text style={[styles.pillText, shellPane === 'labels' && styles.pillTextActive]}>App Terminology</Text>
-          </Pressable>
-          <Pressable style={[styles.pill, shellPane === 'intake' && styles.pillActive]} onPress={() => setShellPane('intake')}>
-            <Text style={[styles.pillText, shellPane === 'intake' && styles.pillTextActive]}>Intake Form Builder</Text>
-          </Pressable>
-          <Pressable style={[styles.pill, shellPane === 'personas' && styles.pillActive]} onPress={() => setShellPane('personas')}>
-            <Text style={[styles.pillText, shellPane === 'personas' && styles.pillTextActive]}>User Personas</Text>
-          </Pressable>
-          <Pressable style={[styles.pill, shellPane === 'lifecycle' && styles.pillActive]} onPress={() => setShellPane('lifecycle')}>
-            <Text style={[styles.pillText, shellPane === 'lifecycle' && styles.pillTextActive]}>Lifecycle Stages</Text>
-          </Pressable>
+        {/* ── KPI Strip ── */}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 10, marginBottom: 14 }}>
+          {[
+            { icon: '🏷️', label: 'Terms', value: '10', sub: 'app words' },
+            { icon: '📝', label: 'Intake Fields', value: String(shellConfig.intakeFields.length), sub: 'configured' },
+            { icon: '👤', label: 'Personas', value: String(shellConfig.personas.length), sub: 'defined' },
+            { icon: '🔄', label: 'Stages', value: String(shellConfig.lifecycleStages.length), sub: 'mapped' },
+          ].map((kpi) => (
+            <View key={kpi.label} style={{ flex: 1, minWidth: 120, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }}>
+              <Text style={{ fontSize: 16, marginBottom: 4 }}>{kpi.icon}</Text>
+              <Text style={{ color: ac, fontSize: 20, fontWeight: '800' }}>{kpi.value}</Text>
+              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 11, fontWeight: '600' }}>{kpi.sub}</Text>
+            </View>
+          ))}
         </View>
 
+        {/* ── Segmented Step Rail ── */}
+        <View style={{
+          flexDirection: 'row', marginBottom: 18, borderRadius: 12, overflow: 'hidden',
+          borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(102,74,154,0.12)',
+        }}>
+          {([
+            { key: 'labels' as const, icon: '🏷️', label: 'App Terminology' },
+            { key: 'intake' as const, icon: '📝', label: 'Intake Builder' },
+            { key: 'personas' as const, icon: '👤', label: 'User Personas' },
+            { key: 'lifecycle' as const, icon: '🔄', label: 'Lifecycle Stages' },
+          ] as const).map(({ key, icon, label }, idx) => {
+            const isActive = shellPane === key;
+            return (
+              <Pressable key={key} onPress={() => setShellPane(key)} style={{
+                flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+                paddingVertical: 11, paddingHorizontal: 8, gap: 5,
+                backgroundColor: isActive ? acRgba(0.20) : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                borderRightWidth: idx < 3 ? 1 : 0,
+                borderRightColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(102,74,154,0.10)',
+              }}>
+                <Text style={{ fontSize: 13 }}>{icon}</Text>
+                <Text style={{ fontSize: 12, fontWeight: isActive ? '800' : '600', color: isActive ? ac : mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)' }}>{label}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {/* ══════════════════════════════════════════════════════════════
+            PANE 1 — APP TERMINOLOGY
+           ══════════════════════════════════════════════════════════════ */}
         {shellPane === 'labels' && (
           <>
-            <Text style={styles.metaText}>App Terminology</Text>
-            <Text style={styles.metaText}>Rename the key labels your team sees across the app. Use words they already say every day.</Text>
-            <LabeledInput label="Main item (one)" helperText="What is one record called?" value={subjectSingular} onChangeText={setSubjectSingular} placeholder="Example: Batch" />
-            <LabeledInput label="Main item (many)" helperText="What do you call multiple records?" value={subjectPlural} onChangeText={setSubjectPlural} placeholder="Example: Batches" />
-            <LabeledInput label="Workspace name word" helperText="What should this area be called in the app?" value={workspaceLabel} onChangeText={setWorkspaceLabel} placeholder="Example: Team Workspace" />
-            <LabeledInput label="SubSpace name word" helperText="What should each smaller work area be called?" value={subSpaceLabel} onChangeText={setSubSpaceLabel} placeholder="Example: Work Lane" />
-            <LabeledInput label={`${data.shellConfig.functionLabel ?? 'Department'} (one)`} helperText="How do you call one top-level business division?" value={functionLabel} onChangeText={setFunctionLabel} placeholder="Department" />
-            <LabeledInput label={`${data.shellConfig.functionLabel ?? 'Department'} (many)`} helperText="Plural version" value={functionLabelPlural} onChangeText={setFunctionLabelPlural} placeholder="Departments" />
-            <LabeledInput label={`${data.shellConfig.objectLabel ?? 'Object'} (one)`} helperText="The type of inventory or asset portfolio being tracked" value={shellObjectLabel} onChangeText={setShellObjectLabel} placeholder="Inventory" />
-            <LabeledInput label={`${data.shellConfig.objectLabel ?? 'Object'} (many)`} helperText="Plural version" value={objectLabelPlural} onChangeText={setObjectLabelPlural} placeholder="Inventories" />
-            <LabeledInput label={`${data.shellConfig.collectionLabel ?? 'Batch'} (one)`} helperText="An individual tracked collection or client portfolio" value={collectionLabel} onChangeText={setCollectionLabel} placeholder="Batch" />
-            <LabeledInput label={`${data.shellConfig.collectionLabel ?? 'Batch'} (many)`} helperText="Plural version" value={collectionLabelPlural} onChangeText={setCollectionLabelPlural} placeholder="Batches" />
-            <Pressable nativeID="wt-save-app-words" disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={() => { saveLabels(); auditLog?.logEntry({ action: 'update', entityType: 'shell-config', entityId: 'shell-config', entityName: 'Shell Configuration', after: { subjectSingular, subjectPlural, workspaceLabel, subSpaceLabel } }); addNotification?.({ type: 'system', title: 'Config Updated', body: 'Shell configuration (app terminology) has been saved.', severity: 'info' }); }}>
-              <Text style={styles.secondaryButtonText}>Save App Words</Text>
+            {/* Section header */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <Text style={{ fontSize: 15 }}>🏷️</Text>
+              <Text style={{ color: mode === 'night' ? '#fff' : '#1a1030', fontSize: 15, fontWeight: '800' }}>App Terminology</Text>
+            </View>
+            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 14 }}>Rename the key labels your team sees across the app. Use words they already say every day.</Text>
+
+            {/* Grouped cards — each card holds a singular/plural pair */}
+            {([
+              { icon: '📦', title: 'Main Item', fields: [
+                { label: 'Singular', helper: 'What is one record called?', value: subjectSingular, setter: setSubjectSingular, ph: 'Batch' },
+                { label: 'Plural', helper: 'What do you call multiple records?', value: subjectPlural, setter: setSubjectPlural, ph: 'Batches' },
+              ]},
+              { icon: '🗂️', title: 'Workspace & SubSpace', fields: [
+                { label: 'Workspace name word', helper: 'What should this area be called?', value: workspaceLabel, setter: setWorkspaceLabel, ph: 'Team Workspace' },
+                { label: 'SubSpace name word', helper: 'What should each smaller work area be called?', value: subSpaceLabel, setter: setSubSpaceLabel, ph: 'Work Lane' },
+              ]},
+              { icon: '🏢', title: data.shellConfig.functionLabel ?? 'Department', fields: [
+                { label: 'Singular', helper: 'One top-level business division', value: functionLabel, setter: setFunctionLabel, ph: 'Department' },
+                { label: 'Plural', helper: 'Plural version', value: functionLabelPlural, setter: setFunctionLabelPlural, ph: 'Departments' },
+              ]},
+              { icon: '📋', title: data.shellConfig.objectLabel ?? 'Object', fields: [
+                { label: 'Singular', helper: 'The type of inventory or asset being tracked', value: shellObjectLabel, setter: setShellObjectLabel, ph: 'Inventory' },
+                { label: 'Plural', helper: 'Plural version', value: objectLabelPlural, setter: setObjectLabelPlural, ph: 'Inventories' },
+              ]},
+              { icon: '📁', title: data.shellConfig.collectionLabel ?? 'Batch', fields: [
+                { label: 'Singular', helper: 'An individual tracked collection', value: collectionLabel, setter: setCollectionLabel, ph: 'Batch' },
+                { label: 'Plural', helper: 'Plural version', value: collectionLabelPlural, setter: setCollectionLabelPlural, ph: 'Batches' },
+              ]},
+            ] as const).map((group) => (
+              <View key={group.title} style={{ backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)', borderRadius: 14, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                  <Text style={{ fontSize: 14 }}>{group.icon}</Text>
+                  <Text style={{ color: ac, fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8 }}>{group.title}</Text>
+                </View>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                  {group.fields.map((f) => (
+                    <View key={f.label + f.ph} style={{ flex: 1, minWidth: 200 }}>
+                      <LabeledInput label={f.label} helperText={f.helper} value={f.value} onChangeText={f.setter as (v: string) => void} placeholder={f.ph} />
+                    </View>
+                  ))}
+                </View>
+              </View>
+            ))}
+
+            {/* Save button — accent styled */}
+            <Pressable nativeID="wt-save-app-words" disabled={!canManageWorkspace} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, paddingHorizontal: 20, alignItems: 'center', marginTop: 6, opacity: canManageWorkspace ? 1 : 0.45 }} onPress={() => { saveLabels(); auditLog?.logEntry({ action: 'update', entityType: 'shell-config', entityId: 'shell-config', entityName: 'Shell Configuration', after: { subjectSingular, subjectPlural, workspaceLabel, subSpaceLabel } }); addNotification?.({ type: 'system', title: 'Config Updated', body: 'Shell configuration (app terminology) has been saved.', severity: 'info' }); }}>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13, letterSpacing: 0.3 }}>💾  Save App Words</Text>
             </Pressable>
           </>
         )}
 
+        {/* ══════════════════════════════════════════════════════════════
+            PANE 2 — INTAKE FORM BUILDER
+           ══════════════════════════════════════════════════════════════ */}
         {shellPane === 'intake' && (
           <>
-            <Text style={styles.metaText}>Intake Form Builder</Text>
-            <Text style={styles.metaText}>Define the fields that every new record starts with. Only ask for information your team actually needs at the start of a workflow.</Text>
-            {shellConfig.intakeFields.map((field) => (
-              <View key={field.id} style={styles.listCard}>
-                <Text style={styles.listTitle}>{field.label}</Text>
-                <Text style={styles.metaText}>Type: {field.type} • Required: {field.required ? 'Yes' : 'No'}</Text>
-                {!!field.options?.length && <Text style={styles.metaText}>Options: {field.options.join(', ')}</Text>}
-                <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={() => removeIntakeField(field.id)}>
-                  <Text style={styles.secondaryButtonText}>Delete Field</Text>
-                </Pressable>
+            {/* Section header */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <Text style={{ fontSize: 15 }}>📝</Text>
+              <Text style={{ color: mode === 'night' ? '#fff' : '#1a1030', fontSize: 15, fontWeight: '800' }}>Intake Form Builder</Text>
+              <View style={{ backgroundColor: acRgba(0.14), borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2, marginLeft: 6 }}>
+                <Text style={{ color: ac, fontSize: 11, fontWeight: '700' }}>{shellConfig.intakeFields.length} fields</Text>
               </View>
-            ))}
-
-            <LabeledInput label="New Field Label" helperText="Example: Carton Serial" value={newFieldLabel} onChangeText={setNewFieldLabel} placeholder="Example: NDC Product Code" />
-            <Text style={styles.metaText}>Field Type</Text>
-            <View style={styles.inlineRow}>
-              {(['text', 'number', 'date', 'select'] as const).map((type) => (
-                <Pressable
-                  key={type}
-                  disabled={!canManageWorkspace}
-                  style={[styles.pill, newFieldType === type && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                  onPress={() => setNewFieldType(type)}
-                >
-                  <Text style={[styles.pillText, newFieldType === type && styles.pillTextActive]}>{type}</Text>
-                </Pressable>
-              ))}
             </View>
-            <Pressable
-              disabled={!canManageWorkspace}
-              style={[styles.secondaryButton, newFieldRequired && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-              onPress={() => setNewFieldRequired((current) => !current)}
-            >
-              <Text style={styles.secondaryButtonText}>Required: {newFieldRequired ? 'Yes' : 'No'}</Text>
-            </Pressable>
-            {newFieldType === 'select' && (
-              <LabeledInput
-                label="Options (comma separated)"
-                helperText="Example: Match, Mismatch, Pending"
-                value={newFieldOptions}
-                onChangeText={setNewFieldOptions}
-                placeholder="Example: Manufacturer, Distributor, Pharmacy"
-              />
+            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 14 }}>Define the fields that every new record starts with. Only ask for information your team actually needs.</Text>
+
+            {/* Existing fields — card grid */}
+            {shellConfig.intakeFields.length > 0 && (
+              <View style={{ gap: 8, marginBottom: 14 }}>
+                {shellConfig.intakeFields.map((field) => {
+                  const typeIcon = field.type === 'text' ? '✏️' : field.type === 'number' ? '#️⃣' : field.type === 'date' ? '📅' : '📋';
+                  return (
+                    <View key={field.id} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', gap: 12 }}>
+                      <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: acRgba(0.12), alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 16 }}>{typeIcon}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: mode === 'night' ? '#fff' : '#1a1030', fontWeight: '700', fontSize: 13 }}>{field.label}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 }}>
+                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)', fontSize: 11 }}>{field.type}</Text>
+                          <View style={{ width: 3, height: 3, borderRadius: 2, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.20)' : 'rgba(0,0,0,0.20)' }} />
+                          <Text style={{ color: field.required ? '#22C55E' : mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', fontSize: 11, fontWeight: '600' }}>{field.required ? 'Required' : 'Optional'}</Text>
+                          {!!field.options?.length && <>
+                            <View style={{ width: 3, height: 3, borderRadius: 2, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.20)' : 'rgba(0,0,0,0.20)' }} />
+                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)', fontSize: 11 }}>{field.options.join(', ')}</Text>
+                          </>}
+                        </View>
+                      </View>
+                      <Pressable disabled={!canManageWorkspace} onPress={() => removeIntakeField(field.id)} style={{ opacity: canManageWorkspace ? 0.7 : 0.3, padding: 6 }}>
+                        <Text style={{ fontSize: 16 }}>🗑️</Text>
+                      </Pressable>
+                    </View>
+                  );
+                })}
+              </View>
             )}
-            <Pressable nativeID="wt-add-intake-field" disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={addIntakeField}>
-              <Text style={styles.secondaryButtonText}>Add Field</Text>
-            </Pressable>
+
+            {/* New field builder card */}
+            <View style={{ backgroundColor: mode === 'night' ? acRgba(0.06) : acRgba(0.03), borderRadius: 14, padding: 16, borderWidth: 1, borderColor: acRgba(0.15), gap: 10 }}>
+              <Text style={{ color: ac, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>➕  Add New Field</Text>
+              <LabeledInput label="Field Label" helperText="Example: Carton Serial" value={newFieldLabel} onChangeText={setNewFieldLabel} placeholder="Example: NDC Product Code" />
+
+              {/* Type selector cards */}
+              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4 }}>Field Type</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                {([
+                  { type: 'text' as const, icon: '✏️', label: 'Text' },
+                  { type: 'number' as const, icon: '#️⃣', label: 'Number' },
+                  { type: 'date' as const, icon: '📅', label: 'Date' },
+                  { type: 'select' as const, icon: '📋', label: 'Dropdown' },
+                ]).map(({ type, icon, label }) => {
+                  const sel = newFieldType === type;
+                  return (
+                    <Pressable key={type} disabled={!canManageWorkspace} onPress={() => setNewFieldType(type)} style={{
+                      flex: 1, minWidth: 80, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+                      paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10,
+                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                      opacity: canManageWorkspace ? 1 : 0.45,
+                    }}>
+                      <Text style={{ fontSize: 14 }}>{icon}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: sel ? '800' : '600', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)' }}>{label}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              {/* Required toggle */}
+              <Pressable disabled={!canManageWorkspace} onPress={() => setNewFieldRequired((c) => !c)} style={{
+                flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 12, borderRadius: 10,
+                backgroundColor: newFieldRequired ? 'rgba(34,197,94,0.10)' : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                borderWidth: 1, borderColor: newFieldRequired ? 'rgba(34,197,94,0.25)' : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                opacity: canManageWorkspace ? 1 : 0.45,
+              }}>
+                <Text style={{ fontSize: 13 }}>{newFieldRequired ? '✅' : '⬜'}</Text>
+                <Text style={{ color: newFieldRequired ? '#22C55E' : mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, fontWeight: '700' }}>Required Field</Text>
+              </Pressable>
+
+              {newFieldType === 'select' && (
+                <LabeledInput label="Dropdown Options (comma separated)" helperText="Example: Match, Mismatch, Pending" value={newFieldOptions} onChangeText={setNewFieldOptions} placeholder="Manufacturer, Distributor, Pharmacy" />
+              )}
+
+              <Pressable nativeID="wt-add-intake-field" disabled={!canManageWorkspace} onPress={addIntakeField} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 4, opacity: canManageWorkspace ? 1 : 0.45 }}>
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>➕  Add Field</Text>
+              </Pressable>
+            </View>
           </>
         )}
 
+        {/* ══════════════════════════════════════════════════════════════
+            PANE 3 — USER PERSONAS
+           ══════════════════════════════════════════════════════════════ */}
         {shellPane === 'personas' && (
           <>
-            <Text style={styles.metaText}>User Persona Builder</Text>
-            <Text style={styles.metaText}>Create personas that represent the different workflow roles in your organization. Each persona can be scoped to specific workspaces and tagged for reporting.</Text>
-            {shellConfig.personas.map((persona) => (
-              <View key={persona.id} style={styles.listCard}>
-                <Text style={styles.listTitle}>{persona.name}</Text>
-                {!!persona.description && <Text style={styles.metaText}>{persona.description}</Text>}
-                <Text style={styles.metaText}>Workspace Scope: {persona.workspaceScope}</Text>
-                {persona.workspaceScope === 'selected' && <Text style={styles.metaText}>Workspace IDs: {persona.workspaceIds.join(', ') || 'None'}</Text>}
-                <Text style={styles.metaText}>Default Tags: {persona.defaultTags.join(', ')}</Text>
-                <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={() => deletePersona(persona.id)}>
-                  <Text style={styles.secondaryButtonText}>Delete Persona</Text>
-                </Pressable>
+            {/* Section header */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <Text style={{ fontSize: 15 }}>👤</Text>
+              <Text style={{ color: mode === 'night' ? '#fff' : '#1a1030', fontSize: 15, fontWeight: '800' }}>User Personas</Text>
+              <View style={{ backgroundColor: acRgba(0.14), borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2, marginLeft: 6 }}>
+                <Text style={{ color: ac, fontSize: 11, fontWeight: '700' }}>{shellConfig.personas.length} personas</Text>
               </View>
-            ))}
-
-            <LabeledInput label="Persona Name" helperText="Example: Distributor Receiver" value={personaName} onChangeText={setPersonaName} placeholder="Example: Pharmacy Dispense Manager" />
-            <LabeledInput
-              label="Persona Description"
-              helperText="Example: Handles incoming carton scans and serial verification"
-              value={personaDescription}
-              onChangeText={setPersonaDescription}
-              placeholder="Describe what this persona does in the workflow"
-              multiline
-            />
-            <Text style={styles.metaText}>Persona Workspace Scope</Text>
-            <View style={styles.inlineRow}>
-              <Pressable
-                disabled={!canManageWorkspace}
-                style={[styles.pill, personaWorkspaceScope === 'all' && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                onPress={() => setPersonaWorkspaceScope('all')}
-              >
-                <Text style={[styles.pillText, personaWorkspaceScope === 'all' && styles.pillTextActive]}>All Workspaces</Text>
-              </Pressable>
-              <Pressable
-                disabled={!canManageWorkspace}
-                style={[styles.pill, personaWorkspaceScope === 'selected' && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                onPress={() => setPersonaWorkspaceScope('selected')}
-              >
-                <Text style={[styles.pillText, personaWorkspaceScope === 'selected' && styles.pillTextActive]}>Selected Workspaces</Text>
-              </Pressable>
             </View>
-            {personaWorkspaceScope === 'selected' && (
-              <View style={styles.inlineRow}>
-                {shellWorkspaces.map((workspaceItem) => {
-                  const selected = personaWorkspaceIds.includes(workspaceItem.id);
+            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 14 }}>Create personas that represent the different workflow roles in your organization. Each persona can be scoped to specific workspaces and tagged for reporting.</Text>
+
+            {/* Existing persona cards */}
+            {shellConfig.personas.length > 0 && (
+              <View style={{ gap: 8, marginBottom: 14 }}>
+                {shellConfig.personas.map((persona) => (
+                  <View key={persona.id} style={{ backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)', borderRadius: 14, padding: 16, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                      <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: acRgba(0.14), alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 16 }}>👤</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: mode === 'night' ? '#fff' : '#1a1030', fontWeight: '700', fontSize: 14 }}>{persona.name}</Text>
+                        {!!persona.description && <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)', fontSize: 11, marginTop: 2 }}>{persona.description}</Text>}
+                      </View>
+                      <Pressable disabled={!canManageWorkspace} onPress={() => deletePersona(persona.id)} style={{ opacity: canManageWorkspace ? 0.7 : 0.3, padding: 6 }}>
+                        <Text style={{ fontSize: 16 }}>🗑️</Text>
+                      </Pressable>
+                    </View>
+                    {/* Meta badges */}
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                      <View style={{ backgroundColor: acRgba(0.10), borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
+                        <Text style={{ color: ac, fontSize: 10, fontWeight: '700' }}>🌐 {persona.workspaceScope === 'all' ? 'All Workspaces' : `${persona.workspaceIds.length} workspace${persona.workspaceIds.length === 1 ? '' : 's'}`}</Text>
+                      </View>
+                      {persona.defaultTags.filter(Boolean).map((tag) => (
+                        <View key={tag} style={{ backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
+                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 10, fontWeight: '600' }}>🏷️ {tag}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* New persona builder card */}
+            <View style={{ backgroundColor: mode === 'night' ? acRgba(0.06) : acRgba(0.03), borderRadius: 14, padding: 16, borderWidth: 1, borderColor: acRgba(0.15), gap: 10 }}>
+              <Text style={{ color: ac, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>➕  New Persona</Text>
+              <LabeledInput label="Persona Name" helperText="Example: Distributor Receiver" value={personaName} onChangeText={setPersonaName} placeholder="Example: Pharmacy Dispense Manager" />
+              <LabeledInput label="Description" helperText="Example: Handles incoming carton scans and serial verification" value={personaDescription} onChangeText={setPersonaDescription} placeholder="Describe what this persona does" multiline />
+
+              {/* Workspace scope selector cards */}
+              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4 }}>Workspace Scope</Text>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {([
+                  { key: 'all' as const, icon: '🌐', label: 'All Workspaces' },
+                  { key: 'selected' as const, icon: '🎯', label: 'Selected Only' },
+                ]).map(({ key, icon, label }) => {
+                  const sel = personaWorkspaceScope === key;
                   return (
-                    <Pressable
-                      key={workspaceItem.id}
-                      disabled={!canManageWorkspace}
-                      style={[styles.pill, selected && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                      onPress={() => togglePersonaWorkspace(workspaceItem.id)}
-                    >
-                      <Text style={[styles.pillText, selected && styles.pillTextActive]}>{workspaceItem.name}</Text>
+                    <Pressable key={key} disabled={!canManageWorkspace} onPress={() => setPersonaWorkspaceScope(key)} style={{
+                      flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+                      paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10,
+                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                      opacity: canManageWorkspace ? 1 : 0.45,
+                    }}>
+                      <Text style={{ fontSize: 13 }}>{icon}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: sel ? '800' : '600', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)' }}>{label}</Text>
                     </Pressable>
                   );
                 })}
               </View>
-            )}
-            <LabeledInput
-              label="Persona Default Tags (comma separated)"
-              helperText="Example: Team:Distributor, Region:US"
-              value={personaDefaultTags}
-              onChangeText={setPersonaDefaultTags}
-              placeholder="Example: Persona:DistributorReceiver, Segment:Traceability"
-            />
-            <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={createPersona}>
-              <Text style={styles.secondaryButtonText}>Create Persona</Text>
-            </Pressable>
+              {personaWorkspaceScope === 'selected' && (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+                  {shellWorkspaces.map((workspaceItem) => {
+                    const sel = personaWorkspaceIds.includes(workspaceItem.id);
+                    return (
+                      <Pressable key={workspaceItem.id} disabled={!canManageWorkspace} onPress={() => togglePersonaWorkspace(workspaceItem.id)} style={{
+                        paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8,
+                        backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                        borderWidth: 1, borderColor: sel ? acRgba(0.30) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                        opacity: canManageWorkspace ? 1 : 0.45,
+                      }}>
+                        <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)' }}>{workspaceItem.name}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              )}
+
+              <LabeledInput label="Default Tags (comma separated)" helperText="Example: Team:Distributor, Region:US" value={personaDefaultTags} onChangeText={setPersonaDefaultTags} placeholder="Persona:DistributorReceiver, Segment:Traceability" />
+
+              <Pressable disabled={!canManageWorkspace} onPress={createPersona} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 4, opacity: canManageWorkspace ? 1 : 0.45 }}>
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>👤  Create Persona</Text>
+              </Pressable>
+            </View>
           </>
         )}
 
+        {/* ══════════════════════════════════════════════════════════════
+            PANE 4 — LIFECYCLE STAGES
+           ══════════════════════════════════════════════════════════════ */}
         {shellPane === 'lifecycle' && (
           <>
-            <Text style={styles.metaText}>Lifecycle Stage Designer</Text>
-            <Text style={styles.metaText}>Map out the stages a record moves through from start to finish. Define which stages exist, set a default starting stage, and create transition rules that control who can move records between stages.</Text>
-            {shellConfig.lifecycleStages.map((stage) => {
-              const isDefault = stage.id === shellConfig.defaultLifecycleStageId;
-              return (
-                <View key={stage.id} style={styles.listCard}>
-                  <Text style={styles.listTitle}>{stage.name}</Text>
-                  {!!stage.description && <Text style={styles.metaText}>{stage.description}</Text>}
-                  <Text style={styles.metaText}>Default: {isDefault ? 'Yes' : 'No'}</Text>
-                  <View style={styles.inlineRow}>
-                    {!isDefault && (
-                      <Pressable
-                        disabled={!canManageWorkspace}
-                        style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                        onPress={() => setDefaultLifecycleStage(stage.id)}
-                      >
-                        <Text style={styles.secondaryButtonText}>Set Default</Text>
-                      </Pressable>
-                    )}
-                    <Pressable
-                      disabled={!canManageWorkspace}
-                      style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                      onPress={() => deleteLifecycleStage(stage.id)}
-                    >
-                      <Text style={styles.secondaryButtonText}>Delete Stage</Text>
-                    </Pressable>
-                  </View>
-                </View>
-              );
-            })}
-
-            <LabeledInput label="New Stage Name" helperText="Example: Exception Review" value={newLifecycleName} onChangeText={setNewLifecycleName} placeholder="Example: Received by Pharmacy" />
-            <LabeledInput
-              label="Stage Description"
-              helperText="Example: Serial event requires returns/loss/suspect investigation"
-              value={newLifecycleDescription}
-              onChangeText={setNewLifecycleDescription}
-              placeholder="Optional context for users"
-              multiline
-            />
-            <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={addLifecycleStage}>
-              <Text style={styles.secondaryButtonText}>Add Stage</Text>
-            </Pressable>
-
-            <View style={styles.separator} />
-            <Text style={styles.metaText}>Lifecycle Transition Rules</Text>
-            {shellConfig.lifecycleTransitions.length === 0 && (
-              <Text style={styles.metaText}>No move rules yet. Records can still start in the default stage.</Text>
-            )}
-            {shellConfig.lifecycleTransitions.map((transition) => {
-              const from = shellConfig.lifecycleStages.find((stage) => stage.id === transition.fromStageId)?.name ?? transition.fromStageId;
-              const to = shellConfig.lifecycleStages.find((stage) => stage.id === transition.toStageId)?.name ?? transition.toStageId;
-              const personaNames = (transition.personaIds ?? [])
-                .map((personaId) => shellConfig.personas.find((persona) => persona.id === personaId)?.name ?? personaId)
-                .join(', ');
-              return (
-                <View key={transition.id} style={styles.listCard}>
-                  <Text style={styles.listTitle}>{from} → {to}</Text>
-                  <Text style={styles.metaText}>Persona scope: {(transition.personaIds ?? []).length === 0 ? 'All personas' : personaNames}</Text>
-                  <Pressable
-                    disabled={!canManageWorkspace}
-                    style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]}
-                    onPress={() => deleteLifecycleTransition(transition.id)}
-                  >
-                    <Text style={styles.secondaryButtonText}>Delete Transition</Text>
-                  </Pressable>
-                </View>
-              );
-            })}
-
-            <Text style={styles.metaText}>From Stage</Text>
-            <View style={styles.inlineRow}>
-              {shellConfig.lifecycleStages.map((stage) => (
-                <Pressable
-                  key={`from-${stage.id}`}
-                  disabled={!canManageWorkspace}
-                  style={[styles.pill, transitionFromStageId === stage.id && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                  onPress={() => setTransitionFromStageId(stage.id)}
-                >
-                  <Text style={[styles.pillText, transitionFromStageId === stage.id && styles.pillTextActive]}>{stage.name}</Text>
-                </Pressable>
-              ))}
+            {/* Section header */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <Text style={{ fontSize: 15 }}>🔄</Text>
+              <Text style={{ color: mode === 'night' ? '#fff' : '#1a1030', fontSize: 15, fontWeight: '800' }}>Lifecycle Stages</Text>
+              <View style={{ backgroundColor: acRgba(0.14), borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2, marginLeft: 6 }}>
+                <Text style={{ color: ac, fontSize: 11, fontWeight: '700' }}>{shellConfig.lifecycleStages.length} stages · {shellConfig.lifecycleTransitions.length} rules</Text>
+              </View>
             </View>
+            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 14 }}>Map out the stages a record moves through from start to finish. Define stages, set a default, and create transition rules.</Text>
 
-            <Text style={styles.metaText}>To Stage</Text>
-            <View style={styles.inlineRow}>
-              {shellConfig.lifecycleStages.map((stage) => (
-                <Pressable
-                  key={`to-${stage.id}`}
-                  disabled={!canManageWorkspace}
-                  style={[styles.pill, transitionToStageId === stage.id && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                  onPress={() => setTransitionToStageId(stage.id)}
-                >
-                  <Text style={[styles.pillText, transitionToStageId === stage.id && styles.pillTextActive]}>{stage.name}</Text>
-                </Pressable>
-              ))}
-            </View>
-
-            <Text style={styles.metaText}>Transition Persona Scope</Text>
-            <View style={styles.inlineRow}>
-              <Pressable
-                disabled={!canManageWorkspace}
-                style={[styles.pill, transitionPersonaScope === 'all' && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                onPress={() => setTransitionPersonaScope('all')}
-              >
-                <Text style={[styles.pillText, transitionPersonaScope === 'all' && styles.pillTextActive]}>All Personas</Text>
-              </Pressable>
-              <Pressable
-                disabled={!canManageWorkspace}
-                style={[styles.pill, transitionPersonaScope === 'selected' && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                onPress={() => setTransitionPersonaScope('selected')}
-              >
-                <Text style={[styles.pillText, transitionPersonaScope === 'selected' && styles.pillTextActive]}>Selected Personas</Text>
-              </Pressable>
-            </View>
-
-            {transitionPersonaScope === 'selected' && (
-              <View style={styles.inlineRow}>
-                {shellConfig.personas.map((persona) => {
-                  const selected = transitionPersonaIds.includes(persona.id);
+            {/* Existing stage cards */}
+            {shellConfig.lifecycleStages.length > 0 && (
+              <View style={{ gap: 8, marginBottom: 14 }}>
+                {shellConfig.lifecycleStages.map((stage) => {
+                  const isDefault = stage.id === shellConfig.defaultLifecycleStageId;
                   return (
-                    <Pressable
-                      key={`transition-persona-${persona.id}`}
-                      disabled={!canManageWorkspace}
-                      style={[styles.pill, selected && styles.pillActive, !canManageWorkspace && styles.buttonDisabled]}
-                      onPress={() => toggleTransitionPersona(persona.id)}
-                    >
-                      <Text style={[styles.pillText, selected && styles.pillTextActive]}>{persona.name}</Text>
-                    </Pressable>
+                    <View key={stage.id} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: isDefault ? 'rgba(34,197,94,0.25)' : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', gap: 12 }}>
+                      <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: isDefault ? 'rgba(34,197,94,0.12)' : acRgba(0.12), alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 16 }}>{isDefault ? '⭐' : '🔄'}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                          <Text style={{ color: mode === 'night' ? '#fff' : '#1a1030', fontWeight: '700', fontSize: 13 }}>{stage.name}</Text>
+                          {isDefault && <View style={{ backgroundColor: 'rgba(34,197,94,0.12)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1 }}><Text style={{ color: '#22C55E', fontSize: 10, fontWeight: '700' }}>DEFAULT</Text></View>}
+                        </View>
+                        {!!stage.description && <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)', fontSize: 11, marginTop: 2 }}>{stage.description}</Text>}
+                      </View>
+                      <View style={{ flexDirection: 'row', gap: 6 }}>
+                        {!isDefault && (
+                          <Pressable disabled={!canManageWorkspace} onPress={() => setDefaultLifecycleStage(stage.id)} style={{ opacity: canManageWorkspace ? 0.7 : 0.3, padding: 6 }}>
+                            <Text style={{ fontSize: 14 }}>⭐</Text>
+                          </Pressable>
+                        )}
+                        <Pressable disabled={!canManageWorkspace} onPress={() => deleteLifecycleStage(stage.id)} style={{ opacity: canManageWorkspace ? 0.7 : 0.3, padding: 6 }}>
+                          <Text style={{ fontSize: 14 }}>🗑️</Text>
+                        </Pressable>
+                      </View>
+                    </View>
                   );
                 })}
               </View>
             )}
 
-            <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={addLifecycleTransition}>
-              <Text style={styles.secondaryButtonText}>Add Rule</Text>
-            </Pressable>
+            {/* Add new stage card */}
+            <View style={{ backgroundColor: mode === 'night' ? acRgba(0.06) : acRgba(0.03), borderRadius: 14, padding: 16, borderWidth: 1, borderColor: acRgba(0.15), gap: 10, marginBottom: 14 }}>
+              <Text style={{ color: ac, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>➕  Add New Stage</Text>
+              <LabeledInput label="Stage Name" helperText="Example: Exception Review" value={newLifecycleName} onChangeText={setNewLifecycleName} placeholder="Received by Pharmacy" />
+              <LabeledInput label="Description" helperText="Example: Serial event requires investigation" value={newLifecycleDescription} onChangeText={setNewLifecycleDescription} placeholder="Optional context for users" multiline />
+              <Pressable disabled={!canManageWorkspace} onPress={addLifecycleStage} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 4, opacity: canManageWorkspace ? 1 : 0.45 }}>
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>🔄  Add Stage</Text>
+              </Pressable>
+            </View>
+
+            {/* ── Transition Rules Section ── */}
+            <View style={{ height: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)', marginVertical: 8 }} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <Text style={{ fontSize: 14 }}>🔀</Text>
+              <Text style={{ color: mode === 'night' ? '#fff' : '#1a1030', fontSize: 14, fontWeight: '800' }}>Transition Rules</Text>
+              <View style={{ backgroundColor: acRgba(0.14), borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2, marginLeft: 4 }}>
+                <Text style={{ color: ac, fontSize: 11, fontWeight: '700' }}>{shellConfig.lifecycleTransitions.length}</Text>
+              </View>
+            </View>
+
+            {shellConfig.lifecycleTransitions.length === 0 && (
+              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)', fontSize: 12, fontStyle: 'italic', marginBottom: 10 }}>No move rules yet. Records can still start in the default stage.</Text>
+            )}
+
+            {/* Existing transition cards */}
+            {shellConfig.lifecycleTransitions.length > 0 && (
+              <View style={{ gap: 8, marginBottom: 14 }}>
+                {shellConfig.lifecycleTransitions.map((transition) => {
+                  const from = shellConfig.lifecycleStages.find((s) => s.id === transition.fromStageId)?.name ?? transition.fromStageId;
+                  const to = shellConfig.lifecycleStages.find((s) => s.id === transition.toStageId)?.name ?? transition.toStageId;
+                  const pNames = (transition.personaIds ?? []).map((pid) => shellConfig.personas.find((p) => p.id === pid)?.name ?? pid).join(', ');
+                  return (
+                    <View key={transition.id} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', gap: 12 }}>
+                      <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: acRgba(0.12), alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 16 }}>🔀</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: mode === 'night' ? '#fff' : '#1a1030', fontWeight: '700', fontSize: 13 }}>{from} → {to}</Text>
+                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)', fontSize: 11, marginTop: 2 }}>{(transition.personaIds ?? []).length === 0 ? '🌐 All personas' : `👤 ${pNames}`}</Text>
+                      </View>
+                      <Pressable disabled={!canManageWorkspace} onPress={() => deleteLifecycleTransition(transition.id)} style={{ opacity: canManageWorkspace ? 0.7 : 0.3, padding: 6 }}>
+                        <Text style={{ fontSize: 16 }}>🗑️</Text>
+                      </Pressable>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
+
+            {/* Transition builder card */}
+            <View style={{ backgroundColor: mode === 'night' ? acRgba(0.06) : acRgba(0.03), borderRadius: 14, padding: 16, borderWidth: 1, borderColor: acRgba(0.15), gap: 10 }}>
+              <Text style={{ color: ac, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>➕  New Transition Rule</Text>
+
+              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8 }}>From Stage</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                {shellConfig.lifecycleStages.map((stage) => {
+                  const sel = transitionFromStageId === stage.id;
+                  return (
+                    <Pressable key={`from-${stage.id}`} disabled={!canManageWorkspace} onPress={() => setTransitionFromStageId(stage.id)} style={{
+                      paddingVertical: 7, paddingHorizontal: 12, borderRadius: 8,
+                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                      opacity: canManageWorkspace ? 1 : 0.45,
+                    }}>
+                      <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)' }}>{stage.name}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4 }}>To Stage</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                {shellConfig.lifecycleStages.map((stage) => {
+                  const sel = transitionToStageId === stage.id;
+                  return (
+                    <Pressable key={`to-${stage.id}`} disabled={!canManageWorkspace} onPress={() => setTransitionToStageId(stage.id)} style={{
+                      paddingVertical: 7, paddingHorizontal: 12, borderRadius: 8,
+                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                      opacity: canManageWorkspace ? 1 : 0.45,
+                    }}>
+                      <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)' }}>{stage.name}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4 }}>Persona Scope</Text>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {([
+                  { key: 'all' as const, icon: '🌐', label: 'All Personas' },
+                  { key: 'selected' as const, icon: '🎯', label: 'Selected' },
+                ]).map(({ key, icon, label }) => {
+                  const sel = transitionPersonaScope === key;
+                  return (
+                    <Pressable key={key} disabled={!canManageWorkspace} onPress={() => setTransitionPersonaScope(key)} style={{
+                      flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+                      paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10,
+                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                      opacity: canManageWorkspace ? 1 : 0.45,
+                    }}>
+                      <Text style={{ fontSize: 13 }}>{icon}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: sel ? '800' : '600', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)' }}>{label}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              {transitionPersonaScope === 'selected' && (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
+                  {shellConfig.personas.map((persona) => {
+                    const sel = transitionPersonaIds.includes(persona.id);
+                    return (
+                      <Pressable key={`tp-${persona.id}`} disabled={!canManageWorkspace} onPress={() => toggleTransitionPersona(persona.id)} style={{
+                        paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8,
+                        backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                        borderWidth: 1, borderColor: sel ? acRgba(0.30) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                        opacity: canManageWorkspace ? 1 : 0.45,
+                      }}>
+                        <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)' }}>{persona.name}</Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              )}
+
+              <Pressable disabled={!canManageWorkspace} onPress={addLifecycleTransition} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 4, opacity: canManageWorkspace ? 1 : 0.45 }}>
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>🔀  Add Transition Rule</Text>
+              </Pressable>
+            </View>
           </>
         )}
 

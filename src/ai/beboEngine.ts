@@ -742,7 +742,7 @@ export function buildSalesPayload(): ScenarioApplyPayload {
     ]),
     mkSubSpace('ss-opps', 'Opportunities', 'Opportunity', 'board', [
       mkField('f-deal', 'Deal Name', 'text', true),
-      mkField('f-value', 'Deal Value', 'number', true),
+      mkField('f-value', 'Deal Value', 'currency', true),
       mkField('f-close', 'Close Date', 'date', false),
       mkField('f-stage', 'Stage', 'select', true),
     ]),
@@ -1037,12 +1037,12 @@ export function buildLegalPayload(): ScenarioApplyPayload {
     mkSubSpace('ss-time-entries', 'Time Entries', 'Time Entry', 'grid', [
       mkField('f-entry-date', 'Date', 'date', true),
       mkField('f-hours', 'Hours', 'number', true),
-      mkField('f-rate', 'Hourly Rate', 'number', true),
+      mkField('f-rate', 'Hourly Rate', 'currency', true),
       mkField('f-desc', 'Description', 'longText', false),
     ]),
     mkSubSpace('ss-invoices', 'Invoices', 'Invoice', 'grid', [
       mkField('f-inv-no', 'Invoice Number', 'text', true),
-      mkField('f-inv-amt', 'Amount', 'number', true),
+      mkField('f-inv-amt', 'Amount', 'currency', true),
       mkField('f-inv-due', 'Due Date', 'date', true),
       mkField('f-inv-status', 'Status', 'select', true),
     ]),
@@ -1164,7 +1164,7 @@ export function buildInsurancePayload(): ScenarioApplyPayload {
       mkField('f-pol-no', 'Policy Number', 'text', true),
       mkField('f-insured', 'Insured Name', 'text', true),
       mkField('f-cov-type', 'Coverage Type', 'select', true),
-      mkField('f-premium', 'Annual Premium', 'number', true),
+      mkField('f-premium', 'Annual Premium', 'currency', true),
     ]),
     mkSubSpace('ss-renewals', 'Renewals', 'Renewal Request', 'board', [
       mkField('f-ren-pol', 'Policy Number', 'text', true),
@@ -1176,7 +1176,7 @@ export function buildInsurancePayload(): ScenarioApplyPayload {
       mkField('f-end-id', 'Endorsement ID', 'text', true),
       mkField('f-end-eff', 'Effective Date', 'date', true),
       mkField('f-end-desc', 'Change Description', 'longText', true),
-      mkField('f-end-impact', 'Premium Impact', 'number', false),
+      mkField('f-end-impact', 'Premium Impact', 'currency', false),
     ]),
   ]);
   // Workspace 2: Claims Processing
@@ -1185,12 +1185,12 @@ export function buildInsurancePayload(): ScenarioApplyPayload {
       mkField('f-claim-no', 'Claim Number', 'text', true),
       mkField('f-claimant', 'Claimant', 'text', true),
       mkField('f-loss-date', 'Date of Loss', 'date', true),
-      mkField('f-est-amount', 'Estimated Amount', 'number', true),
+      mkField('f-est-amount', 'Estimated Amount', 'currency', true),
     ]),
     mkSubSpace('ss-payments', 'Payments', 'Payment', 'grid', [
       mkField('f-pay-id', 'Payment ID', 'text', true),
       mkField('f-pay-claim', 'Claim Number', 'text', true),
-      mkField('f-pay-amt', 'Amount', 'number', true),
+      mkField('f-pay-amt', 'Amount', 'currency', true),
       mkField('f-pay-date', 'Payment Date', 'date', true),
     ]),
     mkSubSpace('ss-claim-docs', 'Documents', 'Document', 'grid', [
@@ -1836,7 +1836,7 @@ export function buildKittingPayload(): ScenarioApplyPayload {
       mkField('f-cat-desc',     'Description',      'text',   false),
       mkField('f-cat-qty',      'Qty On Hand',      'number', true),
       mkField('f-cat-reorder',  'Reorder Point',    'number', true),
-      mkField('f-cat-cost',     'Unit Cost ($)',     'number', false),
+      mkField('f-cat-cost',     'Unit Cost ($)',     'currency', false),
       mkField('f-cat-bin',      'Primary Bin',      'text',   true),
       mkField('f-cat-supplier', 'Supplier',         'text',   false),
     ]),

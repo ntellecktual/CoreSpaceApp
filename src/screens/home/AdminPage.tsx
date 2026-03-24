@@ -286,7 +286,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
           : 'review';
 
   const fieldTypeIcons: Record<SubSpaceBuilderFieldType, string> = {
-    text: 'Aa', longText: '¶', number: '#', date: '📅', datetime: '🕐',
+    text: 'Aa', longText: '¶', number: '#', currency: '$', date: '📅', datetime: '🕐',
     select: '▾', checkbox: '☑', email: '@', phone: '☎', attachment: '📎',
   };
 
@@ -296,6 +296,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
       date: `When "${label}" passes its due date, move record to "Overdue" stage and notify the assigned owner.`,
       datetime: `When "${label}" is within 24 hours, send a reminder notification to the team channel.`,
       number: `When "${label}" drops below threshold (e.g. < 10), trigger a reorder or escalation flow.`,
+      currency: `When "${label}" exceeds a dollar threshold (e.g. > $10,000), trigger an approval or audit flow.`,
       select: `When "${label}" changes to a specific value (e.g. "Rejected"), log the change and notify the reviewer.`,
       checkbox: `When "${label}" is checked, mark the record complete and log an audit entry.`,
       text: `When "${label}" is populated on a new record, auto-assign to the relevant team based on value.`,
@@ -467,6 +468,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const getDetailsFieldPlaceholder = (fieldType: SubSpaceBuilderFieldType) => {
     if (fieldType === 'number') {
       return 'Enter a number';
+    }
+    if (fieldType === 'currency') {
+      return 'Enter dollar amount';
     }
     if (fieldType === 'date') {
       return 'MM / DD / YYYY';
@@ -1328,6 +1332,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                             {([
                               { type: 'text' as const, icon: 'Aa', label: 'Short Text', desc: 'Names, IDs' },
                               { type: 'number' as const, icon: '#', label: 'Number', desc: 'Quantities' },
+                              { type: 'currency' as const, icon: '$', label: 'Currency', desc: 'Money values' },
                               { type: 'date' as const, icon: '📅', label: 'Date', desc: 'Deadlines' },
                               { type: 'select' as const, icon: '▾', label: 'Dropdown', desc: 'Choose option' },
                               { type: 'checkbox' as const, icon: '☑', label: 'Yes / No', desc: 'Toggle' },

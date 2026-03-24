@@ -8,6 +8,7 @@ export type SubSpaceBuilderFieldType =
   | 'text'
   | 'longText'
   | 'number'
+  | 'currency'
   | 'date'
   | 'datetime'
   | 'select'

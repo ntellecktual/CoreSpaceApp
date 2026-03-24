@@ -221,6 +221,16 @@ export function formatUnitCount(amount: number): string {
   return `${amount.toLocaleString('en-US')} units`;
 }
 
+export function formatNumber(n: number): string {
+  return n.toLocaleString('en-US');
+}
+
+const currencyFieldPattern = /cost|price|amount|value|revenue|fee|rate|premium|payment|invoice|balance|budget|income|salary|wage|total.*\$/i;
+
+export function isCurrencyFieldName(key: string): boolean {
+  return currencyFieldPattern.test(key);
+}
+
 export function formatCompactNumber(n: number, locale = 'en-US'): string {
   try {
     return new Intl.NumberFormat(locale, {

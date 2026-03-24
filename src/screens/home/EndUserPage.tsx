@@ -15,7 +15,7 @@ import { useRbac } from './hooks/useRbac';
 import { GuidedPageProps } from './types';
 import { BrandLogo } from '../../components/BrandLogo';
 import { formatDate } from '../../formatDate';
-import { searchFdaDrugs, formatCurrency, formatUnitCount } from '../../api';
+import { searchFdaDrugs, formatCurrency, formatUnitCount, isCurrencyFieldName } from '../../api';
 import type { FdaDrug } from '../../api';
 import type { RuntimeRecord, SubSpaceBuilderField } from '../../types';
 import { getRecordPlaceholderImage } from '../../data/pipelineConfig';
@@ -1691,12 +1691,16 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                               <Text style={{ fontSize: 12, fontWeight: '600', color: mode === 'day' ? '#16A34A' : '#86EFAC' }}>{fmtAmount(rec.amount)}</Text>
                             </View>
                           )}
-                          {Object.entries(rec.data).slice(0, 4).map(([key, val]) => (
+                          {Object.entries(rec.data).slice(0, 4).map(([key, val]) => {
+                          const bf = selectedSubSpace?.builderFields?.find(f => f.label === key);
+                          const isCurrency = bf ? bf.type === 'currency' : isCurrencyFieldName(key);
+                          return (
                           <View key={`d-${rec.id}-${key}`} style={{ gap: 1, backgroundColor: subtleBg, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
                             <Text style={{ fontSize: 9, color: dimColor, textTransform: 'uppercase' as any }}>{key}</Text>
-                            <Text style={{ fontSize: 11, color: txtColor }}>{typeof val === 'number' ? (isPharmWorkspace ? val.toLocaleString() : fmtMoney(val)) : String(val)}</Text>
+                            <Text style={{ fontSize: 11, color: txtColor }}>{typeof val === 'number' ? (isCurrency ? fmtMoney(val) : val.toLocaleString()) : String(val)}</Text>
                           </View>
-                        ))}
+                          );
+                        })}
                       </View>
                       {rec.tags && rec.tags.length > 0 && (
                         <View style={{ flexDirection: 'row', gap: 4, marginTop: 2 }}>

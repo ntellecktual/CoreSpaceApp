@@ -667,8 +667,8 @@ export const defaultData: AppData = {
           showCount: true,
           countMode: 'direct',
           builderFields: [
-            { id: 'estimated-cost', label: 'Estimated Cost', type: 'number', required: true, tags: ['Cost'] },
-            { id: 'parts-cost', label: 'Parts Cost', type: 'number', required: true, tags: ['Cost'] },
+            { id: 'estimated-cost', label: 'Estimated Cost', type: 'currency', required: true, tags: ['Cost'] },
+            { id: 'parts-cost', label: 'Parts Cost', type: 'currency', required: true, tags: ['Cost'] },
             { id: 'labor-hours', label: 'Labor Hours', type: 'number', required: true, tags: ['Cost'] },
             { id: 'ber-decision', label: 'BER Decision', type: 'select', required: true, tags: ['Cost'] },
           ],

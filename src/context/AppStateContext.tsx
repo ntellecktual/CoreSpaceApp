@@ -253,7 +253,7 @@ function normalizeTenantBranding(branding?: Partial<TenantBrandingProfile>): Ten
 }
 
 function mapBuilderTypeToFormType(type: SubSpaceBuilderFieldType): FormFieldDefinition['type'] {
-  if (type === 'number') {
+  if (type === 'number' || type === 'currency') {
     return 'number';
   }
   if (type === 'date' || type === 'datetime') {

@@ -802,6 +802,13 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const totalRecords = allRecordsForWorkspace.length;
   const wsFlows = flows.filter((f) => f.workspaceId === selectedWorkspaceId);
 
+  // Dynamic KPI computations
+  const totalValue = useMemo(() => allRecordsForWorkspace.reduce((s, r) => s + (r.amount ?? 0), 0), [allRecordsForWorkspace]);
+  const terminalStages = new Set(['Closed', 'Archived', 'Completed', 'Discharged', 'Cancelled', 'Lapsed', 'Closed Won', 'Closed Lost', 'Delivered', 'Dispensed', 'Resolved']);
+  const activeRecords = useMemo(() => allRecordsForWorkspace.filter((r) => !terminalStages.has(r.status)).length, [allRecordsForWorkspace]);
+  const completedRecords = totalRecords - activeRecords;
+  const newestRecord = useMemo(() => allRecordsForWorkspace.reduce((best, r) => (!best || String(r.date ?? '') > String(best.date ?? '')) ? r : best, null as typeof allRecordsForWorkspace[0] | null), [allRecordsForWorkspace]);
+
   /* ── NEW: Filtered & sorted records ── */
   const filteredRecords = useMemo(() => {
     let recs = selectedRecords;
@@ -1106,30 +1113,43 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           </ScrollView>
 
           {/* Quick actions at bottom */}
-          <View style={{ gap: 4, paddingTop: 4 }}>
-            {/* Inline recent activity strip — 1-2 most recent items for quick context */}
+          <View style={{ gap: 6, paddingTop: 6 }}>
+            {/* ── Recent Activity — revamped ── */}
             {mergedTimeline.length > 0 && (
-              <View style={{ paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, backgroundColor: mode === 'night' ? 'rgba(196,181,253,0.05)' : 'rgba(100,80,180,0.05)', borderLeftWidth: 2, borderLeftColor: `${accentColor}55` }}>
-                <Text style={{ fontSize: 9, fontWeight: '700', letterSpacing: 0.8, color: accentColor, marginBottom: 3 }}>RECENT ACTIVITY</Text>
-                {mergedTimeline.slice(0, 2).map((item) => (
-                  <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 2 }}>
-                    <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: accentColor }} />
-                    <Text style={{ fontSize: 9, color: dimColor, flex: 1 }} numberOfLines={1}>{item.title}</Text>
-                    {!!item.date && <Text style={{ fontSize: 8, color: `${dimColor}88` }}>{formatDate(item.date)}</Text>}
-                  </View>
-                ))}
-                <Pressable onPress={() => setTimelineModalOpen(true)} style={{ marginTop: 3 }}>
-                  <Text style={{ fontSize: 9, fontWeight: '700', color: accentColor }}>View all →</Text>
+              <View style={{ ...g(0.05), padding: 10, borderRadius: 10, gap: 8, borderWidth: 1, borderColor: acRgba(0.10) }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase' as any, color: accentColor }}>RECENT ACTIVITY</Text>
+                {mergedTimeline.slice(0, 3).map((item, idx) => {
+                  const actionIcon = item.status === 'Deleted' ? '🗑️' : item.status === 'Transitioned' ? '🔄' : item.status === 'create' || item.status === 'Created' ? '➕' : '📝';
+                  return (
+                    <Pressable key={item.id} onPress={() => setTimelineModalOpen(true)} style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
+                      <View style={{ width: 24, alignItems: 'center' as any, gap: 2 }}>
+                        <Text style={{ fontSize: 12 }}>{actionIcon}</Text>
+                        {idx < 2 && <View style={{ width: 1, height: 16, backgroundColor: acRgba(0.15) }} />}
+                      </View>
+                      <View style={{ flex: 1, gap: 1 }}>
+                        <Text style={{ fontSize: 10, fontWeight: '700', color: txtColor }} numberOfLines={1}>{item.title}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                          {chip(item.status)}
+                          {!!item.date && <Text style={{ fontSize: 8, color: `${dimColor}99` }}>{formatDate(item.date)}</Text>}
+                        </View>
+                      </View>
+                    </Pressable>
+                  );
+                })}
+                <Pressable onPress={() => setTimelineModalOpen(true)} style={{ alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: acRgba(0.10), borderWidth: 1, borderColor: acRgba(0.18) }}>
+                  <Text style={{ fontSize: 9, fontWeight: '700', color: accentColor }}>View all activity →</Text>
                 </Pressable>
               </View>
             )}
             {wsFlows.length > 0 && (
-              <Pressable nativeID="eu-flow-button" onPress={() => setFlowsModalOpen(true)} style={{ paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(134,239,172,0.3)', backgroundColor: 'rgba(134,239,172,0.08)' }}>
-                <Text style={{ fontSize: 10, fontWeight: '700', color: '#86EFAC' }}>⚡ {wsFlows.length} Signal Flow{wsFlows.length > 1 ? 's' : ''}</Text>
+              <Pressable nativeID="eu-flow-button" onPress={() => setFlowsModalOpen(true)} style={{ paddingVertical: 8, paddingHorizontal: 10, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(134,239,172,0.3)', backgroundColor: 'rgba(134,239,172,0.08)', flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text style={{ fontSize: 12 }}>⚡</Text>
+                <Text style={{ fontSize: 10, fontWeight: '700', color: '#86EFAC' }}>{wsFlows.length} Signal Flow{wsFlows.length > 1 ? 's' : ''}</Text>
               </Pressable>
             )}
-            <Pressable nativeID="eu-timeline-button" onPress={() => setTimelineModalOpen(true)} style={{ paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(196,181,253,0.3)', backgroundColor: 'rgba(196,181,253,0.06)' }}>
-              <Text style={{ fontSize: 10, fontWeight: '700', color: '#C4B5FD' }}>◷ Full Activity Timeline</Text>
+            <Pressable nativeID="eu-timeline-button" onPress={() => setTimelineModalOpen(true)} style={{ paddingVertical: 8, paddingHorizontal: 10, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(196,181,253,0.3)', backgroundColor: 'rgba(196,181,253,0.06)', flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={{ fontSize: 12 }}>◷</Text>
+              <Text style={{ fontSize: 10, fontWeight: '700', color: '#C4B5FD' }}>Full Activity Timeline</Text>
             </Pressable>
           </View>
           </>)}
@@ -1207,24 +1227,25 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             <SavingIndicator saving={isSaving} />
           </View>
 
-          {/* ── KPI Strip with Sparklines ── */}
+          {/* ── KPI Strip — contextual metrics ── */}
           <View nativeID="eu-kpi-strip" style={{ flexDirection: 'row', gap: 10, padding: 14, borderBottomWidth: 1, borderBottomColor: mode === 'day' ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)', flexWrap: 'wrap' }}
             {...(Platform.OS === 'web' ? { dataSet: { animateStagger: '' } } : {})}
           >
             {[
-              { label: objectLabelPlural, value: totalRecords, color: txtColor, tint: acRgba(0.08), border: acRgba(0.18) },
-              { label: lifecycleStages.length > 0 ? 'Life Stages' : 'Stages', value: lifecycleStages.length > 0 ? lifecycleStages.length : Object.keys(stageDistribution).length, color: mode === 'day' ? '#16A34A' : '#86EFAC', tint: mode === 'day' ? 'rgba(22,163,74,0.07)' : 'rgba(134,239,172,0.08)', border: mode === 'day' ? 'rgba(22,163,74,0.18)' : 'rgba(134,239,172,0.20)' },
-              { label: subSpaceLabelPlural, value: visibleSubSpaces.length, color: mode === 'day' ? '#7C3AED' : '#C4B5FD', tint: mode === 'day' ? 'rgba(124,58,237,0.06)' : 'rgba(196,181,253,0.08)', border: mode === 'day' ? 'rgba(124,58,237,0.16)' : 'rgba(196,181,253,0.20)' },
-              { label: exceptionCount > 0 ? 'Alerts' : 'On Track', value: exceptionCount > 0 ? exceptionCount : allRecordsForWorkspace.filter((r) => r.status !== 'Exception Review').length, color: exceptionCount > 0 ? '#EF4444' : (mode === 'day' ? '#16A34A' : '#86EFAC'), tint: exceptionCount > 0 ? 'rgba(239,68,68,0.08)' : (mode === 'day' ? 'rgba(22,163,74,0.07)' : 'rgba(134,239,172,0.08)'), border: exceptionCount > 0 ? 'rgba(239,68,68,0.22)' : (mode === 'day' ? 'rgba(22,163,74,0.16)' : 'rgba(134,239,172,0.18)') },
+              { icon: '📋', label: `Total ${subjectPlural}`, value: totalRecords, display: String(totalRecords), color: txtColor, tint: acRgba(0.08), border: acRgba(0.18) },
+              { icon: '💰', label: totalValue > 0 ? (isPharmWorkspace ? 'Total Units' : 'Total Value') : `${subSpaceLabelPlural}`, value: totalValue > 0 ? totalValue : visibleSubSpaces.length, display: totalValue > 0 ? fmtAmount(totalValue) : String(visibleSubSpaces.length), color: mode === 'day' ? '#7C3AED' : '#C4B5FD', tint: mode === 'day' ? 'rgba(124,58,237,0.06)' : 'rgba(196,181,253,0.08)', border: mode === 'day' ? 'rgba(124,58,237,0.16)' : 'rgba(196,181,253,0.20)' },
+              { icon: '🟢', label: 'Active', value: activeRecords, display: String(activeRecords), color: mode === 'day' ? '#16A34A' : '#86EFAC', tint: mode === 'day' ? 'rgba(22,163,74,0.07)' : 'rgba(134,239,172,0.08)', border: mode === 'day' ? 'rgba(22,163,74,0.18)' : 'rgba(134,239,172,0.20)' },
+              { icon: exceptionCount > 0 ? '⚠️' : '✅', label: exceptionCount > 0 ? 'Exceptions' : 'Completed', value: exceptionCount > 0 ? exceptionCount : completedRecords, display: String(exceptionCount > 0 ? exceptionCount : completedRecords), color: exceptionCount > 0 ? '#EF4444' : (mode === 'day' ? '#0891B2' : '#67E8F9'), tint: exceptionCount > 0 ? 'rgba(239,68,68,0.08)' : (mode === 'day' ? 'rgba(8,145,178,0.06)' : 'rgba(103,232,249,0.08)'), border: exceptionCount > 0 ? 'rgba(239,68,68,0.22)' : (mode === 'day' ? 'rgba(8,145,178,0.18)' : 'rgba(103,232,249,0.20)') },
             ].map((kpi) => (
-              <View key={kpi.label} style={{ flex: 1, minWidth: 85, alignItems: 'center' as any, padding: 10, borderRadius: 14, backgroundColor: kpi.tint, borderWidth: 1, borderColor: kpi.border, ...(Platform.OS === 'web' ? { backdropFilter: 'blur(12px)', boxShadow: `0 2px 10px ${acRgba(0.08)}` } : {}) }}
+              <View key={kpi.label} style={{ flex: 1, minWidth: 120, alignItems: 'center' as any, padding: 12, borderRadius: 14, backgroundColor: kpi.tint, borderWidth: 1, borderColor: kpi.border, ...(Platform.OS === 'web' ? { backdropFilter: 'blur(12px)', boxShadow: `0 2px 10px ${acRgba(0.08)}` } : {}) }}
                 {...(Platform.OS === 'web' ? { dataSet: { kpiAnimate: '' } } : {})}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Text style={{ fontSize: 24, fontWeight: '800', color: kpi.color, fontVariant: ['tabular-nums'] as any }}>{kpi.value}</Text>
-                  {kpi.label === 'Records' && sparkData.length > 1 && <Sparkline data={sparkData} width={50} height={20} color={accentColor} />}
+                  <Text style={{ fontSize: 14 }}>{kpi.icon}</Text>
+                  <Text style={{ fontSize: 22, fontWeight: '800', color: kpi.color, fontVariant: ['tabular-nums'] as any }}>{kpi.display}</Text>
+                  {kpi.label.startsWith('Total ') && sparkData.length > 1 && <Sparkline data={sparkData} width={48} height={18} color={accentColor} />}
                 </View>
-                <Text style={{ fontSize: 9, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase' as any, color: dimColor, marginTop: 3 }}>{kpi.label}</Text>
+                <Text style={{ fontSize: 9, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase' as any, color: dimColor, marginTop: 4 }}>{kpi.label}</Text>
               </View>
             ))}
             {/* Stage distribution pills inline */}
@@ -2193,27 +2214,72 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
         </Pressable>
       </Modal>
 
-      {/* ═══════════════ TIMELINE MODAL ═══════════════ */}
+      {/* ═══════════════ TIMELINE MODAL — revamped ═══════════════ */}
       <Modal transparent visible={timelineModalOpen} animationType="fade" onRequestClose={() => setTimelineModalOpen(false)}>
         <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center' as any, justifyContent: 'center' as any }} onPress={() => setTimelineModalOpen(false)}>
-          <Pressable onPress={() => {}} style={{ width: 520, maxWidth: '92%' as any, maxHeight: '80%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any, ...(Platform.OS === 'web' ? { boxShadow: `0 8px 40px ${acRgba(0.22)}, 0 2px 12px rgba(0,0,0,0.4)` } as any : {}) }}>
-            <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: acRgba(0.12), flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: acRgba(0.06) }}>
-              <Text style={{ fontSize: 16, fontWeight: '800', color: '#FFFFFF' }}>Activity Timeline</Text>
-              <Pressable onPress={() => setTimelineModalOpen(false)} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center' as any, justifyContent: 'center' as any }}><Text style={{ fontSize: 14, color: dimColor }}>✕</Text></Pressable>
-            </View>
-            <ScrollView style={{ padding: 16 }} contentContainerStyle={{ gap: 8, paddingBottom: 16 }}>
-              {mergedTimeline.length === 0 && <Text style={{ fontSize: 12, color: dimColor }}>No activity recorded yet.</Text>}
-              {mergedTimeline.map((entry) => (
-                <View key={entry.id} style={{ ...g(0.03), padding: 12, gap: 4 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    {chip(entry.status)}
-                    <Text style={{ fontSize: 13, fontWeight: '700', color: '#FFFFFF' }}>{entry.title}</Text>
-                  </View>
-                  <Text style={{ fontSize: 10, color: dimColor }}>{entry.workspaceName} → {entry.subSpaceName} • {formatDate(entry.date)}</Text>
-                  {entry.amount != null && <Text style={{ fontSize: 11, color: '#86EFAC' }}>{fmtAmount(entry.amount)}</Text>}
-                  {entry.auditDetail != null && <Text style={{ fontSize: 10, color: '#C4B5FD', fontStyle: 'italic' as any }}>{entry.auditDetail}</Text>}
+          <Pressable onPress={() => {}} style={{ width: 560, maxWidth: '94%' as any, maxHeight: '85%' as any, ...g(0.08), padding: 0, overflow: 'hidden' as any, ...(Platform.OS === 'web' ? { boxShadow: `0 8px 40px ${acRgba(0.22)}, 0 2px 12px rgba(0,0,0,0.4)` } as any : {}) }}>
+            {/* Header */}
+            <View style={{ paddingHorizontal: 20, paddingTop: 18, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: acRgba(0.12), backgroundColor: acRgba(0.06) }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <Text style={{ fontSize: 18 }}>◷</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '800', color: '#FFFFFF' }}>Activity Timeline</Text>
                 </View>
-              ))}
+                <Pressable onPress={() => setTimelineModalOpen(false)} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center' as any, justifyContent: 'center' as any }}><Text style={{ fontSize: 14, color: dimColor }}>✕</Text></Pressable>
+              </View>
+              {mergedTimeline.length > 0 && (
+                <Text style={{ fontSize: 10, color: dimColor, marginTop: 4 }}>{mergedTimeline.length} event{mergedTimeline.length !== 1 ? 's' : ''} — most recent first</Text>
+              )}
+            </View>
+            <ScrollView style={{ padding: 20 }} contentContainerStyle={{ paddingBottom: 20 }}>
+              {mergedTimeline.length === 0 && (
+                <View style={{ alignItems: 'center' as any, paddingVertical: 40, gap: 8 }}>
+                  <Text style={{ fontSize: 28 }}>📭</Text>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: dimColor }}>No activity recorded yet</Text>
+                  <Text style={{ fontSize: 11, color: `${dimColor}88` }}>Create records or update statuses to see timeline events.</Text>
+                </View>
+              )}
+              {mergedTimeline.map((entry, idx) => {
+                const isLast = idx === mergedTimeline.length - 1;
+                const actionIcon = entry.status === 'Deleted' ? '🗑️' : entry.status === 'Transitioned' ? '🔄' : entry.status === 'create' || entry.status === 'Created' ? '➕' : entry.status === 'Imported' ? '📥' : '📝';
+                const isException = entry.status === 'Exception Review' || entry.status === 'Deleted';
+                const dotColor = isException ? '#EF4444' : accentColor;
+                return (
+                  <View key={entry.id} style={{ flexDirection: 'row', gap: 14, minHeight: 60 }}>
+                    {/* Timeline connector */}
+                    <View style={{ width: 32, alignItems: 'center' as any }}>
+                      <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: `${dotColor}22`, borderWidth: 1.5, borderColor: `${dotColor}55`, alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                        <Text style={{ fontSize: 12 }}>{actionIcon}</Text>
+                      </View>
+                      {!isLast && <View style={{ width: 1.5, flex: 1, backgroundColor: acRgba(0.10), marginTop: 4 }} />}
+                    </View>
+                    {/* Content card */}
+                    <View style={{ flex: 1, ...g(0.04), padding: 12, marginBottom: 8, gap: 6, borderWidth: 1, borderColor: isException ? 'rgba(239,68,68,0.18)' : acRgba(0.08) }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        {chip(entry.status)}
+                        <Text style={{ fontSize: 13, fontWeight: '700', color: '#FFFFFF', flex: 1 }} numberOfLines={2}>{entry.title}</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        {!!entry.workspaceName && <Text style={{ fontSize: 10, color: `${dimColor}CC`, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>{entry.workspaceName}</Text>}
+                        {!!entry.subSpaceName && entry.subSpaceName !== entry.workspaceName && <Text style={{ fontSize: 10, color: `${dimColor}CC`, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>{entry.subSpaceName}</Text>}
+                        {!!entry.date && <Text style={{ fontSize: 9, color: `${dimColor}99` }}>{formatDate(entry.date)}</Text>}
+                      </View>
+                      {entry.amount != null && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                          <Text style={{ fontSize: 10, color: dimColor }}>Value:</Text>
+                          <Text style={{ fontSize: 11, fontWeight: '700', color: '#86EFAC' }}>{fmtAmount(entry.amount)}</Text>
+                        </View>
+                      )}
+                      {entry.auditDetail != null && (
+                        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 4, paddingTop: 2 }}>
+                          <Text style={{ fontSize: 10, color: '#C4B5FD' }}>💬</Text>
+                          <Text style={{ fontSize: 10, color: '#C4B5FD', fontStyle: 'italic' as any, flex: 1 }}>{entry.auditDetail}</Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                );
+              })}
             </ScrollView>
           </Pressable>
         </Pressable>

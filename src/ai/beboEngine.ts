@@ -511,26 +511,27 @@ const KIT_SKUS = [
 
 const KIT_QTY_PER_ORDER = [200, 150, 100, 250, 75, 120, 90, 80];
 
-// Z Fold 7 box contents — used as the master BOM component list
+// Phone kit box contents — used as the master BOM component list
+// Core phone kit: Device + SIM + Charger + Cable + SIM Pin + Accessories
 const KIT_COMPONENTS = [
   'Samsung Galaxy Z Fold 7 (SM-F956U)',
+  'T-Mobile SIM Card (5G NR)',
   '45W USB-C Super Fast Charger',
   'USB-C to USB-C Cable (6ft)',
+  'SIM Eject Pin Tool',
   'S Pen for Galaxy Z Fold',
-  'Samsung Care+ Documentation Packet',
   'Quick Start Guide / User Manual',
-  'SIM Eject Tool',
+  'Samsung Care+ Documentation Packet',
   'Retail Box Insert Card',
   'Anti-Static Device Bag',
   'Foam Tray Insert',
   'Protective Film Kit',
-  'In-Box Accessories Bag',
 ];
 
 const KIT_COMP_SKUS = [
-  'SKU-ZF7-DEVICE', 'SKU-ZF7-CHGR', 'SKU-ZF7-CABLE', 'SKU-ZF7-SPEN',
-  'SKU-ZF7-CARE', 'SKU-ZF7-QSG', 'SKU-ZF7-SIM', 'SKU-ZF7-INSERT',
-  'SKU-ZF7-BAG', 'SKU-ZF7-FOAM', 'SKU-ZF7-FILM', 'SKU-ZF7-ACCS',
+  'SKU-ZF7-DEVICE', 'SKU-ZF7-SIM', 'SKU-ZF7-CHGR', 'SKU-ZF7-CABLE',
+  'SKU-ZF7-PIN', 'SKU-ZF7-SPEN', 'SKU-ZF7-QSG', 'SKU-ZF7-CARE',
+  'SKU-ZF7-INSERT', 'SKU-ZF7-BAG', 'SKU-ZF7-FOAM', 'SKU-ZF7-FILM',
 ];
 
 const KIT_CLIENTS = [
@@ -539,21 +540,21 @@ const KIT_CLIENTS = [
 ];
 
 function generateKittingData(count = 20) {
-  const headers = ['Work Order', 'Client', 'Kit SKU', 'Kit Name', 'Kit Qty', 'BOM Status', 'Stage', 'Technician', 'QC Result', 'Ship Date'];
-  const stages  = ['Inbound Receiving', 'Client Order Intake', 'BOM & Allocation', 'Work Order Created', 'Picking', 'Kitting / Assembly', 'Pack & Label', 'Shipped to Client'];
+  const headers = ['Work Order', 'Client', 'Kit SKU', 'Kit Name', 'Kit Qty', 'IMEI', 'SIM ICCID', 'Stage', 'Technician', 'QC Result', 'Ship Date'];
+  const stages  = ['Ordered', 'Received', 'Picking', 'Packed', 'Shipped', 'Delivered', 'Returned'];
   const techs   = ['J. Rivera', 'K. Thompson', 'M. Santos', 'T. Williams', 'A. Patel', 'D. Nguyen'];
   const rows: string[][] = Array.from({ length: count }, (_, i) => {
     const prodIdx  = i % KIT_PRODUCTS.length;
     const stageIdx = Math.floor(Math.random() * stages.length);
-    const bomSt    = stageIdx >= 3 ? 'Validated' : stageIdx >= 2 ? 'In Progress' : 'Pending';
-    const qc       = stageIdx >= 7 ? 'Passed' : stageIdx === 6 ? pick(['Passed', 'Passed', 'Passed', 'Failed']) : stageIdx === 5 ? pick(['Passed', 'Passed', 'Pending']) : 'Pending';
+    const qc       = stageIdx >= 4 ? 'Passed' : stageIdx === 3 ? pick(['Passed', 'Passed', 'Passed', 'Failed']) : 'Pending';
     return [
       `WO-${String(10234 + i)}`,
       KIT_CLIENTS[i % KIT_CLIENTS.length],
       KIT_SKUS[prodIdx],
       KIT_PRODUCTS[prodIdx],
       String(KIT_QTY_PER_ORDER[prodIdx]),
-      bomSt,
+      `IMEI-${353456789012345 + i}`,
+      `ICCID-${8901260882902000000 + i}`,
       stages[stageIdx],
       pick(techs),
       qc,
@@ -1427,7 +1428,7 @@ export function buildLifecyclePayload(): ScenarioApplyPayload {
   const onbRecords: RuntimeRecord[] = LIFECYCLE_COMPANIES.slice(0, 6).map((co, i) => {
     const goLive = fmtDate(Math.floor(Math.random() * 30) + 7);
     return mkRecord(`rec-lcos-onb-${i}`, `client-lcos-${i}`, 'ws-bebo-lcos-onboarding', 'ss-onb-list',
-      `${co} — Onboarding`, pick(['In Progress', 'Pending', 'Complete']),
+      `${co} — Onboarding`, pick(['In Progress', 'Submitted', 'Closed']),
       undefined, fmtDate(-Math.floor(Math.random() * 14)), ['Type:Onboarding'],
       { 'Company Name': co, 'Primary IT Contact': lcContacts[i % lcContacts.length], 'Device Count': Math.floor(Math.random() * 200 + 10), 'Target Go-Live': goLive });
   });
@@ -1435,7 +1436,7 @@ export function buildLifecyclePayload(): ScenarioApplyPayload {
   const excRecords: RuntimeRecord[] = Array.from({ length: 4 }, (_, i) => {
     const model = pick(lcDevices);
     return mkRecord(`rec-lcos-exc-${i}`, `client-lcos-${i}`, 'ws-bebo-lcos-exchange', 'ss-exc-orders',
-      `EXC-${300 + i} — ${model}`, pick(['Processing', 'Shipped', 'Delivered']),
+      `EXC-${300 + i} — ${model}`, pick(['In Progress', 'In Progress', 'Resolved']),
       undefined, fmtDate(-i), ['Type:Exchange'],
       { 'Order ID': `EXC-${300 + i}`, 'Company': LIFECYCLE_COMPANIES[i % LIFECYCLE_COMPANIES.length], 'Device Model': model, 'Serial Number': `SN-${String(9000 + i)}` });
   });
@@ -1445,7 +1446,7 @@ export function buildLifecyclePayload(): ScenarioApplyPayload {
     const prio = pick(['High', 'Medium', 'Low']);
     const cats = ['Technical', 'Billing', 'Exchange', 'Onboarding', 'Account'];
     return mkRecord(`rec-lcos-tkt-${i}`, `client-lcos-${i % 6}`, 'ws-bebo-lcos-tickets', 'ss-tkt-list',
-      `TKT-2026-${5000 + i} — ${pick(cats)}`, pick(['Open', 'In Progress', 'Resolved']),
+      `TKT-2026-${5000 + i} — ${pick(cats)}`, pick(['Submitted', 'In Progress', 'Resolved']),
       undefined, fmtDate(-Math.floor(Math.random() * 14)), ['Type:Ticket'],
       { 'Ticket ID': `TKT-2026-${5000 + i}`, 'Company': LIFECYCLE_COMPANIES[i % LIFECYCLE_COMPANIES.length], 'Subject': tktSubjects[i % tktSubjects.length], 'Priority': prio });
   });
@@ -1456,9 +1457,9 @@ export function buildLifecyclePayload(): ScenarioApplyPayload {
     LIFECYCLE_COMPANIES.slice(0, 3).map((co, ci) => {
       const done = si < 3 + ci;
       return mkRecord(`rec-lcos-wiz-${si}-${ci}`, `client-lcos-${ci}`, 'ws-bebo-lcos-onboarding', 'ss-onb-wizard',
-        `${co} — ${step}`, done ? 'Complete' : si === 3 + ci ? 'In Progress' : 'Pending',
+        `${co} — ${step}`, done ? 'Closed' : si === 3 + ci ? 'In Progress' : 'Submitted',
         undefined, done ? fmtDate(-14 + si * 2) : undefined, ['Type:WizardStep'],
-        { 'Step Name': step, 'Step Status': done ? 'Complete' : si === 3 + ci ? 'In Progress' : 'Pending', 'Completed': done ? fmtDate(-14 + si * 2) : '', 'Step Notes': done ? `${step} completed for ${co}` : '' });
+        { 'Step Name': step, 'Step Status': done ? 'Closed' : si === 3 + ci ? 'In Progress' : 'Submitted', 'Completed': done ? fmtDate(-14 + si * 2) : '', 'Step Notes': done ? `${step} completed for ${co}` : '' });
     })
   );
 
@@ -1469,7 +1470,7 @@ export function buildLifecyclePayload(): ScenarioApplyPayload {
     const devType = pick(devTypes);
     const mdm = pick(mdmPlatforms);
     return mkRecord(`rec-lcos-dev-${i}`, `client-lcos-${i % 6}`, 'ws-bebo-lcos-onboarding', 'ss-onb-devices',
-      `${devType} × ${Math.floor(Math.random() * 50 + 5)} — ${mdm}`, pick(['Configured', 'Pending', 'Enrolled']),
+      `${devType} × ${Math.floor(Math.random() * 50 + 5)} — ${mdm}`, pick(['In Progress', 'Submitted', 'Resolved']),
       undefined, fmtDate(-Math.floor(Math.random() * 10)), ['Type:DeviceConfig'],
       { 'Device Type': devType, 'MDM Platform': mdm, 'Count': Math.floor(Math.random() * 50 + 5), 'Special Requirements': pick(['None', 'Kiosk mode required', 'VPN pre-configured', 'Custom certificates', 'BitLocker enforced']) });
   });
@@ -1478,7 +1479,7 @@ export function buildLifecyclePayload(): ScenarioApplyPayload {
   const offReasons = ['Contract Ended', 'Merger / Acquisition', 'Downsizing', 'Vendor Switch', 'Budget Reduction'];
   const offRecords: RuntimeRecord[] = LIFECYCLE_COMPANIES.slice(2, 7).map((co, i) =>
     mkRecord(`rec-lcos-off-${i}`, `client-lcos-${(i + 2) % 6}`, 'ws-bebo-lcos-offboarding', 'ss-off-list',
-      `${co} — Offboarding`, pick(['Submitted', 'In Progress', 'Complete']),
+      `${co} — Offboarding`, pick(['Submitted', 'In Progress', 'Closed']),
       undefined, fmtDate(-Math.floor(Math.random() * 20)), ['Type:Offboarding'],
       { 'Customer Account': co, 'Offboarding Reason': pick(offReasons), 'Last Service Date': fmtDate(Math.floor(Math.random() * 30)), 'Total Device Count': Math.floor(Math.random() * 100 + 10) })
   );
@@ -1487,7 +1488,7 @@ export function buildLifecyclePayload(): ScenarioApplyPayload {
   const retMethods = ['UPS Prepaid Label', 'FedEx Pickup', 'On-Site Collection', 'Customer Drop-Off'];
   const assetRecords: RuntimeRecord[] = Array.from({ length: 6 }, (_, i) =>
     mkRecord(`rec-lcos-asset-${i}`, `client-lcos-${(i + 2) % 6}`, 'ws-bebo-lcos-offboarding', 'ss-off-assets',
-      `Return #${i + 1} — ${pick(retMethods)}`, pick(['Scheduled', 'Picked Up', 'Received', 'Processed']),
+      `Return #${i + 1} — ${pick(retMethods)}`, pick(['Submitted', 'In Progress', 'In Progress', 'Closed']),
       undefined, fmtDate(-Math.floor(Math.random() * 14)), ['Type:AssetReturn'],
       { 'Return Method': pick(retMethods), 'Pickup Date': fmtDate(Math.floor(Math.random() * 7) + 1), 'Return Contact': pick(lcContacts), 'Asset Condition Notes': pick(['Good condition', 'Minor cosmetic wear', 'Missing charger', 'Screen protector cracked', 'All accessories included']) })
   );
@@ -1495,7 +1496,7 @@ export function buildLifecyclePayload(): ScenarioApplyPayload {
   // ── Access Revocation Checklist (ss-off-checklist) ──
   const checklistRecords: RuntimeRecord[] = LIFECYCLE_COMPANIES.slice(2, 7).map((co, i) =>
     mkRecord(`rec-lcos-chk-${i}`, `client-lcos-${(i + 2) % 6}`, 'ws-bebo-lcos-offboarding', 'ss-off-checklist',
-      `${co} — Access Revocation`, i < 2 ? 'Complete' : 'In Progress',
+      `${co} — Access Revocation`, i < 2 ? 'Closed' : 'In Progress',
       undefined, fmtDate(-Math.floor(Math.random() * 10)), ['Type:Checklist'],
       { 'SSO Revoked': i < 3 ? 'Yes' : 'No', 'MDM Removed': i < 2 ? 'Yes' : 'No', 'Licenses Released': i < 4 ? 'Yes' : 'No', 'Data Wiped': i < 2 ? 'Yes' : 'No' })
   );
@@ -1504,7 +1505,7 @@ export function buildLifecyclePayload(): ScenarioApplyPayload {
   const excIssues = ['Cracked display after drop', 'Battery draining within 2 hours', 'Keyboard keys unresponsive', 'Trackpad ghost clicking', 'USB-C port not charging', 'Blue screen on boot'];
   const excFormRecords: RuntimeRecord[] = Array.from({ length: 5 }, (_, i) =>
     mkRecord(`rec-lcos-excf-${i}`, `client-lcos-${i % 6}`, 'ws-bebo-lcos-exchange', 'ss-exc-form',
-      `EXR-${400 + i} — ${pick(['High', 'Medium', 'Standard'])} Priority`, pick(['Submitted', 'Approved', 'Processing', 'Shipped']),
+      `EXR-${400 + i} — ${pick(['High', 'Medium', 'Standard'])} Priority`, pick(['Submitted', 'In Progress', 'In Progress', 'Resolved']),
       undefined, fmtDate(-Math.floor(Math.random() * 10)), ['Type:ExchangeRequest'],
       { 'Issue Description': pick(excIssues), 'Priority Level': pick(['High', 'Medium', 'Standard']), 'Delivery Address': `${100 + i * 10} Enterprise Blvd, Suite ${200 + i}`, 'Recipient Name': pick(lcContacts) })
   );
@@ -1647,7 +1648,7 @@ export function buildFulfillmentPayload(): ScenarioApplyPayload {
       { 'SKU': `SKU-${String(3000 + i)}`, 'Product Description': prod, 'Qty Available': qtyAvail, 'Qty Allocated': Math.floor(qtyAvail * 0.3), 'Reorder Point': reorder });
   });
 
-  const rfSteps = ['Receiving', 'Inventoried', 'Ordered', 'Picking', 'Packing', 'Shipped', 'Delivered'];
+  const rfSteps = ['Received', 'Inventoried', 'Ordered', 'Picking', 'Packing', 'Shipped', 'Delivered'];
   const orderRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) => {
     const step = pick(rfSteps);
     return mkRecord(`rec-rf-ord-${i}`, `client-rf-${i % 6}`, 'ws-bebo-rf-orders', 'ss-rf-orders',
@@ -1799,25 +1800,36 @@ export function buildUniversalPayload(): ScenarioApplyPayload {
   return buildTenantScaffold();
 }
 
-// ─── Kitting — Samsung Z Fold 7 / T-Mobile BOM-Driven Assembly ───────
+// ─── Kitting — Hellmann Worldwide / Phone Kit Assembly ────────────────
+// Lifecycle stages map 1-to-1 with subspace order:
+//   Inbound Receiving → Ordered, Received
+//   Pick and Pack     → Picking, Packed
+//   Outbound Shipping → Shipped, Delivered
+//   Returns           → Returned
 
 export function buildKittingPayload(): ScenarioApplyPayload {
 
-  // ── Workspace 1: Component Receiving ─────────────────────────────
-  const wsReceiving = mkWorkspace('ws-kit-receiving', 'Component Receiving', 'Component', '📥', [
-    // Matches the "Receiving Screen" — operator scans inbound PO line items
-    mkSubSpace('ss-kit-recv-queue', 'Receiving Queue', 'Received Item', 'board', [
-      mkField('f-rq-po',        'PO Number',     'text',     true),
-      mkField('f-rq-sku',       'SKU',           'text',     true),
-      mkField('f-rq-compname',  'Component Name','text',     true),
-      mkField('f-rq-qty',       'Qty Received',  'number',   true),
-      mkField('f-rq-serial',    'Serial Numbers','text',     false),
-      mkField('f-rq-condition', 'Condition',     'select',   true),
-      mkField('f-rq-bin',       'Bin Location',  'text',     true),
-      mkField('f-rq-rcvby',     'Received By',   'text',     true),
-      mkField('f-rq-rcvdate',   'Received Date', 'datetime', true),
+  // ── Workspace 1: Inbound Receiving  (stages: Ordered → Received) ───
+  const wsInbound = mkWorkspace('ws-kit-inbound', 'Inbound Receiving', 'Inbound Item', '📥', [
+    mkSubSpace('ss-kit-orders', 'Purchase Orders', 'Purchase Order', 'board', [
+      mkField('f-po-id',       'PO Number',       'text',     true),
+      mkField('f-po-supplier', 'Supplier',        'text',     true),
+      mkField('f-po-sku',      'Kit SKU',         'text',     true),
+      mkField('f-po-qty',      'Order Qty',       'number',   true),
+      mkField('f-po-eta',      'Expected Arrival', 'date',    true),
+      mkField('f-po-status',   'Status',          'select',   true),
     ]),
-    // Master component inventory — tracks all Z Fold 7 box contents
+    mkSubSpace('ss-kit-recv', 'Receiving Dock', 'Received Shipment', 'grid', [
+      mkField('f-rv-po',       'PO Number',       'text',     true),
+      mkField('f-rv-sku',      'SKU',             'text',     true),
+      mkField('f-rv-comp',     'Component Name',  'text',     true),
+      mkField('f-rv-qty',      'Qty Received',    'number',   true),
+      mkField('f-rv-serial',   'Serial / IMEI',   'text',     false),
+      mkField('f-rv-condition','Condition',        'select',   true),
+      mkField('f-rv-bin',      'Bin Location',    'text',     true),
+      mkField('f-rv-by',       'Received By',     'text',     true),
+      mkField('f-rv-date',     'Received Date',   'datetime', true),
+    ]),
     mkSubSpace('ss-kit-catalog', 'Component Catalog', 'Component', 'grid', [
       mkField('f-cat-sku',      'SKU',              'text',   true),
       mkField('f-cat-name',     'Component Name',   'text',   true),
@@ -1827,410 +1839,308 @@ export function buildKittingPayload(): ScenarioApplyPayload {
       mkField('f-cat-cost',     'Unit Cost ($)',     'number', false),
       mkField('f-cat-bin',      'Primary Bin',      'text',   true),
       mkField('f-cat-supplier', 'Supplier',         'text',   false),
-      mkField('f-cat-leadtime', 'Lead Time (Days)', 'number', false),
-    ]),
-    // Full audit trail of every receiving event
-    mkSubSpace('ss-kit-recv-log', 'Receiving Log', 'Receiving Event', 'timeline', [
-      mkField('f-rl-po',      'PO Number',     'text',     true),
-      mkField('f-rl-sku',     'SKU',           'text',     true),
-      mkField('f-rl-name',    'Component',     'text',     true),
-      mkField('f-rl-qty',     'Quantity',      'number',   true),
-      mkField('f-rl-by',      'Received By',   'text',     true),
-      mkField('f-rl-action',  'Action',        'text',     true),
-      mkField('f-rl-ts',      'Timestamp',     'datetime', true),
-      mkField('f-rl-notes',   'Notes',         'longText', false),
     ]),
   ]);
 
-  // ── Workspace 2: Orders & BOM ──────────────────────────────────────
-  const wsOrders = mkWorkspace('ws-kit-orders', 'Orders & BOM', 'Kit Order', '📋', [
-    // Client Orders board — matches "Order Intake Screen"
-    mkSubSpace('ss-kit-client-orders', 'Client Orders', 'Client Order', 'board', [
-      mkField('f-co-po',       'PO Number',  'text',   true),
-      mkField('f-co-client',   'Client',     'text',   true),
-      mkField('f-co-kitsku',   'Kit SKU',    'select', true),
-      mkField('f-co-kitname',  'Kit Name',   'text',   true),
-      mkField('f-co-qty',      'Order Qty',  'number', true),
-      mkField('f-co-shipdate', 'Ship Date',  'date',   true),
-      mkField('f-co-priority', 'Priority',   'select', false),
-      mkField('f-co-rep',      'Account Rep','text',   false),
-      mkField('f-co-status',   'Status',     'select', true),
-    ]),
-    // BOM grid — 12 component lines for Samsung Z Fold 7 Kit
-    mkSubSpace('ss-kit-bom', 'Bill of Materials', 'BOM Line', 'grid', [
-      mkField('f-bom-kitsku',    'Kit SKU',          'select',   true),
-      mkField('f-bom-kitname',   'Kit Name',         'text',     true),
-      mkField('f-bom-compsku',   'Component SKU',    'text',     true),
-      mkField('f-bom-compname',  'Component Name',   'text',     true),
-      mkField('f-bom-qty',       'Qty Per Kit',      'number',   true),
-      mkField('f-bom-serial',    'Serialized',       'checkbox', false),
-      mkField('f-bom-altsku',    'Alt Component SKU','text',     false),
-      mkField('f-bom-notes',     'Notes',            'longText', false),
-    ]),
-    // Allocation check — is inventory sufficient to fulfil each WO?
-    mkSubSpace('ss-kit-allocation', 'BOM Allocation', 'Allocation Check', 'board', [
-      mkField('f-alloc-wo',      'Work Order',       'text',   true),
-      mkField('f-alloc-kitsku',  'Kit SKU',          'text',   true),
-      mkField('f-alloc-compsku', 'Component SKU',    'text',   true),
-      mkField('f-alloc-comp',    'Component Name',   'text',   true),
-      mkField('f-alloc-req',     'Required Qty',     'number', true),
-      mkField('f-alloc-avail',   'Available Qty',    'number', true),
-      mkField('f-alloc-short',   'Shortage Qty',     'number', false),
-      mkField('f-alloc-status',  'Allocation Status','select', true),
-    ]),
-    // Work Orders — matches "Work Order #10234" screen
-    mkSubSpace('ss-kit-workorders', 'Work Orders', 'Work Order', 'board', [
-      mkField('f-wo-id',       'Work Order ID',     'text',     true),
-      mkField('f-wo-client',   'Client',            'text',     true),
-      mkField('f-wo-kitsku',   'Kit SKU',           'text',     true),
-      mkField('f-wo-kitname',  'Kit Name',          'text',     true),
-      mkField('f-wo-qty',      'Kit Qty',           'number',   true),
-      mkField('f-wo-bom',      'BOM Validated',     'checkbox', false),
-      mkField('f-wo-status',   'Status',            'select',   true),
-      mkField('f-wo-tech',     'Assigned Technician','text',    false),
-      mkField('f-wo-due',      'Due Date',          'date',     false),
-    ]),
-  ]);
-
-  // ── Workspace 3: Picking & Kitting Station ─────────────────────────
-  const wsProduction = mkWorkspace('ws-kit-production', 'Picking & Kitting', 'Kit Assembly', '🔧', [
-    // Pick list per WO — matches "Picking Screen" (Item, Location, Qty to Pick, Scan Item)
+  // ── Workspace 2: Pick and Pack  (stages: Picking → Packed) ─────────
+  const wsPickPack = mkWorkspace('ws-kit-pickpack', 'Pick and Pack', 'Pick Order', '📦', [
     mkSubSpace('ss-kit-picklist', 'Pick Lists', 'Pick Line', 'grid', [
       mkField('f-pk-wo',       'Work Order',    'text',   true),
       mkField('f-pk-comp',     'Component',     'text',   true),
-      mkField('f-pk-compsku',  'Component SKU', 'text',   true),
+      mkField('f-pk-sku',      'Component SKU', 'text',   true),
       mkField('f-pk-bin',      'Bin Location',  'text',   true),
       mkField('f-pk-qtyreq',   'Qty to Pick',   'number', true),
-      mkField('f-pk-qtysc',    'Qty Scanned',   'number', false),
+      mkField('f-pk-qtyscan',  'Qty Scanned',   'number', false),
       mkField('f-pk-picker',   'Picker',        'text',   false),
       mkField('f-pk-status',   'Scan Status',   'select', false),
     ]),
-    // Scan event log — every scan recorded
-    mkSubSpace('ss-kit-scan-log', 'Scan & Pick Events', 'Scan Event', 'timeline', [
-      mkField('f-sc-wo',      'Work Order',  'text',     true),
-      mkField('f-sc-comp',    'Component',   'text',     true),
-      mkField('f-sc-bin',     'Bin',         'text',     true),
-      mkField('f-sc-qty',     'Qty Scanned', 'number',   true),
-      mkField('f-sc-by',      'Scanned By',  'text',     true),
-      mkField('f-sc-ts',      'Scan Time',   'datetime', true),
-      mkField('f-sc-verify',  'Verified',    'checkbox', false),
+    mkSubSpace('ss-kit-station', 'Kitting Station', 'Kit Build', 'board', [
+      mkField('f-ks-wo',        'Work Order',           'text',     true),
+      mkField('f-ks-kitid',     'Kit ID',               'text',     true),
+      mkField('f-ks-imei',      'Device IMEI',          'text',     true),
+      mkField('f-ks-iccid',     'SIM ICCID',            'text',     true),
+      mkField('f-ks-activation','SIM Activated',         'checkbox', false),
+      mkField('f-ks-tech',      'Kitting Technician',   'text',     true),
+      mkField('f-ks-assembled', 'Components Assembled', 'number',   false),
+      mkField('f-ks-status',    'Assembly Status',      'select',   true),
     ]),
-    // Kitting Station — matches "Kitting Station" screen
-    mkSubSpace('ss-kit-station', 'Kitting Station', 'Kit Build', 'grid', [
-      mkField('f-ks-wo',           'Work Order',          'text',     true),
-      mkField('f-ks-kitid',        'Kit ID',              'text',     true),
-      mkField('f-ks-kitsku',       'Kit SKU',             'text',     true),
-      mkField('f-ks-kitname',      'Kit Name',            'text',     true),
-      mkField('f-ks-tech',         'Kitting Technician',  'text',     true),
-      mkField('f-ks-assembled',    'Components Assembled','number',   false),
-      mkField('f-ks-serials',      'Serials Assigned',    'checkbox', false),
-      mkField('f-ks-status',       'Assembly Status',     'select',   true),
+    mkSubSpace('ss-kit-qc', 'QC Inspection', 'QC Record', 'board', [
+      mkField('f-qc-kitid',    'Kit ID',            'text',     true),
+      mkField('f-qc-imei',     'Device IMEI',       'text',     true),
+      mkField('f-qc-inspector','Inspector',          'text',     true),
+      mkField('f-qc-result',   'Inspection Result',  'select',   true),
+      mkField('f-qc-defects',  'Defects Found',      'longText', false),
+      mkField('f-qc-date',     'Inspection Date',    'datetime', false),
+      mkField('f-qc-rework',   'Rework Required',    'checkbox', false),
     ]),
-    // Step-by-step assembly audit trail per kit
-    mkSubSpace('ss-kit-assembly-log', 'Assembly Log', 'Assembly Step', 'timeline', [
-      mkField('f-al-kitid',  'Kit ID',       'text',     true),
-      mkField('f-al-step',   'Step',         'text',     true),
-      mkField('f-al-comp',   'Component',    'text',     false),
-      mkField('f-al-by',     'Performed By', 'text',     true),
-      mkField('f-al-ts',     'Timestamp',    'datetime', true),
-      mkField('f-al-notes',  'Notes',        'longText', false),
+    mkSubSpace('ss-kit-pack', 'Pack & Label', 'Pack Record', 'grid', [
+      mkField('f-pl-kitid',   'Kit ID',         'text',     true),
+      mkField('f-pl-imei',    'Device IMEI',    'text',     true),
+      mkField('f-pl-orderid', 'Order ID',       'text',     true),
+      mkField('f-pl-dims',    'Box Dimensions', 'text',     false),
+      mkField('f-pl-weight',  'Weight (lbs)',   'number',   false),
+      mkField('f-pl-date',    'Pack Date',      'datetime', false),
+      mkField('f-pl-by',      'Packed By',      'text',     false),
     ]),
   ]);
 
-  // ── Workspace 4: QC, Pack & Ship ───────────────────────────────────
-  const wsQcShip = mkWorkspace('ws-kit-qcship', 'QC, Pack & Ship', 'Shipment', '🚚', [
-    // QC Inspection board — matches "Quality Check" tab
-    mkSubSpace('ss-kit-qc', 'QC Inspection', 'QC Record', 'board', [
-      mkField('f-qc-kitid',    'Kit ID',           'text',     true),
-      mkField('f-qc-wo',       'Work Order',        'text',     true),
-      mkField('f-qc-kitsku',   'Kit SKU',           'text',     true),
-      mkField('f-qc-inspector','Inspector',         'text',     true),
-      mkField('f-qc-result',   'Inspection Result', 'select',   true),
-      mkField('f-qc-defects',  'Defects Found',     'longText', false),
-      mkField('f-qc-date',     'Inspection Date',   'datetime', false),
-      mkField('f-qc-rework',   'Rework Required',   'checkbox', false),
-    ]),
-    // Pack station — weight, dimensions, box, pack date
-    mkSubSpace('ss-kit-pack', 'Pack & Label Station', 'Pack Record', 'grid', [
-      mkField('f-pl-kitid',  'Kit ID',        'text',     true),
-      mkField('f-pl-orderid','Order ID',      'text',     true),
-      mkField('f-pl-kitsku', 'Kit SKU',       'text',     true),
-      mkField('f-pl-dims',   'Box Dimensions','text',     false),
-      mkField('f-pl-weight', 'Weight (lbs)',  'number',   false),
-      mkField('f-pl-date',   'Pack Date',     'datetime', false),
-      mkField('f-pl-ltype',  'Label Type',    'select',   false),
-      mkField('f-pl-by',     'Packed By',     'text',     false),
-    ]),
-    // Shipping labels — matches "Shipping" tab
+  // ── Workspace 3: Outbound Shipping  (stages: Shipped → Delivered) ──
+  const wsOutbound = mkWorkspace('ws-kit-outbound', 'Outbound Shipping', 'Shipment', '🚚', [
     mkSubSpace('ss-kit-labels', 'Shipping Labels', 'Shipping Label', 'grid', [
-      mkField('f-sl-orderid',  'Order ID',           'text',     true),
-      mkField('f-sl-kitid',    'Kit ID',             'text',     true),
-      mkField('f-sl-carrier',  'Carrier',            'select',   true),
-      mkField('f-sl-service',  'Service Level',      'select',   false),
-      mkField('f-sl-tracking', 'Tracking Number',    'text',     false),
-      mkField('f-sl-generated','Label Generated',    'checkbox', false),
-      mkField('f-sl-created',  'Created Date',       'datetime', false),
-      mkField('f-sl-eta',      'Estimated Delivery', 'date',     false),
+      mkField('f-sl-orderid',  'Order ID',            'text',     true),
+      mkField('f-sl-kitid',    'Kit ID',              'text',     true),
+      mkField('f-sl-carrier',  'Carrier',             'select',   true),
+      mkField('f-sl-service',  'Service Level',       'select',   false),
+      mkField('f-sl-tracking', 'Tracking Number',     'text',     false),
+      mkField('f-sl-eta',      'Estimated Delivery',  'date',     false),
     ]),
-    // Live shipment event feed per order
-    mkSubSpace('ss-kit-shipment-tracker', 'Shipment Tracker', 'Shipment Event', 'timeline', [
+    mkSubSpace('ss-kit-tracker', 'Shipment Tracker', 'Shipment Event', 'timeline', [
       mkField('f-st-orderid', 'Order ID',          'text',     true),
       mkField('f-st-kitid',   'Kit ID',            'text',     true),
       mkField('f-st-carrier', 'Carrier',           'text',     true),
       mkField('f-st-event',   'Event',             'text',     true),
       mkField('f-st-location','Location',          'text',     false),
       mkField('f-st-ts',      'Timestamp',         'datetime', true),
-      mkField('f-st-notify',  'Status Update Sent','checkbox', false),
+    ]),
+  ]);
+
+  // ── Workspace 4: Returns  (stage: Returned) ────────────────────────
+  const wsReturns = mkWorkspace('ws-kit-returns', 'Returns', 'Return', '🔄', [
+    mkSubSpace('ss-kit-rma', 'RMA Requests', 'RMA', 'board', [
+      mkField('f-rma-id',     'RMA Number',     'text',     true),
+      mkField('f-rma-orderid','Original Order',  'text',     true),
+      mkField('f-rma-imei',   'Device IMEI',     'text',     true),
+      mkField('f-rma-reason', 'Return Reason',   'select',   true),
+      mkField('f-rma-cond',   'Item Condition',   'select',   true),
+      mkField('f-rma-status', 'RMA Status',       'select',   true),
+      mkField('f-rma-date',   'Return Date',      'date',     true),
+    ]),
+    mkSubSpace('ss-kit-refurb', 'Refurbishment Log', 'Refurb Event', 'timeline', [
+      mkField('f-ref-rma',    'RMA Number',    'text',     true),
+      mkField('f-ref-imei',   'Device IMEI',   'text',     true),
+      mkField('f-ref-action', 'Action Taken',  'text',     true),
+      mkField('f-ref-by',     'Performed By',  'text',     true),
+      mkField('f-ref-ts',     'Timestamp',     'datetime', true),
+      mkField('f-ref-notes',  'Notes',         'longText', false),
     ]),
   ]);
 
   // ── 7 Signal Flows ────────────────────────────────────────────────
   const flows = [
-    mkFlow('flow-kit-order-confirmed',
-      'Order Confirmed → Draft Work Order',
-      'Client order status set to Confirmed',
-      ['status = Confirmed'],
-      'Run BOM availability check against Component Catalog; auto-create draft Work Order and assign to BOM Coordinator',
-      'ws-kit-orders', 'ss-kit-client-orders', ['Type:Order', 'Stage:ClientOrderIntake']),
+    mkFlow('flow-kit-po-received',
+      'PO Received → Move to Received',
+      'Inbound PO status set to Delivered',
+      ['status = Delivered'],
+      'Transition order to Received stage; create Receiving Dock record for dock inspection',
+      'ws-kit-inbound', 'ss-kit-orders', ['Stage:Received', 'Type:Inbound']),
 
     mkFlow('flow-kit-low-stock',
       'Component Below Reorder Point',
       'Component Catalog qty_on_hand drops below reorder_point',
       ['qty_on_hand < reorder_point'],
-      'Alert Procurement Coordinator with component name, SKU, current qty, and reorder qty; auto-create purchase request',
-      'ws-kit-receiving', 'ss-kit-catalog', ['Priority:LowStock', 'Type:Inventory']),
-
-    mkFlow('flow-kit-bom-shortage',
-      'BOM Allocation Fails → Block Work Order',
-      'BOM Allocation check status set to Shortage',
-      ['allocation_status = Shortage'],
-      'Block Work Order from advancing to Picking; assign exception to BOM Coordinator with shortage detail',
-      'ws-kit-orders', 'ss-kit-allocation', ['Type:Block', 'Exception:BOMShortage']),
-
-    mkFlow('flow-kit-wo-released',
-      'Work Order Released → Auto-Generate Pick List',
-      'Work Order status set to Released and BOM Validated is checked',
-      ['status = Released', 'bom_validated = true'],
-      'Auto-create one Pick Line record per BOM component with bin location and qty to pick; notify assigned Picker',
-      'ws-kit-orders', 'ss-kit-workorders', ['Type:WorkOrder', 'Stage:Picking']),
+      'Alert Procurement to reorder component via email; flag item as Low Stock',
+      'ws-kit-inbound', 'ss-kit-catalog', ['Priority:LowStock', 'Type:Inventory']),
 
     mkFlow('flow-kit-pick-complete',
-      'All Pick Lines Complete → Release to Kitting Station',
-      'All Pick Lines for a Work Order reach Scan Status = Complete',
-      ['all_pick_lines_complete = true'],
-      'Update Work Order status to Kitting / Assembly; create Kitting Station record; notify assigned Kitting Technician',
-      'ws-kit-production', 'ss-kit-picklist', ['Stage:KittingAssembly', 'Type:PickComplete']),
+      'All Picks Complete → Move to Packed',
+      'All pick lines for a work order are Complete',
+      ['scan_status = Complete'],
+      'Transition order to Picking stage; create Kitting Station build record with IMEI + SIM ICCID for activation',
+      'ws-kit-pickpack', 'ss-kit-picklist', ['Stage:Picking', 'Type:Pick']),
+
+    mkFlow('flow-kit-assembly-done',
+      'Assembly Complete + SIM Activated → QC',
+      'Kit Build assembly status set to Complete and SIM Activated is checked',
+      ['assembly_status = Complete', 'sim_activated = true'],
+      'Create QC Inspection record; verify IMEI matches SIM ICCID pairing; notify QC Inspector',
+      'ws-kit-pickpack', 'ss-kit-station', ['Stage:Packed', 'Type:Assembly']),
 
     mkFlow('flow-kit-qc-pass',
-      'QC Passed → Auto-Generate Shipping Label',
+      'QC Passed → Generate Shipping Label',
       'QC Inspection Result set to Passed',
       ['inspection_result = Passed'],
-      'Auto-generate prepaid carrier label (UPS/FedEx based on client SLA); create Pack Record; notify Pack & Label Operator',
-      'ws-kit-qcship', 'ss-kit-qc', ['Type:QC', 'Status:Passed']),
+      'Auto-generate carrier label (UPS/FedEx); create Pack Record; transition to Shipped stage',
+      'ws-kit-pickpack', 'ss-kit-qc', ['Type:QC', 'Status:Passed']),
 
-    mkFlow('flow-kit-carrier-scan',
-      'Carrier Scan → Order Status + Client Notification',
-      'Carrier delivers a milestone scan event (Out for Delivery or Delivered)',
-      ['carrier_event = Delivered', 'carrier_event = Out for Delivery'],
-      'Update Client Order status; append Shipment Tracker event; email Account Manager and client contact with tracking detail',
-      'ws-kit-qcship', 'ss-kit-shipment-tracker', ['Type:Shipment', 'Stage:ShippedToClient']),
+    mkFlow('flow-kit-shipped',
+      'Carrier Scan → Delivered',
+      'Shipment event = Delivered',
+      ['event = Delivered'],
+      'Transition order to Delivered; send delivery confirmation email to client and account manager',
+      'ws-kit-outbound', 'ss-kit-tracker', ['Stage:Delivered', 'Type:Shipment']),
+
+    mkFlow('flow-kit-return',
+      'RMA Approved → Returned Stage',
+      'RMA Status set to Approved',
+      ['rma_status = Approved'],
+      'Transition kit to Returned; create Refurbishment Log entry; update Component Catalog inventory',
+      'ws-kit-returns', 'ss-kit-rma', ['Stage:Returned', 'Type:Return']),
   ];
 
   const integrations = [
-    mkIntegration('int-kit-carrier', 'tpl-custom-http', fmtDate(-14)),  // UPS / FedEx carrier API
-    mkIntegration('int-kit-qb',      'tpl-quickbooks',  fmtDate(-30)),  // billing & invoicing
-    mkIntegration('int-kit-docusign','tpl-docusign',    fmtDate(-45)),  // carrier rate agreements
+    mkIntegration('int-kit-carrier', 'tpl-custom-http', fmtDate(-14)),
+    mkIntegration('int-kit-qb',      'tpl-quickbooks',  fmtDate(-30)),
+    mkIntegration('int-kit-docusign','tpl-docusign',    fmtDate(-45)),
   ];
 
-  // ── Runtime Records — Samsung Z Fold 7 / T-Mobile live scenario ───
+  // ── Runtime Records — Samsung Z Fold 7 / T-Mobile Phone Kit ────────
 
-  // Component Catalog: all 12 Z Fold 7 box contents
-  const compOnHand   = [450, 520, 510, 445, 480, 487, 502, 490, 451, 468, 475, 460];
-  const compCosts    = [1099.00, 28.99, 14.99, 49.99, 0.75, 0.50, 0.25, 0.10, 0.30, 0.40, 3.99, 1.20];
-  const compSuppliers = ['Samsung Electronics', 'Samsung Electronics', 'Samsung Electronics', 'Samsung Electronics',
-    'Samsung Care Print', 'Samsung Print', 'Generic OEM', 'KittingRUs Print', 'Static Solutions Inc',
-    'Foam Pack Co', 'Shield Films LLC', 'Accessories Direct'];
+  // Component Catalog: 12 phone kit contents with IMEI-centric fields
+  const compOnHand   = [450, 500, 510, 520, 480, 445, 487, 502, 490, 451, 468, 475];
+  const compCosts    = [1099.00, 0.50, 49.99, 14.99, 0.25, 28.99, 0.25, 0.10, 0.30, 0.40, 3.99, 1.20];
+  const compSuppliers = ['Samsung Electronics', 'T-Mobile SIM Ops', 'Samsung Electronics', 'Samsung Electronics',
+    'Generic OEM', 'Samsung Electronics', 'Samsung Print', 'Samsung Care Print',
+    'KittingRUs Print', 'Static Solutions Inc', 'Foam Pack Co', 'Shield Films LLC'];
   const catalogRecords: RuntimeRecord[] = KIT_COMPONENTS.map((comp, i) => {
     const qty     = compOnHand[i];
     const reorder = 300;
     const status  = qty < reorder ? 'Low Stock' : 'In Stock';
-    return mkRecord(`rec-kit-cat-${i}`, 'client-kit-0', 'ws-kit-receiving', 'ss-kit-catalog', `${KIT_COMP_SKUS[i]} — ${comp}`, status, compCosts[i] * qty, fmtDate(-2), ['Type:Component'],
-      { 'SKU': KIT_COMP_SKUS[i], 'Component Name': comp, 'Description': `Samsung Galaxy Z Fold 7 Kit — ${comp}`, 'Qty On Hand': qty, 'Reorder Point': reorder, 'Unit Cost ($)': compCosts[i], 'Primary Bin': `A${i + 1}-B${Math.ceil((i + 1) / 3)}`, 'Supplier': compSuppliers[i], 'Lead Time (Days)': i < 4 ? 7 : 3 });
+    return mkRecord(`rec-kit-cat-${i}`, 'client-kit-0', 'ws-kit-inbound', 'ss-kit-catalog', `${KIT_COMP_SKUS[i]} — ${comp}`, status, compCosts[i] * qty, fmtDate(-2), ['Type:Component'],
+      { 'SKU': KIT_COMP_SKUS[i], 'Component Name': comp, 'Description': `Samsung Galaxy Z Fold 7 Kit — ${comp}`, 'Qty On Hand': qty, 'Reorder Point': reorder, 'Unit Cost ($)': compCosts[i], 'Primary Bin': `A${i + 1}-B${Math.ceil((i + 1) / 3)}`, 'Supplier': compSuppliers[i] });
   });
 
-  // Client Orders: 8 real carrier orders across different device kits
-  const orderData = [
-    { po: 'PO-TM-10234',   client: 'T-Mobile',           sku: KIT_SKUS[0], name: KIT_PRODUCTS[0], qty: 200, status: 'Kitting / Assembly',   ship: fmtDate(5),  rep: 'M. Santos',   priority: 'Standard'  },
-    { po: 'PO-VZ-10235',   client: 'Verizon',             sku: KIT_SKUS[1], name: KIT_PRODUCTS[1], qty: 150, status: 'Work Order Created',  ship: fmtDate(6),  rep: 'K. Thompson', priority: 'Standard'  },
-    { po: 'PO-ATT-10236',  client: 'AT&T',                sku: KIT_SKUS[3], name: KIT_PRODUCTS[3], qty: 250, status: 'BOM & Allocation',    ship: fmtDate(8),  rep: 'J. Rivera',   priority: 'Expedited' },
-    { po: 'PO-TM-10237',   client: 'T-Mobile',            sku: KIT_SKUS[0], name: KIT_PRODUCTS[0], qty: 100, status: 'Picking',             ship: fmtDate(9),  rep: 'M. Santos',   priority: 'Rush'      },
-    { po: 'PO-CW-10238',   client: 'Cricket Wireless',    sku: KIT_SKUS[4], name: KIT_PRODUCTS[4], qty: 75,  status: 'Client Order Intake', ship: fmtDate(10), rep: 'A. Patel',    priority: 'Standard'  },
-    { po: 'PO-MTM-10239',  client: 'Metro by T-Mobile',   sku: KIT_SKUS[5], name: KIT_PRODUCTS[5], qty: 120, status: 'Inbound Receiving',   ship: fmtDate(12), rep: 'D. Nguyen',   priority: 'Standard'  },
-    { po: 'PO-BM-10240',   client: 'Boost Mobile',        sku: KIT_SKUS[7], name: KIT_PRODUCTS[7], qty: 80,  status: 'Pack & Label',        ship: fmtDate(3),  rep: 'T. Williams', priority: 'Expedited' },
-    { po: 'PO-USC-10241',  client: 'US Cellular',         sku: KIT_SKUS[2], name: KIT_PRODUCTS[2], qty: 100, status: 'Shipped to Client',  ship: fmtDate(1),  rep: 'A. Patel',    priority: 'Standard'  },
+  // Purchase Orders: supplier inbound orders in various stages
+  const poData = [
+    { po: 'PO-SM-5001', supplier: 'Samsung Electronics', sku: 'SKU-ZF7-DEVICE', qty: 500, eta: fmtDate(2),  status: 'Ordered' },
+    { po: 'PO-TM-5002', supplier: 'T-Mobile SIM Ops',   sku: 'SKU-ZF7-SIM',    qty: 600, eta: fmtDate(1),  status: 'Received' },
+    { po: 'PO-SM-5003', supplier: 'Samsung Electronics', sku: 'SKU-ZF7-CHGR',   qty: 550, eta: fmtDate(4),  status: 'Ordered' },
+    { po: 'PO-SM-5004', supplier: 'Samsung Electronics', sku: 'SKU-ZF7-CABLE',  qty: 600, eta: fmtDate(-1), status: 'Received' },
+    { po: 'PO-GN-5005', supplier: 'Generic OEM',         sku: 'SKU-ZF7-PIN',    qty: 1000, eta: fmtDate(-3), status: 'Received' },
   ];
-  const orderRecords: RuntimeRecord[] = orderData.map((o, i) =>
-    mkRecord(`rec-kit-ord-${i}`, `client-kit-${i % KIT_CLIENTS.length}`, 'ws-kit-orders', 'ss-kit-client-orders',
+  const poRecords: RuntimeRecord[] = poData.map((p, i) =>
+    mkRecord(`rec-kit-po-${i}`, 'client-kit-0', 'ws-kit-inbound', 'ss-kit-orders', `${p.po} — ${p.supplier}`, p.status, undefined, fmtDate(-i - 1), ['Type:PO'],
+      { 'PO Number': p.po, 'Supplier': p.supplier, 'Kit SKU': p.sku, 'Order Qty': p.qty, 'Expected Arrival': p.eta, 'Status': p.status })
+  );
+
+  // Receiving Dock records
+  const recvRecords: RuntimeRecord[] = poData.filter(p => p.status === 'Received').map((p, i) =>
+    mkRecord(`rec-kit-rv-${i}`, 'client-kit-0', 'ws-kit-inbound', 'ss-kit-recv', `${p.po} — Received`, 'Received', undefined, fmtDate(-i), ['Type:Receiving'],
+      { 'PO Number': p.po, 'SKU': p.sku, 'Component Name': KIT_COMPONENTS[i + 1], 'Qty Received': p.qty, 'Serial / IMEI': i === 0 ? 'ICCID-890126088290200001 → …200600' : '', 'Condition': 'Accepted', 'Bin Location': `A${i + 2}-B1`, 'Received By': 'K. Thompson', 'Received Date': fmtDate(-i) })
+  );
+
+  // Client Orders: carrier orders with IMEI tracking
+  const orderData = [
+    { po: 'PO-TM-10234',   client: 'T-Mobile',           sku: KIT_SKUS[0], name: KIT_PRODUCTS[0], qty: 200, status: 'Picking',     ship: fmtDate(5),  rep: 'M. Santos',   priority: 'Standard'  },
+    { po: 'PO-VZ-10235',   client: 'Verizon',             sku: KIT_SKUS[1], name: KIT_PRODUCTS[1], qty: 150, status: 'Ordered',     ship: fmtDate(6),  rep: 'K. Thompson', priority: 'Standard'  },
+    { po: 'PO-ATT-10236',  client: 'AT&T',                sku: KIT_SKUS[3], name: KIT_PRODUCTS[3], qty: 250, status: 'Received',    ship: fmtDate(8),  rep: 'J. Rivera',   priority: 'Expedited' },
+    { po: 'PO-TM-10237',   client: 'T-Mobile',            sku: KIT_SKUS[0], name: KIT_PRODUCTS[0], qty: 100, status: 'Packed',      ship: fmtDate(9),  rep: 'M. Santos',   priority: 'Rush'      },
+    { po: 'PO-CW-10238',   client: 'Cricket Wireless',    sku: KIT_SKUS[4], name: KIT_PRODUCTS[4], qty: 75,  status: 'Ordered',     ship: fmtDate(10), rep: 'A. Patel',    priority: 'Standard'  },
+    { po: 'PO-MTM-10239',  client: 'Metro by T-Mobile',   sku: KIT_SKUS[5], name: KIT_PRODUCTS[5], qty: 120, status: 'Shipped',     ship: fmtDate(3),  rep: 'D. Nguyen',   priority: 'Standard'  },
+    { po: 'PO-BM-10240',   client: 'Boost Mobile',        sku: KIT_SKUS[7], name: KIT_PRODUCTS[7], qty: 80,  status: 'Delivered',   ship: fmtDate(1),  rep: 'T. Williams', priority: 'Expedited' },
+    { po: 'PO-USC-10241',  client: 'US Cellular',         sku: KIT_SKUS[2], name: KIT_PRODUCTS[2], qty: 100, status: 'Shipped',     ship: fmtDate(1),  rep: 'A. Patel',    priority: 'Standard'  },
+  ];
+
+  // Place order records in the workspace matching their lifecycle stage
+  const orderRecords: RuntimeRecord[] = orderData.map((o, i) => {
+    const wsId = ['Ordered', 'Received'].includes(o.status) ? 'ws-kit-inbound'
+      : ['Picking', 'Packed'].includes(o.status) ? 'ws-kit-pickpack'
+      : ['Shipped', 'Delivered'].includes(o.status) ? 'ws-kit-outbound'
+      : 'ws-kit-returns';
+    const ssId = ['Ordered', 'Received'].includes(o.status) ? 'ss-kit-orders'
+      : ['Picking', 'Packed'].includes(o.status) ? 'ss-kit-station'
+      : ['Shipped', 'Delivered'].includes(o.status) ? 'ss-kit-labels'
+      : 'ss-kit-rma';
+    return mkRecord(`rec-kit-ord-${i}`, `client-kit-${i % KIT_CLIENTS.length}`, wsId, ssId,
       `${o.po} — ${o.name} × ${o.qty}`, o.status, o.qty * (i === 0 ? 1799 : i === 1 ? 1199 : i === 3 ? 499 : 899), fmtDate(-i),
       ['Type:KitOrder'],
-      { 'PO Number': o.po, 'Client': o.client, 'Kit SKU': o.sku, 'Kit Name': o.name, 'Order Qty': o.qty, 'Ship Date': o.ship, 'Priority': o.priority, 'Account Rep': o.rep, 'Status': o.status })
-  );
-
-  // BOM Lines: 12 components for Samsung Z Fold 7 Kit
-  const bomQtyPerKit = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-  const bomRecords: RuntimeRecord[] = KIT_COMPONENTS.map((comp, i) =>
-    mkRecord(`rec-kit-bom-${i}`, 'client-kit-0', 'ws-kit-orders', 'ss-kit-bom',
-      `${KIT_SKUS[0]} BOM — ${comp}`, 'Active', undefined, fmtDate(-30),
-      ['Type:BOMLine'],
-      { 'Kit SKU': KIT_SKUS[0], 'Kit Name': KIT_PRODUCTS[0], 'Component SKU': KIT_COMP_SKUS[i], 'Component Name': comp, 'Qty Per Kit': bomQtyPerKit[i], 'Serialized': i === 0 ? 'Yes' : 'No', 'Alt Component SKU': '', 'Notes': i === 0 ? 'IMEI serialization required' : '' })
-  );
-
-  // Work Orders: 6 active WOs
-  const woData = [
-    { id: 'WO-10234', client: 'T-Mobile',         sku: KIT_SKUS[0], name: KIT_PRODUCTS[0], qty: 200, status: 'Kitting / Assembly',  tech: 'J. Rivera',   due: fmtDate(5)  },
-    { id: 'WO-10235', client: 'Verizon',           sku: KIT_SKUS[1], name: KIT_PRODUCTS[1], qty: 150, status: 'Picking',             tech: 'K. Thompson', due: fmtDate(6)  },
-    { id: 'WO-10236', client: 'AT&T',              sku: KIT_SKUS[3], name: KIT_PRODUCTS[3], qty: 250, status: 'Work Order Created',  tech: 'M. Santos',   due: fmtDate(8)  },
-    { id: 'WO-10237', client: 'T-Mobile',          sku: KIT_SKUS[0], name: KIT_PRODUCTS[0], qty: 100, status: 'Picking',             tech: 'T. Williams', due: fmtDate(9)  },
-    { id: 'WO-10240', client: 'Boost Mobile',      sku: KIT_SKUS[7], name: KIT_PRODUCTS[7], qty: 80,  status: 'Pack & Label',        tech: 'A. Patel',    due: fmtDate(3)  },
-    { id: 'WO-10241', client: 'US Cellular',       sku: KIT_SKUS[2], name: KIT_PRODUCTS[2], qty: 100, status: 'Shipped to Client',  tech: 'D. Nguyen',   due: fmtDate(1)  },
-  ];
-  const woRecords: RuntimeRecord[] = woData.map((w, i) =>
-    mkRecord(`rec-kit-wo-${i}`, `client-kit-${i % KIT_CLIENTS.length}`, 'ws-kit-orders', 'ss-kit-workorders',
-      `${w.id} — ${w.name}`, w.status, undefined, fmtDate(-i),
-      ['Type:WorkOrder'],
-      { 'Work Order ID': w.id, 'Client': w.client, 'Kit SKU': w.sku, 'Kit Name': w.name, 'Kit Qty': w.qty, 'BOM Validated': w.status !== 'Work Order Created' ? 'Yes' : 'No', 'Status': w.status, 'Assigned Technician': w.tech, 'Due Date': w.due })
-  );
-
-  // Kitting Station: active assembly records for WO-10234 (T-Mobile Z Fold 7 × 200)
-  const stationRecords: RuntimeRecord[] = [
-    mkRecord('rec-kit-sta-0', 'client-kit-0', 'ws-kit-production', 'ss-kit-station', 'KIT-1001 — Samsung Z Fold 7 Kit', 'Complete',   undefined, fmtDate(-1), ['Type:KitBuild'], { 'Work Order': 'WO-10234', 'Kit ID': 'KIT-1001', 'Kit SKU': KIT_SKUS[0], 'Kit Name': KIT_PRODUCTS[0], 'Kitting Technician': 'J. Rivera',   'Components Assembled': 12, 'Serials Assigned': 'Yes', 'Assembly Status': 'Complete'   }),
-    mkRecord('rec-kit-sta-1', 'client-kit-0', 'ws-kit-production', 'ss-kit-station', 'KIT-1002 — Samsung Z Fold 7 Kit', 'Complete',   undefined, fmtDate(-1), ['Type:KitBuild'], { 'Work Order': 'WO-10234', 'Kit ID': 'KIT-1002', 'Kit SKU': KIT_SKUS[0], 'Kit Name': KIT_PRODUCTS[0], 'Kitting Technician': 'J. Rivera',   'Components Assembled': 12, 'Serials Assigned': 'Yes', 'Assembly Status': 'Complete'   }),
-    mkRecord('rec-kit-sta-2', 'client-kit-0', 'ws-kit-production', 'ss-kit-station', 'KIT-1003 — Samsung Z Fold 7 Kit', 'In Progress',undefined, fmtDate(0),  ['Type:KitBuild'], { 'Work Order': 'WO-10237', 'Kit ID': 'KIT-1003', 'Kit SKU': KIT_SKUS[0], 'Kit Name': KIT_PRODUCTS[0], 'Kitting Technician': 'T. Williams', 'Components Assembled': 8,  'Serials Assigned': 'No',  'Assembly Status': 'In Progress'}),
-    mkRecord('rec-kit-sta-3', 'client-kit-1', 'ws-kit-production', 'ss-kit-station', 'KIT-2001 — iPhone 16 Pro Max Kit','In Progress',undefined, fmtDate(0),  ['Type:KitBuild'], { 'Work Order': 'WO-10235', 'Kit ID': 'KIT-2001', 'Kit SKU': KIT_SKUS[1], 'Kit Name': KIT_PRODUCTS[1], 'Kitting Technician': 'K. Thompson', 'Components Assembled': 5,  'Serials Assigned': 'No',  'Assembly Status': 'In Progress'}),
-  ];
-
-  // QC Records — matches QC & Shipping Screen
-  const qcData = [
-    { kitId: 'KIT-1001', wo: 'WO-10234', sku: KIT_SKUS[0], inspector: 'J. Rivera',   result: 'Passed',  defects: '',                                     rework: false },
-    { kitId: 'KIT-1002', wo: 'WO-10234', sku: KIT_SKUS[0], inspector: 'M. Santos',   result: 'Passed',  defects: '',                                     rework: false },
-    { kitId: 'KIT-1003', wo: 'WO-10237', sku: KIT_SKUS[0], inspector: 'K. Thompson', result: 'Pending', defects: '',                                     rework: false },
-    { kitId: 'KIT-4001', wo: 'WO-10240', sku: KIT_SKUS[7], inspector: 'A. Patel',    result: 'Passed',  defects: '',                                     rework: false },
-    { kitId: 'KIT-4002', wo: 'WO-10240', sku: KIT_SKUS[7], inspector: 'D. Nguyen',   result: 'Failed',  defects: 'Missing S Pen — SKU-ZF7-SPEN not found in tray', rework: true  },
-  ];
-  const qcRecords: RuntimeRecord[] = qcData.map((q, i) =>
-    mkRecord(`rec-kit-qc-${i}`, `client-kit-${i % KIT_CLIENTS.length}`, 'ws-kit-qcship', 'ss-kit-qc',
-      `${q.kitId} — ${q.result}`, q.result, undefined, fmtDate(-i),
-      ['Type:QC'],
-      { 'Kit ID': q.kitId, 'Work Order': q.wo, 'Kit SKU': q.sku, 'Inspector': q.inspector, 'Inspection Result': q.result, 'Defects Found': q.defects, 'Inspection Date': fmtDate(-i), 'Rework Required': q.rework ? 'Yes' : 'No' })
-  );
-
-  // Shipping Labels for completed orders
-  const labelRecords: RuntimeRecord[] = [
-    mkRecord('rec-kit-lbl-0', 'client-kit-0', 'ws-kit-qcship', 'ss-kit-labels', 'ORD-10234 — UPS Ground', 'Generated', undefined, fmtDate(-1), ['Type:Label'],
-      { 'Order ID': 'PO-TM-10234', 'Kit ID': 'KIT-1001', 'Carrier': 'UPS', 'Service Level': 'Ground', 'Tracking Number': '1Z999AA10123456784', 'Label Generated': 'Yes', 'Created Date': fmtDate(-1), 'Estimated Delivery': fmtDate(5) }),
-    mkRecord('rec-kit-lbl-1', 'client-kit-5', 'ws-kit-qcship', 'ss-kit-labels', 'ORD-10241 — FedEx 2Day', 'Generated', undefined, fmtDate(-2), ['Type:Label'],
-      { 'Order ID': 'PO-USC-10241', 'Kit ID': 'KIT-3001', 'Carrier': 'FedEx', 'Service Level': '2-Day Air', 'Tracking Number': '7489489230002845523', 'Label Generated': 'Yes', 'Created Date': fmtDate(-2), 'Estimated Delivery': fmtDate(1) }),
-  ];
-
-  // ── Receiving Queue (ss-kit-recv-queue) ──
-  const kitTechs = ['J. Rivera', 'K. Thompson', 'M. Santos', 'T. Williams', 'A. Patel', 'D. Nguyen'];
-  const recvQueueRecords: RuntimeRecord[] = KIT_COMPONENTS.slice(0, 6).map((comp, i) =>
-    mkRecord(`rec-kit-rq-${i}`, 'client-kit-0', 'ws-kit-receiving', 'ss-kit-recv-queue',
-      `PO-RECV-${8000 + i} — ${comp}`, pick(['Inspecting', 'Accepted', 'Put Away']),
-      undefined, fmtDate(-Math.floor(Math.random() * 7)), ['Type:Receiving'],
-      { 'PO Number': `PO-RECV-${8000 + i}`, 'SKU': KIT_COMP_SKUS[i], 'Component Name': comp, 'Qty Received': Math.floor(Math.random() * 300 + 100), 'Serial Numbers': i === 0 ? 'SN-ZF7-100001 → SN-ZF7-100500' : '', 'Condition': pick(['New', 'Inspecting', 'Accepted']), 'Bin Location': `A${i + 1}-B${Math.ceil((i + 1) / 3)}`, 'Received By': pick(kitTechs), 'Received Date': fmtDate(-Math.floor(Math.random() * 7)) })
-  );
-
-  // ── Receiving Log (ss-kit-recv-log) ──
-  const recvLogActions = ['Received & Counted', 'Inspected — Passed', 'Binned', 'Inspected — Rejected (2 units)', 'Recounted — Adjusted +3'];
-  const recvLogRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) =>
-    mkRecord(`rec-kit-rl-${i}`, 'client-kit-0', 'ws-kit-receiving', 'ss-kit-recv-log',
-      `PO-RECV-${8000 + (i % 6)} — ${pick(recvLogActions)}`, 'Logged',
-      undefined, fmtDate(-7 + i), ['Type:ReceivingLog'],
-      { 'PO Number': `PO-RECV-${8000 + (i % 6)}`, 'SKU': KIT_COMP_SKUS[i % 12], 'Component': KIT_COMPONENTS[i % 12], 'Quantity': Math.floor(Math.random() * 300 + 100), 'Received By': pick(kitTechs), 'Action': pick(recvLogActions), 'Timestamp': fmtDate(-7 + i), 'Notes': pick(['Standard receipt — no issues', 'Minor packaging tear, units intact', 'Qty mismatch resolved', '']) })
-  );
-
-  // ── BOM Allocation (ss-kit-allocation) ──
-  const allocRecords: RuntimeRecord[] = KIT_COMPONENTS.slice(0, 8).map((comp, i) => {
-    const required = 200;
-    const avail = compOnHand[i];
-    const shortage = Math.max(0, required - avail);
-    return mkRecord(`rec-kit-alloc-${i}`, 'client-kit-0', 'ws-kit-orders', 'ss-kit-allocation',
-      `WO-10234 — ${comp}`, shortage > 0 ? 'Shortage' : 'Allocated',
-      undefined, fmtDate(-3), ['Type:Allocation'],
-      { 'Work Order': 'WO-10234', 'Kit SKU': KIT_SKUS[0], 'Component SKU': KIT_COMP_SKUS[i], 'Component Name': comp, 'Required Qty': required, 'Available Qty': avail, 'Shortage Qty': shortage, 'Allocation Status': shortage > 0 ? 'Shortage' : 'Allocated' });
+      { 'PO Number': o.po, 'Client': o.client, 'Kit SKU': o.sku, 'Kit Name': o.name, 'Order Qty': o.qty, 'Ship Date': o.ship, 'Priority': o.priority, 'Account Rep': o.rep, 'Status': o.status });
   });
 
-  // ── Pick Lists (ss-kit-picklist) ──
+  // Pick List records (ws-kit-pickpack / ss-kit-picklist)
   const pickListRecords: RuntimeRecord[] = KIT_COMPONENTS.slice(0, 8).map((comp, i) => {
     const qtyPick = 200;
     const qtyScan = i < 5 ? 200 : Math.floor(Math.random() * 100 + 50);
-    return mkRecord(`rec-kit-pk-${i}`, 'client-kit-0', 'ws-kit-production', 'ss-kit-picklist',
+    return mkRecord(`rec-kit-pk-${i}`, 'client-kit-0', 'ws-kit-pickpack', 'ss-kit-picklist',
       `WO-10234 — Pick ${comp}`, i < 5 ? 'Complete' : 'In Progress',
       undefined, fmtDate(-2), ['Type:Pick'],
-      { 'Work Order': 'WO-10234', 'Component': comp, 'Component SKU': KIT_COMP_SKUS[i], 'Bin Location': `A${i + 1}-B${Math.ceil((i + 1) / 3)}`, 'Qty to Pick': qtyPick, 'Qty Scanned': qtyScan, 'Picker': pick(kitTechs), 'Scan Status': i < 5 ? 'Complete' : 'In Progress' });
+      { 'Work Order': 'WO-10234', 'Component': comp, 'Component SKU': KIT_COMP_SKUS[i], 'Bin Location': `A${i + 1}-B${Math.ceil((i + 1) / 3)}`, 'Qty to Pick': qtyPick, 'Qty Scanned': qtyScan, 'Picker': pick(['J. Rivera', 'K. Thompson', 'M. Santos']), 'Scan Status': i < 5 ? 'Complete' : 'In Progress' });
   });
 
-  // ── Scan & Pick Events (ss-kit-scan-log) ──
-  const scanLogRecords: RuntimeRecord[] = Array.from({ length: 8 }, (_, i) =>
-    mkRecord(`rec-kit-sc-${i}`, 'client-kit-0', 'ws-kit-production', 'ss-kit-scan-log',
-      `WO-10234 — Scan ${KIT_COMPONENTS[i % 12]}`, 'Logged',
-      undefined, fmtDate(-2 + Math.floor(i / 4)), ['Type:ScanEvent'],
-      { 'Work Order': 'WO-10234', 'Component': KIT_COMPONENTS[i % 12], 'Bin': `A${(i % 12) + 1}-B${Math.ceil(((i % 12) + 1) / 3)}`, 'Qty Scanned': Math.floor(Math.random() * 50 + 10), 'Scanned By': pick(kitTechs), 'Scan Time': fmtDate(-2 + Math.floor(i / 4)), 'Verified': i < 6 ? 'Yes' : 'No' })
-  );
-
-  // ── Assembly Log (ss-kit-assembly-log) ──
-  const assemblySteps = ['Unbox device', 'Attach S Pen holster', 'Insert SIM eject tool', 'Place foam tray', 'Add charger & cable', 'Apply protective film', 'Place accessories bag', 'Insert documentation', 'Close & seal box', 'Apply anti-static bag', 'Place retail insert', 'Final visual check'];
-  const assemblyLogRecords: RuntimeRecord[] = assemblySteps.slice(0, 8).map((step, i) =>
-    mkRecord(`rec-kit-al-${i}`, 'client-kit-0', 'ws-kit-production', 'ss-kit-assembly-log',
-      `KIT-1001 — ${step}`, 'Complete',
-      undefined, fmtDate(-1), ['Type:AssemblyStep'],
-      { 'Kit ID': 'KIT-1001', 'Step': step, 'Component': KIT_COMPONENTS[i % 12], 'Performed By': 'J. Rivera', 'Timestamp': fmtDate(-1), 'Notes': i === 0 ? 'IMEI verified: 353456789012345' : '' })
-  );
-
-  // ── Pack & Label Station (ss-kit-pack) ──
-  const packKitRecords: RuntimeRecord[] = [
-    mkRecord('rec-kit-pk-s0', 'client-kit-0', 'ws-kit-qcship', 'ss-kit-pack', 'KIT-1001 — Packed', 'Packed', undefined, fmtDate(-1), ['Type:Pack'],
-      { 'Kit ID': 'KIT-1001', 'Order ID': 'PO-TM-10234', 'Kit SKU': KIT_SKUS[0], 'Box Dimensions': '14×8×6 in', 'Weight (lbs)': 2.8, 'Pack Date': fmtDate(-1), 'Label Type': 'UPS Ground', 'Packed By': 'T. Williams' }),
-    mkRecord('rec-kit-pk-s1', 'client-kit-0', 'ws-kit-qcship', 'ss-kit-pack', 'KIT-1002 — Packed', 'Packed', undefined, fmtDate(-1), ['Type:Pack'],
-      { 'Kit ID': 'KIT-1002', 'Order ID': 'PO-TM-10234', 'Kit SKU': KIT_SKUS[0], 'Box Dimensions': '14×8×6 in', 'Weight (lbs)': 2.7, 'Pack Date': fmtDate(-1), 'Label Type': 'UPS Ground', 'Packed By': 'T. Williams' }),
-    mkRecord('rec-kit-pk-s2', 'client-kit-5', 'ws-kit-qcship', 'ss-kit-pack', 'KIT-3001 — Packed', 'Packed', undefined, fmtDate(-2), ['Type:Pack'],
-      { 'Kit ID': 'KIT-3001', 'Order ID': 'PO-USC-10241', 'Kit SKU': KIT_SKUS[2], 'Box Dimensions': '12×10×4 in', 'Weight (lbs)': 2.1, 'Pack Date': fmtDate(-2), 'Label Type': 'FedEx 2-Day Air', 'Packed By': 'A. Patel' }),
-    mkRecord('rec-kit-pk-s3', 'client-kit-6', 'ws-kit-qcship', 'ss-kit-pack', 'KIT-4001 — Packed', 'Packed', undefined, fmtDate(-1), ['Type:Pack'],
-      { 'Kit ID': 'KIT-4001', 'Order ID': 'PO-BM-10240', 'Kit SKU': KIT_SKUS[7], 'Box Dimensions': '16×12×6 in', 'Weight (lbs)': 3.4, 'Pack Date': fmtDate(-1), 'Label Type': 'FedEx Express', 'Packed By': 'D. Nguyen' }),
+  // Kitting Station: phone kit assemblies with IMEI ↔ SIM ICCID pairing
+  const kitTechs = ['J. Rivera', 'K. Thompson', 'M. Santos', 'T. Williams', 'A. Patel', 'D. Nguyen'];
+  const stationRecords: RuntimeRecord[] = [
+    mkRecord('rec-kit-sta-0', 'client-kit-0', 'ws-kit-pickpack', 'ss-kit-station', 'KIT-1001 — Samsung Z Fold 7 Kit', 'Packed', undefined, fmtDate(-1), ['Type:KitBuild'],
+      { 'Work Order': 'WO-10234', 'Kit ID': 'KIT-1001', 'Device IMEI': '353456789012345', 'SIM ICCID': '89012608829020000001', 'SIM Activated': 'Yes', 'Kitting Technician': 'J. Rivera', 'Components Assembled': 12, 'Assembly Status': 'Complete' }),
+    mkRecord('rec-kit-sta-1', 'client-kit-0', 'ws-kit-pickpack', 'ss-kit-station', 'KIT-1002 — Samsung Z Fold 7 Kit', 'Packed', undefined, fmtDate(-1), ['Type:KitBuild'],
+      { 'Work Order': 'WO-10234', 'Kit ID': 'KIT-1002', 'Device IMEI': '353456789012346', 'SIM ICCID': '89012608829020000002', 'SIM Activated': 'Yes', 'Kitting Technician': 'J. Rivera', 'Components Assembled': 12, 'Assembly Status': 'Complete' }),
+    mkRecord('rec-kit-sta-2', 'client-kit-0', 'ws-kit-pickpack', 'ss-kit-station', 'KIT-1003 — Samsung Z Fold 7 Kit', 'Picking', undefined, fmtDate(0), ['Type:KitBuild'],
+      { 'Work Order': 'WO-10237', 'Kit ID': 'KIT-1003', 'Device IMEI': '353456789012347', 'SIM ICCID': '89012608829020000003', 'SIM Activated': 'No', 'Kitting Technician': 'T. Williams', 'Components Assembled': 8, 'Assembly Status': 'In Progress' }),
+    mkRecord('rec-kit-sta-3', 'client-kit-1', 'ws-kit-pickpack', 'ss-kit-station', 'KIT-2001 — iPhone 16 Pro Max Kit', 'Picking', undefined, fmtDate(0), ['Type:KitBuild'],
+      { 'Work Order': 'WO-10235', 'Kit ID': 'KIT-2001', 'Device IMEI': '353456789012400', 'SIM ICCID': '89012608829020000100', 'SIM Activated': 'No', 'Kitting Technician': 'K. Thompson', 'Components Assembled': 5, 'Assembly Status': 'In Progress' }),
   ];
 
-  // ── Shipment Tracker (ss-kit-shipment-tracker) ──
+  // QC Records
+  const qcData = [
+    { kitId: 'KIT-1001', imei: '353456789012345', inspector: 'J. Rivera',   result: 'Passed',  defects: '' },
+    { kitId: 'KIT-1002', imei: '353456789012346', inspector: 'M. Santos',   result: 'Passed',  defects: '' },
+    { kitId: 'KIT-1003', imei: '353456789012347', inspector: 'K. Thompson', result: 'Pending', defects: '' },
+    { kitId: 'KIT-4001', imei: '353456789012500', inspector: 'A. Patel',    result: 'Passed',  defects: '' },
+    { kitId: 'KIT-4002', imei: '353456789012501', inspector: 'D. Nguyen',   result: 'Failed',  defects: 'SIM not activated — ICCID not paired to IMEI' },
+  ];
+  const qcRecords: RuntimeRecord[] = qcData.map((q, i) =>
+    mkRecord(`rec-kit-qc-${i}`, `client-kit-${i % KIT_CLIENTS.length}`, 'ws-kit-pickpack', 'ss-kit-qc',
+      `${q.kitId} — ${q.result}`, q.result, undefined, fmtDate(-i),
+      ['Type:QC'],
+      { 'Kit ID': q.kitId, 'Device IMEI': q.imei, 'Inspector': q.inspector, 'Inspection Result': q.result, 'Defects Found': q.defects, 'Inspection Date': fmtDate(-i), 'Rework Required': q.result === 'Failed' ? 'Yes' : 'No' })
+  );
+
+  // Pack Records
+  const packRecords: RuntimeRecord[] = [
+    mkRecord('rec-kit-pk-s0', 'client-kit-0', 'ws-kit-pickpack', 'ss-kit-pack', 'KIT-1001 — Packed', 'Packed', undefined, fmtDate(-1), ['Type:Pack'],
+      { 'Kit ID': 'KIT-1001', 'Device IMEI': '353456789012345', 'Order ID': 'PO-TM-10234', 'Box Dimensions': '14×8×6 in', 'Weight (lbs)': 2.8, 'Pack Date': fmtDate(-1), 'Packed By': 'T. Williams' }),
+    mkRecord('rec-kit-pk-s1', 'client-kit-0', 'ws-kit-pickpack', 'ss-kit-pack', 'KIT-1002 — Packed', 'Packed', undefined, fmtDate(-1), ['Type:Pack'],
+      { 'Kit ID': 'KIT-1002', 'Device IMEI': '353456789012346', 'Order ID': 'PO-TM-10234', 'Box Dimensions': '14×8×6 in', 'Weight (lbs)': 2.7, 'Pack Date': fmtDate(-1), 'Packed By': 'T. Williams' }),
+  ];
+
+  // Shipping Labels (ws-kit-outbound / ss-kit-labels)
+  const labelRecords: RuntimeRecord[] = [
+    mkRecord('rec-kit-lbl-0', 'client-kit-5', 'ws-kit-outbound', 'ss-kit-labels', 'PO-MTM-10239 — UPS Ground', 'Shipped', undefined, fmtDate(-1), ['Type:Label'],
+      { 'Order ID': 'PO-MTM-10239', 'Kit ID': 'KIT-3001', 'Carrier': 'UPS', 'Service Level': 'Ground', 'Tracking Number': '1Z999AA10123456784', 'Estimated Delivery': fmtDate(3) }),
+    mkRecord('rec-kit-lbl-1', 'client-kit-6', 'ws-kit-outbound', 'ss-kit-labels', 'PO-BM-10240 — FedEx 2Day', 'Delivered', undefined, fmtDate(-3), ['Type:Label'],
+      { 'Order ID': 'PO-BM-10240', 'Kit ID': 'KIT-4001', 'Carrier': 'FedEx', 'Service Level': '2-Day Air', 'Tracking Number': '7489489230002845523', 'Estimated Delivery': fmtDate(-1) }),
+    mkRecord('rec-kit-lbl-2', 'client-kit-7', 'ws-kit-outbound', 'ss-kit-labels', 'PO-USC-10241 — FedEx Express', 'Shipped', undefined, fmtDate(-2), ['Type:Label'],
+      { 'Order ID': 'PO-USC-10241', 'Kit ID': 'KIT-5001', 'Carrier': 'FedEx', 'Service Level': 'Express', 'Tracking Number': '7489489230002845600', 'Estimated Delivery': fmtDate(1) }),
+  ];
+
+  // Shipment Tracker (ws-kit-outbound / ss-kit-tracker)
   const kitShipEvents = [
-    { orderId: 'PO-USC-10241', kitId: 'KIT-3001', carrier: 'FedEx', event: 'Label Created',          location: 'Dallas, TX',     ts: -3 },
-    { orderId: 'PO-USC-10241', kitId: 'KIT-3001', carrier: 'FedEx', event: 'Picked Up',              location: 'Dallas, TX',     ts: -2 },
-    { orderId: 'PO-USC-10241', kitId: 'KIT-3001', carrier: 'FedEx', event: 'In Transit — Regional Hub', location: 'Memphis, TN', ts: -1 },
-    { orderId: 'PO-USC-10241', kitId: 'KIT-3001', carrier: 'FedEx', event: 'Delivered',              location: 'Chicago, IL',    ts: 0  },
-    { orderId: 'PO-TM-10234',  kitId: 'KIT-1001', carrier: 'UPS',   event: 'Label Created',          location: 'Dallas, TX',     ts: -1 },
-    { orderId: 'PO-TM-10234',  kitId: 'KIT-1001', carrier: 'UPS',   event: 'Picked Up',              location: 'Dallas, TX',     ts: 0  },
+    { orderId: 'PO-BM-10240',  kitId: 'KIT-4001', carrier: 'FedEx', event: 'Label Created',    location: 'Dallas, TX',   ts: -4 },
+    { orderId: 'PO-BM-10240',  kitId: 'KIT-4001', carrier: 'FedEx', event: 'Picked Up',        location: 'Dallas, TX',   ts: -3 },
+    { orderId: 'PO-BM-10240',  kitId: 'KIT-4001', carrier: 'FedEx', event: 'In Transit',       location: 'Memphis, TN',  ts: -2 },
+    { orderId: 'PO-BM-10240',  kitId: 'KIT-4001', carrier: 'FedEx', event: 'Delivered',        location: 'Miami, FL',    ts: -1 },
+    { orderId: 'PO-MTM-10239', kitId: 'KIT-3001', carrier: 'UPS',   event: 'Label Created',    location: 'Dallas, TX',   ts: -1 },
+    { orderId: 'PO-MTM-10239', kitId: 'KIT-3001', carrier: 'UPS',   event: 'Picked Up',        location: 'Dallas, TX',   ts: 0  },
   ];
   const shipTrackerRecords: RuntimeRecord[] = kitShipEvents.map((e, i) =>
-    mkRecord(`rec-kit-st-${i}`, `client-kit-${i < 4 ? 5 : 0}`, 'ws-kit-qcship', 'ss-kit-shipment-tracker',
+    mkRecord(`rec-kit-st-${i}`, `client-kit-${i < 4 ? 6 : 5}`, 'ws-kit-outbound', 'ss-kit-tracker',
       `${e.orderId} — ${e.event}`, e.event,
       undefined, fmtDate(e.ts), ['Type:ShipmentEvent'],
-      { 'Order ID': e.orderId, 'Kit ID': e.kitId, 'Carrier': e.carrier, 'Event': e.event, 'Location': e.location, 'Timestamp': fmtDate(e.ts), 'Status Update Sent': (e.event === 'Delivered' || e.event === 'Out for Delivery') ? 'Yes' : 'No' })
+      { 'Order ID': e.orderId, 'Kit ID': e.kitId, 'Carrier': e.carrier, 'Event': e.event, 'Location': e.location, 'Timestamp': fmtDate(e.ts) })
   );
 
-  const records = [...catalogRecords, ...orderRecords, ...bomRecords, ...woRecords, ...stationRecords, ...qcRecords, ...labelRecords, ...recvQueueRecords, ...recvLogRecords, ...allocRecords, ...pickListRecords, ...scanLogRecords, ...assemblyLogRecords, ...packKitRecords, ...shipTrackerRecords];
+  // Return / RMA records (ws-kit-returns / ss-kit-rma)
+  const rmaRecords: RuntimeRecord[] = [
+    mkRecord('rec-kit-rma-0', 'client-kit-6', 'ws-kit-returns', 'ss-kit-rma', 'RMA-7001 — KIT-4002 Defective SIM', 'Returned', undefined, fmtDate(-1), ['Type:Return'],
+      { 'RMA Number': 'RMA-7001', 'Original Order': 'PO-BM-10240', 'Device IMEI': '353456789012501', 'Return Reason': 'Defective — SIM not activated', 'Item Condition': 'Like New', 'RMA Status': 'Approved', 'Return Date': fmtDate(-1) }),
+  ];
+
+  const records = [...catalogRecords, ...poRecords, ...recvRecords, ...orderRecords, ...pickListRecords, ...stationRecords, ...qcRecords, ...packRecords, ...labelRecords, ...shipTrackerRecords, ...rmaRecords];
   const clients = KIT_CLIENTS.map((co, i) => mkClient(`client-kit-${i}`, co, `CARR-${2000 + i}`, ['Vertical:Kitting', 'Type:Carrier']));
 
   return {
     shellConfig: mkShellConfig('Kit Order', 'Kit Orders', 'Kitting Floor', 'Production Stage',
-      ['Inbound Receiving', 'Client Order Intake', 'BOM & Allocation', 'Work Order Created', 'Picking', 'Kitting / Assembly', 'Pack & Label', 'Shipped to Client'], {
+      ['Ordered', 'Received', 'Picking', 'Packed', 'Shipped', 'Delivered', 'Returned'], {
         collectionLabel: 'Kit Order', collectionLabelPlural: 'Kit Orders',
         intakeFields: [
           { id: 'clientName', label: 'Client Name', type: 'text', required: true },
           { id: 'kitModel', label: 'Kit Model', type: 'select', required: true, options: ['Galaxy Z Fold 7', 'Galaxy S25 Ultra', 'Galaxy A56', 'Galaxy Tab S10', 'Custom Kit'] },
           { id: 'quantity', label: 'Quantity', type: 'number', required: true },
+          { id: 'deviceImei', label: 'Device IMEI', type: 'text', required: false },
+          { id: 'simIccid', label: 'SIM ICCID', type: 'text', required: false },
           { id: 'requiredBy', label: 'Required By', type: 'date', required: false },
         ],
       }),
-    workspaces: [wsReceiving, wsOrders, wsProduction, wsQcShip],
+    workspaces: [wsInbound, wsPickPack, wsOutbound, wsReturns],
     flows, integrations, records, clients,
   };
 }

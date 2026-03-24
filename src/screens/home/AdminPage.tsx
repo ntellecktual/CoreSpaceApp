@@ -991,19 +991,19 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     <View style={{ backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.10)' : 'rgba(140,91,245,0.06)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(140,91,245,0.22)' : 'rgba(140,91,245,0.18)' }}>
                       <Text style={{ color: mode === 'night' ? '#A78BFA' : '#6F4BCF', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Creating a new workspace</Text>
                       <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.58)' : 'rgba(0,0,0,0.50)', fontSize: 12, lineHeight: 18 }}>
-                        Think of a workspace like one team's dashboard — "Customer Requests", "Inventory Tracker", "Employee Onboarding". Keep the name short and clear.
+                        Think of a workspace like a Jira project — "Sprint Board", "Bug Tracker", "Feature Requests". Keep the name short and clear.
                       </Text>
                     </View>
 
                     <View style={{ gap: 6 }}>
                       <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.70)', fontSize: 14, fontWeight: '700' }}>What's this workspace called? <Text style={{ color: '#EF4444' }}>*</Text></Text>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)', fontSize: 12 }}>e.g. "Order Tracker", "Patient Records", "Inventory Management"</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)', fontSize: 12 }}>e.g. "Sprint Board", "Bug Tracker", "Feature Requests", "Release Pipeline"</Text>
                       <LabeledInput label="" value={workspaceName} onChangeText={(v) => { setWorkspaceName(v); setRoute(v.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')); }} placeholder="My Workspace Name" />
                     </View>
 
                     <View style={{ gap: 6 }}>
                       <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.70)', fontSize: 14, fontWeight: '700' }}>Each row in this workspace is a... <Text style={{ color: '#EF4444' }}>*</Text></Text>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)', fontSize: 12 }}>One word for what you're tracking — e.g. "Order", "Patient", "Item", "Employee", "Case"</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)', fontSize: 12 }}>One word for what you're tracking — e.g. "Issue", "Bug", "Feature", "Sprint", "Epic"</Text>
                       <LabeledInput label="" value={rootEntity} onChangeText={setRootEntity} placeholder="e.g. Order" />
                     </View>
 
@@ -1011,14 +1011,14 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                       <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.32)', fontSize: 11, fontWeight: '600' }}>Quick fill examples:</Text>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, gap: 6 }}>
                         {[
-                          { name: 'Order Tracker', entity: 'Order' },
-                          { name: 'Customer Requests', entity: 'Request' },
-                          { name: 'Employee Onboarding', entity: 'Employee' },
-                          { name: 'Inventory Management', entity: 'Item' },
-                          { name: 'Project Tracker', entity: 'Project' },
-                          { name: 'Support Tickets', entity: 'Ticket' },
-                          { name: 'Client Cases', entity: 'Case' },
-                          { name: 'Maintenance Logs', entity: 'Log' },
+                          { name: 'Sprint Board', entity: 'Issue' },
+                          { name: 'Bug Tracker', entity: 'Bug' },
+                          { name: 'Feature Requests', entity: 'Feature' },
+                          { name: 'Release Pipeline', entity: 'Release' },
+                          { name: 'Backlog', entity: 'Story' },
+                          { name: 'Epic Board', entity: 'Epic' },
+                          { name: 'QA Test Runs', entity: 'Test' },
+                          { name: 'Incident Queue', entity: 'Incident' },
                         ].map((ex) => (
                           <Pressable
                             key={ex.name}

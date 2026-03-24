@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react';
+import { Linking } from 'react-native';
 import { useAppState } from '../../../context/AppStateContext';
 import type { FlowRunEntry, RuntimeRecord, SignalFlow, AppNotification, NotificationType } from '../../../types';
 
@@ -188,6 +189,18 @@ export function executeAction(
   if (tagMatch && !recordUpdates) {
     const newTag = tagMatch[1].trim();
     recordUpdates = { tags: [...record.tags, newTag] };
+  }
+
+  // Parse email actions — "Send an email: addr@example.com" or "email addr@example.com"
+  const emailMatch = lower.match(/(?:send\s+(?:an?\s+)?email|email)\s*:?\s*([^\s,→]+@[^\s,→]+)/i);
+  if (emailMatch) {
+    const emailAddr = emailMatch[1].trim();
+    const subject = encodeURIComponent(`[CoreSpace] Signal: ${flow.name}`);
+    const body = encodeURIComponent(
+      `Signal "${flow.name}" triggered on record "${record.title}".\n\nStatus: ${record.status}\nWorkspace: ${flow.workspaceId}\n\n— Sent automatically by CoreSpace Signal Studio`,
+    );
+    const mailto = `mailto:${emailAddr}?subject=${subject}&body=${body}`;
+    try { Linking.openURL(mailto); } catch { /* silently degrade */ }
   }
 
   return {

@@ -239,7 +239,7 @@ showsVerticalScrollIndicator = { false}
         paddingBottom: 6,
     }}
                   >
-        <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', color: isDark ? 'rgba(253,156,253,0.7)' : 'rgba(140,91,245,0.7)' }}>
+        <Text style={{ fontSize: 11, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', color: isDark ? 'rgba(255,211,50,0.7)' : 'rgba(38,51,116,0.7)' }}>
     { CATEGORY_ICONS[category]} { CATEGORY_LABELS[category]}
     </Text>
     </View>
@@ -264,8 +264,8 @@ showsVerticalScrollIndicator = { false}
         borderRadius: 10,
         backgroundColor: isSelected
             ? isDark
-                ? 'rgba(140,91,245,0.18)'
-                : 'rgba(140,91,245,0.10)'
+                ? 'rgba(38,51,116,0.18)'
+                : 'rgba(38,51,116,0.10)'
             : 'transparent',
     }}
                       >
@@ -279,8 +279,8 @@ showsVerticalScrollIndicator = { false}
         fontWeight: '600',
         color: isSelected
             ? isDark
-                ? '#E878F6'
-                : '#8C5BF5'
+                ? '#FFD332'
+                : '#FFD332'
             : isDark
                 ? '#FFFFFF'
                 : '#111111',

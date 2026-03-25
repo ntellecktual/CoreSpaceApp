@@ -341,30 +341,30 @@ function TenantOnboardingGuide({ mode, styles }: { mode: 'day' | 'night'; styles
         title: '#FFFFFF',
         subtitle: 'rgba(232,236,255,0.84)',
         body: 'rgba(232,236,255,0.68)',
-        accent: '#A78BFA',
-        accentBg: 'rgba(167,139,250,0.14)',
-        accentBorder: 'rgba(167,139,250,0.28)',
-        heroBg: 'linear-gradient(135deg, rgba(111,75,207,0.14) 0%, rgba(59,130,246,0.08) 100%)',
+        accent: '#FFD332',
+        accentBg: 'rgba(38,51,116,0.14)',
+        accentBorder: 'rgba(38,51,116,0.28)',
+        heroBg: 'linear-gradient(135deg, rgba(38,51,116,0.14) 0%, rgba(59,130,246,0.08) 100%)',
         divider: 'rgba(255,255,255,0.08)',
-        stepCircleBg: 'rgba(167,139,250,0.14)',
-        stepCircleBorder: 'rgba(167,139,250,0.28)',
-        stepCircleText: '#A78BFA',
+        stepCircleBg: 'rgba(38,51,116,0.14)',
+        stepCircleBorder: 'rgba(38,51,116,0.28)',
+        stepCircleText: '#FFD332',
       }
     : {
         cardBg: 'rgba(255,255,255,0.72)',
         cardBorder: 'rgba(102,74,154,0.16)',
         cardShadow: '0 4px 14px rgba(102,74,154,0.08)',
-        title: '#1E1535',
+        title: '#1A2340',
         subtitle: '#4A3A69',
         body: '#5C477F',
-        accent: '#6F4BCF',
-        accentBg: 'rgba(111,75,207,0.08)',
-        accentBorder: 'rgba(111,75,207,0.20)',
-        heroBg: 'linear-gradient(135deg, rgba(111,75,207,0.06) 0%, rgba(59,130,246,0.04) 100%)',
+        accent: '#263374',
+        accentBg: 'rgba(38,51,116,0.08)',
+        accentBorder: 'rgba(38,51,116,0.20)',
+        heroBg: 'linear-gradient(135deg, rgba(38,51,116,0.06) 0%, rgba(59,130,246,0.04) 100%)',
         divider: 'rgba(102,74,154,0.12)',
-        stepCircleBg: 'rgba(111,75,207,0.10)',
-        stepCircleBorder: 'rgba(111,75,207,0.22)',
-        stepCircleText: '#6F4BCF',
+        stepCircleBg: 'rgba(38,51,116,0.10)',
+        stepCircleBorder: 'rgba(38,51,116,0.22)',
+        stepCircleText: '#263374',
       };
 
   const gridCols = compact ? 1 : windowWidth < 1200 ? 2 : 3;
@@ -814,8 +814,8 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const functionLabelPlural = shellConfig.functionLabelPlural ?? 'Departments';
   const objectLabel = shellConfig.objectLabel ?? 'Registry';
   const objectLabelPlural = shellConfig.objectLabelPlural ?? 'Registries';
-  const accentColor = accentPalette?.accent ? normalizeHex(accentPalette.accent, '#8C5BF5') : '#8C5BF5';
-  const baseSurface = mode === 'day' ? '#FFFFFF' : '#1A1230';
+  const accentColor = accentPalette?.accent ? normalizeHex(accentPalette.accent, '#FFD332') : '#FFD332';
+  const baseSurface = mode === 'day' ? '#FFFFFF' : '#1A2340';
   const accentTextColor = getContrastTextColor(accentColor);
   const txtColor = getContrastTextColor(baseSurface);
   const dimColor = withAlpha(txtColor, 'AA');
@@ -1142,8 +1142,8 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                   style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6, paddingHorizontal: 8, borderRadius: 8, marginBottom: 2, backgroundColor: sel ? accentSoft : 'transparent', borderWidth: sel ? 1 : 0, borderColor: sel ? accentColor : 'transparent' }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1 }}>
                     {workspace?.pipelineEnabled && (
-                      <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: sel ? accentColor : 'rgba(140,91,245,0.22)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
-                        <Text style={{ fontSize: 8, fontWeight: '800', color: sel ? accentTextColor : '#C4B5FD' }}>{ssIdx + 1}</Text>
+                      <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: sel ? accentColor : 'rgba(38,51,116,0.22)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                        <Text style={{ fontSize: 8, fontWeight: '800', color: sel ? accentTextColor : '#FFD332' }}>{ssIdx + 1}</Text>
                       </View>
                     )}
                     <Text style={{ fontSize: 11, fontWeight: sel ? '700' : '500', color: sel ? '#FFFFFF' : dimColor, flex: 1 }} numberOfLines={1}>{ss.name}</Text>
@@ -1194,9 +1194,9 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                 <Text style={{ fontSize: 10, fontWeight: '700', color: '#86EFAC' }}>{wsFlows.length} Signal Flow{wsFlows.length > 1 ? 's' : ''}</Text>
               </Pressable>
             )}
-            <Pressable nativeID="eu-timeline-button" onPress={() => setTimelineModalOpen(true)} style={{ paddingVertical: 8, paddingHorizontal: 10, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(196,181,253,0.3)', backgroundColor: 'rgba(196,181,253,0.06)', flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Pressable nativeID="eu-timeline-button" onPress={() => setTimelineModalOpen(true)} style={{ paddingVertical: 8, paddingHorizontal: 10, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,211,50,0.3)', backgroundColor: 'rgba(255,211,50,0.06)', flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text style={{ fontSize: 12 }}>◷</Text>
-              <Text style={{ fontSize: 10, fontWeight: '700', color: '#C4B5FD' }}>Full Activity Timeline</Text>
+              <Text style={{ fontSize: 10, fontWeight: '700', color: '#FFD332' }}>Full Activity Timeline</Text>
             </Pressable>
           </View>
           </>)}
@@ -1280,7 +1280,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
           >
             {[
               { icon: '📋', label: `Total ${subjectPlural}`, value: totalRecords, display: String(totalRecords), color: txtColor, tint: acRgba(0.08), border: acRgba(0.18) },
-              { icon: '💰', label: totalValue > 0 ? (isPharmWorkspace ? 'Total Units' : 'Total Value') : `${subSpaceLabelPlural}`, value: totalValue > 0 ? totalValue : visibleSubSpaces.length, display: totalValue > 0 ? fmtAmount(totalValue) : String(visibleSubSpaces.length), color: mode === 'day' ? '#7C3AED' : '#C4B5FD', tint: mode === 'day' ? 'rgba(124,58,237,0.06)' : 'rgba(196,181,253,0.08)', border: mode === 'day' ? 'rgba(124,58,237,0.16)' : 'rgba(196,181,253,0.20)' },
+              { icon: '💰', label: totalValue > 0 ? (isPharmWorkspace ? 'Total Units' : 'Total Value') : `${subSpaceLabelPlural}`, value: totalValue > 0 ? totalValue : visibleSubSpaces.length, display: totalValue > 0 ? fmtAmount(totalValue) : String(visibleSubSpaces.length), color: mode === 'day' ? '#263374' : '#FFD332', tint: mode === 'day' ? 'rgba(38,51,116,0.06)' : 'rgba(255,211,50,0.08)', border: mode === 'day' ? 'rgba(38,51,116,0.16)' : 'rgba(255,211,50,0.20)' },
               { icon: '🟢', label: 'Active', value: activeRecords, display: String(activeRecords), color: mode === 'day' ? '#16A34A' : '#86EFAC', tint: mode === 'day' ? 'rgba(22,163,74,0.07)' : 'rgba(134,239,172,0.08)', border: mode === 'day' ? 'rgba(22,163,74,0.18)' : 'rgba(134,239,172,0.20)' },
               { icon: exceptionCount > 0 ? '⚠️' : '✅', label: exceptionCount > 0 ? 'Exceptions' : 'Completed', value: exceptionCount > 0 ? exceptionCount : completedRecords, display: String(exceptionCount > 0 ? exceptionCount : completedRecords), color: exceptionCount > 0 ? '#EF4444' : (mode === 'day' ? '#0891B2' : '#67E8F9'), tint: exceptionCount > 0 ? 'rgba(239,68,68,0.08)' : (mode === 'day' ? 'rgba(8,145,178,0.06)' : 'rgba(103,232,249,0.08)'), border: exceptionCount > 0 ? 'rgba(239,68,68,0.22)' : (mode === 'day' ? 'rgba(8,145,178,0.18)' : 'rgba(103,232,249,0.20)') },
             ].map((kpi) => (
@@ -1407,7 +1407,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                         </View>
                         <Text style={{ fontSize: 11, fontWeight: '700', color: mode === 'night' ? '#E0D4FF' : txtColor }} numberOfLines={1}>{ss.name}</Text>
                         <View style={{ paddingHorizontal: 5, paddingVertical: 1, borderRadius: 8, backgroundColor: acRgba(0.22) }}>
-                          <Text style={{ fontSize: 9, fontWeight: '700', color: mode === 'night' ? '#C4B5FD' : accentColor }}>{cnt}</Text>
+                          <Text style={{ fontSize: 9, fontWeight: '700', color: mode === 'night' ? '#FFD332' : accentColor }}>{cnt}</Text>
                         </View>
                       </Pressable>
                       {!isLast && (
@@ -1628,7 +1628,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                           key={field}
                           data-sortable=""
                           onClick={() => { if (sortField === field) { setSortAsc(!sortAsc); } else { setSortField(field); setSortAsc(true); } }}
-                          style={{ flex, color: sortField === field ? '#E878F6' : (mode === 'day' ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.35)'), letterSpacing: 0.5, textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' } as any}
+                          style={{ flex, color: sortField === field ? '#FFD332' : (mode === 'day' ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.35)'), letterSpacing: 0.5, textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' } as any}
                         >
                           {label} {sortField === field ? (sortAsc ? '↑' : '↓') : ''}
                         </span>
@@ -2382,8 +2382,8 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                       )}
                       {entry.auditDetail != null && (
                         <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 4, paddingTop: 2 }}>
-                          <Text style={{ fontSize: 10, color: '#C4B5FD' }}>💬</Text>
-                          <Text style={{ fontSize: 10, color: '#C4B5FD', fontStyle: 'italic' as any, flex: 1 }}>{entry.auditDetail}</Text>
+                          <Text style={{ fontSize: 10, color: '#FFD332' }}>💬</Text>
+                          <Text style={{ fontSize: 10, color: '#FFD332', fontStyle: 'italic' as any, flex: 1 }}>{entry.auditDetail}</Text>
                         </View>
                       )}
                     </View>
@@ -2410,8 +2410,8 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                 return (
                   <View key={flow.id} style={{ ...g(0.03), padding: 12, gap: 4 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                      <View style={[styles.tagBadge, { backgroundColor: flow.status === 'published' ? 'rgba(134,239,172,0.2)' : 'rgba(196,181,253,0.2)' }]}>
-                        <Text style={[styles.tagBadgeText, { color: flow.status === 'published' ? '#86EFAC' : '#C4B5FD' }]}>{flow.status.toUpperCase()}</Text>
+                      <View style={[styles.tagBadge, { backgroundColor: flow.status === 'published' ? 'rgba(134,239,172,0.2)' : 'rgba(255,211,50,0.2)' }]}>
+                        <Text style={[styles.tagBadgeText, { color: flow.status === 'published' ? '#86EFAC' : '#FFD332' }]}>{flow.status.toUpperCase()}</Text>
                       </View>
                       <Text style={{ fontSize: 13, fontWeight: '700', color: '#FFFFFF' }}>{flow.name}</Text>
                     </View>
@@ -2504,23 +2504,23 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             {/* Tooltip card */}
             <div style={{
               ...tooltipStyle,
-              background: 'linear-gradient(168deg, #1A1230 0%, #120C23 100%)',
+              background: 'linear-gradient(168deg, #1A2340 0%, #131D35 100%)',
               border: '1px solid rgba(140, 91, 245, 0.35)',
               borderRadius: 14,
               boxShadow: '0 8px 40px rgba(140, 91, 245, 0.18), 0 2px 12px rgba(0,0,0,0.4)',
               padding: '22px 24px 18px',
-              color: '#F1E8FF',
+              color: '#EEF1F8',
               fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
             }}>
               {/* Progress bar */}
               <div style={{ height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 3, marginBottom: 12 }}>
-                <div style={{ height: 3, width: `${walkthroughProgress}%`, background: 'linear-gradient(90deg, #8C5BF5, #E878F6)', borderRadius: 3 }} />
+                <div style={{ height: 3, width: `${walkthroughProgress}%`, background: 'linear-gradient(90deg, #FFD332, #FFD332)', borderRadius: 3 }} />
               </div>
 
               {/* Badge */}
               <span style={{
                 display: 'inline-block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const,
-                letterSpacing: 1.2, color: '#E878F6',
+                letterSpacing: 1.2, color: '#FFD332',
                 background: 'rgba(232, 120, 246, 0.12)', border: '1px solid rgba(232, 120, 246, 0.25)',
                 borderRadius: 6, padding: '3px 10px', marginBottom: 8,
               }}>
@@ -2557,7 +2557,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     style={{
                       width: i === walkthroughStep ? 14 : 6, height: 6, borderRadius: 3,
                       background: i === walkthroughStep
-                        ? 'linear-gradient(135deg, #8C5BF5, #E878F6)'
+                        ? 'linear-gradient(135deg, #FFD332, #FFD332)'
                         : i < walkthroughStep
                           ? 'rgba(140, 91, 245, 0.5)'
                           : 'rgba(255, 255, 255, 0.12)',
@@ -2577,7 +2577,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                   style={{
                     border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 600,
                     cursor: isFirst ? 'default' : 'pointer',
-                    background: 'rgba(255,255,255,0.08)', color: '#F1E8FF',
+                    background: 'rgba(255,255,255,0.08)', color: '#EEF1F8',
                     opacity: isFirst ? 0.35 : 1,
                   }}
                 >
@@ -2588,7 +2588,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     onClick={() => setWalkthroughOpen(false)}
                     style={{
                       border: 'none', borderRadius: 8, padding: '8px 20px', fontSize: 12, fontWeight: 600,
-                      cursor: 'pointer', background: 'linear-gradient(135deg, #8C5BF5, #E878F6)', color: '#fff',
+                      cursor: 'pointer', background: 'linear-gradient(135deg, #FFD332, #FFD332)', color: '#fff',
                     }}
                   >
                     Finish
@@ -2598,7 +2598,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
                     onClick={() => goToEndUserStep(walkthroughStep + 1)}
                     style={{
                       border: 'none', borderRadius: 8, padding: '8px 20px', fontSize: 12, fontWeight: 600,
-                      cursor: 'pointer', background: 'linear-gradient(135deg, #8C5BF5, #E878F6)', color: '#fff',
+                      cursor: 'pointer', background: 'linear-gradient(135deg, #FFD332, #FFD332)', color: '#fff',
                     }}
                   >
                     Next ({walkthroughStep + 1}/{totalWalkthroughSteps})

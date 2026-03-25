@@ -75,7 +75,7 @@ const FORMAT_INFO: Record<IngestionFormat, { label: string; icon: string; descri
   },
 };
 
-const ACCENT = '#06B6D4';   // Cyan — distinct from Financial amber (#F59E0B) and platform purple (#8C5BF5)
+const ACCENT = '#06B6D4';   // Cyan — distinct from Financial amber (#F59E0B) and platform purple (#FFD332)
 const SUCCESS = '#10B981';
 const DANGER = '#EF4444';
 const WARN = '#F59E0B';

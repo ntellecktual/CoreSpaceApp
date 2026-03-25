@@ -16,8 +16,8 @@ const nightStyleObject = {
   // Removed duplicate landingTopMenuText
   root: {
     flex: 1,
-    backgroundColor: '#0B0E1A',
-    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(38,51,116,.22), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.14), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.12), transparent 60%), linear-gradient(180deg, #0B0E1A, #0B0E16)',
+    backgroundColor: '#263374',
+    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(38,51,116,.22), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.14), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.12), transparent 60%), linear-gradient(180deg, #263374, #1E2A5E)',
   },
   dashboardShell: {
     flex: 1,
@@ -706,7 +706,7 @@ const nightStyleObject = {
   },
   builderStepItemCurrent: {
     borderColor: 'rgba(250,225,120,0.9)',
-    backgroundColor: 'rgba(111,75,207,0.92)',
+    backgroundColor: 'rgba(38,51,116,0.92)',
     boxShadow: '0 0 10px rgba(253,224,120,0.5)',
     elevation: 6,
   },
@@ -1554,8 +1554,8 @@ const nightStyleObject = {
   },
   authWrap: {
     flex: 1,
-    backgroundColor: '#0B0E1A',
-    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(38,51,116,.22), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.14), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.12), transparent 60%), linear-gradient(180deg, #0B0E1A, #0B0E16)',
+    backgroundColor: '#263374',
+    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(38,51,116,.22), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.14), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.12), transparent 60%), linear-gradient(180deg, #263374, #1E2A5E)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 18,
@@ -1957,7 +1957,7 @@ const nightStyleObject = {
     flex: 1,
   },
   adminNavSectionChevron: {
-    color: '#A78BFA',
+    color: '#FFD332',
     fontSize: 11,
     fontWeight: '700',
   },
@@ -2020,7 +2020,7 @@ const nightStyleObject = {
     marginTop: 8,
   },
   adminContentHeader: {
-    backgroundImage: 'linear-gradient(135deg, rgba(111,75,207,0.18) 0%, rgba(59,130,246,0.10) 100%)',
+    backgroundImage: 'linear-gradient(135deg, rgba(38,51,116,0.18) 0%, rgba(59,130,246,0.10) 100%)',
     borderRadius: 14,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
@@ -2178,7 +2178,7 @@ const dayOverrides = {
     borderBottomColor: 'rgba(102,74,154,0.22)',
   },
   dashboardDraftBanner: {
-    backgroundColor: 'rgba(111,75,207,0.12)',
+    backgroundColor: 'rgba(38,51,116,0.12)',
     borderBottomColor: 'rgba(102,74,154,0.24)',
   },
   dashboardDraftText: {
@@ -2203,7 +2203,7 @@ const dayOverrides = {
     color: 'rgba(46,33,72,0.45)',
   },
   dashboardNavItemActive: {
-    backgroundColor: '#6F4BCF',
+    backgroundColor: '#263374',
   },
   dashboardTenantChevron: {
     color: '#2E2148',
@@ -2213,8 +2213,8 @@ const dayOverrides = {
     backgroundColor: 'rgba(112,85,163,0.08)',
   },
   dashboardTenantNavItemActive: {
-    borderColor: 'rgba(111,75,207,0.88)',
-    backgroundColor: 'rgba(111,75,207,0.78)',
+    borderColor: 'rgba(38,51,116,0.88)',
+    backgroundColor: 'rgba(38,51,116,0.78)',
   },
   dashboardTenantNavItemText: {
     color: '#2F2249',
@@ -2224,8 +2224,8 @@ const dayOverrides = {
     backgroundColor: 'rgba(112,85,163,0.08)',
   },
   dashboardTenantHeaderActive: {
-    borderColor: 'rgba(111,75,207,0.50)',
-    backgroundColor: 'rgba(111,75,207,0.14)',
+    borderColor: 'rgba(38,51,116,0.50)',
+    backgroundColor: 'rgba(38,51,116,0.14)',
   },
   dashboardTenantHeaderName: {
     color: '#2F2249',
@@ -2243,8 +2243,8 @@ const dayOverrides = {
     backgroundColor: 'rgba(112,85,163,0.12)',
   },
   dashboardTenantPillActive: {
-    borderColor: 'rgba(111,75,207,0.88)',
-    backgroundColor: 'rgba(111,75,207,0.78)',
+    borderColor: 'rgba(38,51,116,0.88)',
+    backgroundColor: 'rgba(38,51,116,0.78)',
   },
   dashboardTenantPillText: {
     color: '#2F2249',
@@ -2253,7 +2253,7 @@ const dayOverrides = {
     backgroundColor: 'transparent',
   },
   dashboardCollapsedNavItemActive: {
-    backgroundColor: '#6F4BCF',
+    backgroundColor: '#263374',
   },
   dashboardNavItemTextActive: {
     color: '#FFFFFF',
@@ -2267,8 +2267,8 @@ const dayOverrides = {
     backgroundColor: 'rgba(112,85,163,0.12)',
   },
   dashboardRoleItemActive: {
-    borderColor: 'rgba(111,75,207,0.88)',
-    backgroundColor: 'rgba(111,75,207,0.78)',
+    borderColor: 'rgba(38,51,116,0.88)',
+    backgroundColor: 'rgba(38,51,116,0.78)',
   },
   dashboardRoleItemTextActive: {
     color: '#FFFFFF',
@@ -2282,8 +2282,8 @@ const dayOverrides = {
     backgroundColor: 'rgba(112,85,163,0.12)',
   },
   dashboardSidebarActionActive: {
-    borderColor: 'rgba(111,75,207,0.9)',
-    backgroundColor: 'rgba(111,75,207,0.8)',
+    borderColor: 'rgba(38,51,116,0.9)',
+    backgroundColor: 'rgba(38,51,116,0.8)',
   },
   dashboardSidebarActionTextActive: {
     color: '#FFFFFF',
@@ -2334,8 +2334,8 @@ const dayOverrides = {
     backgroundColor: 'rgba(112,85,163,0.08)',
   },
   pillButtonActive: {
-    borderColor: '#7C3AED',
-    backgroundColor: 'rgba(124,58,237,0.16)',
+    borderColor: '#263374',
+    backgroundColor: 'rgba(38,51,116,0.16)',
   },
   pillButtonText: {
     color: '#4A3A69',
@@ -2364,8 +2364,8 @@ const dayOverrides = {
     color: '#111111',
   },
   dashboardHeaderButton: {
-    borderColor: 'rgba(111,75,207,0.5)',
-    backgroundColor: 'rgba(111,75,207,0.14)',
+    borderColor: 'rgba(38,51,116,0.5)',
+    backgroundColor: 'rgba(38,51,116,0.14)',
   },
   dashboardHeaderButtonText: {
     color: '#111111',
@@ -2378,18 +2378,18 @@ const dayOverrides = {
     fontWeight: '800',
   },
   pill: {
-    borderColor: 'rgba(111,75,207,0.22)',
-    backgroundColor: 'rgba(111,75,207,0.06)',
+    borderColor: 'rgba(38,51,116,0.22)',
+    backgroundColor: 'rgba(38,51,116,0.06)',
   },
   pillActive: {
-    borderColor: 'rgba(111,75,207,0.72)',
-    backgroundColor: 'rgba(111,75,207,0.14)',
+    borderColor: 'rgba(38,51,116,0.72)',
+    backgroundColor: 'rgba(38,51,116,0.14)',
   },
   pillText: {
     color: '#4A3A69',
   },
   pillTextActive: {
-    color: '#6F4BCF',
+    color: '#263374',
     fontWeight: '800',
   },
   buttonDisabled: {
@@ -2449,27 +2449,27 @@ const dayOverrides = {
     boxShadow: '0 4px 24px rgba(102,74,154,0.08)',
   },
   adminNavSectionHeaderActive: {
-    backgroundColor: 'rgba(111,75,207,0.08)',
-    borderColor: 'rgba(111,75,207,0.20)',
+    backgroundColor: 'rgba(38,51,116,0.08)',
+    borderColor: 'rgba(38,51,116,0.20)',
   },
   adminNavSectionHeaderLabel: {
-    color: '#1E1535',
+    color: '#1A2340',
   },
   adminNavSectionChevron: {
-    color: '#6F4BCF',
+    color: '#263374',
   },
   adminNavSectionDescription: {
     color: '#5C477F',
   },
   adminNavItemActive: {
-    backgroundColor: 'rgba(111,75,207,0.10)',
-    borderColor: 'rgba(111,75,207,0.18)',
+    backgroundColor: 'rgba(38,51,116,0.10)',
+    borderColor: 'rgba(38,51,116,0.18)',
   },
   adminNavItemLabel: {
     color: '#4A3A69',
   },
   adminNavItemLabelActive: {
-    color: '#6F4BCF',
+    color: '#263374',
   },
   adminNavItemDetail: {
     color: '#7A6A9A',
@@ -2481,11 +2481,11 @@ const dayOverrides = {
     boxShadow: '0 4px 24px rgba(102,74,154,0.08)',
   },
   adminContentHeader: {
-    backgroundImage: 'linear-gradient(135deg, rgba(111,75,207,0.06) 0%, rgba(59,130,246,0.04) 100%)',
+    backgroundImage: 'linear-gradient(135deg, rgba(38,51,116,0.06) 0%, rgba(59,130,246,0.04) 100%)',
     borderColor: 'rgba(102,74,154,0.16)',
   },
   adminContentTitle: {
-    color: '#1E1535',
+    color: '#1A2340',
   },
   adminContentDescription: {
     color: '#4A3A69',
@@ -2499,7 +2499,7 @@ const dayOverrides = {
   builderPreviewHeroCard: {
     backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
     backgroundColor: 'rgba(255,255,255,0.90)',
-    borderColor: 'rgba(111,75,207,0.28)',
+    borderColor: 'rgba(38,51,116,0.28)',
     boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
   },
   builderPreviewHeroTitle: {
@@ -2511,7 +2511,7 @@ const dayOverrides = {
   builderPreviewStatCard: {
     backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
     backgroundColor: '#FFFFFF',
-    borderColor: 'rgba(111,75,207,0.3)',
+    borderColor: 'rgba(38,51,116,0.3)',
     boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
   },
   builderPreviewStatValue: {
@@ -2529,13 +2529,13 @@ const dayOverrides = {
   builderSectionCard: {
     backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
     backgroundColor: 'rgba(255,255,255,0.94)',
-    borderColor: 'rgba(111,75,207,0.28)',
+    borderColor: 'rgba(38,51,116,0.28)',
     boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
   },
   builderFormSection: {
     backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
     backgroundColor: 'rgba(255,255,255,0.94)',
-    borderColor: 'rgba(111,75,207,0.28)',
+    borderColor: 'rgba(38,51,116,0.28)',
     boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
   },
   builderFormSectionHeaderRail: {
@@ -2562,18 +2562,18 @@ const dayOverrides = {
   builderConfigPane: {
     backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.72))',
     backgroundColor: 'rgba(255,255,255,0.92)',
-    borderColor: 'rgba(111,75,207,0.34)',
+    borderColor: 'rgba(38,51,116,0.34)',
     boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
   },
   builderPreviewCard: {
     backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.72))',
     backgroundColor: 'rgba(255,255,255,0.95)',
-    borderColor: 'rgba(111,75,207,0.34)',
+    borderColor: 'rgba(38,51,116,0.34)',
     boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
   },
   builderDropZone: {
-    borderColor: 'rgba(111,75,207,0.58)',
-    backgroundColor: 'rgba(111,75,207,0.12)',
+    borderColor: 'rgba(38,51,116,0.58)',
+    backgroundColor: 'rgba(38,51,116,0.12)',
   },
   builderCreateModeBanner: {
     borderColor: 'rgba(176,130,38,0.55)',
@@ -2633,8 +2633,8 @@ const dayOverrides = {
     boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
   },
   endUserWorkspaceTabActive: {
-    borderColor: 'rgba(111,75,207,0.92)',
-    backgroundColor: 'rgba(111,75,207,0.78)',
+    borderColor: 'rgba(38,51,116,0.92)',
+    backgroundColor: 'rgba(38,51,116,0.78)',
   },
   endUserWorkspaceTabStep: {
     color: '#2E2148',

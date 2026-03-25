@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAppState } from '../../../context/AppStateContext';
 import { DisplayType, SubSpaceBuilderField, SubSpaceBuilderFieldType, SubSpaceDefinition, VisibilityRule, WorkspaceDefinition } from '../../../types';
 import { useRbac } from './useRbac';
@@ -1170,7 +1170,7 @@ export function useAdminWorkspace() {
       id: 'bfn-supply-chain',
       name: 'Supply Chain & Regulatory',
       icon: '🔗',
-      color: '#8C5BF5',
+      color: '#FFD332',
       order: 0,
       description: 'End-to-end pharmaceutical serialization from manufacturer to patient dispensing (DSCSA)',
       objects: [

@@ -41,8 +41,8 @@ function getPortalRoot(): HTMLElement {
 
 // ─── Markdown-lite renderer ─────────────────────────────────────────
 function renderMarkdown(text: string, isDark: boolean) {
-  const baseColor = isDark ? '#E2D9F3' : '#1A1230';
-  const codeColor = isDark ? '#FD9CFD' : '#8C5BF5';
+  const baseColor = isDark ? '#E0E4ED' : '#1A2340';
+  const codeColor = isDark ? '#FFD332' : '#FFD332';
   const dimColor = isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)';
 
   const lines = text.split('\n');
@@ -109,7 +109,7 @@ function renderMarkdown(text: string, isDark: boolean) {
 
 // ─── Typing indicator ───────────────────────────────────────────────
 function TypingIndicator({ isDark }: { isDark: boolean }) {
-  const dotColor = isDark ? '#E878F6' : '#8C5BF5';
+  const dotColor = isDark ? '#FFD332' : '#FFD332';
   return (
     <View style={{ flexDirection: 'row', gap: 4, paddingVertical: 6, paddingHorizontal: 4, alignItems: 'center' }}>
       {[0, 1, 2].map((i) => (
@@ -184,9 +184,9 @@ export const AiChatPanel = React.memo(function AiChatPanel({
 
   const bg = isDark ? 'rgba(14,10,28,0.97)' : 'rgba(255,255,255,0.98)';
   const border = isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)';
-  const accentBg = isDark ? 'rgba(140,91,245,0.18)' : 'rgba(140,91,245,0.10)';
-  const userBg = isDark ? 'rgba(232,120,246,0.16)' : 'rgba(140,91,245,0.12)';
-  const accentText = isDark ? '#E878F6' : '#8C5BF5';
+  const accentBg = isDark ? 'rgba(38,51,116,0.18)' : 'rgba(38,51,116,0.10)';
+  const userBg = isDark ? 'rgba(255,211,50,0.16)' : 'rgba(38,51,116,0.12)';
+  const accentText = isDark ? '#FFD332' : '#FFD332';
   const chipBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)';
   const chipBorder = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.10)';
 
@@ -316,7 +316,7 @@ export const AiChatPanel = React.memo(function AiChatPanel({
               flex: 1,
               paddingVertical: 8,
               borderRadius: 10,
-              backgroundColor: '#8C5BF5',
+              backgroundColor: '#FFD332',
               alignItems: 'center',
             }}
           >
@@ -381,7 +381,7 @@ export const AiChatPanel = React.memo(function AiChatPanel({
             width: 32,
             height: 32,
             borderRadius: 16,
-            backgroundColor: isThinking ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : '#8C5BF5',
+            backgroundColor: isThinking ? (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)') : '#FFD332',
             alignItems: 'center',
             justifyContent: 'center',
           }}
@@ -434,7 +434,7 @@ function MessageBubble({
       {!isUser && (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 2 }}>
           <Image source={isDark ? beboLogoDark : beboLogoLight} style={{ width: 16, height: 16, borderRadius: 8 }} resizeMode="contain" />
-          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.8, color: isDark ? '#E878F6' : '#8C5BF5' }}>
+          <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.8, color: isDark ? '#FFD332' : '#FFD332' }}>
             Bebo
           </Text>
         </View>

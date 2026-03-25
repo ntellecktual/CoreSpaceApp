@@ -2152,7 +2152,7 @@ function buildPharmaBusinessFunctions(): BusinessFunction[] {
     id: 'bfn-supply-chain',
     name: 'Supply Chain & Regulatory',
     icon: '🔗',
-    color: '#8C5BF5',
+    color: '#FFD332',
     order: 0,
     description: 'End-to-end pharmaceutical serialization from manufacturer to patient dispensing',
     objects: [{
@@ -2406,7 +2406,7 @@ export function generateBeboResponse(userText: string, vertical: DemoVertical): 
           fnId: fn.id,
           name: fn.name,
           icon: fn.icon ?? '🏢',
-          color: fn.color ?? '#8C5BF5',
+          color: fn.color ?? '#FFD332',
           description: fn.description ?? '',
           objects: fn.objects.map(obj => ({
             name: obj.name,

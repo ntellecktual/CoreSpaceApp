@@ -56,9 +56,9 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
   const { mode } = useUiTheme();
   const isDark = mode === 'night';
 
-  const accent = tenantAccent ?? (isDark ? '#E878F6' : '#8C5BF5');
+  const accent = tenantAccent ?? (isDark ? '#FFD332' : '#FFD332');
   const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-  const textColor = isDark ? '#E2D9F3' : '#1A1230';
+  const textColor = isDark ? '#E0E4ED' : '#1A2340';
   const dimText = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
   const sectionBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)';
   const surfaceBg = isDark ? '#0E0A1C' : '#FAFBFF';
@@ -181,7 +181,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
             overflow: 'hidden',
             ...(Platform.OS === 'web' ? {
               boxShadow: isDark
-                ? '-8px 0 40px rgba(0,0,0,0.50), 0 0 0 1px rgba(140,91,245,0.08)'
+                ? '-8px 0 40px rgba(0,0,0,0.50), 0 0 0 1px rgba(38,51,116,0.08)'
                 : '-8px 0 40px rgba(0,0,0,0.10)',
               animation: 'cs-drawer-slide 0.28s cubic-bezier(0.16,1,0.3,1) both',
             } : { elevation: 24 }),

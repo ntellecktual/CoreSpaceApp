@@ -30,8 +30,6 @@ import { IngestionPage } from './home/IngestionPage';
 import { WorkflowChainsPage } from './home/WorkflowChainsPage';
 import { ModulePageActions } from './home/types';
 import type { CommandPaletteItem } from '../types';
-import { useGuidedTour } from '../components/GuidedTour';
-import { useSpotlightTour } from '../components/SpotlightTour';
 import type { Page } from './home/types';
 
 // ─── Demo Journey — ordered 6-step demo flow ────────────────────────
@@ -155,7 +153,7 @@ const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF'];
 const TIMEZONE_OPTIONS = ['UTC', 'US/Eastern', 'US/Central', 'US/Mountain', 'US/Pacific', 'Europe/London', 'Europe/Berlin', 'Asia/Tokyo', 'Asia/Shanghai', 'Australia/Sydney'];
 
 const PALETTE_PRESETS = [
-  { name: 'Cosmic Purple', colors: ['#120C23', '#1A1230', '#8C5BF5', '#A78BFA', '#22C55E', '#F59E0B', '#EF4444', '#1E1535'] as const },
+  { name: 'Halo Navy', colors: ['#131D35', '#1A2340', '#FFD332', '#FFD332', '#22C55E', '#F59E0B', '#EF4444', '#1A2340'] as const },
   { name: 'Ocean Blue', colors: ['#0A1628', '#0F1D32', '#3B82F6', '#60A5FA', '#10B981', '#F59E0B', '#EF4444', '#152238'] as const },
   { name: 'Forest Green', colors: ['#0A1A0F', '#0F261A', '#22C55E', '#4ADE80', '#3B82F6', '#F59E0B', '#EF4444', '#0D1F14'] as const },
   { name: 'Sunset Coral', colors: ['#1A0E14', '#261420', '#F43F5E', '#FB7185', '#8B5CF6', '#F59E0B', '#EF4444', '#1F1018'] as const },
@@ -180,8 +178,8 @@ const TENANT_TABS: Array<{ id: TenantTabId; label: string; icon: string }> = [
 ];
 
 const DEFAULT_TENANT_EXTRAS = {
-  tagline: '', industryVertical: '', accentSecondary: '#A78BFA', successColor: '#22C55E',
-  warningColor: '#F59E0B', dangerColor: '#EF4444', surfaceColor: '#1E1535', fontFamily: 'System Default',
+  tagline: '', industryVertical: '', accentSecondary: '#FFD332', successColor: '#22C55E',
+  warningColor: '#F59E0B', dangerColor: '#EF4444', surfaceColor: '#1A2340', fontFamily: 'System Default',
   headingWeight: '800', baseFontSize: 13, borderRadius: 'rounded', uiDensity: 'comfortable',
   sidebarStyle: 'glass', cardStyle: 'elevated', welcomeMessage: '', heroImageUri: '',
   dashboardLayout: 'grid', defaultThemeMode: 'night', animationsEnabled: true, departments: [] as string[],
@@ -192,11 +190,11 @@ function extractExtras(branding: any) {
   return {
     tagline: branding?.tagline ?? '',
     industryVertical: branding?.industryVertical ?? '',
-    accentSecondary: branding?.accentSecondary ?? '#A78BFA',
+    accentSecondary: branding?.accentSecondary ?? '#FFD332',
     successColor: branding?.successColor ?? '#22C55E',
     warningColor: branding?.warningColor ?? '#F59E0B',
     dangerColor: branding?.dangerColor ?? '#EF4444',
-    surfaceColor: branding?.surfaceColor ?? '#1E1535',
+    surfaceColor: branding?.surfaceColor ?? '#1A2340',
     fontFamily: branding?.fontFamily ?? 'System Default',
     headingWeight: branding?.headingWeight ?? '800',
     baseFontSize: branding?.baseFontSize ?? 13,
@@ -236,18 +234,7 @@ export function HomeScreen() {
   } = useAppState();
   const { page, guidedMode, activeGuide, setPage, toggleGuidedMode, openGuide, closeGuide } = useHomeScreenState();
   const { activeRole, roles, setActiveRoleId } = useRbac();
-  const { currentStep, steps, isOpen: tourOpen, openTour } = useGuidedTour();
-  const { openSpotlightTour } = useSpotlightTour();
 
-  // Auto-navigate to the correct page when the guided tour step changes
-  useEffect(() => {
-    if (!tourOpen) return;
-    const tourStep = steps[currentStep];
-    if (tourStep?.navigateTo) {
-      setTenantAccessOpen(false);
-      setPage(tourStep.navigateTo as Page);
-    }
-  }, [tourOpen, currentStep, steps]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -266,9 +253,9 @@ export function HomeScreen() {
   const [tenantCustomRoleTitle, setTenantCustomRoleTitle] = useState('');
   const [tenantRolesExpanded, setTenantRolesExpanded] = useState(false);
   const [newTenantLogoUri, setNewTenantLogoUri] = useState('');
-  const [newTenantPrimaryColor, setNewTenantPrimaryColor] = useState('#120C23');
-  const [newTenantSecondaryColor, setNewTenantSecondaryColor] = useState('#1A1230');
-  const [newTenantAccentColor, setNewTenantAccentColor] = useState('#8C5BF5');
+  const [newTenantPrimaryColor, setNewTenantPrimaryColor] = useState('#131D35');
+  const [newTenantSecondaryColor, setNewTenantSecondaryColor] = useState('#1A2340');
+  const [newTenantAccentColor, setNewTenantAccentColor] = useState('#FFD332');
   const [tenantExportTarget, setTenantExportTarget] = useState<PortableDatabaseTarget>('cosmos');
   const [newTenantRoleTitles, setNewTenantRoleTitles] = useState<string[]>(['Operations Coordinator']);
   const [newTenantCustomRoleTitle, setNewTenantCustomRoleTitle] = useState('');
@@ -377,7 +364,6 @@ export function HomeScreen() {
       { id: 'nav-enduser', label: 'Go to End User', category: 'navigation', keywords: ['enduser', 'runtime', 'dashboard'], action: () => { setTenantAccessOpen(false); setPage('enduser'); } },
       { id: 'nav-architecture', label: 'Go to Architecture Docs', category: 'navigation', keywords: ['docs', 'architecture', 'documentation'], action: () => { setTenantAccessOpen(false); setPage('architecture'); } },
       { id: 'settings-theme', label: `Switch to ${mode === 'day' ? 'Night' : 'Day'} Mode`, category: 'settings', keywords: ['theme', 'dark', 'light', 'mode'], action: toggleMode },
-      { id: 'settings-guided', label: 'Start Guided Tour', category: 'settings', keywords: ['guide', 'walkthrough', 'tutorial', 'tour'], action: openTour },
       { id: 'settings-sidebar', label: `${isSidebarCollapsed ? 'Expand' : 'Collapse'} Sidebar`, category: 'settings', keywords: ['sidebar', 'collapse', 'expand'], action: () => setSidebarCollapsed((c) => !c) },
       { id: 'tenant-access', label: 'Open Tenant Access', category: 'tenant', keywords: ['tenant', 'manage', 'admin'], action: () => setTenantAccessOpen(true) },
       { id: 'notifications-open', label: 'Open Notifications', category: 'settings', keywords: ['notifications', 'alerts', 'bell'], action: () => setNotificationsOpen(true) },
@@ -722,9 +708,9 @@ export function HomeScreen() {
       const createResult = createTenant(newTenantName, {
         logoUri: newTenantLogoUri.trim() || undefined,
         brandColors: [
-          normalizeHex(newTenantPrimaryColor, '#120C23'),
-          normalizeHex(newTenantSecondaryColor, '#1A1230'),
-          normalizeHex(newTenantAccentColor, '#8C5BF5'),
+          normalizeHex(newTenantPrimaryColor, '#131D35'),
+          normalizeHex(newTenantSecondaryColor, '#1A2340'),
+          normalizeHex(newTenantAccentColor, '#FFD332'),
         ],
         widgetTwoColumnBreakpoint: GLOBAL_WIDGET_TWO_COLUMN_BREAKPOINT,
         employeeTitles: newTenantRoleTitles,
@@ -761,9 +747,9 @@ export function HomeScreen() {
 
       setNewTenantName('');
       setNewTenantLogoUri('');
-      setNewTenantPrimaryColor('#120C23');
-      setNewTenantSecondaryColor('#1A1230');
-      setNewTenantAccentColor('#8C5BF5');
+      setNewTenantPrimaryColor('#131D35');
+      setNewTenantSecondaryColor('#1A2340');
+      setNewTenantAccentColor('#FFD332');
       setNewTenantRoleTitles(['Operations Coordinator']);
       setNewTenantCustomRoleTitle('');
       setNewTenantRolesExpanded(false);
@@ -805,7 +791,7 @@ export function HomeScreen() {
       <View style={styles.loadingWrap}>
         <NebulaBackground mode={mode} />
         <BrandLogo width={260} height={104} />
-        <ActivityIndicator color="#E878F6" />
+        <ActivityIndicator color="#FFD332" />
         <Text style={styles.loadingText}>Getting things ready...</Text>
       </View>
     );
@@ -911,7 +897,7 @@ export function HomeScreen() {
               {endUserTenantMenuOpen && (
                 <View style={styles.dashboardTenantNavList}>
                   {tenants.filter((t) => t.name === 'Witherite Law Group' || t.name === 'Create a Tenant +').map((tenant) => {
-                    const tenantAccent = normalizeHex(tenant.branding.brandColors[2], '#8C5BF5');
+                    const tenantAccent = normalizeHex(tenant.branding.brandColors[2], '#FFD332');
                     const tenantAccentText = getContrastTextColor(tenantAccent);
                     const selectedTenant = activeTenantId === tenant.id && page === 'enduser';
                     const isCreatePlaceholder = tenant.name === 'Create a Tenant +';
@@ -1063,14 +1049,6 @@ export function HomeScreen() {
                   </Text>
                 </Pressable>
                 <Pressable
-                  style={styles.dashboardSidebarAction}
-                  onPress={openTour}
-                  accessibilityRole="button"
-                  accessibilityLabel="Launch the full guided tour"
-                >
-                  <Text style={styles.dashboardSidebarActionText}>🎯 Launch Full Tour</Text>
-                </Pressable>
-                <Pressable
                   style={[styles.dashboardSidebarAction, guidedMode && styles.dashboardSidebarActionActive]}
                   onPress={toggleGuidedMode}
                   accessibilityRole="switch"
@@ -1081,14 +1059,6 @@ export function HomeScreen() {
                   <Text style={[styles.dashboardSidebarActionText, guidedMode && styles.dashboardSidebarActionTextActive]}>
                     Step-by-Step Hints: {guidedMode ? 'On' : 'Off'}
                   </Text>
-                </Pressable>
-                <Pressable
-                  style={styles.dashboardSidebarAction}
-                  onPress={openSpotlightTour}
-                  accessibilityRole="button"
-                  accessibilityLabel="Take a spotlight tour of the home screen"
-                >
-                  <Text style={styles.dashboardSidebarActionText}>Spotlight Tour</Text>
                 </Pressable>
                 <Pressable
                   style={[styles.dashboardSidebarAction, mode === 'day' && styles.dashboardSidebarActionActive]}
@@ -1224,17 +1194,17 @@ export function HomeScreen() {
                 paddingHorizontal: 16,
                 paddingVertical: 5,
                 borderBottomWidth: 1,
-                borderBottomColor: mode === 'night' ? 'rgba(140,91,245,0.14)' : 'rgba(140,91,245,0.10)',
-                backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.05)' : 'rgba(140,91,245,0.03)',
+                borderBottomColor: mode === 'night' ? 'rgba(38,51,116,0.14)' : 'rgba(38,51,116,0.10)',
+                backgroundColor: mode === 'night' ? 'rgba(38,51,116,0.05)' : 'rgba(38,51,116,0.03)',
                 gap: 2,
                 flexWrap: 'wrap' as any,
-                ...(Platform.OS === 'web' ? { boxShadow: mode === 'night' ? 'inset 0 -1px 0 rgba(140,91,245,0.12)' : 'inset 0 -1px 0 rgba(140,91,245,0.08)' } : {}),
+                ...(Platform.OS === 'web' ? { boxShadow: mode === 'night' ? 'inset 0 -1px 0 rgba(38,51,116,0.12)' : 'inset 0 -1px 0 rgba(38,51,116,0.08)' } : {}),
               }}>
                 {/* Left accent pip */}
-                <View style={{ width: 3, height: 16, borderRadius: 2, backgroundColor: '#8C5BF5', marginRight: 10, opacity: 0.7 }} />
+                <View style={{ width: 3, height: 16, borderRadius: 2, backgroundColor: '#FFD332', marginRight: 10, opacity: 0.7 }} />
                 {DEMO_STEPS.map((step, idx) => {
                   const isCurrent = page === step.id;
-                  const accent = '#8C5BF5';
+                  const accent = '#FFD332';
                   const stepNum = idx + 1;
                   return (
                     <React.Fragment key={step.id}>
@@ -1283,26 +1253,6 @@ export function HomeScreen() {
                   );
                 })}
                 <View style={{ flex: 1 }} />
-                <Pressable
-                  onPress={openTour}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 5,
-                    paddingHorizontal: 11,
-                    paddingVertical: 5,
-                    borderRadius: 20,
-                    backgroundColor: mode === 'night' ? 'rgba(140,91,245,0.16)' : 'rgba(140,91,245,0.10)',
-                    borderWidth: 1,
-                    borderColor: 'rgba(140,91,245,0.35)',
-                    ...(Platform.OS === 'web' ? { boxShadow: '0 0 8px rgba(140,91,245,0.20)' } : {}),
-                  } as any}
-                  accessibilityRole="button"
-                  accessibilityLabel="Start tour guide"
-                >
-                  <Text style={{ fontSize: 11 }}>✦</Text>
-                  <Text style={{ fontSize: 11, color: '#A78BFA', fontWeight: '700', letterSpacing: 0.2 }}>Tour Guide</Text>
-                </Pressable>
               </View>
             )}
             {tenantAccessOpen && isSuperAdmin ? (
@@ -1376,24 +1326,24 @@ export function HomeScreen() {
                       <View style={[styles.card, styles.tenantWidgetCard]}>
                         <Text style={styles.cardTitle}>Color Palette</Text>
                         <View style={styles.cardBody}>
-                          <LabeledInput label="Sidebar (Primary)" value={tenantPrimaryColor} onChangeText={setTenantPrimaryColor} placeholder="#120C23" />
-                          <LabeledInput label="Background (Secondary)" value={tenantSecondaryColor} onChangeText={setTenantSecondaryColor} placeholder="#1A1230" />
-                          <LabeledInput label="Accent" value={tenantAccentColor} onChangeText={setTenantAccentColor} placeholder="#8C5BF5" />
-                          <LabeledInput label="Accent Secondary" value={tenantExtras.accentSecondary} onChangeText={(v: string) => updateExtra('accentSecondary', v)} placeholder="#A78BFA" />
+                          <LabeledInput label="Sidebar (Primary)" value={tenantPrimaryColor} onChangeText={setTenantPrimaryColor} placeholder="#131D35" />
+                          <LabeledInput label="Background (Secondary)" value={tenantSecondaryColor} onChangeText={setTenantSecondaryColor} placeholder="#1A2340" />
+                          <LabeledInput label="Accent" value={tenantAccentColor} onChangeText={setTenantAccentColor} placeholder="#FFD332" />
+                          <LabeledInput label="Accent Secondary" value={tenantExtras.accentSecondary} onChangeText={(v: string) => updateExtra('accentSecondary', v)} placeholder="#FFD332" />
                           <LabeledInput label="Success" value={tenantExtras.successColor} onChangeText={(v: string) => updateExtra('successColor', v)} placeholder="#22C55E" />
                           <LabeledInput label="Warning" value={tenantExtras.warningColor} onChangeText={(v: string) => updateExtra('warningColor', v)} placeholder="#F59E0B" />
                           <LabeledInput label="Danger" value={tenantExtras.dangerColor} onChangeText={(v: string) => updateExtra('dangerColor', v)} placeholder="#EF4444" />
-                          <LabeledInput label="Surface" value={tenantExtras.surfaceColor} onChangeText={(v: string) => updateExtra('surfaceColor', v)} placeholder="#1E1535" />
+                          <LabeledInput label="Surface" value={tenantExtras.surfaceColor} onChangeText={(v: string) => updateExtra('surfaceColor', v)} placeholder="#1A2340" />
                           <View style={[styles.inlineRow, { marginTop: 8 }]}>
                             {[
                               { label: 'Pri', hex: tenantPrimaryResolved },
                               { label: 'Sec', hex: tenantSecondaryResolved },
                               { label: 'Acc', hex: tenantAccentResolved },
-                              { label: 'Acc2', hex: normalizeHex(tenantExtras.accentSecondary, '#A78BFA') },
+                              { label: 'Acc2', hex: normalizeHex(tenantExtras.accentSecondary, '#FFD332') },
                               { label: 'Ok', hex: normalizeHex(tenantExtras.successColor, '#22C55E') },
                               { label: 'Wrn', hex: normalizeHex(tenantExtras.warningColor, '#F59E0B') },
                               { label: 'Err', hex: normalizeHex(tenantExtras.dangerColor, '#EF4444') },
-                              { label: 'Srf', hex: normalizeHex(tenantExtras.surfaceColor, '#1E1535') },
+                              { label: 'Srf', hex: normalizeHex(tenantExtras.surfaceColor, '#1A2340') },
                             ].map((swatch) => (
                               <View key={swatch.label} style={{ alignItems: 'center', gap: 3 }}>
                                 <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: swatch.hex, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' }} />
@@ -1769,14 +1719,14 @@ export function HomeScreen() {
                       <View style={[styles.card, styles.tenantWidgetCard]}>
                         <Text style={styles.cardTitle}>New Tenant Colors</Text>
                         <View style={styles.cardBody}>
-                          <LabeledInput label="Primary" value={newTenantPrimaryColor} onChangeText={setNewTenantPrimaryColor} placeholder="#120C23" />
-                          <LabeledInput label="Secondary" value={newTenantSecondaryColor} onChangeText={setNewTenantSecondaryColor} placeholder="#1A1230" />
-                          <LabeledInput label="Accent" value={newTenantAccentColor} onChangeText={setNewTenantAccentColor} placeholder="#8C5BF5" />
-                          <LabeledInput label="Accent Secondary" value={newTenantExtras.accentSecondary} onChangeText={(v: string) => updateNewExtra('accentSecondary', v)} placeholder="#A78BFA" />
+                          <LabeledInput label="Primary" value={newTenantPrimaryColor} onChangeText={setNewTenantPrimaryColor} placeholder="#131D35" />
+                          <LabeledInput label="Secondary" value={newTenantSecondaryColor} onChangeText={setNewTenantSecondaryColor} placeholder="#1A2340" />
+                          <LabeledInput label="Accent" value={newTenantAccentColor} onChangeText={setNewTenantAccentColor} placeholder="#FFD332" />
+                          <LabeledInput label="Accent Secondary" value={newTenantExtras.accentSecondary} onChangeText={(v: string) => updateNewExtra('accentSecondary', v)} placeholder="#FFD332" />
                           <LabeledInput label="Success" value={newTenantExtras.successColor} onChangeText={(v: string) => updateNewExtra('successColor', v)} placeholder="#22C55E" />
                           <LabeledInput label="Warning" value={newTenantExtras.warningColor} onChangeText={(v: string) => updateNewExtra('warningColor', v)} placeholder="#F59E0B" />
                           <LabeledInput label="Danger" value={newTenantExtras.dangerColor} onChangeText={(v: string) => updateNewExtra('dangerColor', v)} placeholder="#EF4444" />
-                          <LabeledInput label="Surface" value={newTenantExtras.surfaceColor} onChangeText={(v: string) => updateNewExtra('surfaceColor', v)} placeholder="#1E1535" />
+                          <LabeledInput label="Surface" value={newTenantExtras.surfaceColor} onChangeText={(v: string) => updateNewExtra('surfaceColor', v)} placeholder="#1A2340" />
                           <Text style={styles.metaText}>Apply Preset</Text>
                           <View style={styles.inlineRow}>
                             {PALETTE_PRESETS.map((preset) => (

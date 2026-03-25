@@ -58,7 +58,7 @@ const LEGACY_STORAGE_KEYS = ['corespace.crm.v5', 'doowi.crm.v1', 'sheerview.crm.
 const REMOVED_DEFAULT_ROLE_IDS = new Set(['role-operations-user', 'role-read-only']);
 const DEFAULT_TENANT_ID = 'tenant-a';
 const DEFAULT_TENANT_NAME = 'Create a Tenant +';
-const DEFAULT_TENANT_BRAND_COLORS: [string, string, string] = ['#120C23', '#1A1230', '#8C5BF5'];
+const DEFAULT_TENANT_BRAND_COLORS: [string, string, string] = ['#131D35', '#1A2340', '#FFD332'];
 const DEFAULT_END_USER_TITLES = ['Operations Coordinator', 'Case Specialist', 'Compliance Officer'];
 const DEFAULT_WIDGET_TWO_COLUMN_BREAKPOINT = 1280;
 
@@ -226,11 +226,11 @@ function normalizeTenantBranding(branding?: Partial<TenantBrandingProfile>): Ten
       normalizeHexColor(colors[1], DEFAULT_TENANT_BRAND_COLORS[1]),
       normalizeHexColor(colors[2], DEFAULT_TENANT_BRAND_COLORS[2]),
     ],
-    accentSecondary: branding?.accentSecondary ? normalizeHexColor(branding.accentSecondary, '#A78BFA') : undefined,
+    accentSecondary: branding?.accentSecondary ? normalizeHexColor(branding.accentSecondary, '#FFD332') : undefined,
     successColor: branding?.successColor ? normalizeHexColor(branding.successColor, '#22C55E') : undefined,
     warningColor: branding?.warningColor ? normalizeHexColor(branding.warningColor, '#F59E0B') : undefined,
     dangerColor: branding?.dangerColor ? normalizeHexColor(branding.dangerColor, '#EF4444') : undefined,
-    surfaceColor: branding?.surfaceColor ? normalizeHexColor(branding.surfaceColor, '#1E1535') : undefined,
+    surfaceColor: branding?.surfaceColor ? normalizeHexColor(branding.surfaceColor, '#1A2340') : undefined,
     fontFamily: branding?.fontFamily || undefined,
     headingWeight: branding?.headingWeight || undefined,
     baseFontSize: branding?.baseFontSize ? Math.max(10, Math.min(20, Math.round(branding.baseFontSize))) : undefined,

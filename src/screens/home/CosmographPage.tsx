@@ -332,18 +332,18 @@ export function CosmographPage({ registerActions, addNotification, auditLog }: G
   const p = isDark ? {
     bg: 'rgba(13,13,22,0.82)', border: 'rgba(255,255,255,0.09)', cardBg: 'rgba(255,255,255,0.04)',
     title: '#FFFFFF', sub: 'rgba(232,236,255,0.75)', body: 'rgba(232,236,255,0.60)',
-    accent: '#A78BFA', accentBg: 'rgba(167,139,250,0.12)', accentBorder: 'rgba(167,139,250,0.28)',
+    accent: '#FFD332', accentBg: 'rgba(38,51,116,0.12)', accentBorder: 'rgba(38,51,116,0.28)',
     inputBg: 'rgba(255,255,255,0.05)', inputBorder: 'rgba(255,255,255,0.12)',
     rowHover: 'rgba(139,92,246,0.10)', activeRow: 'rgba(139,92,246,0.18)',
-    pillBg: 'rgba(255,255,255,0.07)', pillText: '#C4B5FD',
+    pillBg: 'rgba(255,255,255,0.07)', pillText: '#FFD332',
     green: '#22C55E', red: '#EF4444', amber: '#F59E0B', blue: '#3B82F6',
   } : {
     bg: 'rgba(248,246,255,0.95)', border: 'rgba(0,0,0,0.09)', cardBg: 'rgba(255,255,255,0.82)',
-    title: '#1E1535', sub: '#4A3A69', body: '#5C477F',
-    accent: '#6F4BCF', accentBg: 'rgba(111,75,207,0.08)', accentBorder: 'rgba(111,75,207,0.22)',
-    inputBg: '#FFFFFF', inputBorder: 'rgba(111,75,207,0.22)',
-    rowHover: 'rgba(111,75,207,0.06)', activeRow: 'rgba(111,75,207,0.14)',
-    pillBg: 'rgba(111,75,207,0.10)', pillText: '#6F4BCF',
+    title: '#1A2340', sub: '#4A3A69', body: '#5C477F',
+    accent: '#263374', accentBg: 'rgba(38,51,116,0.08)', accentBorder: 'rgba(38,51,116,0.22)',
+    inputBg: '#FFFFFF', inputBorder: 'rgba(38,51,116,0.22)',
+    rowHover: 'rgba(38,51,116,0.06)', activeRow: 'rgba(38,51,116,0.14)',
+    pillBg: 'rgba(38,51,116,0.10)', pillText: '#263374',
     green: '#16A34A', red: '#DC2626', amber: '#D97706', blue: '#2563EB',
   };
 
@@ -658,7 +658,7 @@ export function CosmographPage({ registerActions, addNotification, auditLog }: G
                     style={{
                       width: '100%', fontSize: 12, padding: '6px 8px', borderRadius: 8,
                       background: isDark ? 'rgba(255,255,255,0.07)' : '#FFFFFF',
-                      color: isDark ? '#E2D9F3' : '#1E1535',
+                      color: isDark ? '#E0E4ED' : '#1A2340',
                       border: `1px solid ${col.mappedFieldId ? p.accent : p.inputBorder}`,
                       outline: 'none',
                     }}

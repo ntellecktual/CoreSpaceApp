@@ -47,10 +47,10 @@ export function NotificationCenter({
 
   const panelBg = isDark ? 'rgba(14,10,28,0.92)' : 'rgba(255,255,255,0.95)';
   const border = isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)';
-  const textColor = isDark ? '#E2D9F3' : '#1A1230';
+  const textColor = isDark ? '#E0E4ED' : '#1A2340';
   const dimText = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
-  const accent = isDark ? '#E878F6' : '#8C5BF5';
-  const unreadBg = isDark ? 'rgba(140,91,245,0.10)' : 'rgba(140,91,245,0.05)';
+  const accent = isDark ? '#FFD332' : '#FFD332';
+  const unreadBg = isDark ? 'rgba(38,51,116,0.10)' : 'rgba(38,51,116,0.05)';
   const cardBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)';
   const hoverBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)';
 
@@ -213,12 +213,12 @@ export function AuditLogViewer({
   const isDark = mode === 'night';
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const textColor = isDark ? '#E2D9F3' : '#1A1230';
+  const textColor = isDark ? '#E0E4ED' : '#1A2340';
   const dimText = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
   const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
   const rowBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)';
-  const accent = isDark ? '#E878F6' : '#8C5BF5';
-  const filterPillBg = isDark ? 'rgba(140,91,245,0.18)' : 'rgba(140,91,245,0.10)';
+  const accent = isDark ? '#FFD332' : '#FFD332';
+  const filterPillBg = isDark ? 'rgba(38,51,116,0.18)' : 'rgba(38,51,116,0.10)';
 
   const entityTypes = useMemo(() => {
     const set = new Set(entries.map((e) => e.entityType));

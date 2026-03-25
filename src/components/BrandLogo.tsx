@@ -25,7 +25,7 @@ export function BrandLogo({
 
   return React.createElement(Image, {
     source: logoUri?.trim() ? { uri: logoUri.trim() } : resolvedMode === 'day' ? dayLogoSource : nightLogoSource,
-    resizeMode: logoUri?.trim() ? 'contain' : 'cover',
+    resizeMode: 'contain',
     style: [{ width, height }, style],
     accessibilityRole: 'image',
     accessibilityLabel,

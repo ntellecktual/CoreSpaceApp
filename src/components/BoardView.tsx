@@ -69,7 +69,7 @@ export const BoardView = React.memo(function BoardView({
 }) {
   const { mode } = useUiTheme();
   const isDark = mode === 'night';
-  const accent = accentColor ?? (isDark ? '#8C5BF5' : '#8C5BF5');
+  const accent = accentColor ?? (isDark ? '#FFD332' : '#FFD332');
 
   const columns = useMemo(() => deriveColumns(records, subSpace), [records, subSpace]);
 
@@ -77,10 +77,10 @@ export const BoardView = React.memo(function BoardView({
   const cardBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
   const colBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)';
   const colBorder = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
-  const textColor = isDark ? '#E2D9F3' : '#1A1230';
+  const textColor = isDark ? '#E0E4ED' : '#1A2340';
   const dimText = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
-  const countBg = isDark ? 'rgba(140,91,245,0.2)' : 'rgba(140,91,245,0.12)';
-  const countText = isDark ? '#E878F6' : '#8C5BF5';
+  const countBg = isDark ? 'rgba(38,51,116,0.2)' : 'rgba(38,51,116,0.12)';
+  const countText = isDark ? '#FFD332' : '#FFD332';
 
   /* ── DnD state ── */
   const [dragOverCol, setDragOverCol] = useState<string | null>(null);
@@ -179,7 +179,7 @@ export const BoardView = React.memo(function BoardView({
                       width: 16,
                       height: 16,
                       borderRadius: 3,
-                      border: `1.5px solid ${allSelected || someSelected ? accent : 'rgba(140,91,245,0.35)'}`,
+                      border: `1.5px solid ${allSelected || someSelected ? accent : 'rgba(38,51,116,0.35)'}`,
                       backgroundColor: allSelected ? accent : someSelected ? `${accent}44` : 'transparent',
                       display: 'flex',
                       alignItems: 'center',
@@ -247,7 +247,7 @@ export const BoardView = React.memo(function BoardView({
                               width: 16,
                               height: 16,
                               borderRadius: 3,
-                              border: `1.5px solid ${isSelected ? accent : 'rgba(140,91,245,0.35)'}`,
+                              border: `1.5px solid ${isSelected ? accent : 'rgba(38,51,116,0.35)'}`,
                               backgroundColor: isSelected ? accent : 'transparent',
                               display: 'flex',
                               alignItems: 'center',

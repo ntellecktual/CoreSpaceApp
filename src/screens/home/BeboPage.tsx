@@ -136,7 +136,7 @@ function WorkspaceProposalCard({
       <View style={{ gap: 8 }}>
         {card.workspaces.map((ws, wi) => (
           <View key={wi} style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 12, gap: 6 }}>
-            <Text style={{ color: '#E8E4FF', fontWeight: '700', fontSize: 14 }}>{ws.icon} {ws.name}</Text>
+            <Text style={{ color: '#E0E4ED', fontWeight: '700', fontSize: 14 }}>{ws.icon} {ws.name}</Text>
             <Text style={{ color: 'rgba(232,228,255,0.50)', fontSize: 12 }}>Root Entity: {ws.rootEntity}</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 2 }}>
               {ws.subSpaces.map((ss, si) => (
@@ -265,7 +265,7 @@ function IntegrationStatusCard({ card, accent }: { card: BeboCardIntegrationStat
             <Text style={{ fontSize: 20 }}>{intg.icon}</Text>
             <View style={{ flex: 1 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Text style={{ color: '#E8E4FF', fontWeight: '700', fontSize: 13 }}>{intg.name}</Text>
+                <Text style={{ color: '#E0E4ED', fontWeight: '700', fontSize: 13 }}>{intg.name}</Text>
                 <View style={{ backgroundColor: intg.status === 'active' ? 'rgba(34,197,94,0.18)' : 'rgba(255,255,255,0.08)', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 }}>
                   <Text style={{ color: intg.status === 'active' ? '#22C55E' : 'rgba(232,228,255,0.45)', fontSize: 10, fontWeight: '700', textTransform: 'uppercase' as any }}>{intg.status}</Text>
                 </View>
@@ -296,7 +296,7 @@ function SignalFlowsCard({
       <View style={{ gap: 10 }}>
         {card.flows.map((fl, i) => (
           <View key={i} style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 12, gap: 6 }}>
-            <Text style={{ color: '#E8E4FF', fontWeight: '700', fontSize: 13 }}>{fl.name}</Text>
+            <Text style={{ color: '#E0E4ED', fontWeight: '700', fontSize: 13 }}>{fl.name}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
               <View style={{ backgroundColor: 'rgba(59,130,246,0.18)', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 }}>
                 <Text style={{ color: '#60A5FA', fontSize: 10, fontWeight: '700' }}>TRIGGER</Text>
@@ -378,7 +378,7 @@ function ArchitectureCard({
               <View key={oi} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: `${fn.color}10`, borderRadius: 10, padding: 10 }}>
                 <Text style={{ fontSize: 18 }}>{obj.icon}</Text>
                 <View style={{ flex: 1, gap: 3 }}>
-                  <Text style={{ color: '#E8E4FF', fontWeight: '600', fontSize: 13 }}>{obj.name} <Text style={{ color: '#9CA3AF', fontWeight: '400' }}>({obj.namePlural})</Text></Text>
+                  <Text style={{ color: '#E0E4ED', fontWeight: '600', fontSize: 13 }}>{obj.name} <Text style={{ color: '#9CA3AF', fontWeight: '400' }}>({obj.namePlural})</Text></Text>
                   {!!obj.description && <Text style={{ color: '#9CA3AF', fontSize: 11 }}>{obj.description}</Text>}
                   {obj.workspaceNames.length > 0 && (
                     <View style={{ flexDirection: 'row', gap: 5, flexWrap: 'wrap', marginTop: 3 }}>
@@ -469,7 +469,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
         msgBorder: 'rgba(102,74,154,0.12)',
         inputBg: 'rgba(255,255,255,0.92)',
         inputBorder: 'rgba(102,74,154,0.20)',
-        inputText: '#1E1535',
+        inputText: '#1A2340',
         placeholder: 'rgba(30,21,53,0.35)',
         bodyText: '#3D2B5E',
         subtleText: '#7C6FA0',
@@ -598,7 +598,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
             <Text style={{ fontSize: 22 }}>✦</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ color: isDark ? '#FFFFFF' : '#1E1535', fontWeight: '800', fontSize: 18, letterSpacing: -0.3 }}>Bebo AI</Text>
+            <Text style={{ color: isDark ? '#FFFFFF' : '#1A2340', fontWeight: '800', fontSize: 18, letterSpacing: -0.3 }}>Bebo AI</Text>
             <Text style={{ color: pal.subtleText, fontSize: 12, lineHeight: 16 }}>Your AI assistant — ask anything or pick an industry below</Text>
           </View>
           {!!VERTICAL_META[vertical].tenantLogo && (
@@ -642,13 +642,13 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
               onPress={handleUniversalSuite}
               style={{
                 flexDirection: 'row', alignItems: 'center', gap: 6,
-                backgroundColor: isDark ? 'rgba(124,58,237,0.14)' : 'rgba(124,58,237,0.08)',
-                borderWidth: 1, borderColor: 'rgba(124,58,237,0.30)',
+                backgroundColor: isDark ? 'rgba(38,51,116,0.14)' : 'rgba(38,51,116,0.08)',
+                borderWidth: 1, borderColor: 'rgba(38,51,116,0.30)',
                 borderRadius: 10, paddingHorizontal: 12, paddingVertical: 7,
               } as any}
             >
               <Text style={{ fontSize: 14 }}>🌐</Text>
-              <Text style={{ color: isDark ? '#A78BFA' : '#7C3AED', fontSize: 13, fontWeight: '600' }}>Org Layer</Text>
+              <Text style={{ color: isDark ? '#FFD332' : '#263374', fontSize: 13, fontWeight: '600' }}>Org Layer</Text>
             </Pressable>
           </View>
         </ScrollView>

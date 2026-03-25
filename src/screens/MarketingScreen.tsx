@@ -3,7 +3,6 @@ import '../../assets/marketing.css';
 import { Image, LayoutChangeEvent, ScrollView, Text, View } from 'react-native';
 import { useWindowDimensions } from 'react-native';
 import { BrandLogo } from '../components/BrandLogo';
-import { NebulaBackground } from '../components/NebulaBackground';
 import { InteractivePressable as Pressable } from '../components/InteractivePressable';
 import { useUiTheme } from '../context/UiThemeContext';
 
@@ -619,8 +618,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
   );
 
   return (
-    <View style={[styles.landingWrap, { backgroundColor: '#0B0E1A' } as any]}>
-    <NebulaBackground mode="night" />
+    <View style={[styles.landingWrap, { backgroundColor: '#263374' } as any]}>
 
     {/* ─── Sticky nav (show on scroll-up) ────────────────────── */}
     <View style={{
@@ -634,10 +632,10 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
           flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
           paddingHorizontal: navHorizontalPadding, paddingVertical: navVerticalPadding,
           ...(navScrolled ? {
-            backgroundColor: 'rgba(7,8,12,0.88)',
+            backgroundColor: 'rgba(20,28,65,0.92)',
             backdropFilter: 'blur(18px)',
             WebkitBackdropFilter: 'blur(18px)',
-            borderBottom: '1px solid rgba(38,51,116,0.10)',
+            borderBottom: '1px solid rgba(38,51,116,0.18)',
             boxShadow: '0 4px 30px rgba(0,0,0,0.30)',
           } : {
             backgroundColor: 'transparent',
@@ -697,12 +695,12 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
       {/* ── Mobile dropdown menu ── */}
       {isMobile && mobileMenuOpen && (
         <View style={{
-          backgroundColor: 'rgba(7,8,12,0.96)',
+          backgroundColor: 'rgba(20,28,65,0.96)',
           backdropFilter: 'blur(18px)',
           paddingHorizontal: 20,
           paddingVertical: 12,
           gap: 4,
-          borderBottom: '1px solid rgba(38,51,116,0.12)',
+          borderBottom: '1px solid rgba(38,51,116,0.18)',
         } as any}>
           {NAV_ITEMS.map((item) => {
             const isActive = activeTab === item.key;

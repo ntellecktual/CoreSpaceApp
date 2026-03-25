@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Platform, ScrollView, Text, TextInput, View, useWindowDimensions } from 'react-native';
 
 /* ── Local sub-types ────────────────────────────────────────────── */
@@ -27,7 +27,7 @@ const COND_OPS = ['equals', 'not equals', 'contains', 'starts with', '>', '<', '
 function makeId() { return Math.random().toString(36).slice(2, 9); }
 
 const TRIGGER_CARDS = [
-  { type: 'event' as const,   icon: '📬', title: 'Something happens to a record',         description: 'A record is created, updated, or changes status',                       color: '#8C5BF5' },
+  { type: 'event' as const,   icon: '📬', title: 'Something happens to a record',         description: 'A record is created, updated, or changes status',                       color: '#FFD332' },
   { type: 'schedule' as const, icon: '⏰', title: 'On a schedule',                         description: 'Run at a set time — hourly, daily, weekly, or custom',                   color: '#F59E0B' },
   { type: 'webhook' as const,  icon: '🌐', title: 'An outside system sends a message',     description: 'An external app triggers this signal via a webhook URL',                 color: '#22C55E' },
 ];
@@ -188,10 +188,10 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
 
   // ── Theme helpers ──
   const surface = mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.90)';
-  const border = mode === 'night' ? 'rgba(140,91,245,0.18)' : 'rgba(140,91,245,0.15)';
-  const textPrimary = mode === 'night' ? '#E8E4FF' : '#1a1030';
+  const border = mode === 'night' ? 'rgba(38,51,116,0.18)' : 'rgba(38,51,116,0.15)';
+  const textPrimary = mode === 'night' ? '#E0E4ED' : '#1A2340';
   const textMuted = mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.50)';
-  const accent = '#8C5BF5';
+  const accent = '#FFD332';
 
   const handlePublish = () => {
     const chainStr = actionChain.map((s, i) => `${i + 1}. ${ACTION_STEP_LABELS[s.type].label}: ${s.config || '(not configured)'}`).join(' → ');
@@ -235,7 +235,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
           <View style={{ flex: 1 }} />
           <Pressable
             onPress={() => { setAiFlowPanelOpen(true); if (!aiFlow.session) aiFlow.startSession('flow_builder'); }}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 9, paddingHorizontal: 14, borderRadius: 10, backgroundColor: 'rgba(140,91,245,0.12)', borderWidth: 1, borderColor: 'rgba(140,91,245,0.30)' }}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 9, paddingHorizontal: 14, borderRadius: 10, backgroundColor: 'rgba(38,51,116,0.12)', borderWidth: 1, borderColor: 'rgba(38,51,116,0.30)' }}
           >
             <Text style={{ fontSize: 13 }}>✦</Text>
             <Text style={{ fontWeight: '700', fontSize: 13, color: accent }}>Ask Bebo to build it</Text>
@@ -460,7 +460,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                             <View style={{ flex: 2, minWidth: 120, gap: 3 }}>
                               <Text style={{ fontSize: 10, color: textMuted, fontWeight: '700' }}>HOW TO COMPARE</Text>
                               {Platform.OS === 'web' ? (
-                                <select title="Condition operator" value={row.op} onChange={(e) => updateCondRow(group.id, row.id, 'op', e.target.value)} style={{ fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(111,75,207,0.22)', background: 'transparent', color: 'inherit', width: '100%', outline: 'none' }}>
+                                <select title="Condition operator" value={row.op} onChange={(e) => updateCondRow(group.id, row.id, 'op', e.target.value)} style={{ fontSize: 13, padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(38,51,116,0.22)', background: 'transparent', color: 'inherit', width: '100%', outline: 'none' }}>
                                   {COND_OPS.map((op) => <option key={op} value={op}>{op}</option>)}
                                 </select>
                               ) : (
@@ -505,7 +505,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                           <Text style={{ fontSize: 18 }}>{meta.icon}</Text>
                           <View style={{ flex: 1 }}>
                             {Platform.OS === 'web' ? (
-                              <select title="Action type" value={step.type} onChange={(e) => updateActionStep(step.id, 'type', e.target.value)} style={{ fontSize: 13, fontWeight: '700', padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(111,75,207,0.22)', background: 'transparent', color: 'inherit', width: '100%', outline: 'none' }}>
+                              <select title="Action type" value={step.type} onChange={(e) => updateActionStep(step.id, 'type', e.target.value)} style={{ fontSize: 13, fontWeight: '700', padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(38,51,116,0.22)', background: 'transparent', color: 'inherit', width: '100%', outline: 'none' }}>
                                 {(Object.keys(ACTION_STEP_LABELS) as ActionStepType[]).map((t) => (
                                   <option key={t} value={t}>{ACTION_STEP_LABELS[t].icon} {ACTION_STEP_LABELS[t].label}</option>
                                 ))}
@@ -588,7 +588,7 @@ export function SignalStudioPage({ guidedMode, onGuide, registerActions, auditLo
                   <Pressable
                     disabled={!canPublishFlow}
                     onPress={() => { applyWarehouseServiceFlowPack(); addNotification?.({ type: 'system', title: 'Sample Pack Loaded', body: 'Sample supply chain signals loaded. Check My Signals to see them.', severity: 'success' }); }}
-                    style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 9, paddingHorizontal: 14, borderRadius: 10, backgroundColor: 'rgba(140,91,245,0.08)', borderWidth: 1, borderColor: 'rgba(140,91,245,0.20)', alignSelf: 'flex-start' as any }}
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 9, paddingHorizontal: 14, borderRadius: 10, backgroundColor: 'rgba(38,51,116,0.08)', borderWidth: 1, borderColor: 'rgba(38,51,116,0.20)', alignSelf: 'flex-start' as any }}
                   >
                     <Text style={{ fontSize: 12 }}>📥</Text>
                     <Text style={{ fontSize: 12, fontWeight: '600', color: accent }}>Load Sample Signal Pack</Text>

@@ -72,7 +72,7 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
             borderRadius: 20,
             borderWidth: 1,
             borderColor: 'rgba(255,255,255,0.10)',
-            backgroundColor: 'rgba(16,12,28,0.90)',
+            backgroundColor: 'rgba(16,22,52,0.90)',
             overflow: 'hidden',
             padding: 36,
             alignItems: 'center',
@@ -81,7 +81,7 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
                   // Only apply web-specific styles on web
                   boxShadow: '0 8px 48px rgba(0,0,0,0.40)',
                   // backgroundImage and backdropFilter are not supported by React Native View
-                  backgroundImage: 'linear-gradient(180deg, rgba(20,15,35,0.88), rgba(12,10,24,0.94))',
+                  backgroundImage: 'linear-gradient(180deg, rgba(20,28,65,0.90), rgba(14,20,48,0.95))',
                   backdropFilter: 'blur(24px)',
                   WebkitBackdropFilter: 'blur(24px)',
                   gap: 0,

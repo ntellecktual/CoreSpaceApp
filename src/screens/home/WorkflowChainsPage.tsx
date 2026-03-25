@@ -36,7 +36,7 @@ const CHAIN_TYPE_COLORS: Record<WorkflowChainDefinition['chainType'], string> = 
   ar_inbound: '#10B981',
   period_close: '#6366F1',
   exception: '#EF4444',
-  custom: '#8C5BF5',
+  custom: '#FFD332',
 };
 
 const ACTION_DOCS: { type: FinancialActionType; icon: string; label: string; description: string; parameters: string[] }[] = [

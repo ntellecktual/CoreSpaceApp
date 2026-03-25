@@ -153,7 +153,7 @@ export const GuidedTourProvider: React.FC<GuidedTourProviderProps> = ({ steps, c
             className="guided-tour-modal"
             role="dialog"
             aria-modal="true"
-            aria-label="CoreSpace Guided Tour"
+            aria-label="Halo Internal Guided Tour"
             data-theme={mode}
           >
 
@@ -193,7 +193,7 @@ export const GuidedTourProvider: React.FC<GuidedTourProviderProps> = ({ steps, c
                 <div className="guided-tour-hero">
                   <span className="guided-tour-hero-logo">{SECTION_CONFIG.intro.icon}</span>
                   <h2 className="guided-tour-title guided-tour-title-center">{step.title}</h2>
-                  <p className="guided-tour-hero-tagline">CoreSpace Platform Walkthrough</p>
+                  <p className="guided-tour-hero-tagline">Halo Internal Platform Walkthrough</p>
                   <p className="guided-tour-content guided-tour-content-center">{step.content}</p>
                   {step.tip && (
                     <div className="guided-tour-tip guided-tour-tip-mt">

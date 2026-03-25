@@ -44,7 +44,7 @@ type SourceSubTab = 'ocr' | 'csv' | 'edi' | 'webhook';
 const ING_TABS: { id: IngTab; label: string; icon: string; description: string }[] = [
   { id: 'pipeline',  label: 'Pipeline',       icon: '🔄', description: 'All ingestion records, confidence scores, and review status' },
   { id: 'sources',   label: 'Sources',         icon: '📡', description: 'Configure ingestion source endpoints by format' },
-  { id: 'mappings',  label: 'Field Mappings',  icon: '🗺️', description: 'Map extracted keys to CoreSpace field slugs per document type' },
+  { id: 'mappings',  label: 'Field Mappings',  icon: '🗺️', description: 'Map extracted keys to Halo Internal field slugs per document type' },
   { id: 'presence',  label: 'Presence',        icon: '👥', description: 'Active users and routing availability (WS-048 v2.1)' },
 ];
 
@@ -475,7 +475,7 @@ export function IngestionPage({}: GuidedPageProps) {
           <Text style={{ color: '#34D399', fontSize: 13, fontWeight: '700', marginBottom: 4 }}>FIELD MAPPING ARCHITECTURE — WS-048 §2.1</Text>
           <Text style={{ color: 'rgba(243,234,255,0.6)', fontSize: 12, lineHeight: 18 }}>
             Field mapping templates declare how extracted keys (from OCR, CSV headers, EDI data elements, or JSON paths)
-            map to CoreSpace field slugs. Each source configuration references one template.{'\n\n'}
+            map to Halo Internal field slugs. Each source configuration references one template.{'\n\n'}
             Confidence thresholds are resolved per-field at ingestion time using a 3-level lookup:{'\n'}
             1. Field-level override → 2. Source-level override → 3. Global tenant default (80%)
           </Text>

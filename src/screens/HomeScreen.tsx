@@ -646,12 +646,12 @@ export function HomeScreen() {
 
   const handleRemoveActiveTenantLogo = () => {
     setTenantLogoUri('');
-    setTenantNotice('Active tenant logo removed. Save to persist the default CoreSpace brand mark.');
+    setTenantNotice('Active tenant logo removed. Save to persist the default Halo Internal brand mark.');
   };
 
   const handleRemoveNewTenantLogo = () => {
     setNewTenantLogoUri('');
-    setTenantNotice('New tenant logo cleared. Default CoreSpace brand mark will be used.');
+    setTenantNotice('New tenant logo cleared. Default Halo Internal brand mark will be used.');
   };
 
   const applyActiveTenantUpdates = () => {
@@ -1056,7 +1056,7 @@ export function HomeScreen() {
                     setPage('architecture');
                   }}
                   accessibilityRole="button"
-                  accessibilityLabel="CoreSpace Documentation"
+                  accessibilityLabel="Halo Internal Documentation"
                 >
                   <Text style={[styles.dashboardSidebarActionText, !tenantAccessOpen && page === 'architecture' && styles.dashboardSidebarActionTextActive, tenantBrandedMode && !tenantAccessOpen && page === 'architecture' && { color: tenantAccentResolved }]}>
                     Platform Docs

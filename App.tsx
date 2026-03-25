@@ -32,15 +32,15 @@ class AppErrorBoundary extends React.Component<{ children: React.ReactNode }, Er
   }
 
   componentDidCatch(error: Error) {
-    console.error('CoreSpace runtime error:', error);
+    console.error('Halo Internal runtime error:', error);
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: '#201535', padding: 16 }}>
-          <Text style={{ color: '#E878F6', fontSize: 13, fontWeight: '700' }}>CoreSpace encountered a runtime error.</Text>
-          <Text style={{ color: '#F1E8FF', fontSize: 13 }}>{this.state.message || 'Unknown error'}</Text>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: '#263374', padding: 16 }}>
+          <Text style={{ color: '#FFD332', fontSize: 13, fontWeight: '700' }}>Halo Internal encountered a runtime error.</Text>
+          <Text style={{ color: '#FFFFFF', fontSize: 13 }}>{this.state.message || 'Unknown error'}</Text>
         </View>
       );
     }
@@ -49,20 +49,20 @@ class AppErrorBoundary extends React.Component<{ children: React.ReactNode }, Er
   }
 }
 
-const CORESPACE_SCROLLBAR_STYLE_ID = 'corespace-global-scrollbar';
+const HALO_SCROLLBAR_STYLE_ID = 'halo-global-scrollbar';
 
 function useGlobalScrollbar() {
   useEffect(() => {
     if (Platform.OS !== 'web') return;
-    if (document.getElementById(CORESPACE_SCROLLBAR_STYLE_ID)) return;
+    if (document.getElementById(HALO_SCROLLBAR_STYLE_ID)) return;
     const style = document.createElement('style');
-    style.id = CORESPACE_SCROLLBAR_STYLE_ID;
+    style.id = HALO_SCROLLBAR_STYLE_ID;
     style.textContent = [
       '*::-webkit-scrollbar { width: 8px; height: 8px; }',
       '*::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 999px; }',
-      '*::-webkit-scrollbar-thumb { background: rgba(140,91,245,0.38); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }',
-      '*::-webkit-scrollbar-thumb:hover { background: rgba(140,91,245,0.55); }',
-      '* { scrollbar-width: thin; scrollbar-color: rgba(140,91,245,0.38) rgba(255,255,255,0.03); }',
+      '*::-webkit-scrollbar-thumb { background: rgba(38,51,116,0.50); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }',
+      '*::-webkit-scrollbar-thumb:hover { background: rgba(38,51,116,0.70); }',
+      '* { scrollbar-width: thin; scrollbar-color: rgba(38,51,116,0.50) rgba(255,255,255,0.03); }',
     ].join('\n');
     document.head.appendChild(style);
     return () => { style.remove(); };
@@ -87,8 +87,8 @@ function AppShell() {
   if (!hydrated) {
     return (
       <View style={styles.loadingWrap}>
-        <ActivityIndicator color="#E878F6" />
-        <Text style={styles.loadingText}>Loading CoreSpace...</Text>
+        <ActivityIndicator color="#FFD332" />
+        <Text style={styles.loadingText}>Loading Halo Internal...</Text>
       </View>
     );
   }
@@ -117,15 +117,15 @@ const tourSteps: TourStep[] = [
   {
     id: 'welcome',
     section: 'intro',
-    title: 'Welcome to CoreSpace',
-    content: 'CoreSpace is a fully configurable enterprise platform — sign in once and access AI-powered workspace design, automation, integrations, data analysis, and role-based end-user experiences. This tour walks you through every section end to end.',
+    title: 'Welcome to Halo Internal',
+    content: 'Halo Internal is a fully configurable enterprise platform — sign in once and access AI-powered workspace design, automation, integrations, data analysis, and role-based end-user experiences. This tour walks you through every section end to end.',
     tip: 'Use the section chips at the top to jump to any module. Press → or ← to move between steps, Escape to exit.',
   },
   {
     id: 'intro-signin',
     section: 'intro',
     title: 'Signing In',
-    content: 'From the landing page, click "Get Started" to reach the sign-in screen. Enter your email and password — or use the demo credentials pre-filled for you. CoreSpace supports multi-tenant access; your role and tenant are loaded automatically on sign-in.',
+    content: 'From the landing page, click "Get Started" to reach the sign-in screen. Enter your email and password — or use the demo credentials pre-filled for you. Halo Internal supports multi-tenant access; your role and tenant are loaded automatically on sign-in.',
     tip: 'First-time users land on the Marketing screen. Returning users go straight to the dashboard.',
   },
 
@@ -136,7 +136,7 @@ const tourSteps: TourStep[] = [
     id: 'ai-intro',
     section: 'ai',
     title: 'Meet Bebo — Your AI Co-Pilot',
-    content: 'Bebo AI is CoreSpace\'s built-in assistant. It understands the full platform — workspaces, flows, integrations, records, and roles — and can help you build anything through natural language. No prompting expertise required.',
+    content: 'Bebo AI is Halo Internal\'s built-in assistant. It understands the full platform — workspaces, flows, integrations, records, and roles — and can help you build anything through natural language. No prompting expertise required.',
     navigateTo: 'bebo',
     tip: 'Bebo is running locally with streamed responses. Everything you build with Bebo is persisted in your workspace.',
   },
@@ -235,7 +235,7 @@ const tourSteps: TourStep[] = [
     id: 'integrate-intro',
     section: 'integrate',
     title: 'Orbital — Integration Marketplace',
-    content: 'Orbital connects CoreSpace to your external systems — ERP, CRM, EPCIS repositories, shipping carriers, compliance databases, and custom APIs. Browse the integration library, configure credentials, and test connections in seconds.',
+    content: 'Orbital connects Halo Internal to your external systems — ERP, CRM, EPCIS repositories, shipping carriers, compliance databases, and custom APIs. Browse the integration library, configure credentials, and test connections in seconds.',
     navigateTo: 'orbital',
     tip: 'Orbital integrations are referenced by Signal flows — e.g. "On Stage Changed, push update to SAP via the SAP Integration".',
   },
@@ -243,7 +243,7 @@ const tourSteps: TourStep[] = [
     id: 'integrate-connect',
     section: 'integrate',
     title: 'Connecting an Integration',
-    content: 'Click any integration card to open its detail panel. Fill in credentials (API keys, OAuth, webhook URLs) in the Connection tab. Hit "Test Connection" — CoreSpace sends a live ping and shows latency + status in the event log. Save to activate.',
+    content: 'Click any integration card to open its detail panel. Fill in credentials (API keys, OAuth, webhook URLs) in the Connection tab. Hit "Test Connection" — Halo Internal sends a live ping and shows latency + status in the event log. Save to activate.',
     tip: 'Connection credentials are stored encrypted per-tenant. Switching tenants automatically loads that tenant\'s credential set.',
   },
   {
@@ -320,7 +320,7 @@ const tourSteps: TourStep[] = [
     id: 'tour-finish',
     section: 'finish',
     title: 'You\'re Ready to Build',
-    content: 'That\'s the full CoreSpace platform — AI-powered workspace design, event-driven automation, external integrations, graph analytics, and role-scoped end-user experiences, all in one shell. Everything you build here is production-grade and deployable.',
+    content: 'That\'s the full Halo Internal platform — AI-powered workspace design, event-driven automation, external integrations, graph analytics, and role-scoped end-user experiences, all in one shell. Everything you build here is production-grade and deployable.',
     tip: 'Restart this tour anytime from Settings → Guided Tour. Use Ctrl+K (⌘K) to open the Command Palette and jump to any module instantly.',
   },
 ];
@@ -329,7 +329,7 @@ const spotlightSteps: SpotlightStep[] = [
   {
     target: 'tour-nav-panel',
     title: 'Navigation Panel',
-    content: 'All six CoreSpace modules live here. Switch between AI, Design, Automate, Integrate, Analyze, and Operate with one click.',
+    content: 'All six Halo Internal modules live here. Switch between AI, Design, Automate, Integrate, Analyze, and Operate with one click.',
     placement: 'right',
   },
   {
@@ -353,7 +353,7 @@ const spotlightSteps: SpotlightStep[] = [
   {
     target: 'tour-nav-orbital',
     title: 'Integrate — Orbital',
-    content: 'Connect CoreSpace to any external API, data source, or service. Marketplace integrations included.',
+    content: 'Connect Halo Internal to any external API, data source, or service. Marketplace integrations included.',
     placement: 'right',
   },
   {

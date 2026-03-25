@@ -26,7 +26,7 @@ export function ArchitecturePage({ guidedMode, onGuide }: GuidedPageProps) {
       label: 'Platform Architecture',
       description: 'Logical layers, service boundaries, and system design.',
       items: [
-        { label: 'System Blueprint', detail: 'CoreSpace layers from admin to runtime', onPress: () => setArchNav('blueprint') },
+        { label: 'System Blueprint', detail: 'Halo Internal layers from admin to runtime', onPress: () => setArchNav('blueprint') },
       ],
     },
     {
@@ -49,7 +49,7 @@ export function ArchitecturePage({ guidedMode, onGuide }: GuidedPageProps) {
   const archContentHeaders: Record<string, { title: string; description: string }> = {
     blueprint: {
       title: 'System Blueprint',
-      description: 'How CoreSpace is organized — from the admin design layer all the way to the end-user runtime and data persistence.',
+      description: 'How Halo Internal is organized — from the admin design layer all the way to the end-user runtime and data persistence.',
     },
     tenant: {
       title: 'Tenant Overview',
@@ -61,7 +61,7 @@ export function ArchitecturePage({ guidedMode, onGuide }: GuidedPageProps) {
     <ScrollView style={styles.pageWrap} contentContainerStyle={[styles.pageContent, styles.pageContentTight]} keyboardShouldPersistTaps="handled">
       {guidedMode && (
         <>
-          <ProcessStepper title="CoreSpace Documentation Guide" steps={architectureSteps} activeIndex={0} />
+          <ProcessStepper title="Halo Internal Documentation Guide" steps={architectureSteps} activeIndex={0} />
           <HintStrip steps={architectureSteps} onGuide={onGuide} />
         </>
       )}

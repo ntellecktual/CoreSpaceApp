@@ -175,7 +175,7 @@ function WorkspaceProposalCard({
         } as any}
       >
         <Text style={{ color: applied ? '#22C55E' : '#FFFFFF', fontWeight: '700', fontSize: 15 }}>
-          {applied ? '✅  Applied to CoreSpace' : 'Apply Full Scenario  →'}
+          {applied ? '✅  Applied to Halo Internal' : 'Apply Full Scenario  →'}
         </Text>
       </Pressable>
     </View>
@@ -238,15 +238,15 @@ function DataPreviewCard({ card, accent, vertical }: { card: BeboCardDataPreview
 
       {/* Actions */}
       <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
-        <Pressable onPress={() => downloadFile(card.csvContent, `corespace-${slug}.csv`, 'text/csv')}
+        <Pressable onPress={() => downloadFile(card.csvContent, `halointernal-${slug}.csv`, 'text/csv')}
           style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 }}>
           <Text style={{ color: 'rgba(232,228,255,0.70)', fontSize: 12, fontWeight: '600' }}>⬇ CSV</Text>
         </Pressable>
-        <Pressable onPress={() => downloadFile(card.jsonContent, `corespace-${slug}.json`, 'application/json')}
+        <Pressable onPress={() => downloadFile(card.jsonContent, `halointernal-${slug}.json`, 'application/json')}
           style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 }}>
           <Text style={{ color: 'rgba(232,228,255,0.70)', fontSize: 12, fontWeight: '600' }}>⬇ JSON</Text>
         </Pressable>
-        <Pressable onPress={() => downloadFile(card.csvContent, `corespace-${slug}.csv`, 'text/csv')}
+        <Pressable onPress={() => downloadFile(card.csvContent, `halointernal-${slug}.csv`, 'text/csv')}
           style={{ backgroundColor: `${accent}22`, borderWidth: 1, borderColor: `${accent}55`, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 } as any}>
           <Text style={{ color: accent, fontSize: 12, fontWeight: '600' }}>🌐 Import to Cosmograph</Text>
         </Pressable>
@@ -542,7 +542,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     setMessages(prev => [...prev, {
       id: uid(),
       role: 'assistant',
-      text: `🌐 **Universal is your tenant's org layer** — it ships with every CoreSpace tenant automatically. It is not a template.\n\n**How it works:**\n• **⚙️ Operations** contains your active vertical's workspaces (currently ${icon} **${label}**)\n• **💰 Finance · 👥 HR · 📣 Marketing · 📈 Sales · ⚖️ Legal · 💻 IT · 🌱 Sustainability** — all empty department containers, each ready to accept workspaces as your org grows\n\nAny workspace — whether from a vertical template or manually created — is placed into the department it belongs to. Operations is where your vertical's core workspaces live.\n\n**6 cross-department signal flows are pre-wired** and activate as departments are built out:\n• Deal Won → Finance invoice + CS onboarding\n• New Hire → IT provisioning + HR onboarding checklist\n• Contract Expiry → Legal renewal task\n• Overdue Invoice → Finance Director escalation\n• P1 Incident → IT war room + status page update\n• ESG Deadline → Sustainability team alert`,
+      text: `🌐 **Universal is your tenant's org layer** — it ships with every Halo Internal tenant automatically. It is not a template.\n\n**How it works:**\n• **⚙️ Operations** contains your active vertical's workspaces (currently ${icon} **${label}**)\n• **💰 Finance · 👥 HR · 📣 Marketing · 📈 Sales · ⚖️ Legal · 💻 IT · 🌱 Sustainability** — all empty department containers, each ready to accept workspaces as your org grows\n\nAny workspace — whether from a vertical template or manually created — is placed into the department it belongs to. Operations is where your vertical's core workspaces live.\n\n**6 cross-department signal flows are pre-wired** and activate as departments are built out:\n• Deal Won → Finance invoice + CS onboarding\n• New Hire → IT provisioning + HR onboarding checklist\n• Contract Expiry → Legal renewal task\n• Overdue Invoice → Finance Director escalation\n• P1 Incident → IT war room + status page update\n• ESG Deadline → Sustainability team alert`,
       cards: [wsCard],
       quickReplies: [
         `View ${label} workspaces in Operations`,
@@ -574,7 +574,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     setMessages(prev => [...prev, {
       id: uid(),
       role: 'assistant',
-      text: `✅ **Applied!** Your **${icon} ${label}** scenario is now live across CoreSpace.\n\n• **${payload.workspaces.length}** workspace${payload.workspaces.length !== 1 ? 's' : ''} created in Admin\n• **${payload.records.length}** records added to End User\n• **${(payload.clients?.length ?? 0)}** collection${(payload.clients?.length ?? 0) !== 1 ? 's' : ''} created\n• **${payload.flows.length}** Signal flows published\n• **${payload.integrations.length}** Orbital integrations activated${(payload.businessFunctions?.length ?? 0) > 0 ? `\n• **${payload.businessFunctions!.length}** department${payload.businessFunctions!.length !== 1 ? 's' : ''} loaded in Architecture` : ''}\n• Shell labels updated to ${label} terminology\n\nNavigate to **Admin** → Workspace Design to inspect the structure, or go to **End User** to interact with live ${label.toLowerCase()} data.`,
+      text: `✅ **Applied!** Your **${icon} ${label}** scenario is now live across Halo Internal.\n\n• **${payload.workspaces.length}** workspace${payload.workspaces.length !== 1 ? 's' : ''} created in Admin\n• **${payload.records.length}** records added to End User\n• **${(payload.clients?.length ?? 0)}** collection${(payload.clients?.length ?? 0) !== 1 ? 's' : ''} created\n• **${payload.flows.length}** Signal flows published\n• **${payload.integrations.length}** Orbital integrations activated${(payload.businessFunctions?.length ?? 0) > 0 ? `\n• **${payload.businessFunctions!.length}** department${payload.businessFunctions!.length !== 1 ? 's' : ''} loaded in Architecture` : ''}\n• Shell labels updated to ${label} terminology\n\nNavigate to **Admin** → Workspace Design to inspect the structure, or go to **End User** to interact with live ${label.toLowerCase()} data.`,
       cards: [],
       quickReplies: ['Generate more sample data', 'Show platform analytics', 'Customize workspace fields', 'Try another scenario'],
       timestamp: new Date(),

@@ -1233,7 +1233,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
         return { ok: true, message: `Welcome back, ${user.fullName}.` };
       },
       signInWithProvider: (provider) => {
-        const providerEmail = provider === 'google' ? 'google.user@corespace.app' : 'microsoft.user@corespace.app';
+        const providerEmail = provider === 'google' ? 'google.user@halointernal.app' : 'microsoft.user@halointernal.app';
         const providerName = provider === 'google' ? 'Google User' : 'Microsoft User';
 
         let user = users.find((item) => normalizeEmail(item.email) === providerEmail);
@@ -1306,7 +1306,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
             ? 'Super admin account created. You can access and switch all tenants.'
             : asAdmin
               ? 'Admin account created. You now have full admin capabilities for this tenant.'
-            : 'Account created. You can now use CoreSpace.',
+            : 'Account created. You can now use Halo Internal.',
         };
       },
       addFlowRunEntry: (entry) => {

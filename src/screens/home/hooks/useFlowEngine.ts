@@ -195,9 +195,9 @@ export function executeAction(
   const emailMatch = lower.match(/(?:send\s+(?:an?\s+)?email|email)\s*:?\s*([^\s,→]+@[^\s,→]+)/i);
   if (emailMatch) {
     const emailAddr = emailMatch[1].trim();
-    const subject = encodeURIComponent(`[CoreSpace] Signal: ${flow.name}`);
+    const subject = encodeURIComponent(`[Halo Internal] Signal: ${flow.name}`);
     const body = encodeURIComponent(
-      `Signal "${flow.name}" triggered on record "${record.title}".\n\nStatus: ${record.status}\nWorkspace: ${flow.workspaceId}\n\n— Sent automatically by CoreSpace Signal Studio`,
+      `Signal "${flow.name}" triggered on record "${record.title}".\n\nStatus: ${record.status}\nWorkspace: ${flow.workspaceId}\n\n— Sent automatically by Halo Internal Signal Studio`,
     );
     const mailto = `mailto:${emailAddr}?subject=${subject}&body=${body}`;
     try { Linking.openURL(mailto); } catch { /* silently degrade */ }

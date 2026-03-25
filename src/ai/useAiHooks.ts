@@ -594,7 +594,7 @@ export function useAiWorkspaceBuilder() {
 
   const startSession = useCallback((tenantId: string) => {
     const s = createAiSession(tenantId, 'workspace-builder', data.shellConfig);
-    const welcome = addAssistantMessage(s, `Hi! I'm **Bebo**, CoreSpace's AI workspace architect.\n\nTell me about your business or industry and I'll generate a **complete operational workspace** in seconds — workspaces, subspaces, data fields, team roles, lifecycle stages, and Signal Studio automation flows.\n\nI already know **11 industries** out of the box, including a full **DSCSA pharmaceutical serialization** template with track-and-trace from manufacturer to pharmacy. Try one of these:\n\n• *"We're a pharma distributor verifying serial numbers under DSCSA"*\n• *"I run a property management company with 200 units"*\n• *"We manage insurance claims and need compliance tracking"*`);
+    const welcome = addAssistantMessage(s, `Hi! I'm **Bebo**, Halo Internal's AI workspace architect.\n\nTell me about your business or industry and I'll generate a **complete operational workspace** in seconds — workspaces, subspaces, data fields, team roles, lifecycle stages, and Signal Studio automation flows.\n\nI already know **11 industries** out of the box, including a full **DSCSA pharmaceutical serialization** template with track-and-trace from manufacturer to pharmacy. Try one of these:\n\n• *"We're a pharma distributor verifying serial numbers under DSCSA"*\n• *"I run a property management company with 200 units"*\n• *"We manage insurance claims and need compliance tracking"*`);
     setSession(welcome);
     setProposal(null);
   }, []);

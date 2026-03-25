@@ -1,7 +1,7 @@
 import { AppData } from '../types';
 
 export const defaultData: AppData = {
-  appName: 'CoreSpace',
+  appName: 'Halo Internal',
   organizations: [],
   activeOrg: '',
   shellConfig: {

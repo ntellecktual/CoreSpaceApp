@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Platform } from 'react-native';
-import { Image, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { BrandLogo } from '../components/BrandLogo';
 import { NebulaBackground } from '../components/NebulaBackground';
 import { useAppState } from '../context/AppStateContext';
@@ -13,41 +13,6 @@ type AuthScreenProps = {
   onBackToOverview?: () => void;
 };
 
-/** NASA APOD — auth-screen-only cosmic photo overlay */
-const APOD_URL = 'https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=1';
-const CACHE_KEY = 'corespace_cosmic_bg';
-const CACHE_TTL = 1000 * 60 * 60;
-
-function useCosmicBackground() {
-  const [bgUri, setBgUri] = useState<string | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        const { url, ts } = JSON.parse(cached);
-        if (url && Date.now() - ts < CACHE_TTL) { setBgUri(url); return; }
-      }
-    } catch { /* */ }
-    (async () => {
-      try {
-        const res = await fetch(APOD_URL);
-        if (res.ok) {
-          const data = await res.json();
-          const item = Array.isArray(data) ? data[0] : data;
-          const url = item?.media_type === 'image' ? (item.hdurl || item.url) : null;
-          if (!cancelled && url) {
-            setBgUri(url);
-            try { localStorage.setItem(CACHE_KEY, JSON.stringify({ url, ts: Date.now() })); } catch { /* */ }
-          }
-        }
-      } catch { /* API failed — nebula handles background */ }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-  return bgUri;
-}
-
 export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
   const { styles } = useUiTheme();
   const { signInWithEmail, signInWithProvider, createAccount } = useAppState();
@@ -57,7 +22,6 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
   const [password, setPassword] = useState('');
   const [createAdminAccount, setCreateAdminAccount] = useState(false);
   const [message, setMessage] = useState('');
-  const cosmicBg = useCosmicBackground();
 
   const onEmailAuth = () => {
     const result =
@@ -91,17 +55,9 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#050608' }}>
+    <View style={{ flex: 1, backgroundColor: '#263374' }}>
       {/* Shared animated nebula + stars */}
       <NebulaBackground mode="night" />
-      {/* NASA APOD image overlay — auth screen only */}
-      {cosmicBg && (
-        <Image
-          source={{ uri: cosmicBg }}
-          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.18 } as any}
-          resizeMode="cover"
-        />
-      )}
 
       <ScrollView
         keyboardShouldPersistTaps="handled"
@@ -142,8 +98,8 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
           <Text style={{ color: '#FFFFFF', fontSize: 22, fontWeight: '800', textAlign: 'center', marginBottom: 4 }}>
             {mode === 'login' ? 'Welcome back' : 'Create your account'}
           </Text>
-          <Text style={{ color: '#C9B8EA', fontSize: 13, textAlign: 'center', marginBottom: 22 }}>
-            {mode === 'login' ? 'Sign in to access your workspaces' : 'Get started with CoreSpace for free'}
+          <Text style={{ color: '#C9D4F0', fontSize: 13, textAlign: 'center', marginBottom: 22 }}>
+            {mode === 'login' ? 'Sign in to access your workspaces' : 'Get started with Halo Internal for free'}
           </Text>
 
           {/* Inputs */}
@@ -184,7 +140,7 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
           {/* Forgot password (login only) */}
           {mode === 'login' && (
             <Pressable style={{ alignSelf: 'flex-end', marginBottom: 14, marginTop: -6 }}>
-              <Text style={{ color: '#8C5BF5', fontSize: 13, fontWeight: '600' }}>Forgot your password?</Text>
+              <Text style={{ color: '#FFD332', fontSize: 13, fontWeight: '600' }}>Forgot your password?</Text>
             </Pressable>
           )}
 
@@ -196,13 +152,13 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
                 width: '100%',
                 borderRadius: 10,
                 borderWidth: 1,
-                borderColor: createAdminAccount ? 'rgba(139,92,246,0.45)' : 'rgba(255,255,255,0.10)',
-                backgroundColor: createAdminAccount ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.04)',
+                borderColor: createAdminAccount ? 'rgba(38,51,116,0.55)' : 'rgba(255,255,255,0.10)',
+                backgroundColor: createAdminAccount ? 'rgba(38,51,116,0.20)' : 'rgba(255,255,255,0.04)',
                 padding: 12,
                 marginBottom: 14,
               }}
             >
-              <Text style={{ color: '#EBDFFF', fontSize: 13, lineHeight: 19 }}>
+              <Text style={{ color: '#D4DEEF', fontSize: 13, lineHeight: 19 }}>
                 {createAdminAccount
                   ? '✅ Admin Account — full access to Workspace Creator, Signal Studio, and Tenant settings'
                   : '👤 Standard Account — day-to-day operations, intake, and record management'}
@@ -217,7 +173,7 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
               width: '100%',
               height: 48,
               borderRadius: 10,
-              backgroundImage: 'linear-gradient(135deg, #8C5BF5, #6D28D9)',
+              backgroundImage: 'linear-gradient(135deg, #263374, #1a2455)',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: 8,
@@ -249,8 +205,8 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
                 flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}
             >
-              <GoogleOutlined style={{ color: '#EBDFFF', fontSize: 16 }} />
-              <Text style={{ color: '#EBDFFF', fontSize: 13, fontWeight: '600' }}>Google</Text>
+              <GoogleOutlined style={{ color: '#D4DEEF', fontSize: 16 }} />
+              <Text style={{ color: '#D4DEEF', fontSize: 13, fontWeight: '600' }}>Google</Text>
             </Pressable>
             <Pressable
               onPress={onMicrosoft}
@@ -260,31 +216,31 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
                 flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}
             >
-              <WindowsOutlined style={{ color: '#EBDFFF', fontSize: 16 }} />
-              <Text style={{ color: '#EBDFFF', fontSize: 13, fontWeight: '600' }}>Microsoft</Text>
+              <WindowsOutlined style={{ color: '#D4DEEF', fontSize: 16 }} />
+              <Text style={{ color: '#D4DEEF', fontSize: 13, fontWeight: '600' }}>Microsoft</Text>
             </Pressable>
           </View>
 
           {/* Toggle mode */}
           <View style={{ alignItems: 'center', marginTop: 20, gap: 6 }}>
             <Pressable onPress={() => { setMode((c) => (c === 'login' ? 'signup' : 'login')); setMessage(''); }}>
-              <Text style={{ color: '#C9B8EA', fontSize: 13 }}>
+              <Text style={{ color: '#C9D4F0', fontSize: 13 }}>
                 {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-                <Text style={{ color: '#8C5BF5', fontWeight: '700' }}>
+                <Text style={{ color: '#FFD332', fontWeight: '700' }}>
                   {mode === 'login' ? 'Sign up' : 'Sign in'}
                 </Text>
               </Text>
             </Pressable>
             {!!onBackToOverview && (
               <Pressable onPress={onBackToOverview} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <ArrowLeftOutlined style={{ color: '#9B8ABE', fontSize: 12 }} />
-                <Text style={{ color: '#9B8ABE', fontSize: 12 }}>Back to platform overview</Text>
+                <ArrowLeftOutlined style={{ color: '#8A9BC2', fontSize: 12 }} />
+                <Text style={{ color: '#8A9BC2', fontSize: 12 }}>Back to platform overview</Text>
               </Pressable>
             )}
           </View>
 
           {mode === 'signup' && (
-            <Text style={{ color: '#9B8ABE', fontSize: 11, textAlign: 'center', marginTop: 10, lineHeight: 16 }}>
+            <Text style={{ color: '#8A9BC2', fontSize: 11, textAlign: 'center', marginTop: 10, lineHeight: 16 }}>
               Tip: Choose Admin if you're setting up workspaces and automations for your team.
             </Text>
           )}
@@ -292,8 +248,8 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
 
         {/* Footer */}
         <View style={{ marginTop: 32, alignItems: 'center', gap: 6, opacity: 0.5 }}>
-          <Text style={{ color: '#C9B8EA', fontSize: 11 }}>© 2026 CoreSpace. All rights reserved.</Text>
-          <Text style={{ color: '#9B8ABE', fontSize: 10 }}>Powered by Bebo AI  •  Background via NASA APOD</Text>
+          <Text style={{ color: '#C9D4F0', fontSize: 11 }}>© 2026 Halo Internal. All rights reserved.</Text>
+          <Text style={{ color: '#8A9BC2', fontSize: 10 }}>Powered by Bebo AI</Text>
         </View>
       </ScrollView>
     </View>

@@ -1,13 +1,13 @@
-﻿import { StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 export type ThemeMode = 'day' | 'night';
 
 const colors = {
   white: '#FFFFFF',
-  lilac100: '#FD9CFD',
-  lilac300: '#E878F6',
-  violet500: '#8C5BF5',
-  midnight900: '#201535',
+  gold100: '#FFE680',
+  gold300: '#FFD332',
+  navy500: '#263374',
+  midnight900: '#1a2455',
 };
 
 const nightStyleObject = {
@@ -16,8 +16,8 @@ const nightStyleObject = {
   // Removed duplicate landingTopMenuText
   root: {
     flex: 1,
-    backgroundColor: '#07080C',
-    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(139,92,246,.22), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.14), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.12), transparent 60%), linear-gradient(180deg, #07080C, #0B0E16)',
+    backgroundColor: '#0B0E1A',
+    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(38,51,116,.22), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.14), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.12), transparent 60%), linear-gradient(180deg, #0B0E1A, #0B0E16)',
   },
   dashboardShell: {
     flex: 1,
@@ -62,7 +62,7 @@ const nightStyleObject = {
     width: '100%',
     borderRadius: 0,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(253,156,253,0.24)',
+    borderBottomColor: 'rgba(255,211,50,0.24)',
     paddingTop: 12,
   },
   dashboardSidebarCollapsed: {
@@ -85,24 +85,24 @@ const nightStyleObject = {
     backgroundColor: 'transparent',
   },
   dashboardCollapsedNavItemActive: {
-    backgroundColor: 'rgba(140,91,245,0.38)',
+    backgroundColor: 'rgba(38,51,116,0.38)',
   },
   dashboardTenantHeader: {
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(253,156,253,0.18)',
-    backgroundColor: 'rgba(32,21,53,0.55)',
+    borderColor: 'rgba(255,211,50,0.18)',
+    backgroundColor: 'rgba(18,26,60,0.55)',
     paddingHorizontal: 10,
     paddingVertical: 8,
     marginHorizontal: 2,
     marginTop: 4,
   },
   dashboardTenantHeaderActive: {
-    borderColor: 'rgba(140,91,245,0.45)',
-    backgroundColor: 'rgba(140,91,245,0.18)',
+    borderColor: 'rgba(38,51,116,0.45)',
+    backgroundColor: 'rgba(38,51,116,0.18)',
   },
   dashboardTenantHeaderName: {
-    color: '#DCCFF5',
+    color: '#C5D4EE',
     fontSize: 13,
     fontWeight: '600',
     flex: 1,
@@ -113,7 +113,7 @@ const nightStyleObject = {
     borderRadius: 7,
     borderWidth: 1,
     borderColor: 'rgba(214,204,235,0.18)',
-    backgroundColor: 'rgba(140,91,245,0.14)',
+    backgroundColor: 'rgba(38,51,116,0.14)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -123,26 +123,26 @@ const nightStyleObject = {
     borderRadius: 5,
     borderWidth: 1,
     borderColor: 'rgba(214,204,235,0.18)',
-    backgroundColor: 'rgba(140,91,245,0.14)',
+    backgroundColor: 'rgba(38,51,116,0.14)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   dashboardTenantPill: {
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(253,156,253,0.3)',
-    backgroundColor: 'rgba(32,21,53,0.65)',
+    borderColor: 'rgba(255,211,50,0.3)',
+    backgroundColor: 'rgba(18,26,60,0.65)',
     paddingHorizontal: 10,
     paddingVertical: 5,
     marginHorizontal: 2,
     marginTop: 4,
   },
   dashboardTenantPillActive: {
-    borderColor: 'rgba(253,156,253,0.85)',
-    backgroundColor: 'rgba(140,91,245,0.34)',
+    borderColor: 'rgba(255,211,50,0.85)',
+    backgroundColor: 'rgba(38,51,116,0.34)',
   },
   dashboardTenantPillText: {
-    color: '#DCCFF5',
+    color: '#C5D4EE',
     fontSize: 12,
     fontWeight: '600',
     flex: 1,
@@ -187,7 +187,7 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   dashboardSubBrand: {
-    color: '#C9B8EA',
+    color: '#C9D4F0',
     fontSize: 11,
   },
   dashboardCreateButton: {
@@ -218,7 +218,7 @@ const nightStyleObject = {
     marginVertical: 4,
   },
   dashboardSectionLabel: {
-    color: '#8878AE',
+    color: '#6B7DAA',
     fontSize: 11,
     fontWeight: '700',
     marginTop: 2,
@@ -243,13 +243,13 @@ const nightStyleObject = {
     resizeMode: 'contain',
   },
   dashboardNavItemActive: {
-    backgroundColor: 'rgba(140,91,245,0.38)',
+    backgroundColor: 'rgba(38,51,116,0.38)',
   },
   dashboardTenantNavGroup: {
     gap: 6,
   },
   dashboardTenantChevron: {
-    color: '#F3EAFF',
+    color: '#E8EFF8',
     fontSize: 13,
     fontWeight: '800',
     marginLeft: 'auto',
@@ -261,8 +261,8 @@ const nightStyleObject = {
   dashboardTenantNavItem: {
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(253,156,253,0.12)',
-    backgroundColor: 'rgba(32,21,53,0.40)',
+    borderColor: 'rgba(255,211,50,0.12)',
+    backgroundColor: 'rgba(18,26,60,0.40)',
     paddingHorizontal: 8,
     minHeight: 34,
     paddingVertical: 5,
@@ -274,8 +274,8 @@ const nightStyleObject = {
     backgroundColor: 'transparent',
   },
   dashboardTenantNavItemActive: {
-    borderColor: 'rgba(253,156,253,0.85)',
-    backgroundColor: 'rgba(140,91,245,0.34)',
+    borderColor: 'rgba(255,211,50,0.85)',
+    backgroundColor: 'rgba(38,51,116,0.34)',
   },
   dashboardTenantNavItemRow: {
     flexDirection: 'row',
@@ -283,12 +283,12 @@ const nightStyleObject = {
     gap: 8,
   },
   dashboardTenantNavItemText: {
-    color: '#DCCFF5',
+    color: '#C5D4EE',
     fontSize: 11,
     fontWeight: '600',
   },
   dashboardNavItemText: {
-    color: '#D6CCEB',
+    color: '#C5D4EE',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -306,19 +306,19 @@ const nightStyleObject = {
   dashboardRoleItem: {
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(253,156,253,0.22)',
+    borderColor: 'rgba(255,211,50,0.22)',
     paddingHorizontal: 8,
     minHeight: 26,
     paddingVertical: 3,
-    backgroundColor: 'rgba(37,26,60,0.8)',
+    backgroundColor: 'rgba(20,30,68,0.8)',
     justifyContent: 'center',
   },
   dashboardRoleItemActive: {
-    borderColor: 'rgba(253,156,253,0.7)',
-    backgroundColor: 'rgba(140,91,245,0.3)',
+    borderColor: 'rgba(255,211,50,0.7)',
+    backgroundColor: 'rgba(38,51,116,0.3)',
   },
   dashboardRoleItemText: {
-    color: '#DCCFF5',
+    color: '#C5D4EE',
     fontSize: 11,
     fontWeight: '600',
   },
@@ -336,19 +336,19 @@ const nightStyleObject = {
   dashboardSidebarAction: {
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(253,156,253,0.24)',
-    backgroundColor: 'rgba(29,20,48,0.88)',
+    borderColor: 'rgba(255,211,50,0.24)',
+    backgroundColor: 'rgba(16,24,56,0.88)',
     paddingHorizontal: 8,
     minHeight: 30,
     paddingVertical: 4,
     justifyContent: 'center',
   },
   dashboardSidebarActionActive: {
-    borderColor: 'rgba(253,156,253,0.75)',
-    backgroundColor: 'rgba(140,91,245,0.3)',
+    borderColor: 'rgba(255,211,50,0.75)',
+    backgroundColor: 'rgba(38,51,116,0.3)',
   },
   dashboardSidebarActionText: {
-    color: '#E4DAFA',
+    color: '#D4DEEF',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -356,7 +356,7 @@ const nightStyleObject = {
     color: '#FFFFFF',
   },
   dashboardUserText: {
-    color: '#AFA1CE',
+    color: '#8A9BC2',
     fontSize: 11,
     lineHeight: 16,
     paddingHorizontal: 2,
@@ -392,7 +392,7 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   dashboardMainSubtitle: {
-    color: '#C9B8EA',
+    color: '#C9D4F0',
     fontSize: 13,
     marginTop: 2,
   },
@@ -408,21 +408,21 @@ const nightStyleObject = {
   dashboardHeaderButton: {
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(253,156,253,0.4)',
-    backgroundColor: 'rgba(140,91,245,0.2)',
+    borderColor: 'rgba(255,211,50,0.4)',
+    backgroundColor: 'rgba(38,51,116,0.2)',
     paddingHorizontal: 10,
     minHeight: 34,
     paddingVertical: 6,
     justifyContent: 'center',
   },
   dashboardHeaderButtonText: {
-    color: '#F7F1FF',
+    color: '#F0F4FA',
     fontSize: 12,
     fontWeight: '700',
   },
   dashboardHeaderPrimaryButton: {
     borderRadius: 10,
-    backgroundColor: '#8C5BF5',
+    backgroundColor: '#263374',
     paddingHorizontal: 10,
     minHeight: 34,
     paddingVertical: 6,
@@ -462,7 +462,7 @@ const nightStyleObject = {
     alignItems: 'stretch',
   },
   dashboardBottomStatusText: {
-    color: '#C9B8EA',
+    color: '#C9D4F0',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -473,13 +473,13 @@ const nightStyleObject = {
   },
   dashboardDraftBanner: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(253,156,253,0.2)',
+    borderBottomColor: 'rgba(255,211,50,0.2)',
     paddingHorizontal: 18,
     paddingVertical: 8,
-    backgroundColor: 'rgba(140,91,245,0.08)',
+    backgroundColor: 'rgba(38,51,116,0.08)',
   },
   dashboardDraftText: {
-    color: '#C9B8EA',
+    color: '#C9D4F0',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -603,32 +603,32 @@ const nightStyleObject = {
     lineHeight: 20,
   },
   bullet: {
-    color: '#F4EDFF',
+    color: '#F0F4FA',
     fontSize: 14,
     lineHeight: 21,
   },
   diagram: {
-    color: '#F8F3FF',
+    color: '#F0F4FA',
     fontFamily: 'monospace',
     fontSize: 12,
     lineHeight: 18,
   },
   pill: {
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.18)',
+    borderColor: 'rgba(38,51,116,0.18)',
     borderRadius: 999,
     paddingHorizontal: 10,
     minHeight: 30,
     paddingVertical: 5,
-    backgroundColor: 'rgba(167,139,250,0.08)',
+    backgroundColor: 'rgba(38,51,116,0.08)',
     justifyContent: 'center',
   },
   pillActive: {
-    borderColor: 'rgba(167,139,250,0.45)',
-    backgroundColor: 'rgba(167,139,250,0.18)',
+    borderColor: 'rgba(38,51,116,0.45)',
+    backgroundColor: 'rgba(38,51,116,0.18)',
   },
   pillText: {
-    color: '#C4B5FD',
+    color: '#8A9BC2',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -676,7 +676,7 @@ const nightStyleObject = {
     borderWidth: 1,
     borderColor: 'rgba(250,225,120,0.78)',
     borderRadius: 999,
-    backgroundColor: 'rgba(32,21,53,0.22)',
+    backgroundColor: 'rgba(18,26,60,0.22)',
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
@@ -693,9 +693,9 @@ const nightStyleObject = {
   },
   builderStepItem: {
     borderWidth: 1,
-    borderColor: 'rgba(253,156,253,0.38)',
+    borderColor: 'rgba(255,211,50,0.38)',
     borderRadius: 999,
-    backgroundColor: 'rgba(140,91,245,0.14)',
+    backgroundColor: 'rgba(38,51,116,0.14)',
     paddingHorizontal: 10,
     minHeight: 30,
     paddingVertical: 6,
@@ -731,7 +731,7 @@ const nightStyleObject = {
     backgroundColor: '#37C778',
   },
   builderStepText: {
-    color: '#EDE3FF',
+    color: '#E8EFF8',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -749,7 +749,7 @@ const nightStyleObject = {
   },
   builderSectionCard: {
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.14)',
+    borderColor: 'rgba(38,51,116,0.14)',
     borderRadius: 14,
     backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
     backgroundColor: 'transparent',
@@ -767,15 +767,15 @@ const nightStyleObject = {
     letterSpacing: -0.2,
   },
   builderSectionHint: {
-    color: '#C4B5FD',
+    color: '#8A9BC2',
     fontSize: 11,
     lineHeight: 16,
   },
   builderStudioTextPrimary: {
-    color: '#F8F5FF',
+    color: '#F0F4FA',
   },
   builderStudioTextSecondary: {
-    color: '#C4B5FD',
+    color: '#8A9BC2',
   },
   builderActionRow: {
     flexDirection: 'row',
@@ -788,7 +788,7 @@ const nightStyleObject = {
     alignItems: 'flex-start',
     gap: 10,
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.14)',
+    borderColor: 'rgba(38,51,116,0.14)',
     borderRadius: 14,
     backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
     backgroundColor: 'transparent',
@@ -819,13 +819,13 @@ const nightStyleObject = {
     paddingBottom: 8,
   },
   builderFormSectionTitle: {
-    color: '#F8F5FF',
+    color: '#F0F4FA',
     fontSize: 13,
     fontWeight: '800',
     letterSpacing: -0.2,
   },
   builderFormSectionText: {
-    color: '#C4B5FD',
+    color: '#8A9BC2',
     fontSize: 11,
     lineHeight: 16,
   },
@@ -882,7 +882,7 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   builderPreviewHeroSubtitle: {
-    color: '#E8DFF8',
+    color: '#D4DEEF',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -912,7 +912,7 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   builderPreviewStatLabel: {
-    color: '#C9B8EA',
+    color: '#C9D4F0',
     fontSize: 11,
     fontWeight: '600',
   },
@@ -933,12 +933,12 @@ const nightStyleObject = {
   },
   builderDropZone: {
     borderWidth: 2,
-    borderColor: 'rgba(253,156,253,0.62)',
+    borderColor: 'rgba(255,211,50,0.62)',
     borderStyle: 'dashed',
     borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    backgroundColor: 'rgba(140,91,245,0.16)',
+    backgroundColor: 'rgba(38,51,116,0.16)',
   },
   builderDetailsFormPanel: {
     borderWidth: 1,
@@ -962,21 +962,21 @@ const nightStyleObject = {
     width: '100%',
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(253,156,253,0.18)',
+    borderBottomColor: 'rgba(255,211,50,0.18)',
   },
   builderDetailsFormRowHalf: {
     width: '48%',
   },
   builderDetailsFormLabel: {
-    color: '#F7F1FF',
+    color: '#F0F4FA',
     fontSize: 13,
     fontWeight: '700',
   },
   builderDetailsFormInput: {
     borderWidth: 1,
-    borderColor: 'rgba(253,156,253,0.4)',
+    borderColor: 'rgba(255,211,50,0.4)',
     borderRadius: 10,
-    backgroundColor: 'rgba(140,91,245,0.14)',
+    backgroundColor: 'rgba(38,51,116,0.14)',
     minHeight: 38,
     paddingHorizontal: 10,
     paddingVertical: 8,
@@ -988,11 +988,11 @@ const nightStyleObject = {
     justifyContent: 'flex-start',
   },
   builderDetailsFormInputText: {
-    color: '#D9CFF2',
+    color: '#C5D4EE',
     fontSize: 12,
   },
   builderDetailsFormType: {
-    color: '#B8A8D9',
+    color: '#8A9BC2',
     fontSize: 11,
   },
   endUserWorkspaceShell: {
@@ -1025,10 +1025,10 @@ const nightStyleObject = {
     width: '100%',
     borderRightWidth: 0,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(253,156,253,0.24)',
+    borderBottomColor: 'rgba(255,211,50,0.24)',
   },
   endUserWorkspaceRailLabel: {
-    color: '#B8A8D9',
+    color: '#8A9BC2',
     fontSize: 11,
     fontWeight: '700',
     paddingHorizontal: 4,
@@ -1050,11 +1050,11 @@ const nightStyleObject = {
   },
   endUserWorkspaceTabActive: {
     borderWidth: 2,
-    borderColor: 'rgba(253,156,253,0.82)',
-    backgroundColor: 'rgba(140,91,245,0.34)',
+    borderColor: 'rgba(255,211,50,0.82)',
+    backgroundColor: 'rgba(38,51,116,0.34)',
   },
   endUserWorkspaceTabStep: {
-    color: '#E4DAFA',
+    color: '#D4DEEF',
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.3,
@@ -1064,11 +1064,11 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   endUserWorkspaceTabName: {
-    color: '#B8A8D9',
+    color: '#8A9BC2',
     fontSize: 11,
   },
   endUserWorkspaceTabNameActive: {
-    color: '#F7F1FF',
+    color: '#F0F4FA',
     fontWeight: '700',
   },
   endUserWorkspaceContent: {
@@ -1097,7 +1097,7 @@ const nightStyleObject = {
     paddingVertical: 8,
   },
   endUserHierarchyCardText: {
-    color: '#F7F1FF',
+    color: '#F0F4FA',
     fontSize: 12,
     fontWeight: '800',
   },
@@ -1143,10 +1143,10 @@ const nightStyleObject = {
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(139,92,246,0.40)',
-    backgroundImage: 'linear-gradient(135deg, rgba(139,92,246,0.85), rgba(59,130,246,0.65))',
-    backgroundColor: '#8B5CF6',
-    boxShadow: '0 8px 16px rgba(139,92,246,0.24), 0 18px 40px rgba(139,92,246,0.18)',
+    borderColor: 'rgba(38,51,116,0.40)',
+    backgroundImage: 'linear-gradient(135deg, rgba(38,51,116,0.85), rgba(59,130,246,0.65))',
+    backgroundColor: '#263374',
+    boxShadow: '0 8px 16px rgba(38,51,116,0.24), 0 18px 40px rgba(38,51,116,0.18)',
   },
   primaryButtonText: {
     color: '#fff',
@@ -1187,7 +1187,7 @@ const nightStyleObject = {
     flex: 1,
   },
   adminSidebar: {
-    backgroundColor: 'rgba(30,22,50,0.65)',
+    backgroundColor: 'rgba(18,26,60,0.65)',
     paddingTop: 8,
   },
   textInput: {
@@ -1209,8 +1209,8 @@ const nightStyleObject = {
     backgroundColor: 'rgba(255,255,255,0.04)',
   },
   pillButtonActive: {
-    borderColor: '#8C5BF5',
-    backgroundColor: 'rgba(140,91,245,0.22)',
+    borderColor: '#263374',
+    backgroundColor: 'rgba(38,51,116,0.22)',
   },
   pillButtonText: {
     color: 'rgba(232,236,255,0.78)',
@@ -1218,7 +1218,7 @@ const nightStyleObject = {
     fontWeight: '600',
   },
   pillButtonTextActive: {
-    color: '#D4BBFF',
+    color: '#B0C4E8',
     fontWeight: '700',
   },
   listCard: {
@@ -1254,7 +1254,7 @@ const nightStyleObject = {
   stageTriage: { backgroundColor: 'rgba(249,115,22,0.22)' },
   stageTriageText: { color: '#FDBA74' },
   stageRepair: { backgroundColor: 'rgba(168,85,247,0.22)' },
-  stageRepairText: { color: '#C4B5FD' },
+  stageRepairText: { color: '#8A9BC2' },
   stageQC: { backgroundColor: 'rgba(234,179,8,0.22)' },
   stageQCText: { color: '#FDE68A' },
   stageShipped: { backgroundColor: 'rgba(34,197,94,0.22)' },
@@ -1396,11 +1396,11 @@ const nightStyleObject = {
     paddingHorizontal: 6,
     paddingVertical: 1,
     borderRadius: 4,
-    backgroundColor: 'rgba(140,91,245,0.22)',
+    backgroundColor: 'rgba(38,51,116,0.22)',
     alignSelf: 'flex-start',
   },
   tagBadgeText: {
-    color: '#C4B5FD',
+    color: '#8A9BC2',
     fontSize: 9,
     fontWeight: '700',
   },
@@ -1427,7 +1427,7 @@ const nightStyleObject = {
     gap: 10,
   },
   loadingText: {
-    color: '#F1E8FF',
+    color: '#E8EFF8',
     fontSize: 13,
   },
   emptyWrap: {
@@ -1436,7 +1436,7 @@ const nightStyleObject = {
     justifyContent: 'center',
   },
   emptyText: {
-    color: '#EBDFFF',
+    color: '#D4DEEF',
   },
   processCard: {
     borderWidth: 1,
@@ -1469,17 +1469,17 @@ const nightStyleObject = {
     height: 26,
     borderRadius: 99,
     borderWidth: 1,
-    borderColor: 'rgba(253,156,253,0.55)',
+    borderColor: 'rgba(255,211,50,0.55)',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(140,91,245,0.2)',
+    backgroundColor: 'rgba(38,51,116,0.2)',
   },
   stepDotActive: {
-    borderColor: 'rgba(253,156,253,0.95)',
-    backgroundColor: 'rgba(232,120,246,0.35)',
+    borderColor: 'rgba(255,211,50,0.95)',
+    backgroundColor: 'rgba(255,211,50,0.35)',
   },
   stepDotText: {
-    color: '#F7F1FF',
+    color: '#F0F4FA',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -1487,7 +1487,7 @@ const nightStyleObject = {
     color: '#ffffff',
   },
   stepLabel: {
-    color: '#E4D5FF',
+    color: '#D4DEEF',
     fontSize: 11,
     fontWeight: '600',
     textAlign: 'center',
@@ -1504,7 +1504,7 @@ const nightStyleObject = {
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
     backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
-    backgroundColor: 'rgba(140,91,245,0.18)',
+    backgroundColor: 'rgba(38,51,116,0.18)',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
     overflow: 'hidden',
@@ -1517,7 +1517,7 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   hintBubbleText: {
-    color: '#F1E8FF',
+    color: '#E8EFF8',
     fontSize: 11,
     lineHeight: 16,
   },
@@ -1525,7 +1525,7 @@ const nightStyleObject = {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(32,21,53,0.7)',
+    backgroundColor: 'rgba(18,26,60,0.7)',
     padding: 20,
   },
   modalCard: {
@@ -1548,14 +1548,14 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   modalText: {
-    color: '#F0E7FF',
+    color: '#E8EFF8',
     fontSize: 14,
     lineHeight: 21,
   },
   authWrap: {
     flex: 1,
-    backgroundColor: '#07080C',
-    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(139,92,246,.22), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.14), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.12), transparent 60%), linear-gradient(180deg, #07080C, #0B0E16)',
+    backgroundColor: '#0B0E1A',
+    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(38,51,116,.22), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.14), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.12), transparent 60%), linear-gradient(180deg, #0B0E1A, #0B0E16)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 18,
@@ -1619,7 +1619,7 @@ const nightStyleObject = {
     textAlign: 'center',
   },
   linkText: {
-    color: colors.lilac100,
+    color: colors.gold100,
     fontSize: 12,
     fontWeight: '700',
     textAlign: 'center',
@@ -1671,11 +1671,11 @@ const nightStyleObject = {
     justifyContent: 'center',
   },
   landingTopMenuButtonActive: {
-    borderColor: 'rgba(139,92,246,0.55)',
-    backgroundColor: 'rgba(139,92,246,0.18)',
+    borderColor: 'rgba(38,51,116,0.55)',
+    backgroundColor: 'rgba(38,51,116,0.18)',
   },
   landingTopMenuText: {
-    color: '#F7F1FF',
+    color: '#F0F4FA',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -1697,7 +1697,7 @@ const nightStyleObject = {
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
     backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))',
-    backgroundColor: 'rgba(139,92,246,0.18)',
+    backgroundColor: 'rgba(38,51,116,0.18)',
     backdropFilter: 'blur(14px)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1716,7 +1716,7 @@ const nightStyleObject = {
     maxWidth: 980,
   },
   landingHeroSubtitle: {
-    color: '#EBDFFF',
+    color: '#D4DEEF',
     fontSize: 21,
     lineHeight: 31,
     textAlign: 'center',
@@ -1730,10 +1730,10 @@ const nightStyleObject = {
   landingPrimaryCta: {
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(139,92,246,0.40)',
-    backgroundImage: 'linear-gradient(135deg, rgba(139,92,246,0.85), rgba(59,130,246,0.65))',
-    backgroundColor: '#8C5BF5',
-    boxShadow: '0 18px 40px rgba(139,92,246,0.18)',
+    borderColor: 'rgba(38,51,116,0.40)',
+    backgroundImage: 'linear-gradient(135deg, rgba(38,51,116,0.85), rgba(59,130,246,0.65))',
+    backgroundColor: '#263374',
+    boxShadow: '0 18px 40px rgba(38,51,116,0.18)',
     minHeight: 44,
     paddingHorizontal: 18,
     paddingVertical: 11,
@@ -1756,13 +1756,13 @@ const nightStyleObject = {
     justifyContent: 'center',
   },
   landingSecondaryCtaText: {
-    color: '#F7F1FF',
+    color: '#F0F4FA',
     fontSize: 14,
     fontWeight: '700',
   },
   landingTrustText: {
     marginTop: 20,
-    color: '#C9B8EA',
+    color: '#C9D4F0',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -1775,7 +1775,7 @@ const nightStyleObject = {
     marginTop: 2,
   },
   landingLogoItem: {
-    color: '#D8C8F3',
+    color: '#C5D4EE',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1799,13 +1799,13 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   landingSectionEyebrow: {
-    color: '#FD9CFD',
+    color: '#FFD332',
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1,
   },
   landingSectionText: {
-    color: '#EBDFFF',
+    color: '#D4DEEF',
     fontSize: 17,
     lineHeight: 26,
   },
@@ -1835,7 +1835,7 @@ const nightStyleObject = {
     fontWeight: '700',
   },
   landingFeatureText: {
-    color: '#EBDFFF',
+    color: '#D4DEEF',
     fontSize: 12,
     lineHeight: 18,
   },
@@ -1858,7 +1858,7 @@ const nightStyleObject = {
     backgroundColor: 'rgba(255,255,255,0.03)',
   },
   landingShowcaseHeaderText: {
-    color: '#F1E8FF',
+    color: '#E8EFF8',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1888,7 +1888,7 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   landingShowcaseItem: {
-    color: '#EBDFFF',
+    color: '#D4DEEF',
     fontSize: 12,
     lineHeight: 17,
   },
@@ -1945,12 +1945,12 @@ const nightStyleObject = {
     gap: 8,
   },
   adminNavSectionHeaderActive: {
-    backgroundColor: 'rgba(167,139,250,0.14)',
+    backgroundColor: 'rgba(38,51,116,0.14)',
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.28)',
+    borderColor: 'rgba(38,51,116,0.28)',
   },
   adminNavSectionHeaderLabel: {
-    color: '#F8F5FF',
+    color: '#F0F4FA',
     fontSize: 13,
     fontWeight: '800',
     letterSpacing: -0.2,
@@ -1977,12 +1977,12 @@ const nightStyleObject = {
     backgroundColor: 'transparent',
   },
   adminNavItemActive: {
-    backgroundColor: 'rgba(167,139,250,0.18)',
+    backgroundColor: 'rgba(38,51,116,0.18)',
     borderWidth: 1,
-    borderColor: 'rgba(167,139,250,0.22)',
+    borderColor: 'rgba(38,51,116,0.22)',
   },
   adminNavItemLabel: {
-    color: '#C4B5FD',
+    color: '#8A9BC2',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -2148,7 +2148,7 @@ const dayStyleObject = Object.fromEntries(
 const dayOverrides = {
   root: {
     backgroundColor: '#F5F1FF',
-    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(139,92,246,.10), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.06), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.06), transparent 60%), linear-gradient(180deg, #F5F1FF, #EDE6FC)',
+    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(38,51,116,.10), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.06), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.06), transparent 60%), linear-gradient(180deg, #F5F1FF, #EDE6FC)',
   },
   dashboardSidebar: {
     backgroundImage: 'linear-gradient(180deg, rgba(239,232,252,0.72), rgba(245,241,255,0.58))',
@@ -2341,7 +2341,7 @@ const dayOverrides = {
     color: '#4A3A69',
   },
   pillButtonTextActive: {
-    color: '#6D28D9',
+    color: '#1a2455',
   },
   metaText: {
     color: '#111111',
@@ -2410,7 +2410,7 @@ const dayOverrides = {
   },
   authWrap: {
     backgroundColor: '#F5F1FF',
-    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(139,92,246,.10), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.06), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.06), transparent 60%), linear-gradient(180deg, #F5F1FF, #EDE6FC)',
+    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(38,51,116,.10), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.06), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.06), transparent 60%), linear-gradient(180deg, #F5F1FF, #EDE6FC)',
   },
   authSubTitle: {
     color: '#3D2D5F',

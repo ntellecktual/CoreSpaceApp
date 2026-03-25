@@ -340,6 +340,6 @@ export const integrationTemplates: IntegrationTemplate[] = [
         eventType: 'custom.webhook.inbound',
       },
     ],
-    documentation: 'Configure custom HTTP integrations to connect CoreSpace with any REST API.',
+    documentation: 'Configure custom HTTP integrations to connect Halo Internal with any REST API.',
   },
 ];

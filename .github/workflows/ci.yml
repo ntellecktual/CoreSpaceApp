@@ -100,7 +100,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: vercel
-      url: https://corespace.vercel.app
+      url: https://halointernal.vercel.app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -124,7 +124,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: cloudflare
-      url: https://corespace.pages.dev
+      url: https://halointernal.pages.dev
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -136,7 +136,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: corespace
+          projectName: halointernal
           directory: dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
@@ -173,14 +173,14 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: surge
-      url: https://corespace.surge.sh
+      url: https://halointernal.surge.sh
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: web-dist
           path: dist
       - name: Deploy to Surge
-        run: npx surge dist corespace.surge.sh
+        run: npx surge dist halointernal.surge.sh
         env:
           SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}

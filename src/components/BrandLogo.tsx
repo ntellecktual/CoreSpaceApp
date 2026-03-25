@@ -10,15 +10,15 @@ type BrandLogoProps = {
   accessibilityLabel?: string;
 };
 
-const nightLogoSource = require('../../assets/icon.png');
-const dayLogoSource = require('../../assets/icon2.png');
+const nightLogoSource = require('../../assets/mainhalologo.png');
+const dayLogoSource = require('../../assets/secondaryhalologo.png');
 
 export function BrandLogo({
   width = 148,
   height = 40,
   logoUri,
   style,
-  accessibilityLabel = 'CoreSpace logo',
+  accessibilityLabel = 'Halo Internal logo',
 }: BrandLogoProps) {
   const theme = useUiTheme();
   const resolvedMode = (theme as any).mode?.mode ?? theme.mode;

@@ -114,9 +114,9 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
   };
 
   const publisherBadge = (publisher: string) => (
-    <View style={{ backgroundColor: publisher === 'corespace' ? '#8C5BF5' : '#6B7280', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, marginLeft: 8 }}>
+    <View style={{ backgroundColor: publisher === 'corespace' ? '#263374' : '#6B7280', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, marginLeft: 8 }}>
       <Text style={{ fontSize: 11, fontWeight: '700', color: '#FFF', letterSpacing: 0.3 }}>
-        {publisher === 'corespace' ? 'CoreSpace' : 'Org'}
+        {publisher === 'corespace' ? 'Halo Internal' : 'Org'}
       </Text>
     </View>
   );

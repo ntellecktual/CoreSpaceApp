@@ -1,13 +1,13 @@
-# CoreSpace (React Native)
+# Halo Internal (React Native)
 
 Configuration-driven CRM prototype aligned to storyboard and architecture goals.
 
 ## Brand
 
-- Name: CoreSpace
-- Slogan: Make your core operations your unfair advantage.
-- Positioning: CoreSpace helps teams build the operational core of their business inside a no-code CRM shell. Non-technical admins create workflows around real business needs while the platform captures structured, high-quality data by default. The result is faster execution, clearer decisions, and measurable growth.
-- Product palette: `#FFFFFF`, `#FD9CFD`, `#E878F6`, `#8C5BF5`, `#201535`
+- Name: Halo Internal
+- Slogan: The legal operations platform that runs your firm.
+- Positioning: Halo Internal helps law firms and legal teams build the operational core of their practice inside a no-code CRM shell. Non-technical admins create workflows around real case management needs while the platform captures structured, high-quality data by default. The result is faster case resolution, clearer decisions, and measurable growth.
+- Product palette: `#263374`, `#FFFFFF`, `#FFD332`
 
 ## Features
 
@@ -97,9 +97,9 @@ Configuration-driven CRM prototype aligned to storyboard and architecture goals.
   - Unified enterprise shell for Admin, Architecture, End User, and Signal Studio pages
     - Persistent left sidebar navigation (module switching, role controls, guided mode, sign-out)
     - Structured right workspace canvas with page header and action controls
-    - CoreSpace brand-aligned dark-purple interface styling across all operational pages
+    - Halo Internal brand-aligned navy interface styling across all operational pages
     - Core shell messaging now consistently reinforces the top-to-bottom operating model: core operation first, then workspace/subspace branching
-  - Full-app visual harmonization using the CoreSpace palette so landing, auth, and operational pages share one consistent design language
+  - Full-app visual harmonization using the Halo Internal palette so landing, auth, and operational pages share one consistent design language
   - Final design-system polish pass for typography and spacing consistency
     - Normalized heading/body text scale across shell, cards, forms, auth, and landing sections
     - Standardized card/panel/input padding rhythm for cleaner visual hierarchy
@@ -115,7 +115,7 @@ Configuration-driven CRM prototype aligned to storyboard and architecture goals.
   - Home/About actions smooth-scroll to their corresponding landing sections
   - Home/About content switching for a business-focused landing narrative
   - Expanded modern marketing sections (platform value, outcomes, governance, and automation readiness)
-  - Detailed landing narrative covering core app function and why businesses need CoreSpace now
+  - Detailed landing narrative covering core app function and why businesses need Halo Internal now
   - Wireframe-inspired modern hero layout: centered headline, dual CTA row, trust/logo row, and sticky pill nav
   - Light visual system and structured showcase panel for a polished product-marketing first impression
   - Sticky top banner menu on the marketing page so Home/About/Login remains visible while scrolling

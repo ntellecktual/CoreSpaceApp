@@ -129,7 +129,7 @@ export function useAuditLog(tenantId: string, currentUser?: { id: string; fullNa
       id: uid('demo'),
       tenantId,
       type: 'tenant-created',
-      title: 'Welcome to CoreSpace',
+      title: 'Welcome to Halo Internal',
       body: 'Your tenant environment is ready. Start by configuring workspaces and personas.',
       severity: 'success',
       read: true,

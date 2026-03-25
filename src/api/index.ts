@@ -1,5 +1,5 @@
 /**
- * CoreSpace Free API Utilities
+ * Halo Internal Free API Utilities
  *
  * Integrates free public APIs and built-in platform capabilities:
  * - OpenFDA Drug API  (drug lookup, recall search — no key required)

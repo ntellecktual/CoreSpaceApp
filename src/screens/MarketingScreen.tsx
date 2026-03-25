@@ -153,6 +153,7 @@ const ssLogo = require('../../assets/cs_sslightlogo.png');
 const orbitalLogo = require('../../assets/cs_orbitallightlogo.png');
 const cosmoLogo = require('../../assets/cs_orbitallightlogo.png'); // placeholder until cs_cosmolightlogo.png ships
 const planetLogo = require('../../assets/cs_planetlogo.png');
+const haloIcon = require('../../assets/haloicon.png');
 
 /* ─── Section-nav keys ──────────────────────────────────────────── */
 type NavKey = 'home' | 'problem' | 'how' | 'industries' | 'investors' | 'pricing' | 'about' | 'blog' | 'careers';
@@ -161,10 +162,8 @@ const NAV_ITEMS: { key: NavKey; label: string }[] = [
   { key: 'problem', label: 'Problem' },
   { key: 'how', label: 'How It Works' },
   { key: 'industries', label: 'Industries' },
-  { key: 'investors', label: 'Investors' },
   { key: 'pricing', label: 'Pricing' },
   { key: 'about', label: 'About' },
-  { key: 'blog', label: 'Blog' },
   { key: 'careers', label: 'Careers' },
 ];
 
@@ -729,8 +728,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
       )}
     </View>
 
-    {/* Preload planet logo so it's cached before the user scrolls to it */}
-    <Image source={planetLogo} style={{ width: 0, height: 0, position: 'absolute', opacity: 0 }} />
+    {/* Preload halo icon so it's cached before the user scrolls to it */}
+    <Image source={haloIcon} style={{ width: 0, height: 0, position: 'absolute', opacity: 0 }} />
 
     {/* ─── Scrollable content ─────────────────────────────────── */}
     <ScrollView
@@ -810,7 +809,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
 
       <div className="cs-section-divider" />
 
-      {/* ═══ 60-MINUTE BUILD ════════════════════════════════════ */}
+      {/* ═══ 60-MINUTE BUILD (disabled) ════════════════════════════════════ */}
+      {false && (
       <View>
         <div ref={revealRef}>
           <SectionGlass>
@@ -869,6 +869,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
           </SectionGlass>
         </div>
       </View>
+      )}
 
       <div className="cs-section-divider" />
 
@@ -924,7 +925,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
               ))}
             </View>
             <View style={{ ...(glassCard as any), padding: compactCtas ? 14 : 20, gap: 6, borderColor: 'rgba(38,51,116,0.28)', background: 'linear-gradient(135deg, rgba(38,51,116,0.10), rgba(59,130,246,0.06))', flexDirection: 'row', alignItems: 'center' } as any}>
-              <Image source={planetLogo} style={{ width: compactCtas ? 52 : 72, height: compactCtas ? 52 : 72, marginRight: compactCtas ? 12 : 18, opacity: 0.92 }} resizeMode="contain" />
+              <Image source={haloIcon} style={{ width: compactCtas ? 52 : 72, height: compactCtas ? 52 : 72, marginRight: compactCtas ? 12 : 18, opacity: 0.92 }} resizeMode="contain" />
               <Text style={{ color: '#FFFFFF', fontSize: compactCtas ? 15 : 18, fontWeight: '900', flex: 1, lineHeight: compactCtas ? 22 : 26 }}>
                 Halo Internal is the fix — built specifically for law firms that need enterprise structure without the enterprise price tag.
               </Text>
@@ -1023,7 +1024,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
 
       <div className="cs-section-divider" />
 
-      {/* ═══ INVESTORS ═════════════════════════════════════════ */}
+      {/* ═══ INVESTORS (disabled) ═════════════════════════════════════════ */}
+      {false && (
       <View onLayout={setAnchor('investors')}>
         <div ref={revealRef}>
           <SectionGlass>
@@ -1289,6 +1291,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
           </SectionGlass>
         </div>
       </View>
+      )}
 
       <div className="cs-section-divider" />
 
@@ -1459,7 +1462,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
 
       <div className="cs-section-divider" />
 
-      {/* ═══ BLOG ══════════════════════════════════════════════════════════ */}
+      {/* ═══ BLOG (disabled) ═══════════════════════════════════════════════════════════ */}
+      {false && (
       <View onLayout={setAnchor('blog')}>
         <div ref={revealRef}>
           <SectionGlass>
@@ -1506,6 +1510,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
           </SectionGlass>
         </div>
       </View>
+      )}
 
       <div className="cs-section-divider" />
 

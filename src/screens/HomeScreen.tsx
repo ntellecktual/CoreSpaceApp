@@ -887,7 +887,7 @@ export function HomeScreen() {
               </Pressable>
               {endUserTenantMenuOpen && (
                 <View style={styles.dashboardTenantNavList}>
-                  {tenants.filter((t) => t.name === 'Witherite Law Group' || t.name === 'Create a Tenant +').map((tenant) => {
+                  {tenants.map((tenant) => {
                     const tenantAccent = normalizeHex(tenant.branding.brandColors[2], '#FFD332');
                     const tenantAccentText = getContrastTextColor(tenantAccent);
                     const selectedTenant = activeTenantId === tenant.id && page === 'enduser';

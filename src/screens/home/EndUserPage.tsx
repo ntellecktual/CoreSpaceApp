@@ -815,7 +815,7 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
   const objectLabel = shellConfig.objectLabel ?? 'Registry';
   const objectLabelPlural = shellConfig.objectLabelPlural ?? 'Registries';
   const accentColor = accentPalette?.accent ? normalizeHex(accentPalette.accent, '#FFD332') : '#FFD332';
-  const baseSurface = mode === 'day' ? '#FFFFFF' : '#1A2340';
+  const baseSurface = mode === 'day' ? '#FFFFFF' : '#263374';
   const accentTextColor = getContrastTextColor(accentColor);
   const txtColor = getContrastTextColor(baseSurface);
   const dimColor = withAlpha(txtColor, 'AA');
@@ -2504,10 +2504,10 @@ export function EndUserPage({ guidedMode, onGuide, accentPalette, addNotificatio
             {/* Tooltip card */}
             <div style={{
               ...tooltipStyle,
-              background: 'linear-gradient(168deg, #1A2340 0%, #131D35 100%)',
-              border: '1px solid rgba(140, 91, 245, 0.35)',
+              background: 'linear-gradient(168deg, #263374 0%, #1E2A5E 100%)',
+              border: '1px solid rgba(38, 51, 116, 0.35)',
               borderRadius: 14,
-              boxShadow: '0 8px 40px rgba(140, 91, 245, 0.18), 0 2px 12px rgba(0,0,0,0.4)',
+              boxShadow: '0 8px 40px rgba(38, 51, 116, 0.18), 0 2px 12px rgba(0,0,0,0.4)',
               padding: '22px 24px 18px',
               color: '#EEF1F8',
               fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",

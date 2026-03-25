@@ -153,7 +153,7 @@ const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF'];
 const TIMEZONE_OPTIONS = ['UTC', 'US/Eastern', 'US/Central', 'US/Mountain', 'US/Pacific', 'Europe/London', 'Europe/Berlin', 'Asia/Tokyo', 'Asia/Shanghai', 'Australia/Sydney'];
 
 const PALETTE_PRESETS = [
-  { name: 'Halo Navy', colors: ['#131D35', '#1A2340', '#FFD332', '#FFD332', '#22C55E', '#F59E0B', '#EF4444', '#1A2340'] as const },
+  { name: 'Halo Navy', colors: ['#1E2A5E', '#263374', '#FFD332', '#FFD332', '#22C55E', '#F59E0B', '#EF4444', '#263374'] as const },
   { name: 'Ocean Blue', colors: ['#0A1628', '#0F1D32', '#3B82F6', '#60A5FA', '#10B981', '#F59E0B', '#EF4444', '#152238'] as const },
   { name: 'Forest Green', colors: ['#0A1A0F', '#0F261A', '#22C55E', '#4ADE80', '#3B82F6', '#F59E0B', '#EF4444', '#0D1F14'] as const },
   { name: 'Sunset Coral', colors: ['#1A0E14', '#261420', '#F43F5E', '#FB7185', '#8B5CF6', '#F59E0B', '#EF4444', '#1F1018'] as const },
@@ -179,7 +179,7 @@ const TENANT_TABS: Array<{ id: TenantTabId; label: string; icon: string }> = [
 
 const DEFAULT_TENANT_EXTRAS = {
   tagline: '', industryVertical: '', accentSecondary: '#FFD332', successColor: '#22C55E',
-  warningColor: '#F59E0B', dangerColor: '#EF4444', surfaceColor: '#1A2340', fontFamily: 'System Default',
+  warningColor: '#F59E0B', dangerColor: '#EF4444', surfaceColor: '#263374', fontFamily: 'System Default',
   headingWeight: '800', baseFontSize: 13, borderRadius: 'rounded', uiDensity: 'comfortable',
   sidebarStyle: 'glass', cardStyle: 'elevated', welcomeMessage: '', heroImageUri: '',
   dashboardLayout: 'grid', defaultThemeMode: 'night', animationsEnabled: true, departments: [] as string[],
@@ -194,7 +194,7 @@ function extractExtras(branding: any) {
     successColor: branding?.successColor ?? '#22C55E',
     warningColor: branding?.warningColor ?? '#F59E0B',
     dangerColor: branding?.dangerColor ?? '#EF4444',
-    surfaceColor: branding?.surfaceColor ?? '#1A2340',
+    surfaceColor: branding?.surfaceColor ?? '#263374',
     fontFamily: branding?.fontFamily ?? 'System Default',
     headingWeight: branding?.headingWeight ?? '800',
     baseFontSize: branding?.baseFontSize ?? 13,
@@ -253,8 +253,8 @@ export function HomeScreen() {
   const [tenantCustomRoleTitle, setTenantCustomRoleTitle] = useState('');
   const [tenantRolesExpanded, setTenantRolesExpanded] = useState(false);
   const [newTenantLogoUri, setNewTenantLogoUri] = useState('');
-  const [newTenantPrimaryColor, setNewTenantPrimaryColor] = useState('#131D35');
-  const [newTenantSecondaryColor, setNewTenantSecondaryColor] = useState('#1A2340');
+  const [newTenantPrimaryColor, setNewTenantPrimaryColor] = useState('#1E2A5E');
+  const [newTenantSecondaryColor, setNewTenantSecondaryColor] = useState('#263374');
   const [newTenantAccentColor, setNewTenantAccentColor] = useState('#FFD332');
   const [tenantExportTarget, setTenantExportTarget] = useState<PortableDatabaseTarget>('cosmos');
   const [newTenantRoleTitles, setNewTenantRoleTitles] = useState<string[]>(['Operations Coordinator']);
@@ -708,8 +708,8 @@ export function HomeScreen() {
       const createResult = createTenant(newTenantName, {
         logoUri: newTenantLogoUri.trim() || undefined,
         brandColors: [
-          normalizeHex(newTenantPrimaryColor, '#131D35'),
-          normalizeHex(newTenantSecondaryColor, '#1A2340'),
+          normalizeHex(newTenantPrimaryColor, '#1E2A5E'),
+          normalizeHex(newTenantSecondaryColor, '#263374'),
           normalizeHex(newTenantAccentColor, '#FFD332'),
         ],
         widgetTwoColumnBreakpoint: GLOBAL_WIDGET_TWO_COLUMN_BREAKPOINT,
@@ -747,8 +747,8 @@ export function HomeScreen() {
 
       setNewTenantName('');
       setNewTenantLogoUri('');
-      setNewTenantPrimaryColor('#131D35');
-      setNewTenantSecondaryColor('#1A2340');
+      setNewTenantPrimaryColor('#1E2A5E');
+      setNewTenantSecondaryColor('#263374');
       setNewTenantAccentColor('#FFD332');
       setNewTenantRoleTitles(['Operations Coordinator']);
       setNewTenantCustomRoleTitle('');
@@ -830,16 +830,7 @@ export function HomeScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               >
-                {isSidebarCollapsed ? (
-                  <Image
-                    source={require('../../assets/hamburger.png')}
-                    style={{ width: 26, height: 26, borderRadius: 6, resizeMode: 'contain' } as any}
-                    accessibilityRole="image"
-                    accessibilityLabel="Expand sidebar"
-                  />
-                ) : (
-                  <Text style={styles.dashboardHamburgerButtonText}>☰</Text>
-                )}
+                <Text style={styles.dashboardHamburgerButtonText}>☰</Text>
               </Pressable>
 
               {!isSidebarCollapsed && (
@@ -1326,14 +1317,14 @@ export function HomeScreen() {
                       <View style={[styles.card, styles.tenantWidgetCard]}>
                         <Text style={styles.cardTitle}>Color Palette</Text>
                         <View style={styles.cardBody}>
-                          <LabeledInput label="Sidebar (Primary)" value={tenantPrimaryColor} onChangeText={setTenantPrimaryColor} placeholder="#131D35" />
-                          <LabeledInput label="Background (Secondary)" value={tenantSecondaryColor} onChangeText={setTenantSecondaryColor} placeholder="#1A2340" />
+                          <LabeledInput label="Sidebar (Primary)" value={tenantPrimaryColor} onChangeText={setTenantPrimaryColor} placeholder="#1E2A5E" />
+                          <LabeledInput label="Background (Secondary)" value={tenantSecondaryColor} onChangeText={setTenantSecondaryColor} placeholder="#263374" />
                           <LabeledInput label="Accent" value={tenantAccentColor} onChangeText={setTenantAccentColor} placeholder="#FFD332" />
                           <LabeledInput label="Accent Secondary" value={tenantExtras.accentSecondary} onChangeText={(v: string) => updateExtra('accentSecondary', v)} placeholder="#FFD332" />
                           <LabeledInput label="Success" value={tenantExtras.successColor} onChangeText={(v: string) => updateExtra('successColor', v)} placeholder="#22C55E" />
                           <LabeledInput label="Warning" value={tenantExtras.warningColor} onChangeText={(v: string) => updateExtra('warningColor', v)} placeholder="#F59E0B" />
                           <LabeledInput label="Danger" value={tenantExtras.dangerColor} onChangeText={(v: string) => updateExtra('dangerColor', v)} placeholder="#EF4444" />
-                          <LabeledInput label="Surface" value={tenantExtras.surfaceColor} onChangeText={(v: string) => updateExtra('surfaceColor', v)} placeholder="#1A2340" />
+                          <LabeledInput label="Surface" value={tenantExtras.surfaceColor} onChangeText={(v: string) => updateExtra('surfaceColor', v)} placeholder="#263374" />
                           <View style={[styles.inlineRow, { marginTop: 8 }]}>
                             {[
                               { label: 'Pri', hex: tenantPrimaryResolved },
@@ -1343,7 +1334,7 @@ export function HomeScreen() {
                               { label: 'Ok', hex: normalizeHex(tenantExtras.successColor, '#22C55E') },
                               { label: 'Wrn', hex: normalizeHex(tenantExtras.warningColor, '#F59E0B') },
                               { label: 'Err', hex: normalizeHex(tenantExtras.dangerColor, '#EF4444') },
-                              { label: 'Srf', hex: normalizeHex(tenantExtras.surfaceColor, '#1A2340') },
+                              { label: 'Srf', hex: normalizeHex(tenantExtras.surfaceColor, '#263374') },
                             ].map((swatch) => (
                               <View key={swatch.label} style={{ alignItems: 'center', gap: 3 }}>
                                 <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: swatch.hex, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' }} />
@@ -1719,14 +1710,14 @@ export function HomeScreen() {
                       <View style={[styles.card, styles.tenantWidgetCard]}>
                         <Text style={styles.cardTitle}>New Tenant Colors</Text>
                         <View style={styles.cardBody}>
-                          <LabeledInput label="Primary" value={newTenantPrimaryColor} onChangeText={setNewTenantPrimaryColor} placeholder="#131D35" />
-                          <LabeledInput label="Secondary" value={newTenantSecondaryColor} onChangeText={setNewTenantSecondaryColor} placeholder="#1A2340" />
+                          <LabeledInput label="Primary" value={newTenantPrimaryColor} onChangeText={setNewTenantPrimaryColor} placeholder="#1E2A5E" />
+                          <LabeledInput label="Secondary" value={newTenantSecondaryColor} onChangeText={setNewTenantSecondaryColor} placeholder="#263374" />
                           <LabeledInput label="Accent" value={newTenantAccentColor} onChangeText={setNewTenantAccentColor} placeholder="#FFD332" />
                           <LabeledInput label="Accent Secondary" value={newTenantExtras.accentSecondary} onChangeText={(v: string) => updateNewExtra('accentSecondary', v)} placeholder="#FFD332" />
                           <LabeledInput label="Success" value={newTenantExtras.successColor} onChangeText={(v: string) => updateNewExtra('successColor', v)} placeholder="#22C55E" />
                           <LabeledInput label="Warning" value={newTenantExtras.warningColor} onChangeText={(v: string) => updateNewExtra('warningColor', v)} placeholder="#F59E0B" />
                           <LabeledInput label="Danger" value={newTenantExtras.dangerColor} onChangeText={(v: string) => updateNewExtra('dangerColor', v)} placeholder="#EF4444" />
-                          <LabeledInput label="Surface" value={newTenantExtras.surfaceColor} onChangeText={(v: string) => updateNewExtra('surfaceColor', v)} placeholder="#1A2340" />
+                          <LabeledInput label="Surface" value={newTenantExtras.surfaceColor} onChangeText={(v: string) => updateNewExtra('surfaceColor', v)} placeholder="#263374" />
                           <Text style={styles.metaText}>Apply Preset</Text>
                           <View style={styles.inlineRow}>
                             {PALETTE_PRESETS.map((preset) => (

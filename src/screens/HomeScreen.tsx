@@ -877,20 +877,33 @@ export function HomeScreen() {
                   setEndUserTenantMenuOpen((current) => !current);
                 }}
                 style={[
-                  styles.dashboardTenantPill,
-                  page === 'enduser' && styles.dashboardTenantPillActive,
-                  tenantBrandedMode && page === 'enduser' && { backgroundColor: tenantAccentResolved },
+                  styles.dashboardTenantHeader,
+                  page === 'enduser' && styles.dashboardTenantHeaderActive,
+                  tenantBrandedMode && page === 'enduser' && { borderColor: `${tenantAccentResolved}44` },
                 ]}
                 accessibilityRole="button"
                 accessibilityState={{ expanded: endUserTenantMenuOpen, selected: page === 'enduser' }}
                 accessibilityLabel="End user tenant selector"
               >
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Text style={{ fontSize: 11, color: page === 'enduser' ? '#FFFFFF' : 'rgba(214,204,235,0.70)' }}>▣</Text>
-                  <Text style={[styles.dashboardTenantPillText, page === 'enduser' && { color: '#FFFFFF', fontWeight: '700' }, tenantBrandedMode && page === 'enduser' && { color: tenantAccentTextColor }]} numberOfLines={1}>
-                    {activeTenantName}
-                  </Text>
-                  <Text style={[{ fontSize: 10, color: '#F3EAFF', marginLeft: 'auto', fontWeight: '800' }, tenantBrandedMode && page === 'enduser' && { color: tenantAccentTextColor }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  {activeTenantBranding.logoUri?.trim() ? (
+                    <Image source={{ uri: activeTenantBranding.logoUri }} style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(255,255,255,0.06)' } as any} resizeMode="contain" />
+                  ) : (
+                    <View style={[styles.dashboardTenantAvatar, page === 'enduser' && { backgroundColor: `${tenantAccentResolved}30`, borderColor: `${tenantAccentResolved}50` }]}>
+                      <Text style={{ fontSize: 11, fontWeight: '800', color: page === 'enduser' ? tenantAccentResolved : 'rgba(214,204,235,0.85)' }}>
+                        {(activeTenantName ?? '?').slice(0, 2).toUpperCase()}
+                      </Text>
+                    </View>
+                  )}
+                  <View style={{ flex: 1, gap: 1 }}>
+                    <Text style={[styles.dashboardTenantHeaderName, page === 'enduser' && { color: '#FFFFFF', fontWeight: '700' }]} numberOfLines={1}>
+                      {activeTenantName}
+                    </Text>
+                    {activeTenantBranding.industryVertical ? (
+                      <Text style={{ fontSize: 9, color: 'rgba(214,204,235,0.45)', fontWeight: '600' }} numberOfLines={1}>{activeTenantBranding.industryVertical}</Text>
+                    ) : null}
+                  </View>
+                  <Text style={{ fontSize: 10, color: page === 'enduser' ? 'rgba(255,255,255,0.55)' : 'rgba(214,204,235,0.45)', fontWeight: '800' }}>
                     {endUserTenantMenuOpen ? '▾' : '▸'}
                   </Text>
                 </View>
@@ -901,16 +914,46 @@ export function HomeScreen() {
                     const tenantAccent = normalizeHex(tenant.branding.brandColors[2], '#8C5BF5');
                     const tenantAccentText = getContrastTextColor(tenantAccent);
                     const selectedTenant = activeTenantId === tenant.id && page === 'enduser';
+                    const isCreatePlaceholder = tenant.name === 'Create a Tenant +';
+                    const logoUri = tenant.branding.logoUri?.trim();
                     return (
                       <Pressable
                         key={`tenant-enduser-${tenant.id}`}
-                        onPress={() => { setTenantAccessOpen(false); handleSwitchTenant(tenant.id); setPage('enduser'); }}
-                        style={[styles.dashboardTenantNavItem, selectedTenant && styles.dashboardTenantNavItemActive, selectedTenant && { backgroundColor: tenantAccent, borderColor: tenantAccent }]}
+                        onPress={() => {
+                          if (isCreatePlaceholder) { setEndUserTenantMenuOpen(false); setTenantAccessOpen(true); }
+                          else { setTenantAccessOpen(false); handleSwitchTenant(tenant.id); setPage('enduser'); }
+                        }}
+                        style={[
+                          styles.dashboardTenantNavItem,
+                          selectedTenant && { backgroundColor: `${tenantAccent}22`, borderColor: `${tenantAccent}55` },
+                          isCreatePlaceholder && styles.dashboardTenantNavItemCreate,
+                        ]}
                         accessibilityRole="button"
                         accessibilityState={{ selected: selectedTenant }}
-                        accessibilityLabel={`Open ${tenant.name} end user view`}
+                        accessibilityLabel={isCreatePlaceholder ? 'Create a new tenant' : `Open ${tenant.name} end user view`}
                       >
-                        <Text style={[styles.dashboardTenantNavItemText, selectedTenant && { color: tenantAccentText }]}>{tenant.name}</Text>
+                        {isCreatePlaceholder ? (
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <View style={[styles.dashboardTenantAvatar, { borderStyle: 'dashed' as any }]}>
+                              <Text style={{ fontSize: 13, fontWeight: '800', color: 'rgba(214,204,235,0.50)' }}>+</Text>
+                            </View>
+                            <Text style={{ fontSize: 11, fontWeight: '600', color: 'rgba(214,204,235,0.50)' }}>New Tenant</Text>
+                          </View>
+                        ) : (
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <View style={{ borderLeftWidth: 3, borderLeftColor: selectedTenant ? tenantAccent : `${tenantAccent}55`, borderRadius: 2, paddingLeft: 8, flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+                              {logoUri ? (
+                                <Image source={{ uri: logoUri }} style={{ width: 22, height: 22, borderRadius: 5, backgroundColor: 'rgba(255,255,255,0.04)' } as any} resizeMode="contain" />
+                              ) : (
+                                <View style={[styles.dashboardTenantAvatarSmall, selectedTenant && { backgroundColor: `${tenantAccent}30`, borderColor: `${tenantAccent}50` }]}>
+                                  <Text style={{ fontSize: 8, fontWeight: '800', color: selectedTenant ? tenantAccentText : 'rgba(214,204,235,0.70)' }}>{tenant.name.slice(0, 2).toUpperCase()}</Text>
+                                </View>
+                              )}
+                              <Text style={[styles.dashboardTenantNavItemText, selectedTenant && { color: tenantAccentText, fontWeight: '700' }]} numberOfLines={1}>{tenant.name}</Text>
+                            </View>
+                            {selectedTenant && <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: tenantAccent }} />}
+                          </View>
+                        )}
                       </Pressable>
                     );
                   })}
@@ -919,19 +962,33 @@ export function HomeScreen() {
             </View>
           )}
 
-          {/* ── Non-super-admin tenant pill ── */}
+          {/* ── Non-super-admin tenant header ── */}
           {!isSuperAdmin && !isSidebarCollapsed && (
             <Pressable
               nativeID="tour-nav-enduser"
               onPress={() => { setTenantAccessOpen(false); setPage('enduser'); }}
-              style={[styles.dashboardTenantPill, page === 'enduser' && styles.dashboardTenantPillActive, tenantBrandedMode && page === 'enduser' && { backgroundColor: tenantAccentResolved }]}
+              style={[
+                styles.dashboardTenantHeader,
+                page === 'enduser' && styles.dashboardTenantHeaderActive,
+                tenantBrandedMode && page === 'enduser' && { borderColor: `${tenantAccentResolved}44` },
+              ]}
               accessibilityRole="button"
               accessibilityState={{ selected: page === 'enduser' }}
               accessibilityLabel="End User page"
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Text style={{ fontSize: 11, color: page === 'enduser' ? '#FFFFFF' : 'rgba(214,204,235,0.70)' }}>▣</Text>
-                <Text style={[styles.dashboardTenantPillText, page === 'enduser' && { color: '#FFFFFF', fontWeight: '700' }, tenantBrandedMode && page === 'enduser' && { color: tenantAccentTextColor }]}>End User</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                {activeTenantBranding.logoUri?.trim() ? (
+                  <Image source={{ uri: activeTenantBranding.logoUri }} style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(255,255,255,0.06)' } as any} resizeMode="contain" />
+                ) : (
+                  <View style={[styles.dashboardTenantAvatar, page === 'enduser' && { backgroundColor: `${tenantAccentResolved}30`, borderColor: `${tenantAccentResolved}50` }]}>
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: page === 'enduser' ? tenantAccentResolved : 'rgba(214,204,235,0.85)' }}>
+                      {(activeTenantName ?? '?').slice(0, 2).toUpperCase()}
+                    </Text>
+                  </View>
+                )}
+                <Text style={[styles.dashboardTenantHeaderName, page === 'enduser' && { color: '#FFFFFF', fontWeight: '700' }]} numberOfLines={1}>
+                  {activeTenantName}
+                </Text>
               </View>
             </Pressable>
           )}

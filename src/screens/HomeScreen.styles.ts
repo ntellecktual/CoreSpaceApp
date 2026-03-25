@@ -87,6 +87,46 @@ const nightStyleObject = {
   dashboardCollapsedNavItemActive: {
     backgroundColor: 'rgba(140,91,245,0.38)',
   },
+  dashboardTenantHeader: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(253,156,253,0.18)',
+    backgroundColor: 'rgba(32,21,53,0.55)',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginHorizontal: 2,
+    marginTop: 4,
+  },
+  dashboardTenantHeaderActive: {
+    borderColor: 'rgba(140,91,245,0.45)',
+    backgroundColor: 'rgba(140,91,245,0.18)',
+  },
+  dashboardTenantHeaderName: {
+    color: '#DCCFF5',
+    fontSize: 13,
+    fontWeight: '600',
+    flex: 1,
+  },
+  dashboardTenantAvatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 7,
+    borderWidth: 1,
+    borderColor: 'rgba(214,204,235,0.18)',
+    backgroundColor: 'rgba(140,91,245,0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dashboardTenantAvatarSmall: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(214,204,235,0.18)',
+    backgroundColor: 'rgba(140,91,245,0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   dashboardTenantPill: {
     borderRadius: 8,
     borderWidth: 1,
@@ -215,18 +255,23 @@ const nightStyleObject = {
     marginLeft: 'auto',
   },
   dashboardTenantNavList: {
-    gap: 3,
-    paddingLeft: 8,
+    gap: 2,
+    paddingLeft: 4,
   },
   dashboardTenantNavItem: {
-    borderRadius: 6,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(253,156,253,0.3)',
-    backgroundColor: 'rgba(32,21,53,0.65)',
-    paddingHorizontal: 7,
-    minHeight: 24,
-    paddingVertical: 3,
+    borderColor: 'rgba(253,156,253,0.12)',
+    backgroundColor: 'rgba(32,21,53,0.40)',
+    paddingHorizontal: 8,
+    minHeight: 34,
+    paddingVertical: 5,
     justifyContent: 'center',
+  },
+  dashboardTenantNavItemCreate: {
+    borderStyle: 'dashed' as any,
+    borderColor: 'rgba(214,204,235,0.18)',
+    backgroundColor: 'transparent',
   },
   dashboardTenantNavItemActive: {
     borderColor: 'rgba(253,156,253,0.85)',
@@ -2164,8 +2209,8 @@ const dayOverrides = {
     color: '#2E2148',
   },
   dashboardTenantNavItem: {
-    borderColor: 'rgba(112,85,163,0.5)',
-    backgroundColor: 'rgba(112,85,163,0.12)',
+    borderColor: 'rgba(112,85,163,0.25)',
+    backgroundColor: 'rgba(112,85,163,0.08)',
   },
   dashboardTenantNavItemActive: {
     borderColor: 'rgba(111,75,207,0.88)',
@@ -2173,6 +2218,25 @@ const dayOverrides = {
   },
   dashboardTenantNavItemText: {
     color: '#2F2249',
+  },
+  dashboardTenantHeader: {
+    borderColor: 'rgba(112,85,163,0.30)',
+    backgroundColor: 'rgba(112,85,163,0.08)',
+  },
+  dashboardTenantHeaderActive: {
+    borderColor: 'rgba(111,75,207,0.50)',
+    backgroundColor: 'rgba(111,75,207,0.14)',
+  },
+  dashboardTenantHeaderName: {
+    color: '#2F2249',
+  },
+  dashboardTenantAvatar: {
+    borderColor: 'rgba(112,85,163,0.25)',
+    backgroundColor: 'rgba(112,85,163,0.12)',
+  },
+  dashboardTenantAvatarSmall: {
+    borderColor: 'rgba(112,85,163,0.25)',
+    backgroundColor: 'rgba(112,85,163,0.12)',
   },
   dashboardTenantPill: {
     borderColor: 'rgba(112,85,163,0.5)',

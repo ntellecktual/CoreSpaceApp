@@ -56,12 +56,12 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
   const { mode } = useUiTheme();
   const isDark = mode === 'night';
 
-  const accent = tenantAccent ?? (isDark ? '#FFD332' : '#FFD332');
+  const accent = tenantAccent ?? (isDark ? '#111111' : '#111111');
   const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
   const textColor = isDark ? '#E0E4ED' : '#1A2340';
   const dimText = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
   const sectionBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)';
-  const surfaceBg = isDark ? '#0E0A1C' : '#FAFBFF';
+  const surfaceBg = isDark ? '#FAFBFF' : '#FAFBFF';
   const cardBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.018)';
   const acRgba = (a: number) => {
     const hex = accent.replace('#', '');
@@ -181,7 +181,7 @@ export const RecordDetailDrawer = React.memo(function RecordDetailDrawer({
             overflow: 'hidden',
             ...(Platform.OS === 'web' ? {
               boxShadow: isDark
-                ? '-8px 0 40px rgba(0,0,0,0.50), 0 0 0 1px rgba(38,51,116,0.08)'
+                ? '-8px 0 40px rgba(0,0,0,0.50), 0 0 0 1px rgba(0,0,0,0.02)'
                 : '-8px 0 40px rgba(0,0,0,0.10)',
               animation: 'cs-drawer-slide 0.28s cubic-bezier(0.16,1,0.3,1) both',
             } : { elevation: 24 }),

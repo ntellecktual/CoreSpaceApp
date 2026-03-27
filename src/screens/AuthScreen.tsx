@@ -46,16 +46,16 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
     height: 48,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: '#F3F4F6',
     paddingHorizontal: 16,
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 15,
     ...(Platform.OS === 'web' ? { outlineStyle: 'none' as const } : {}),
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#263374' }}>
+    <View style={{ flex: 1, backgroundcolor: '#111111' }}>
       {/* Shared animated nebula + stars */}
       <NebulaBackground mode="night" />
 
@@ -71,17 +71,17 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
             maxWidth: 420,
             borderRadius: 20,
             borderWidth: 1,
-            borderColor: 'rgba(255,255,255,0.10)',
-            backgroundColor: 'rgba(16,22,52,0.90)',
+            borderColor: 'rgba(0,0,0,0.08)',
+            backgroundcolor: '#111111',
             overflow: 'hidden',
             padding: 36,
             alignItems: 'center',
             ...(Platform.OS === 'web'
               ? {
                   // Only apply web-specific styles on web
-                  boxShadow: '0 8px 48px rgba(0,0,0,0.40)',
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
                   // backgroundImage and backdropFilter are not supported by React Native View
-                  backgroundImage: 'linear-gradient(180deg, rgba(20,28,65,0.90), rgba(14,20,48,0.95))',
+                  backgroundImage: 'none',
                   backdropFilter: 'blur(24px)',
                   WebkitBackdropFilter: 'blur(24px)',
                   gap: 0,
@@ -95,10 +95,10 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
           </View>
 
           {/* Heading */}
-          <Text style={{ color: '#FFFFFF', fontSize: 22, fontWeight: '800', textAlign: 'center', marginBottom: 4 }}>
+          <Text style={{ color: '#111111', fontSize: 22, fontWeight: '800', textAlign: 'center', marginBottom: 4 }}>
             {mode === 'login' ? 'Welcome back' : 'Create your account'}
           </Text>
-          <Text style={{ color: '#C9D4F0', fontSize: 13, textAlign: 'center', marginBottom: 22 }}>
+          <Text style={{ color: '#6B7280', fontSize: 13, textAlign: 'center', marginBottom: 22 }}>
             {mode === 'login' ? 'Sign in to access your workspaces' : 'Get started with Halo Internal for free'}
           </Text>
 
@@ -107,7 +107,7 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
             {mode === 'signup' && (
               <TextInput
                 placeholder="Full Name"
-                placeholderTextColor="rgba(201,184,234,0.5)"
+                placeholderTextColor="rgba(0,0,0,0.3)"
                 value={fullName}
                 onChangeText={setFullName}
                 autoCapitalize="words"
@@ -117,7 +117,7 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
             )}
             <TextInput
               placeholder="Email"
-              placeholderTextColor="rgba(201,184,234,0.5)"
+              placeholderTextColor="rgba(0,0,0,0.3)"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -127,7 +127,7 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
             />
             <TextInput
               placeholder="Password"
-              placeholderTextColor="rgba(201,184,234,0.5)"
+              placeholderTextColor="rgba(0,0,0,0.3)"
               value={password}
               onChangeText={setPassword}
               textContentType="password"
@@ -140,7 +140,7 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
           {/* Forgot password (login only) */}
           {mode === 'login' && (
             <Pressable style={{ alignSelf: 'flex-end', marginBottom: 14, marginTop: -6 }}>
-              <Text style={{ color: '#FFD332', fontSize: 13, fontWeight: '600' }}>Forgot your password?</Text>
+              <Text style={{ color: '#111111', fontSize: 13, fontWeight: '600' }}>Forgot your password?</Text>
             </Pressable>
           )}
 
@@ -152,13 +152,13 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
                 width: '100%',
                 borderRadius: 10,
                 borderWidth: 1,
-                borderColor: createAdminAccount ? 'rgba(38,51,116,0.55)' : 'rgba(255,255,255,0.10)',
-                backgroundColor: createAdminAccount ? 'rgba(38,51,116,0.20)' : 'rgba(255,255,255,0.04)',
+                borderColor: createAdminAccount ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.08)',
+                backgroundColor: createAdminAccount ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.02)',
                 padding: 12,
                 marginBottom: 14,
               }}
             >
-              <Text style={{ color: '#D4DEEF', fontSize: 13, lineHeight: 19 }}>
+              <Text style={{ color: '#4B5563', fontSize: 13, lineHeight: 19 }}>
                 {createAdminAccount
                   ? '✅ Admin Account — full access to Workspace Creator, Signal Studio, and Tenant settings'
                   : '👤 Standard Account — day-to-day operations, intake, and record management'}
@@ -173,13 +173,13 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
               width: '100%',
               height: 48,
               borderRadius: 10,
-              backgroundImage: 'linear-gradient(135deg, #263374, #1a2455)',
+              backgroundImage: 'none',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: 8,
             } as any}
           >
-            <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '800' }}>
+            <Text style={{ color: '#111111', fontSize: 15, fontWeight: '800' }}>
               {mode === 'login' ? 'Sign In' : 'Create Account'}
             </Text>
           </Pressable>
@@ -190,9 +190,9 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
 
           {/* Divider */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, width: '100%', marginVertical: 16 }}>
-            <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' }} />
-            <Text style={{ color: 'rgba(201,184,234,0.50)', fontSize: 11, fontWeight: '700', letterSpacing: 0.3 }}>OR CONTINUE WITH</Text>
-            <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.08)' }} />
+            <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(0,0,0,0.06)' }} />
+            <Text style={{ color: 'rgba(0,0,0,0.35)', fontSize: 11, fontWeight: '700', letterSpacing: 0.3 }}>OR CONTINUE WITH</Text>
+            <View style={{ flex: 1, height: 1, backgroundColor: 'rgba(0,0,0,0.06)' }} />
           </View>
 
           {/* Social buttons */}
@@ -201,46 +201,46 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
               onPress={onGoogle}
               style={{
                 flex: 1, height: 44, borderRadius: 10, borderWidth: 1,
-                borderColor: 'rgba(255,255,255,0.10)', backgroundColor: 'rgba(255,255,255,0.05)',
+                borderColor: 'rgba(0,0,0,0.08)', backgroundColor: '#F9FAFB',
                 flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}
             >
-              <GoogleOutlined style={{ color: '#D4DEEF', fontSize: 16 }} />
-              <Text style={{ color: '#D4DEEF', fontSize: 13, fontWeight: '600' }}>Google</Text>
+              <GoogleOutlined style={{ color: '#4B5563', fontSize: 16 }} />
+              <Text style={{ color: '#4B5563', fontSize: 13, fontWeight: '600' }}>Google</Text>
             </Pressable>
             <Pressable
               onPress={onMicrosoft}
               style={{
                 flex: 1, height: 44, borderRadius: 10, borderWidth: 1,
-                borderColor: 'rgba(255,255,255,0.10)', backgroundColor: 'rgba(255,255,255,0.05)',
+                borderColor: 'rgba(0,0,0,0.08)', backgroundColor: '#F9FAFB',
                 flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}
             >
-              <WindowsOutlined style={{ color: '#D4DEEF', fontSize: 16 }} />
-              <Text style={{ color: '#D4DEEF', fontSize: 13, fontWeight: '600' }}>Microsoft</Text>
+              <WindowsOutlined style={{ color: '#4B5563', fontSize: 16 }} />
+              <Text style={{ color: '#4B5563', fontSize: 13, fontWeight: '600' }}>Microsoft</Text>
             </Pressable>
           </View>
 
           {/* Toggle mode */}
           <View style={{ alignItems: 'center', marginTop: 20, gap: 6 }}>
             <Pressable onPress={() => { setMode((c) => (c === 'login' ? 'signup' : 'login')); setMessage(''); }}>
-              <Text style={{ color: '#C9D4F0', fontSize: 13 }}>
+              <Text style={{ color: '#6B7280', fontSize: 13 }}>
                 {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-                <Text style={{ color: '#FFD332', fontWeight: '700' }}>
+                <Text style={{ color: '#111111', fontWeight: '700' }}>
                   {mode === 'login' ? 'Sign up' : 'Sign in'}
                 </Text>
               </Text>
             </Pressable>
             {!!onBackToOverview && (
               <Pressable onPress={onBackToOverview} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <ArrowLeftOutlined style={{ color: '#8A9BC2', fontSize: 12 }} />
-                <Text style={{ color: '#8A9BC2', fontSize: 12 }}>Back to platform overview</Text>
+                <ArrowLeftOutlined style={{ color: '#9CA3AF', fontSize: 12 }} />
+                <Text style={{ color: '#9CA3AF', fontSize: 12 }}>Back to platform overview</Text>
               </Pressable>
             )}
           </View>
 
           {mode === 'signup' && (
-            <Text style={{ color: '#8A9BC2', fontSize: 11, textAlign: 'center', marginTop: 10, lineHeight: 16 }}>
+            <Text style={{ color: '#9CA3AF', fontSize: 11, textAlign: 'center', marginTop: 10, lineHeight: 16 }}>
               Tip: Choose Admin if you're setting up workspaces and automations for your team.
             </Text>
           )}
@@ -248,8 +248,8 @@ export function AuthScreen({ onBackToOverview }: AuthScreenProps) {
 
         {/* Footer */}
         <View style={{ marginTop: 32, alignItems: 'center', gap: 6, opacity: 0.5 }}>
-          <Text style={{ color: '#C9D4F0', fontSize: 11 }}>© 2026 Halo Internal. All rights reserved.</Text>
-          <Text style={{ color: '#8A9BC2', fontSize: 10 }}>Powered by Bebo AI</Text>
+          <Text style={{ color: '#6B7280', fontSize: 11 }}>© 2026 Halo Internal. All rights reserved.</Text>
+          <Text style={{ color: '#9CA3AF', fontSize: 10 }}>Powered by Bebo AI</Text>
         </View>
       </ScrollView>
     </View>

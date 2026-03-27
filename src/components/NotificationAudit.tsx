@@ -49,8 +49,8 @@ export function NotificationCenter({
   const border = isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)';
   const textColor = isDark ? '#E0E4ED' : '#1A2340';
   const dimText = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
-  const accent = isDark ? '#FFD332' : '#FFD332';
-  const unreadBg = isDark ? 'rgba(38,51,116,0.10)' : 'rgba(38,51,116,0.05)';
+  const accent = isDark ? '#111111' : '#111111';
+  const unreadBg = isDark ? 'rgba(0,0,0,0.03)' : 'rgba(38,51,116,0.05)';
   const cardBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)';
   const hoverBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)';
 
@@ -217,8 +217,8 @@ export function AuditLogViewer({
   const dimText = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
   const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
   const rowBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)';
-  const accent = isDark ? '#FFD332' : '#FFD332';
-  const filterPillBg = isDark ? 'rgba(38,51,116,0.18)' : 'rgba(38,51,116,0.10)';
+  const accent = isDark ? '#111111' : '#111111';
+  const filterPillBg = isDark ? 'rgba(38,51,116,0.18)' : 'rgba(0,0,0,0.03)';
 
   const entityTypes = useMemo(() => {
     const set = new Set(entries.map((e) => e.entityType));

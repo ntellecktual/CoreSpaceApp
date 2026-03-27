@@ -219,7 +219,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
   const { activeTenantId, data, isSuperAdmin, currentUser, tenants, copyActiveDataToAllTenants, getFormForSubSpace, upsertBusinessFunction, deleteBusinessFunction, upsertBusinessObject, deleteBusinessObject } = useAppState();
 
   // ── Tenant accent helpers ───────────────────────────────────────────
-  const ac = accentPalette?.accent ?? '#FFD332';
+  const ac = accentPalette?.accent ?? '#111111';
   const acSoft = `${ac}2E`;
   const acMid = `${ac}40`;
   const acText = (() => {
@@ -847,7 +847,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
           borderRadius: 12,
           overflow: 'hidden',
           borderWidth: 1,
-          borderColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(102,74,154,0.12)',
+          borderColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(102,74,154,0.12)',
         }}>
           {([
             { step: 1 as const, icon: '🏷️', label: 'Name' },
@@ -868,15 +868,15 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     ? acRgba(0.20)
                     : isDone
                       ? mode === 'night' ? 'rgba(34,197,94,0.08)' : 'rgba(34,197,94,0.06)'
-                      : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                      : mode === 'night' ? 'rgba(0,0,0,0.015)' : 'rgba(0,0,0,0.02)',
                   borderRightWidth: idx < 3 ? 1 : 0,
-                  borderRightColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(102,74,154,0.10)',
+                  borderRightColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(102,74,154,0.10)',
                 }}
               >
                 <Text style={{ fontSize: 13 }}>{isDone && !isActive ? '✅' : icon}</Text>
                 <Text style={{
                   fontSize: 12, fontWeight: isActive ? '800' : '600',
-                  color: isActive ? ac : isDone ? '#22C55E' : mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)',
+                  color: isActive ? ac : isDone ? '#22C55E' : mode === 'night' ? 'rgba(0,0,0,0.40)' : 'rgba(0,0,0,0.40)',
                 }}>{label}</Text>
               </Pressable>
             );
@@ -900,23 +900,23 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 {workspaces.length === 0 && canManageWorkspace && !isCreatingWorkspace && (
                   <View style={{ gap: 16 }}>
                     <View style={{
-                      backgroundColor: mode === 'night' ? 'rgba(38,51,116,0.09)' : 'rgba(38,51,116,0.05)',
+                      backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.03)',
                       borderRadius: 16, padding: 24, borderWidth: 1,
-                      borderColor: mode === 'night' ? 'rgba(38,51,116,0.22)' : 'rgba(38,51,116,0.16)',
+                      borderColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.06)',
                       alignItems: 'center' as any, gap: 10,
                     }}>
                       <Text style={{ fontSize: 44 }}>🏗️</Text>
                       <Text style={{ color: mode === 'night' ? '#E0E4ED' : '#1A2340', fontSize: 20, fontWeight: '800', textAlign: 'center' }}>Build your first workspace</Text>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 13, textAlign: 'center', lineHeight: 20 }}>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 13, textAlign: 'center', lineHeight: 20 }}>
                         A workspace is like a dashboard for one job — it holds your data, sections, and fields.{'\n'}Start with a ready-made template or create your own from scratch.
                       </Text>
                     </View>
 
-                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.42)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Ready-made templates</Text>
+                    <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.42)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Ready-made templates</Text>
                     <View style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap' as any }}>
                       <Pressable
                         nativeID="wt-load-template"
-                        style={{ flex: 1, minWidth: 200, backgroundColor: mode === 'night' ? 'rgba(38,51,116,0.12)' : 'rgba(38,51,116,0.06)', borderRadius: 14, padding: 18, gap: 10, borderWidth: 1, borderColor: 'rgba(38,51,116,0.28)' }}
+                        style={{ flex: 1, minWidth: 200, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.03)' : 'rgba(0,0,0,0.03)', borderRadius: 14, padding: 18, gap: 10, borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}
                         onPress={() => {
                           applyDscsaSerializationTemplate();
                           setWizardStep(4);
@@ -926,7 +926,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                       >
                         <Text style={{ fontSize: 32 }}>💊</Text>
                         <Text style={{ color: mode === 'night' ? '#E0E4ED' : '#1A2340', fontWeight: '700', fontSize: 14 }}>DSCSA Pharma Serialization</Text>
-                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.48)', fontSize: 11, lineHeight: 17 }}>8 sections · 17 sample records · 5 automation flows · Full pharma supply chain</Text>
+                        <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.48)' : 'rgba(0,0,0,0.48)', fontSize: 11, lineHeight: 17 }}>8 sections · 17 sample records · 5 automation flows · Full pharma supply chain</Text>
                         <View style={{ backgroundColor: ac, borderRadius: 10, paddingVertical: 10, alignItems: 'center' as any }}>
                           <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Use This Template →</Text>
                         </View>
@@ -943,7 +943,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                       >
                         <Text style={{ fontSize: 32 }}>🖥️</Text>
                         <Text style={{ color: mode === 'night' ? '#E0E4ED' : '#1A2340', fontWeight: '700', fontSize: 14 }}>WRVAS Service Operations</Text>
-                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.48)', fontSize: 11, lineHeight: 17 }}>12 sections · 22 sample records · 5 automation flows · IT device service</Text>
+                        <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.48)' : 'rgba(0,0,0,0.48)', fontSize: 11, lineHeight: 17 }}>12 sections · 22 sample records · 5 automation flows · IT device service</Text>
                         <View style={{ backgroundColor: '#3B82F6', borderRadius: 10, paddingVertical: 10, alignItems: 'center' as any }}>
                           <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Use This Template →</Text>
                         </View>
@@ -960,7 +960,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                       >
                         <Text style={{ fontSize: 32 }}>⚖️</Text>
                         <Text style={{ color: mode === 'night' ? '#E0E4ED' : '#1A2340', fontWeight: '700', fontSize: 14 }}>Legal Case Management</Text>
-                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.48)', fontSize: 11, lineHeight: 17 }}>5 practice areas · 6 sample cases · 4 automation flows · Intake → Closed/Archive</Text>
+                        <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.48)' : 'rgba(0,0,0,0.48)', fontSize: 11, lineHeight: 17 }}>5 practice areas · 6 sample cases · 4 automation flows · Intake → Closed/Archive</Text>
                         <View style={{ backgroundColor: '#C9A84C', borderRadius: 10, paddingVertical: 10, alignItems: 'center' as any }}>
                           <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Use This Template →</Text>
                         </View>
@@ -968,9 +968,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     </View>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                      <View style={{ flex: 1, height: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.32)' : 'rgba(0,0,0,0.32)', fontSize: 12 }}>or build from scratch</Text>
-                      <View style={{ flex: 1, height: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }} />
+                      <View style={{ flex: 1, height: 1, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)' }} />
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.32)' : 'rgba(0,0,0,0.32)', fontSize: 12 }}>or build from scratch</Text>
+                      <View style={{ flex: 1, height: 1, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)' }} />
                     </View>
                     <Pressable style={[styles.primaryButton, { paddingVertical: 14 }]} onPress={beginCreateWorkspace}>
                       <Text style={[styles.primaryButtonText, { fontSize: 15, fontWeight: '700' }]}>+ Create My Own Workspace</Text>
@@ -981,27 +981,27 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 {/* Creating from scratch — name form */}
                 {isCreatingWorkspace && canManageWorkspace && (
                   <View style={{ gap: 14 }}>
-                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(38,51,116,0.10)' : 'rgba(38,51,116,0.06)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(38,51,116,0.22)' : 'rgba(38,51,116,0.18)' }}>
-                      <Text style={{ color: mode === 'night' ? '#FFD332' : '#263374', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Creating a new workspace</Text>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.58)' : 'rgba(0,0,0,0.50)', fontSize: 12, lineHeight: 18 }}>
+                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.03)' : 'rgba(0,0,0,0.03)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.06)' }}>
+                      <Text style={{ color: mode === 'night' ? '#111111' : '#111111', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>Creating a new workspace</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.58)' : 'rgba(0,0,0,0.50)', fontSize: 12, lineHeight: 18 }}>
                         Think of a workspace like a Jira project — "Sprint Board", "Bug Tracker", "Feature Requests". Keep the name short and clear.
                       </Text>
                     </View>
 
                     <View style={{ gap: 6 }}>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.70)', fontSize: 14, fontWeight: '700' }}>What's this workspace called? <Text style={{ color: '#EF4444' }}>*</Text></Text>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)', fontSize: 12 }}>e.g. "Sprint Board", "Bug Tracker", "Feature Requests", "Release Pipeline"</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0.70)', fontSize: 14, fontWeight: '700' }}>What's this workspace called? <Text style={{ color: '#EF4444' }}>*</Text></Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.40)' : 'rgba(0,0,0,0.40)', fontSize: 12 }}>e.g. "Sprint Board", "Bug Tracker", "Feature Requests", "Release Pipeline"</Text>
                       <LabeledInput label="" value={workspaceName} onChangeText={(v) => { setWorkspaceName(v); setRoute(v.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')); }} placeholder="My Workspace Name" />
                     </View>
 
                     <View style={{ gap: 6 }}>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.70)', fontSize: 14, fontWeight: '700' }}>Each row in this workspace is a... <Text style={{ color: '#EF4444' }}>*</Text></Text>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)', fontSize: 12 }}>One word for what you're tracking — e.g. "Issue", "Bug", "Feature", "Sprint", "Epic"</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0.70)', fontSize: 14, fontWeight: '700' }}>Each row in this workspace is a... <Text style={{ color: '#EF4444' }}>*</Text></Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.40)' : 'rgba(0,0,0,0.40)', fontSize: 12 }}>One word for what you're tracking — e.g. "Issue", "Bug", "Feature", "Sprint", "Epic"</Text>
                       <LabeledInput label="" value={rootEntity} onChangeText={setRootEntity} placeholder="e.g. Order" />
                     </View>
 
                     <View style={{ gap: 6 }}>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.32)', fontSize: 11, fontWeight: '600' }}>Quick fill examples:</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.32)', fontSize: 11, fontWeight: '600' }}>Quick fill examples:</Text>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, gap: 6 }}>
                         {[
                           { name: 'Sprint Board', entity: 'Issue' },
@@ -1015,10 +1015,10 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         ].map((ex) => (
                           <Pressable
                             key={ex.name}
-                            style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: mode === 'night' ? 'rgba(38,51,116,0.10)' : 'rgba(38,51,116,0.07)', borderWidth: 1, borderColor: mode === 'night' ? 'rgba(38,51,116,0.25)' : 'rgba(38,51,116,0.20)' }}
+                            style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.03)' : 'rgba(0,0,0,0.04)', borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.10)' : 'rgba(0,0,0,0.08)' }}
                             onPress={() => { setWorkspaceName(ex.name); setRootEntity(ex.entity); setRoute(ex.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')); }}
                           >
-                            <Text style={{ fontSize: 11, color: mode === 'night' ? '#FFD332' : '#263374', fontWeight: '600' }}>{ex.name}</Text>
+                            <Text style={{ fontSize: 11, color: mode === 'night' ? '#111111' : '#111111', fontWeight: '600' }}>{ex.name}</Text>
                           </Pressable>
                         ))}
                       </View>
@@ -1046,24 +1046,24 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 {workspaces.length > 0 && canManageWorkspace && !isCreatingWorkspace && (
                   <View style={{ gap: 14 }}>
                     <View style={{ gap: 8 }}>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.70)' : 'rgba(0,0,0,0.65)', fontSize: 13, fontWeight: '700' }}>Choose a workspace to edit</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.70)' : 'rgba(0,0,0,0.65)', fontSize: 13, fontWeight: '700' }}>Choose a workspace to edit</Text>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, gap: 8 }}>
                         {workspaces.map((ws) => (
                           <Pressable
                             key={ws.id}
-                            style={{ paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1.5, backgroundColor: selectedWorkspaceId === ws.id ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)', borderColor: selectedWorkspaceId === ws.id ? ac : mode === 'night' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.10)' }}
+                            style={{ paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1.5, backgroundColor: selectedWorkspaceId === ws.id ? acRgba(0.18) : mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)', borderColor: selectedWorkspaceId === ws.id ? ac : mode === 'night' ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.10)' }}
                             onPress={() => { setSelectedWorkspaceId(ws.id); setWizardStep(2); setWorkspacePane('subspaces'); }}
                           >
-                            <Text style={{ fontSize: 13, fontWeight: '700', color: selectedWorkspaceId === ws.id ? '#FFD332' : mode === 'night' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.68)' }}>{ws.name}</Text>
-                            <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', marginTop: 2 }}>{ws.subSpaces.length} section{ws.subSpaces.length !== 1 ? 's' : ''}</Text>
+                            <Text style={{ fontSize: 13, fontWeight: '700', color: selectedWorkspaceId === ws.id ? '#111111' : mode === 'night' ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0.68)' }}>{ws.name}</Text>
+                            <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.35)', marginTop: 2 }}>{ws.subSpaces.length} section{ws.subSpaces.length !== 1 ? 's' : ''}</Text>
                           </Pressable>
                         ))}
                       </View>
                     </View>
 
                     {hasWorkspace && (
-                      <View style={{ gap: 10, borderTopWidth: 1, borderTopColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)', paddingTop: 14 }}>
-                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.65)' : 'rgba(0,0,0,0.60)', fontSize: 13, fontWeight: '700' }}>Edit "{workspace?.name}"</Text>
+                      <View style={{ gap: 10, borderTopWidth: 1, borderTopColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.07)', paddingTop: 14 }}>
+                        <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0.60)', fontSize: 13, fontWeight: '700' }}>Edit "{workspace?.name}"</Text>
                         <LabeledInput label="Workspace Name" value={workspaceName} onChangeText={setWorkspaceName} placeholder="Workspace Name" />
                         <LabeledInput label="Each row is a..." helperText="e.g. Order, Patient, Item" value={rootEntity} onChangeText={setRootEntity} placeholder="e.g. Order" />
                         <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -1078,17 +1078,17 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     )}
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                      <View style={{ flex: 1, height: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)' }} />
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.28)', fontSize: 11 }}>or</Text>
-                      <View style={{ flex: 1, height: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)' }} />
+                      <View style={{ flex: 1, height: 1, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.07)' }} />
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.28)' : 'rgba(0,0,0,0.28)', fontSize: 11 }}>or</Text>
+                      <View style={{ flex: 1, height: 1, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.07)' }} />
                     </View>
                     <Pressable style={[styles.secondaryButton, { paddingVertical: 12 }]} onPress={beginCreateWorkspace}>
                       <Text style={[styles.secondaryButtonText, { textAlign: 'center' }]}>+ Create Another Workspace</Text>
                     </Pressable>
 
                     {/* Templates when workspace exists */}
-                    <View style={{ gap: 6, borderTopWidth: 1, borderTopColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', paddingTop: 12 }}>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.33)' : 'rgba(0,0,0,0.33)', fontSize: 11, fontWeight: '600' }}>Load a template instead</Text>
+                    <View style={{ gap: 6, borderTopWidth: 1, borderTopColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)', paddingTop: 12 }}>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.33)' : 'rgba(0,0,0,0.33)', fontSize: 11, fontWeight: '600' }}>Load a template instead</Text>
                       <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' as any }}>
                         <Pressable nativeID="wt-load-template" style={[styles.secondaryButton, { flex: 1 }]} onPress={() => { applyDscsaSerializationTemplate(); setWizardStep(4); addNotification?.({ type: 'system', title: 'Template Loaded!', body: 'DSCSA workspace loaded.', severity: 'success' }); }}>
                           <Text style={styles.secondaryButtonText}>💊 DSCSA Template</Text>
@@ -1117,16 +1117,16 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 {!hasWorkspace ? (
                   <View style={{ backgroundColor: 'rgba(245,158,11,0.10)', borderRadius: 10, padding: 14, borderWidth: 1, borderColor: 'rgba(245,158,11,0.25)', gap: 10 }}>
                     <Text style={{ color: '#F59E0B', fontWeight: '700', fontSize: 13 }}>⚠ Create a workspace first</Text>
-                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 12 }}>Go to Step 1 to name your workspace before adding sections.</Text>
+                    <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 12 }}>Go to Step 1 to name your workspace before adding sections.</Text>
                     <Pressable style={[styles.secondaryButton, { alignSelf: 'flex-start' as any }]} onPress={() => { setWizardStep(1); setWorkspacePane('workspace'); }}>
                       <Text style={styles.secondaryButtonText}>← Go to Step 1</Text>
                     </Pressable>
                   </View>
                 ) : (
                   <>
-                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(38,51,116,0.08)' : 'rgba(38,51,116,0.05)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(38,51,116,0.18)' : 'rgba(38,51,116,0.13)' }}>
-                      <Text style={{ color: mode === 'night' ? '#FFD332' : '#263374', fontSize: 12, fontWeight: '700', marginBottom: 4 }}>📂 SECTIONS in "{workspace?.name}"</Text>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.48)', fontSize: 12, lineHeight: 18 }}>
+                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.05)' }}>
+                      <Text style={{ color: mode === 'night' ? '#111111' : '#111111', fontSize: 12, fontWeight: '700', marginBottom: 4 }}>📂 SECTIONS in "{workspace?.name}"</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.48)', fontSize: 12, lineHeight: 18 }}>
                         Sections are like tabs — each holds a different category of data. Example: "Details", "Documents", "Tasks", "Contacts".
                       </Text>
                     </View>
@@ -1134,7 +1134,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     {/* Existing sections list */}
                     {workspaceSubSpaces.length > 0 && (
                       <View style={{ gap: 6 }}>
-                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Your sections ({workspaceSubSpaces.length})</Text>
+                        <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Your sections ({workspaceSubSpaces.length})</Text>
                         <Reorder.Group
                           as="div"
                           axis="y"
@@ -1149,7 +1149,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                               as="div"
                               style={{
                                 display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10,
-                                backgroundColor: mode === 'night' ? 'rgba(38,51,116,0.10)' : 'rgba(38,51,116,0.06)',
+                                backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.03)' : 'rgba(0,0,0,0.03)',
                                 borderRadius: 10, paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10,
                                 borderWidth: 1, borderStyle: 'solid',
                                 borderColor: selectedSubSpaceId === ss.id ? ac : mode === 'night' ? acRgba(0.20) : acRgba(0.14),
@@ -1162,20 +1162,20 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                             >
                               {/* ⠿ drag handle */}
                               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 18, opacity: canManageSubSpace ? 0.45 : 0.15, cursor: canManageSubSpace ? 'grab' : 'default', flexShrink: 0 }}>
-                                <span style={{ fontSize: 16, color: '#FFD332', lineHeight: 1 }}>⠿</span>
+                                <span style={{ fontSize: 16, color: '#111111', lineHeight: 1 }}>⠿</span>
                               </div>
-                              <View style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(38,51,116,0.20)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
-                                <Text style={{ fontSize: 12, color: '#FFD332', fontWeight: '800' }}>{ssIdx + 1}</Text>
+                              <View style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(0,0,0,0.08)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                                <Text style={{ fontSize: 12, color: '#111111', fontWeight: '800' }}>{ssIdx + 1}</Text>
                               </View>
                               <View style={{ flex: 1 }}>
                                 <Text style={{ color: mode === 'night' ? '#E0E4ED' : '#1A2340', fontWeight: '700', fontSize: 13 }}>{ss.name}</Text>
-                                <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', fontSize: 11, marginTop: 1 }}>{(ss.builderFields ?? []).length} field{(ss.builderFields ?? []).length !== 1 ? 's' : ''}</Text>
+                                <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.35)', fontSize: 11, marginTop: 1 }}>{(ss.builderFields ?? []).length} field{(ss.builderFields ?? []).length !== 1 ? 's' : ''}</Text>
                               </View>
                               <Pressable
                                 style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: selectedSubSpaceId === ss.id ? acRgba(0.28) : 'transparent', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? ac : acRgba(0.25) }}
                                 onPress={() => { setSelectedSubSpaceId(ss.id); setWizardStep(3); setWorkspacePane('subspaces'); }}
                               >
-                                <Text style={{ fontSize: 11, fontWeight: '700', color: '#FFD332' }}>Add Fields →</Text>
+                                <Text style={{ fontSize: 11, fontWeight: '700', color: '#111111' }}>Add Fields →</Text>
                               </Pressable>
                               <Pressable
                                 disabled={!canManageSubSpace}
@@ -1192,7 +1192,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
 
                     {/* Add new section */}
                     <View style={{ gap: 8 }}>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.68)' : 'rgba(0,0,0,0.62)', fontSize: 13, fontWeight: '700' }}>+ Add a section</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.68)' : 'rgba(0,0,0,0.62)', fontSize: 13, fontWeight: '700' }}>+ Add a section</Text>
                       <View style={{ flexDirection: 'row', gap: 8 }}>
                         <View style={{ flex: 1 }}>
                           <LabeledInput label="" value={newSubSpaceName} onChangeText={(v) => { setNewSubSpaceName(v); setNewSubSpaceEntity(v); }} placeholder="Section name (e.g. Details, Tasks, Documents)" />
@@ -1217,7 +1217,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
 
                     {/* Quick suggestion chips */}
                     <View style={{ gap: 6 }}>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.33)' : 'rgba(0,0,0,0.32)', fontSize: 11, fontWeight: '600' }}>Quick add:</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.33)' : 'rgba(0,0,0,0.32)', fontSize: 11, fontWeight: '600' }}>Quick add:</Text>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, gap: 6 }}>
                         {['Details', 'Documents', 'Tasks', 'Notes', 'Contacts', 'Timeline', 'Approvals', 'Status Updates', 'Inventory', 'History', 'Issues', 'Checklist']
                           .filter((s) => !workspaceSubSpaces.some((ss) => ss.name.toLowerCase() === s.toLowerCase()))
@@ -1225,10 +1225,10 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                             <Pressable
                               key={suggestion}
                               disabled={!canManageSubSpace || !hasWorkspace}
-                              style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.11)' : 'rgba(0,0,0,0.09)' }}
+                              style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.03)' : 'rgba(0,0,0,0.04)', borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.11)' : 'rgba(0,0,0,0.09)' }}
                               onPress={() => { setNewSubSpaceName(suggestion); setNewSubSpaceEntity(suggestion); }}
                             >
-                              <Text style={{ fontSize: 12, color: mode === 'night' ? 'rgba(255,255,255,0.62)' : 'rgba(0,0,0,0.56)', fontWeight: '600' }}>+ {suggestion}</Text>
+                              <Text style={{ fontSize: 12, color: mode === 'night' ? 'rgba(0,0,0,0.62)' : 'rgba(0,0,0,0.56)', fontWeight: '600' }}>+ {suggestion}</Text>
                             </Pressable>
                           ))}
                       </View>
@@ -1252,7 +1252,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                               <React.Fragment key={`pipe-${ss.id}`}>
                                 {idx > 0 && <Text style={{ fontSize: 12, color: ac, fontWeight: '800' }}>→</Text>}
                                 <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: selectedSubSpaceId === ss.id ? acRgba(0.36) : acRgba(0.12), borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? ac : acRgba(0.22) }}>
-                                  <Text style={{ fontSize: 10, fontWeight: '700', color: selectedSubSpaceId === ss.id ? '#FFFFFF' : '#FFD332' }}>{idx + 1}. {ss.name}</Text>
+                                  <Text style={{ fontSize: 10, fontWeight: '700', color: selectedSubSpaceId === ss.id ? '#FFFFFF' : '#111111' }}>{idx + 1}. {ss.name}</Text>
                                 </View>
                               </React.Fragment>
                             ))}
@@ -1274,7 +1274,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         <Text style={[styles.primaryButtonText, { textAlign: 'center' }]}>Continue to Fields →</Text>
                       </Pressable>
                     </View>
-                    {!isSubSpacesStepComplete && <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.32)' : 'rgba(0,0,0,0.32)', fontSize: 11, textAlign: 'center' }}>Add at least one section to continue</Text>}
+                    {!isSubSpacesStepComplete && <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.32)' : 'rgba(0,0,0,0.32)', fontSize: 11, textAlign: 'center' }}>Add at least one section to continue</Text>}
                   </>
                 )}
               </>
@@ -1294,22 +1294,22 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                   <>
                     <View style={{ backgroundColor: mode === 'night' ? 'rgba(59,130,246,0.08)' : 'rgba(59,130,246,0.05)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(59,130,246,0.18)' : 'rgba(59,130,246,0.13)' }}>
                       <Text style={{ color: mode === 'night' ? '#60A5FA' : '#2563EB', fontSize: 12, fontWeight: '700', marginBottom: 4 }}>📝 FIELDS — what data you collect</Text>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.48)', fontSize: 12, lineHeight: 18 }}>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.48)', fontSize: 12, lineHeight: 18 }}>
                         Fields are the form questions on each record. Pick a section, type the field name, choose a type, and tap Add.
                       </Text>
                     </View>
 
                     {/* Section picker tabs */}
                     <View style={{ gap: 6 }}>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Select section to add fields to:</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Select section to add fields to:</Text>
                       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: 'row', gap: 6 }}>
                         {workspaceSubSpaces.map((ss) => (
                           <Pressable
                             key={ss.id}
-                            style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: selectedSubSpaceId === ss.id ? ac : mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? ac : mode === 'night' ? 'rgba(255,255,255,0.11)' : 'rgba(0,0,0,0.09)' }}
+                            style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: selectedSubSpaceId === ss.id ? ac : mode === 'night' ? 'rgba(0,0,0,0.03)' : 'rgba(0,0,0,0.04)', borderWidth: 1, borderColor: selectedSubSpaceId === ss.id ? ac : mode === 'night' ? 'rgba(0,0,0,0.11)' : 'rgba(0,0,0,0.09)' }}
                             onPress={() => setSelectedSubSpaceId(ss.id)}
                           >
-                            <Text style={{ fontSize: 12, fontWeight: '700', color: selectedSubSpaceId === ss.id ? '#FFFFFF' : mode === 'night' ? 'rgba(255,255,255,0.62)' : 'rgba(0,0,0,0.56)' }}>
+                            <Text style={{ fontSize: 12, fontWeight: '700', color: selectedSubSpaceId === ss.id ? '#FFFFFF' : mode === 'night' ? 'rgba(0,0,0,0.62)' : 'rgba(0,0,0,0.56)' }}>
                               {ss.name}{(ss.builderFields ?? []).length > 0 ? ` (${(ss.builderFields ?? []).length})` : ''}
                             </Text>
                           </Pressable>
@@ -1321,13 +1321,13 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                       <>
                         {/* Field name input */}
                         <View style={{ gap: 6 }}>
-                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.68)' : 'rgba(0,0,0,0.62)', fontSize: 13, fontWeight: '700' }}>Add a field to "{selectedSubSpace.name}"</Text>
+                          <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.68)' : 'rgba(0,0,0,0.62)', fontSize: 13, fontWeight: '700' }}>Add a field to "{selectedSubSpace.name}"</Text>
                           <View nativeID="wt-field-palette"><LabeledInput label="" value={newBuilderFieldLabel} onChangeText={setNewBuilderFieldLabel} placeholder='Field name (e.g. "Customer Name", "Due Date", "Status")' /></View>
                         </View>
 
                         {/* Field type grid */}
                         <View style={{ gap: 6 }}>
-                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Field type:</Text>
+                          <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Field type:</Text>
                           <View style={{ flexDirection: 'row', flexWrap: 'wrap' as any, gap: 6 }}>
                             {([
                               { type: 'text' as const, icon: 'Aa', label: 'Short Text', desc: 'Names, IDs' },
@@ -1344,12 +1344,12 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                             ] as Array<{ type: SubSpaceBuilderFieldType; icon: string; label: string; desc: string }>).map(({ type, icon, label, desc }) => (
                               <Pressable
                                 key={type}
-                                style={{ width: 86, paddingHorizontal: 6, paddingVertical: 9, borderRadius: 10, gap: 3, alignItems: 'center' as any, borderWidth: 1.5, backgroundColor: wizardActiveFieldType === type ? acRgba(0.22) : mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: wizardActiveFieldType === type ? ac : mode === 'night' ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.09)' }}
+                                style={{ width: 86, paddingHorizontal: 6, paddingVertical: 9, borderRadius: 10, gap: 3, alignItems: 'center' as any, borderWidth: 1.5, backgroundColor: wizardActiveFieldType === type ? acRgba(0.22) : mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.02)', borderColor: wizardActiveFieldType === type ? ac : mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.09)' }}
                                 onPress={() => setWizardActiveFieldType(type)}
                               >
                                 <Text style={{ fontSize: 17, lineHeight: 21 }}>{icon}</Text>
-                                <Text style={{ fontSize: 10, fontWeight: '700', textAlign: 'center' as any, color: wizardActiveFieldType === type ? '#FFD332' : mode === 'night' ? 'rgba(255,255,255,0.68)' : 'rgba(0,0,0,0.62)' }}>{label}</Text>
-                                <Text style={{ fontSize: 9, textAlign: 'center' as any, color: mode === 'night' ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.28)' }}>{desc}</Text>
+                                <Text style={{ fontSize: 10, fontWeight: '700', textAlign: 'center' as any, color: wizardActiveFieldType === type ? '#111111' : mode === 'night' ? 'rgba(0,0,0,0.68)' : 'rgba(0,0,0,0.62)' }}>{label}</Text>
+                                <Text style={{ fontSize: 9, textAlign: 'center' as any, color: mode === 'night' ? 'rgba(0,0,0,0.28)' : 'rgba(0,0,0,0.28)' }}>{desc}</Text>
                               </Pressable>
                             ))}
                           </View>
@@ -1358,7 +1358,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         {/* Dropdown options entry — shown when 'select' type is active */}
                         {wizardActiveFieldType === 'select' && (
                           <View style={{ gap: 8 }}>
-                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.48)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase' as any, letterSpacing: 1 }}>
+                            <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.48)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase' as any, letterSpacing: 1 }}>
                               Dropdown Options {newBuilderDropdownOptions.length > 0 ? `(${newBuilderDropdownOptions.length})` : ''}
                             </Text>
                             <View style={{ flexDirection: 'row', gap: 6 }}>
@@ -1366,8 +1366,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                 value={newBuilderDropdownOptionInput}
                                 onChangeText={setNewBuilderDropdownOptionInput}
                                 placeholder="Type an option..."
-                                placeholderTextColor={mode === 'night' ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)'}
-                                style={{ flex: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8, color: mode === 'night' ? '#E0E4ED' : '#1A2340', fontSize: 13, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)' } as any}
+                                placeholderTextColor={mode === 'night' ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.25)'}
+                                style={{ flex: 1, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8, color: mode === 'night' ? '#E0E4ED' : '#1A2340', fontSize: 13, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.12)' } as any}
                                 onSubmitEditing={() => {
                                   const val = newBuilderDropdownOptionInput.trim();
                                   if (val && !newBuilderDropdownOptions.includes(val)) {
@@ -1386,7 +1386,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                   setNewBuilderDropdownOptionInput('');
                                 }}
                               >
-                                <Text style={{ color: '#FFD332', fontWeight: '700', fontSize: 13 }}>+ Add</Text>
+                                <Text style={{ color: '#111111', fontWeight: '700', fontSize: 13 }}>+ Add</Text>
                               </Pressable>
                             </View>
                             {newBuilderDropdownOptions.length > 0 && (
@@ -1397,14 +1397,14 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                     onPress={() => setNewBuilderDropdownOptions(newBuilderDropdownOptions.filter((o) => o !== opt))}
                                     style={{ flexDirection: 'row', alignItems: 'center' as any, gap: 4, backgroundColor: acRgba(0.14), borderRadius: 20, paddingVertical: 4, paddingHorizontal: 10, borderWidth: 1, borderColor: acRgba(0.28) }}
                                   >
-                                    <Text style={{ color: '#FFD332', fontSize: 12, fontWeight: '600' }}>{opt}</Text>
-                                    <Text style={{ color: 'rgba(38,51,116,0.6)', fontSize: 11 }}>✕</Text>
+                                    <Text style={{ color: '#111111', fontSize: 12, fontWeight: '600' }}>{opt}</Text>
+                                    <Text style={{ color: 'rgba(0,0,0,0.15)', fontSize: 11 }}>✕</Text>
                                   </Pressable>
                                 ))}
                               </View>
                             )}
                             {newBuilderDropdownOptions.length === 0 && (
-                              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)', fontSize: 11, fontStyle: 'italic' as any }}>Add at least one option, then click "Add Field" below.</Text>
+                              <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.3)', fontSize: 11, fontStyle: 'italic' as any }}>Add at least one option, then click "Add Field" below.</Text>
                             )}
                           </View>
                         )}
@@ -1412,31 +1412,31 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         {/* Date / DateTime sub-field hint */}
                         {(wizardActiveFieldType === 'date' || wizardActiveFieldType === 'datetime') && (
                           <View style={{ backgroundColor: acRgba(0.08), borderRadius: 10, padding: 10, gap: 6, borderWidth: 1, borderColor: acRgba(0.18) }}>
-                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)', fontSize: 10, fontWeight: '700', textTransform: 'uppercase' as any, letterSpacing: 1 }}>
+                            <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.45)', fontSize: 10, fontWeight: '700', textTransform: 'uppercase' as any, letterSpacing: 1 }}>
                               {wizardActiveFieldType === 'datetime' ? 'Date & Time — Split Entry' : 'Date — Split Entry'}
                             </Text>
                             <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' as any }}>
                               {(['MM', 'DD', 'YYYY'] as const).map((seg, i) => (
                                 <React.Fragment key={seg}>
-                                  <View style={{ flex: seg === 'YYYY' ? 2 : 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingVertical: 7, alignItems: 'center' as any, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
-                                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)', fontSize: 11 }}>{seg}</Text>
+                                  <View style={{ flex: seg === 'YYYY' ? 2 : 1, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingVertical: 7, alignItems: 'center' as any, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.1)' }}>
+                                    <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.3)', fontSize: 11 }}>{seg}</Text>
                                   </View>
-                                  {i < 2 && <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)', fontSize: 13 }}>/</Text>}
+                                  {i < 2 && <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.25)', fontSize: 13 }}>/</Text>}
                                 </React.Fragment>
                               ))}
                               {wizardActiveFieldType === 'datetime' && (
                                 <>
-                                  <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', fontSize: 13, marginHorizontal: 2 }}>·</Text>
+                                  <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.2)', fontSize: 13, marginHorizontal: 2 }}>·</Text>
                                   {(['HH', 'MM'] as const).map((seg, i) => (
                                     <React.Fragment key={`t-${seg}`}>
-                                      <View style={{ flex: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingVertical: 7, alignItems: 'center' as any, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
-                                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)', fontSize: 11 }}>{seg}</Text>
+                                      <View style={{ flex: 1, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingVertical: 7, alignItems: 'center' as any, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.1)' }}>
+                                        <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.3)', fontSize: 11 }}>{seg}</Text>
                                       </View>
-                                      {i < 1 && <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)', fontSize: 13 }}>:</Text>}
+                                      {i < 1 && <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.25)', fontSize: 13 }}>:</Text>}
                                     </React.Fragment>
                                   ))}
-                                  <View style={{ flex: 1.3, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingVertical: 7, alignItems: 'center' as any, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
-                                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)', fontSize: 11 }}>AM/PM</Text>
+                                  <View style={{ flex: 1.3, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingVertical: 7, alignItems: 'center' as any, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.1)' }}>
+                                    <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.3)', fontSize: 11 }}>AM/PM</Text>
                                   </View>
                                 </>
                               )}
@@ -1465,7 +1465,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         {/* Existing fields in selected section */}
                         {(selectedSubSpace.builderFields ?? []).length > 0 && (
                           <View style={{ gap: 4 }}>
-                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Fields in "{selectedSubSpace.name}" — tap name to rename, drag to reorder</Text>
+                            <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Fields in "{selectedSubSpace.name}" — tap name to rename, drag to reorder</Text>
                             <Reorder.Group
                               as="div"
                               axis="y"
@@ -1479,9 +1479,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                 value={field}
                                 as="div"
                                 style={{
-                                  backgroundColor: editingFieldId === field.id ? (mode === 'night' ? acRgba(0.14) : acRgba(0.08)) : (mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'),
+                                  backgroundColor: editingFieldId === field.id ? (mode === 'night' ? acRgba(0.14) : acRgba(0.08)) : (mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)'),
                                   borderRadius: 10, borderWidth: 1, borderStyle: 'solid',
-                                  borderColor: editingFieldId === field.id ? ac : (mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'),
+                                  borderColor: editingFieldId === field.id ? ac : (mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.07)'),
                                   overflow: 'hidden',
                                   cursor: canManageSubSpace ? 'grab' : 'default',
                                   userSelect: 'none',
@@ -1492,10 +1492,10 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 10, paddingVertical: 8 }}>
                                   {/* Drag handle */}
                                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 18, opacity: canManageSubSpace ? 0.45 : 0.15, cursor: canManageSubSpace ? 'grab' : 'default', flexShrink: 0 }}>
-                                    <span style={{ fontSize: 16, color: '#FFD332', lineHeight: 1 }}>⠿</span>
+                                    <span style={{ fontSize: 16, color: '#111111', lineHeight: 1 }}>⠿</span>
                                   </div>
                                   {/* Type icon */}
-                                  <View style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: 'rgba(38,51,116,0.15)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                                  <View style={{ width: 30, height: 30, borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.06)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
                                     <Text style={{ fontSize: 13 }}>{fieldTypeIcons[field.type] ?? '?'}</Text>
                                   </View>
                                   {/* Label — tap to edit inline */}
@@ -1503,16 +1503,16 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                     style={{ flex: 1 }}
                                     onPress={() => { if (editingFieldId === field.id) { setEditingFieldId(null); } else { setEditingFieldId(field.id); setEditingFieldLabel(field.label); } }}
                                   >
-                                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.42)', fontSize: 9, fontWeight: '600', textTransform: 'uppercase' as any }}>{field.type} · tap to rename</Text>
+                                    <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.42)', fontSize: 9, fontWeight: '600', textTransform: 'uppercase' as any }}>{field.type} · tap to rename</Text>
                                     <Text style={{ color: mode === 'night' ? '#E0E4ED' : '#1A2340', fontWeight: '700', fontSize: 13 }}>{field.label}</Text>
                                   </Pressable>
                                   {/* Required toggle */}
                                   <Pressable
                                     disabled={!canManageSubSpace}
-                                    style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 7, borderWidth: 1, borderColor: field.required ? 'rgba(38,51,116,0.45)' : (mode === 'night' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'), backgroundColor: field.required ? 'rgba(38,51,116,0.15)' : 'transparent' }}
+                                    style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 7, borderWidth: 1, borderColor: field.required ? 'rgba(0,0,0,0.12)' : (mode === 'night' ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.12)'), backgroundColor: field.required ? 'rgba(0,0,0,0.06)' : 'transparent' }}
                                     onPress={() => toggleBuilderFieldRequired(field.id)}
                                   >
-                                    <Text style={{ fontSize: 10, fontWeight: '700', color: field.required ? '#FFD332' : (mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.38)') }}>{field.required ? '★ Req' : '☆ Opt'}</Text>
+                                    <Text style={{ fontSize: 10, fontWeight: '700', color: field.required ? '#111111' : (mode === 'night' ? 'rgba(0,0,0,0.40)' : 'rgba(0,0,0,0.38)') }}>{field.required ? '★ Req' : '☆ Opt'}</Text>
                                   </Pressable>
                                   {/* Delete */}
                                   <Pressable
@@ -1530,9 +1530,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                       value={editingFieldLabel}
                                       onChangeText={setEditingFieldLabel}
                                       placeholder="New field name"
-                                      placeholderTextColor={mode === 'night' ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)'}
+                                      placeholderTextColor={mode === 'night' ? 'rgba(0,0,0,0.25)' : 'rgba(0,0,0,0.25)'}
                                       autoFocus
-                                      style={{ flex: 1, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.30)' : 'rgba(255,255,255,0.85)', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(38,51,116,0.45)', paddingHorizontal: 10, paddingVertical: 7, color: mode === 'night' ? '#E0E4ED' : '#1A2340', fontSize: 13, fontWeight: '600' }}
+                                      style={{ flex: 1, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.30)' : 'rgba(0,0,0,0.85)', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(0,0,0,0.12)', paddingHorizontal: 10, paddingVertical: 7, color: mode === 'night' ? '#E0E4ED' : '#1A2340', fontSize: 13, fontWeight: '600' }}
                                       onSubmitEditing={() => { renameBuilderFieldInSubSpace(field.id, editingFieldLabel); setEditingFieldId(null); }}
                                     />
                                     <Pressable
@@ -1543,10 +1543,10 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                                       <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 12 }}>Save</Text>
                                     </Pressable>
                                     <Pressable
-                                      style={{ paddingHorizontal: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.14)', justifyContent: 'center' as any }}
+                                      style={{ paddingHorizontal: 10, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.14)' : 'rgba(0,0,0,0.14)', justifyContent: 'center' as any }}
                                       onPress={() => setEditingFieldId(null)}
                                     >
-                                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.48)', fontSize: 12 }}>Cancel</Text>
+                                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.48)', fontSize: 12 }}>Cancel</Text>
                                     </Pressable>
                                   </View>
                                 )}
@@ -1580,30 +1580,30 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     <View style={{ backgroundColor: mode === 'night' ? 'rgba(34,197,94,0.10)' : 'rgba(34,197,94,0.07)', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(34,197,94,0.24)' : 'rgba(34,197,94,0.18)', alignItems: 'center' as any, gap: 10 }}>
                       <Text style={{ fontSize: 40 }}>🎉</Text>
                       <Text style={{ color: mode === 'night' ? '#E0E4ED' : '#1A2340', fontSize: 18, fontWeight: '800', textAlign: 'center' }}>{workspace?.name} is ready!</Text>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.52)' : 'rgba(0,0,0,0.48)', fontSize: 12, textAlign: 'center', lineHeight: 18 }}>Review everything below, then publish so your team can see it in the End User view.</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.52)' : 'rgba(0,0,0,0.48)', fontSize: 12, textAlign: 'center', lineHeight: 18 }}>Review everything below, then publish so your team can see it in the End User view.</Text>
                     </View>
 
                     {/* Summary */}
-                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderRadius: 12, padding: 16, gap: 12, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)' }}>
+                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)', borderRadius: 12, padding: 16, gap: 12, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.07)' }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                        <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(38,51,116,0.20)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
+                        <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(0,0,0,0.08)', alignItems: 'center' as any, justifyContent: 'center' as any }}>
                           <Text style={{ fontSize: 18 }}>🏗️</Text>
                         </View>
                         <View style={{ flex: 1 }}>
                           <Text style={{ color: mode === 'night' ? '#E0E4ED' : '#1A2340', fontWeight: '800', fontSize: 16 }}>{workspace?.name}</Text>
-                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.42)' : 'rgba(0,0,0,0.42)', fontSize: 12 }}>Tracking: {workspace?.rootEntity} · Route: /{workspace?.route}</Text>
+                          <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.42)' : 'rgba(0,0,0,0.42)', fontSize: 12 }}>Tracking: {workspace?.rootEntity} · Route: /{workspace?.route}</Text>
                         </View>
                       </View>
 
                       <View style={{ gap: 4 }}>
-                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>{workspaceSubSpaces.length} Section{workspaceSubSpaces.length !== 1 ? 's' : ''} · {totalBuilderFields} Field{totalBuilderFields !== 1 ? 's' : ''}</Text>
+                        <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.42)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>{workspaceSubSpaces.length} Section{workspaceSubSpaces.length !== 1 ? 's' : ''} · {totalBuilderFields} Field{totalBuilderFields !== 1 ? 's' : ''}</Text>
                         {workspaceSubSpaces.map((ss) => (
-                          <View key={ss.id} style={{ flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: 'rgba(38,51,116,0.07)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}>
-                            <Text style={{ color: '#FFD332', fontWeight: '700', fontSize: 12, flex: 1 }}>{ss.name}</Text>
-                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', fontSize: 11 }}>{(ss.builderFields ?? []).length} field{(ss.builderFields ?? []).length !== 1 ? 's' : ''}</Text>
+                          <View key={ss.id} style={{ flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.04)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}>
+                            <Text style={{ color: '#111111', fontWeight: '700', fontSize: 12, flex: 1 }}>{ss.name}</Text>
+                            <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.35)', fontSize: 11 }}>{(ss.builderFields ?? []).length} field{(ss.builderFields ?? []).length !== 1 ? 's' : ''}</Text>
                             {(ss.builderFields ?? []).filter((f) => f.required).length > 0 && <Text style={{ color: '#22C55E', fontSize: 10, fontWeight: '600' }}>{(ss.builderFields ?? []).filter((f) => f.required).length} req</Text>}
                             <Pressable onPress={() => { setSelectedSubSpaceId(ss.id); setWizardStep(3); }}>
-                              <Text style={{ fontSize: 11, color: '#FFD332', fontWeight: '600' }}>Edit</Text>
+                              <Text style={{ fontSize: 11, color: '#111111', fontWeight: '600' }}>Edit</Text>
                             </Pressable>
                           </View>
                         ))}
@@ -1639,15 +1639,15 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                       <Text style={[styles.secondaryButtonText, { textAlign: 'center' }]}>Save as Draft (publish later)</Text>
                     </Pressable>
 
-                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(38,51,116,0.08)' : 'rgba(38,51,116,0.05)', borderRadius: 10, padding: 12, gap: 5, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(38,51,116,0.20)' : 'rgba(38,51,116,0.13)' }}>
-                      <Text style={{ color: mode === 'night' ? '#FFD332' : '#263374', fontWeight: '700', fontSize: 12 }}>What happens after publishing?</Text>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.52)' : 'rgba(0,0,0,0.48)', fontSize: 12, lineHeight: 18 }}>{'→ Your workspace appears in End User (sidebar nav).\n→ Team members can create records, fill in fields, and track status.\n→ You can keep editing — changes publish in real time.'}</Text>
-                      <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.38)' : 'rgba(0,0,0,0.36)', fontSize: 11, marginTop: 3 }}>Next: Set up lifecycle stages via Language & Intake → Lifecycle Stages</Text>
+                    <View style={{ backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)', borderRadius: 10, padding: 12, gap: 5, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.05)' }}>
+                      <Text style={{ color: mode === 'night' ? '#111111' : '#111111', fontWeight: '700', fontSize: 12 }}>What happens after publishing?</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.52)' : 'rgba(0,0,0,0.48)', fontSize: 12, lineHeight: 18 }}>{'→ Your workspace appears in End User (sidebar nav).\n→ Team members can create records, fill in fields, and track status.\n→ You can keep editing — changes publish in real time.'}</Text>
+                      <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.38)' : 'rgba(0,0,0,0.36)', fontSize: 11, marginTop: 3 }}>Next: Set up lifecycle stages via Language & Intake → Lifecycle Stages</Text>
                     </View>
                   </>
                 ) : (
                   <View style={{ gap: 14, alignItems: 'center' as any }}>
-                    <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.48)', fontSize: 13, textAlign: 'center' }}>Complete steps 1–3 to build your workspace first.</Text>
+                    <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.50)' : 'rgba(0,0,0,0.48)', fontSize: 13, textAlign: 'center' }}>Complete steps 1–3 to build your workspace first.</Text>
                     <Pressable style={styles.primaryButton} onPress={() => { setWizardStep(1); setWorkspacePane('workspace'); }}>
                       <Text style={[styles.primaryButtonText, { textAlign: 'center' }]}>Start from Step 1</Text>
                     </Pressable>
@@ -1666,9 +1666,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               {!workspace ? (
                 <View style={{ gap: 8, paddingTop: 8 }}>
                   <Text style={[styles.metaText, styles.builderStudioTextSecondary]}>Your workspace will appear here as you build it.</Text>
-                  <View style={{ height: 130, borderRadius: 12, borderWidth: 2, borderColor: mode === 'night' ? 'rgba(38,51,116,0.14)' : 'rgba(38,51,116,0.12)', alignItems: 'center' as any, justifyContent: 'center' as any, gap: 6 }}>
+                  <View style={{ height: 130, borderRadius: 12, borderWidth: 2, borderColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.03)', alignItems: 'center' as any, justifyContent: 'center' as any, gap: 6 }}>
                     <Text style={{ fontSize: 28, opacity: 0.3 }}>🏗️</Text>
-                    <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.22)', textAlign: 'center' }}>Start building to see preview</Text>
+                    <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(0,0,0,0.22)' : 'rgba(0,0,0,0.22)', textAlign: 'center' }}>Start building to see preview</Text>
                   </View>
                 </View>
               ) : (
@@ -1782,7 +1782,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 ].map((kpi, i) => (
                   <View key={i} style={{ flex: 1, minWidth: 100, borderRadius: 10, padding: 10, borderWidth: 1, borderColor: `${kpi.color}20`, backgroundColor: `${kpi.color}08` }}>
                     <Text style={{ fontSize: 14, marginBottom: 2 }}>{kpi.icon}</Text>
-                    <Text style={{ fontSize: 18, fontWeight: '800', color: mode === 'night' ? '#EEF1F8' : '#1A2340' }}>{kpi.val}</Text>
+                    <Text style={{ fontSize: 18, fontWeight: '800', color: mode === 'night' ? '#1A2340' : '#1A2340' }}>{kpi.val}</Text>
                     <Text style={{ fontSize: 10, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)' }}>{kpi.label}</Text>
                   </View>
                 ))}
@@ -1792,9 +1792,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
         })()}
 
         {/* ── Form Coverage Strip ── */}
-        <View style={{ borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
+        <View style={{ borderRadius: 12, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.02)' }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340' }}>📝 Form Coverage</Text>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340' }}>📝 Form Coverage</Text>
             {insights.selectedWorkspaceSubSpacesMissingForms.length === 0
               ? <View style={{ backgroundColor: 'rgba(34,197,94,0.12)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}><Text style={{ fontSize: 10, fontWeight: '700', color: '#22C55E' }}>ALL COVERED</Text></View>
               : <View style={{ backgroundColor: 'rgba(239,68,68,0.12)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}><Text style={{ fontSize: 10, fontWeight: '700', color: '#EF4444' }}>{insights.selectedWorkspaceSubSpacesMissingForms.length} MISSING</Text></View>
@@ -1807,7 +1807,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             const pct = Math.round((covered / total) * 100);
             return (
               <>
-                <View style={{ height: 6, borderRadius: 3, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', marginBottom: 6, overflow: 'hidden' }}>
+                <View style={{ height: 6, borderRadius: 3, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)', marginBottom: 6, overflow: 'hidden' }}>
                   <View style={{ height: 6, borderRadius: 3, width: `${pct}%` as any, backgroundColor: pct === 100 ? '#22C55E' : ac }} />
                 </View>
                 <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)' }}>{covered} of {total} SubSpaces ({pct}%)</Text>
@@ -1826,7 +1826,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
         </View>
 
         {/* ── Findings ── */}
-        <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340', marginBottom: 8 }}>Action Items</Text>
+        <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340', marginBottom: 8 }}>Action Items</Text>
         <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)', marginBottom: 10 }}>Resolve warnings before go-live. Green items are complete.</Text>
         <View style={{ gap: 8, marginBottom: 16 }}>
           {insights.findings.map((finding) => {
@@ -1855,8 +1855,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
         </View>
 
         {/* ── Audit Log ── */}
-        <View style={{ borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
-          <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340', marginBottom: 4 }}>📋 Audit Log</Text>
+        <View style={{ borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.02)' }}>
+          <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340', marginBottom: 4 }}>📋 Audit Log</Text>
           <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.45)' : 'rgba(0,0,0,0.4)', marginBottom: 8 }}>All workspace and platform changes in one timeline.</Text>
           <AuditLogViewer
             entries={auditLog?.entries ?? []}
@@ -1915,7 +1915,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
         {(data.businessFunctions ?? []).length === 0 ? (
           <View style={{ gap: 14 }}>
             {/* Hero */}
-            <View style={{ backgroundColor: 'rgba(38,51,116,0.08)', borderWidth: 1, borderColor: 'rgba(38,51,116,0.24)', borderRadius: 12, padding: 16, gap: 8 }}>
+            <View style={{ backgroundColor: 'rgba(0,0,0,0.02)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)', borderRadius: 12, padding: 16, gap: 8 }}>
               <Text style={{ fontSize: 22, textAlign: 'center' }}>🏗️</Text>
               <Text style={[styles.listTitle, { textAlign: 'center', fontSize: 16 }]}>Define Your Business Architecture</Text>
               <Text style={[styles.bodyText, { textAlign: 'center', fontSize: 13 }]}>
@@ -1934,7 +1934,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 { icon: '📋', label: 'SubSpace', desc: 'A lane inside a workspace (e.g. Distributor Verification, Repair Tasks)', color: '#EF4444' },
                 { icon: '📄', label: 'Record', desc: 'A single tracked item with fields, status, and history', color: '#6B7280' },
               ].map((level, i) => (
-                <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 5, borderBottomWidth: i < 5 ? 1 : 0, borderBottomColor: 'rgba(255,255,255,0.06)' }}>
+                <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 5, borderBottomWidth: i < 5 ? 1 : 0, borderBottomColor: 'rgba(0,0,0,0.04)' }}>
                   <View style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: `${level.color}20`, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Text style={{ fontSize: 14 }}>{level.icon}</Text>
                   </View>
@@ -2036,7 +2036,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
         ) : (
           <View style={{ gap: 10 }}>
             {/* Summary bar */}
-            <View style={{ backgroundColor: 'rgba(38,51,116,0.08)', borderWidth: 1, borderColor: 'rgba(38,51,116,0.20)', borderRadius: 10, padding: 12 }}>
+            <View style={{ backgroundColor: 'rgba(0,0,0,0.02)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)', borderRadius: 10, padding: 12 }}>
               <Text style={[styles.listTitle, { fontSize: 14, marginBottom: 4 }]}>🏗️ Your Operations Map</Text>
               <View style={{ flexDirection: 'row', gap: 14, flexWrap: 'wrap' }}>
                 <Text style={styles.metaText}>
@@ -2109,7 +2109,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 </Pressable>
                 <Pressable onPress={() => {
                   setEditingFunctionId(isEditingFn ? null : fn.id);
-                  if (!isEditingFn) { setNewFnName(fn.name); setNewFnIcon(fn.icon ?? ''); setNewFnColor(fn.color ?? '#FFD332'); setNewFnDesc(fn.description ?? ''); }
+                  if (!isEditingFn) { setNewFnName(fn.name); setNewFnIcon(fn.icon ?? ''); setNewFnColor(fn.color ?? '#111111'); setNewFnDesc(fn.description ?? ''); }
                 }} style={styles.secondaryButton}>
                   <Text style={styles.secondaryButtonText}>{isEditingFn ? 'Cancel' : 'Edit'}</Text>
                 </Pressable>
@@ -2123,7 +2123,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 <View style={{ marginTop: 8, gap: 6 }}>
                   <LabeledInput label="Name" value={newFnName} onChangeText={setNewFnName} placeholder="e.g. Supply Chain & Regulatory" />
                   <LabeledInput label="Icon (emoji)" value={newFnIcon} onChangeText={setNewFnIcon} placeholder="🔗" />
-                  <LabeledInput label="Accent Color (hex)" value={newFnColor} onChangeText={setNewFnColor} placeholder="#FFD332" />
+                  <LabeledInput label="Accent Color (hex)" value={newFnColor} onChangeText={setNewFnColor} placeholder="#111111" />
                   <LabeledInput label="Description (optional)" value={newFnDesc} onChangeText={setNewFnDesc} placeholder="What this department covers" />
                   <Pressable style={styles.secondaryButton} onPress={() => {
                     if (!newFnName.trim()) return;
@@ -2259,14 +2259,14 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             <Text style={styles.listTitle}>New {data.shellConfig.functionLabel ?? 'Department'}</Text>
             <LabeledInput label="Name" value={newFnName} onChangeText={setNewFnName} placeholder="e.g. Finance" />
             <LabeledInput label="Icon (emoji)" value={newFnIcon} onChangeText={setNewFnIcon} placeholder="💰" />
-            <LabeledInput label="Accent Color (hex)" value={newFnColor} onChangeText={setNewFnColor} placeholder="#FFD332" />
+            <LabeledInput label="Accent Color (hex)" value={newFnColor} onChangeText={setNewFnColor} placeholder="#111111" />
             <LabeledInput label="Description (optional)" value={newFnDesc} onChangeText={setNewFnDesc} placeholder="What this department covers" />
             <View style={styles.inlineRow}>
               <Pressable style={styles.secondaryButton} onPress={() => {
                 if (!newFnName.trim()) return;
                 const id = `bfn-${newFnName.trim().toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
                 const order = (data.businessFunctions ?? []).length;
-                upsertBusinessFunction({ id, name: newFnName.trim(), icon: newFnIcon.trim() || undefined, color: newFnColor.trim() || '#FFD332', description: newFnDesc.trim() || undefined, order, objects: [] });
+                upsertBusinessFunction({ id, name: newFnName.trim(), icon: newFnIcon.trim() || undefined, color: newFnColor.trim() || '#111111', description: newFnDesc.trim() || undefined, order, objects: [] });
                 setNewFnName(''); setNewFnIcon(''); setNewFnColor(ac); setNewFnDesc('');
                 setEditingFunctionId(null);
               }}>
@@ -2295,7 +2295,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
           </View>
           <View style={{ flex: 1 }}>
             <Text style={{ color: mode === 'night' ? '#fff' : '#1A2340', fontSize: 17, fontWeight: '800' }}>Language & Intake Designer</Text>
-            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 17 }}>Customize terminology, intake forms, personas, and lifecycle stages — no coding needed.</Text>
+            <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 17 }}>Customize terminology, intake forms, personas, and lifecycle stages — no coding needed.</Text>
           </View>
         </View>
         {!canManageWorkspace && <Text style={styles.notice}>{deniedMessage('workspace.manage')}</Text>}
@@ -2308,10 +2308,10 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             { icon: '👤', label: 'Personas', value: String(shellConfig.personas.length), sub: 'defined' },
             { icon: '🔄', label: 'Stages', value: String(shellConfig.lifecycleStages.length), sub: 'mapped' },
           ].map((kpi) => (
-            <View key={kpi.label} style={{ flex: 1, minWidth: 120, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }}>
+            <View key={kpi.label} style={{ flex: 1, minWidth: 120, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.02)', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)' }}>
               <Text style={{ fontSize: 16, marginBottom: 4 }}>{kpi.icon}</Text>
               <Text style={{ color: ac, fontSize: 20, fontWeight: '800' }}>{kpi.value}</Text>
-              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 11, fontWeight: '600' }}>{kpi.sub}</Text>
+              <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 11, fontWeight: '600' }}>{kpi.sub}</Text>
             </View>
           ))}
         </View>
@@ -2319,7 +2319,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
         {/* ── Segmented Step Rail ── */}
         <View style={{
           flexDirection: 'row', marginBottom: 18, borderRadius: 12, overflow: 'hidden',
-          borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(102,74,154,0.12)',
+          borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(102,74,154,0.12)',
         }}>
           {([
             { key: 'labels' as const, icon: '🏷️', label: 'App Terminology' },
@@ -2332,12 +2332,12 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <Pressable key={key} onPress={() => setShellPane(key)} style={{
                 flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
                 paddingVertical: 11, paddingHorizontal: 8, gap: 5,
-                backgroundColor: isActive ? acRgba(0.20) : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                backgroundColor: isActive ? acRgba(0.20) : mode === 'night' ? 'rgba(0,0,0,0.015)' : 'rgba(0,0,0,0.02)',
                 borderRightWidth: idx < 3 ? 1 : 0,
-                borderRightColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(102,74,154,0.10)',
+                borderRightColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(102,74,154,0.10)',
               }}>
                 <Text style={{ fontSize: 13 }}>{icon}</Text>
-                <Text style={{ fontSize: 12, fontWeight: isActive ? '800' : '600', color: isActive ? ac : mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.40)' }}>{label}</Text>
+                <Text style={{ fontSize: 12, fontWeight: isActive ? '800' : '600', color: isActive ? ac : mode === 'night' ? 'rgba(0,0,0,0.40)' : 'rgba(0,0,0,0.40)' }}>{label}</Text>
               </Pressable>
             );
           })}
@@ -2353,7 +2353,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <Text style={{ fontSize: 15 }}>🏷️</Text>
               <Text style={{ color: mode === 'night' ? '#fff' : '#1A2340', fontSize: 15, fontWeight: '800' }}>App Terminology</Text>
             </View>
-            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 14 }}>Rename the key labels your team sees across the app. Use words they already say every day.</Text>
+            <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 14 }}>Rename the key labels your team sees across the app. Use words they already say every day.</Text>
 
             {/* Grouped cards — each card holds a singular/plural pair */}
             {([
@@ -2378,7 +2378,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 { label: 'Plural', helper: 'Plural version', value: collectionLabelPlural, setter: setCollectionLabelPlural, ph: 'Batches' },
               ]},
             ] as const).map((group) => (
-              <View key={group.title} style={{ backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)', borderRadius: 14, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }}>
+              <View key={group.title} style={{ backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.015)', borderRadius: 14, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                   <Text style={{ fontSize: 14 }}>{group.icon}</Text>
                   <Text style={{ color: ac, fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8 }}>{group.title}</Text>
@@ -2394,7 +2394,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             ))}
 
             {/* Save button — accent styled */}
-            <Pressable nativeID="wt-save-app-words" disabled={!canManageWorkspace} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, paddingHorizontal: 20, alignItems: 'center', marginTop: 6, opacity: canManageWorkspace ? 1 : 0.45 }} onPress={() => { saveLabels(); auditLog?.logEntry({ action: 'update', entityType: 'shell-config', entityId: 'shell-config', entityName: 'Shell Configuration', after: { subjectSingular, subjectPlural, workspaceLabel, subSpaceLabel } }); addNotification?.({ type: 'system', title: 'Config Updated', body: 'Shell configuration (app terminology) has been saved.', severity: 'info' }); }}>
+            <Pressable nativeID="wt-save-app-words" disabled={!canManageWorkspace} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, paddingHorizontal: 20, alignItems: 'center', marginTop: 6, opacity: canManageWorkspace ? 1 : 0.45 }} onPress={() => { saveLabels(); auditLog?.logEntry({ action: 'update', entityType: 'shell-config', entityId: 'shell-config', entityName: 'Shell Configuration', after: { subjectSingular, subjectPlural, workspaceLabel, subSpaceLabel } }); addNotification?.({ type: 'system', title: 'Config Updated', body: 'Shell configuration (app terminology) has been saved.', severity: 'info' }); }}>
               <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13, letterSpacing: 0.3 }}>💾  Save App Words</Text>
             </Pressable>
           </>
@@ -2413,7 +2413,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 <Text style={{ color: ac, fontSize: 11, fontWeight: '700' }}>{shellConfig.intakeFields.length} fields</Text>
               </View>
             </View>
-            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 14 }}>Define the fields that every new record starts with. Only ask for information your team actually needs.</Text>
+            <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 14 }}>Define the fields that every new record starts with. Only ask for information your team actually needs.</Text>
 
             {/* Existing fields — card grid */}
             {shellConfig.intakeFields.length > 0 && (
@@ -2421,19 +2421,19 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 {shellConfig.intakeFields.map((field) => {
                   const typeIcon = field.type === 'text' ? '✏️' : field.type === 'number' ? '#️⃣' : field.type === 'date' ? '📅' : '📋';
                   return (
-                    <View key={field.id} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', gap: 12 }}>
+                    <View key={field.id} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.015)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)', gap: 12 }}>
                       <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: acRgba(0.12), alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ fontSize: 16 }}>{typeIcon}</Text>
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={{ color: mode === 'night' ? '#fff' : '#1A2340', fontWeight: '700', fontSize: 13 }}>{field.label}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 }}>
-                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)', fontSize: 11 }}>{field.type}</Text>
-                          <View style={{ width: 3, height: 3, borderRadius: 2, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.20)' : 'rgba(0,0,0,0.20)' }} />
-                          <Text style={{ color: field.required ? '#22C55E' : mode === 'night' ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)', fontSize: 11, fontWeight: '600' }}>{field.required ? 'Required' : 'Optional'}</Text>
+                          <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.40)', fontSize: 11 }}>{field.type}</Text>
+                          <View style={{ width: 3, height: 3, borderRadius: 2, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.20)' : 'rgba(0,0,0,0.20)' }} />
+                          <Text style={{ color: field.required ? '#22C55E' : mode === 'night' ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.35)', fontSize: 11, fontWeight: '600' }}>{field.required ? 'Required' : 'Optional'}</Text>
                           {!!field.options?.length && <>
-                            <View style={{ width: 3, height: 3, borderRadius: 2, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.20)' : 'rgba(0,0,0,0.20)' }} />
-                            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)', fontSize: 11 }}>{field.options.join(', ')}</Text>
+                            <View style={{ width: 3, height: 3, borderRadius: 2, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.20)' : 'rgba(0,0,0,0.20)' }} />
+                            <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.40)' : 'rgba(0,0,0,0.35)', fontSize: 11 }}>{field.options.join(', ')}</Text>
                           </>}
                         </View>
                       </View>
@@ -2452,7 +2452,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <LabeledInput label="Field Label" helperText="Example: Carton Serial" value={newFieldLabel} onChangeText={setNewFieldLabel} placeholder="Example: NDC Product Code" />
 
               {/* Type selector cards */}
-              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4 }}>Field Type</Text>
+              <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4 }}>Field Type</Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                 {([
                   { type: 'text' as const, icon: '✏️', label: 'Text' },
@@ -2465,12 +2465,12 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     <Pressable key={type} disabled={!canManageWorkspace} onPress={() => setNewFieldType(type)} style={{
                       flex: 1, minWidth: 80, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
                       paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10,
-                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)',
+                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)',
                       opacity: canManageWorkspace ? 1 : 0.45,
                     }}>
                       <Text style={{ fontSize: 14 }}>{icon}</Text>
-                      <Text style={{ fontSize: 12, fontWeight: sel ? '800' : '600', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)' }}>{label}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: sel ? '800' : '600', color: sel ? ac : mode === 'night' ? 'rgba(0,0,0,0.50)' : 'rgba(0,0,0,0.45)' }}>{label}</Text>
                     </Pressable>
                   );
                 })}
@@ -2479,19 +2479,19 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               {/* Required toggle */}
               <Pressable disabled={!canManageWorkspace} onPress={() => setNewFieldRequired((c) => !c)} style={{
                 flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 12, borderRadius: 10,
-                backgroundColor: newFieldRequired ? 'rgba(34,197,94,0.10)' : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-                borderWidth: 1, borderColor: newFieldRequired ? 'rgba(34,197,94,0.25)' : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                backgroundColor: newFieldRequired ? 'rgba(34,197,94,0.10)' : mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)',
+                borderWidth: 1, borderColor: newFieldRequired ? 'rgba(34,197,94,0.25)' : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)',
                 opacity: canManageWorkspace ? 1 : 0.45,
               }}>
                 <Text style={{ fontSize: 13 }}>{newFieldRequired ? '✅' : '⬜'}</Text>
-                <Text style={{ color: newFieldRequired ? '#22C55E' : mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, fontWeight: '700' }}>Required Field</Text>
+                <Text style={{ color: newFieldRequired ? '#22C55E' : mode === 'night' ? 'rgba(0,0,0,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, fontWeight: '700' }}>Required Field</Text>
               </Pressable>
 
               {newFieldType === 'select' && (
                 <LabeledInput label="Dropdown Options (comma separated)" helperText="Example: Match, Mismatch, Pending" value={newFieldOptions} onChangeText={setNewFieldOptions} placeholder="Manufacturer, Distributor, Pharmacy" />
               )}
 
-              <Pressable nativeID="wt-add-intake-field" disabled={!canManageWorkspace} onPress={addIntakeField} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 4, opacity: canManageWorkspace ? 1 : 0.45 }}>
+              <Pressable nativeID="wt-add-intake-field" disabled={!canManageWorkspace} onPress={addIntakeField} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 4, opacity: canManageWorkspace ? 1 : 0.45 }}>
                 <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>➕  Add Field</Text>
               </Pressable>
             </View>
@@ -2511,20 +2511,20 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 <Text style={{ color: ac, fontSize: 11, fontWeight: '700' }}>{shellConfig.personas.length} personas</Text>
               </View>
             </View>
-            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 14 }}>Create personas that represent the different workflow roles in your organization. Each persona can be scoped to specific workspaces and tagged for reporting.</Text>
+            <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 14 }}>Create personas that represent the different workflow roles in your organization. Each persona can be scoped to specific workspaces and tagged for reporting.</Text>
 
             {/* Existing persona cards */}
             {shellConfig.personas.length > 0 && (
               <View style={{ gap: 8, marginBottom: 14 }}>
                 {shellConfig.personas.map((persona) => (
-                  <View key={persona.id} style={{ backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)', borderRadius: 14, padding: 16, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }}>
+                  <View key={persona.id} style={{ backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.015)', borderRadius: 14, padding: 16, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                       <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: acRgba(0.14), alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ fontSize: 16 }}>👤</Text>
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={{ color: mode === 'night' ? '#fff' : '#1A2340', fontWeight: '700', fontSize: 14 }}>{persona.name}</Text>
-                        {!!persona.description && <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)', fontSize: 11, marginTop: 2 }}>{persona.description}</Text>}
+                        {!!persona.description && <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.40)', fontSize: 11, marginTop: 2 }}>{persona.description}</Text>}
                       </View>
                       <Pressable disabled={!canManageWorkspace} onPress={() => deletePersona(persona.id)} style={{ opacity: canManageWorkspace ? 0.7 : 0.3, padding: 6 }}>
                         <Text style={{ fontSize: 16 }}>🗑️</Text>
@@ -2536,8 +2536,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                         <Text style={{ color: ac, fontSize: 10, fontWeight: '700' }}>🌐 {persona.workspaceScope === 'all' ? 'All Workspaces' : `${persona.workspaceIds.length} workspace${persona.workspaceIds.length === 1 ? '' : 's'}`}</Text>
                       </View>
                       {persona.defaultTags.filter(Boolean).map((tag) => (
-                        <View key={tag} style={{ backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
-                          <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 10, fontWeight: '600' }}>🏷️ {tag}</Text>
+                        <View key={tag} style={{ backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.05)', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
+                          <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 10, fontWeight: '600' }}>🏷️ {tag}</Text>
                         </View>
                       ))}
                     </View>
@@ -2553,7 +2553,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <LabeledInput label="Description" helperText="Example: Handles incoming carton scans and serial verification" value={personaDescription} onChangeText={setPersonaDescription} placeholder="Describe what this persona does" multiline />
 
               {/* Workspace scope selector cards */}
-              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4 }}>Workspace Scope</Text>
+              <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4 }}>Workspace Scope</Text>
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 {([
                   { key: 'all' as const, icon: '🌐', label: 'All Workspaces' },
@@ -2564,12 +2564,12 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     <Pressable key={key} disabled={!canManageWorkspace} onPress={() => setPersonaWorkspaceScope(key)} style={{
                       flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
                       paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10,
-                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)',
+                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)',
                       opacity: canManageWorkspace ? 1 : 0.45,
                     }}>
                       <Text style={{ fontSize: 13 }}>{icon}</Text>
-                      <Text style={{ fontSize: 12, fontWeight: sel ? '800' : '600', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)' }}>{label}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: sel ? '800' : '600', color: sel ? ac : mode === 'night' ? 'rgba(0,0,0,0.50)' : 'rgba(0,0,0,0.45)' }}>{label}</Text>
                     </Pressable>
                   );
                 })}
@@ -2581,11 +2581,11 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     return (
                       <Pressable key={workspaceItem.id} disabled={!canManageWorkspace} onPress={() => togglePersonaWorkspace(workspaceItem.id)} style={{
                         paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8,
-                        backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-                        borderWidth: 1, borderColor: sel ? acRgba(0.30) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                        backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)',
+                        borderWidth: 1, borderColor: sel ? acRgba(0.30) : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)',
                         opacity: canManageWorkspace ? 1 : 0.45,
                       }}>
-                        <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)' }}>{workspaceItem.name}</Text>
+                        <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? ac : mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.40)' }}>{workspaceItem.name}</Text>
                       </Pressable>
                     );
                   })}
@@ -2594,7 +2594,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
 
               <LabeledInput label="Default Tags (comma separated)" helperText="Example: Team:Distributor, Region:US" value={personaDefaultTags} onChangeText={setPersonaDefaultTags} placeholder="Persona:DistributorReceiver, Segment:Traceability" />
 
-              <Pressable disabled={!canManageWorkspace} onPress={createPersona} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 4, opacity: canManageWorkspace ? 1 : 0.45 }}>
+              <Pressable disabled={!canManageWorkspace} onPress={createPersona} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 4, opacity: canManageWorkspace ? 1 : 0.45 }}>
                 <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>👤  Create Persona</Text>
               </Pressable>
             </View>
@@ -2614,7 +2614,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 <Text style={{ color: ac, fontSize: 11, fontWeight: '700' }}>{shellConfig.lifecycleStages.length} stages · {shellConfig.lifecycleTransitions.length} rules</Text>
               </View>
             </View>
-            <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 14 }}>Map out the stages a record moves through from start to finish. Define stages, set a default, and create transition rules.</Text>
+            <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.50)' : 'rgba(0,0,0,0.45)', fontSize: 12, lineHeight: 18, marginBottom: 14 }}>Map out the stages a record moves through from start to finish. Define stages, set a default, and create transition rules.</Text>
 
             {/* Existing stage cards */}
             {shellConfig.lifecycleStages.length > 0 && (
@@ -2622,7 +2622,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 {shellConfig.lifecycleStages.map((stage) => {
                   const isDefault = stage.id === shellConfig.defaultLifecycleStageId;
                   return (
-                    <View key={stage.id} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: isDefault ? 'rgba(34,197,94,0.25)' : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', gap: 12 }}>
+                    <View key={stage.id} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.015)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: isDefault ? 'rgba(34,197,94,0.25)' : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)', gap: 12 }}>
                       <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: isDefault ? 'rgba(34,197,94,0.12)' : acRgba(0.12), alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ fontSize: 16 }}>{isDefault ? '⭐' : '🔄'}</Text>
                       </View>
@@ -2631,7 +2631,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                           <Text style={{ color: mode === 'night' ? '#fff' : '#1A2340', fontWeight: '700', fontSize: 13 }}>{stage.name}</Text>
                           {isDefault && <View style={{ backgroundColor: 'rgba(34,197,94,0.12)', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1 }}><Text style={{ color: '#22C55E', fontSize: 10, fontWeight: '700' }}>DEFAULT</Text></View>}
                         </View>
-                        {!!stage.description && <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)', fontSize: 11, marginTop: 2 }}>{stage.description}</Text>}
+                        {!!stage.description && <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.40)', fontSize: 11, marginTop: 2 }}>{stage.description}</Text>}
                       </View>
                       <View style={{ flexDirection: 'row', gap: 6 }}>
                         {!isDefault && (
@@ -2654,13 +2654,13 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <Text style={{ color: ac, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>➕  Add New Stage</Text>
               <LabeledInput label="Stage Name" helperText="Example: Exception Review" value={newLifecycleName} onChangeText={setNewLifecycleName} placeholder="Received by Pharmacy" />
               <LabeledInput label="Description" helperText="Example: Serial event requires investigation" value={newLifecycleDescription} onChangeText={setNewLifecycleDescription} placeholder="Optional context for users" multiline />
-              <Pressable disabled={!canManageWorkspace} onPress={addLifecycleStage} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 4, opacity: canManageWorkspace ? 1 : 0.45 }}>
+              <Pressable disabled={!canManageWorkspace} onPress={addLifecycleStage} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 4, opacity: canManageWorkspace ? 1 : 0.45 }}>
                 <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>🔄  Add Stage</Text>
               </Pressable>
             </View>
 
             {/* ── Transition Rules Section ── */}
-            <View style={{ height: 1, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)', marginVertical: 8 }} />
+            <View style={{ height: 1, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.07)', marginVertical: 8 }} />
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
               <Text style={{ fontSize: 14 }}>🔀</Text>
               <Text style={{ color: mode === 'night' ? '#fff' : '#1A2340', fontSize: 14, fontWeight: '800' }}>Transition Rules</Text>
@@ -2670,7 +2670,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             </View>
 
             {shellConfig.lifecycleTransitions.length === 0 && (
-              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)', fontSize: 12, fontStyle: 'italic', marginBottom: 10 }}>No move rules yet. Records can still start in the default stage.</Text>
+              <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.40)' : 'rgba(0,0,0,0.35)', fontSize: 12, fontStyle: 'italic', marginBottom: 10 }}>No move rules yet. Records can still start in the default stage.</Text>
             )}
 
             {/* Existing transition cards */}
@@ -2681,13 +2681,13 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                   const to = shellConfig.lifecycleStages.find((s) => s.id === transition.toStageId)?.name ?? transition.toStageId;
                   const pNames = (transition.personaIds ?? []).map((pid) => shellConfig.personas.find((p) => p.id === pid)?.name ?? pid).join(', ');
                   return (
-                    <View key={transition.id} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.015)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', gap: 12 }}>
+                    <View key={transition.id} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.015)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)', gap: 12 }}>
                       <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: acRgba(0.12), alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ fontSize: 16 }}>🔀</Text>
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={{ color: mode === 'night' ? '#fff' : '#1A2340', fontWeight: '700', fontSize: 13 }}>{from} → {to}</Text>
-                        <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)', fontSize: 11, marginTop: 2 }}>{(transition.personaIds ?? []).length === 0 ? '🌐 All personas' : `👤 ${pNames}`}</Text>
+                        <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.40)', fontSize: 11, marginTop: 2 }}>{(transition.personaIds ?? []).length === 0 ? '🌐 All personas' : `👤 ${pNames}`}</Text>
                       </View>
                       <Pressable disabled={!canManageWorkspace} onPress={() => deleteLifecycleTransition(transition.id)} style={{ opacity: canManageWorkspace ? 0.7 : 0.3, padding: 6 }}>
                         <Text style={{ fontSize: 16 }}>🗑️</Text>
@@ -2702,41 +2702,41 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             <View style={{ backgroundColor: mode === 'night' ? acRgba(0.06) : acRgba(0.03), borderRadius: 14, padding: 16, borderWidth: 1, borderColor: acRgba(0.15), gap: 10 }}>
               <Text style={{ color: ac, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>➕  New Transition Rule</Text>
 
-              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8 }}>From Stage</Text>
+              <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8 }}>From Stage</Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                 {shellConfig.lifecycleStages.map((stage) => {
                   const sel = transitionFromStageId === stage.id;
                   return (
                     <Pressable key={`from-${stage.id}`} disabled={!canManageWorkspace} onPress={() => setTransitionFromStageId(stage.id)} style={{
                       paddingVertical: 7, paddingHorizontal: 12, borderRadius: 8,
-                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)',
+                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)',
                       opacity: canManageWorkspace ? 1 : 0.45,
                     }}>
-                      <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)' }}>{stage.name}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? ac : mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.40)' }}>{stage.name}</Text>
                     </Pressable>
                   );
                 })}
               </View>
 
-              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4 }}>To Stage</Text>
+              <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4 }}>To Stage</Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                 {shellConfig.lifecycleStages.map((stage) => {
                   const sel = transitionToStageId === stage.id;
                   return (
                     <Pressable key={`to-${stage.id}`} disabled={!canManageWorkspace} onPress={() => setTransitionToStageId(stage.id)} style={{
                       paddingVertical: 7, paddingHorizontal: 12, borderRadius: 8,
-                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)',
+                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)',
                       opacity: canManageWorkspace ? 1 : 0.45,
                     }}>
-                      <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)' }}>{stage.name}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? ac : mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.40)' }}>{stage.name}</Text>
                     </Pressable>
                   );
                 })}
               </View>
 
-              <Text style={{ color: mode === 'night' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4 }}>Persona Scope</Text>
+              <Text style={{ color: mode === 'night' ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.50)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 4 }}>Persona Scope</Text>
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 {([
                   { key: 'all' as const, icon: '🌐', label: 'All Personas' },
@@ -2747,12 +2747,12 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     <Pressable key={key} disabled={!canManageWorkspace} onPress={() => setTransitionPersonaScope(key)} style={{
                       flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
                       paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10,
-                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                      backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)',
+                      borderWidth: 1, borderColor: sel ? acRgba(0.35) : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)',
                       opacity: canManageWorkspace ? 1 : 0.45,
                     }}>
                       <Text style={{ fontSize: 13 }}>{icon}</Text>
-                      <Text style={{ fontSize: 12, fontWeight: sel ? '800' : '600', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.50)' : 'rgba(0,0,0,0.45)' }}>{label}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: sel ? '800' : '600', color: sel ? ac : mode === 'night' ? 'rgba(0,0,0,0.50)' : 'rgba(0,0,0,0.45)' }}>{label}</Text>
                     </Pressable>
                   );
                 })}
@@ -2765,18 +2765,18 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     return (
                       <Pressable key={`tp-${persona.id}`} disabled={!canManageWorkspace} onPress={() => toggleTransitionPersona(persona.id)} style={{
                         paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8,
-                        backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
-                        borderWidth: 1, borderColor: sel ? acRgba(0.30) : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                        backgroundColor: sel ? acRgba(0.18) : mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.03)',
+                        borderWidth: 1, borderColor: sel ? acRgba(0.30) : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)',
                         opacity: canManageWorkspace ? 1 : 0.45,
                       }}>
-                        <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? ac : mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.40)' }}>{persona.name}</Text>
+                        <Text style={{ fontSize: 12, fontWeight: sel ? '700' : '500', color: sel ? ac : mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.40)' }}>{persona.name}</Text>
                       </Pressable>
                     );
                   })}
                 </View>
               )}
 
-              <Pressable disabled={!canManageWorkspace} onPress={addLifecycleTransition} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 4, opacity: canManageWorkspace ? 1 : 0.45 }}>
+              <Pressable disabled={!canManageWorkspace} onPress={addLifecycleTransition} style={{ backgroundColor: canManageWorkspace ? ac : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)', borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 4, opacity: canManageWorkspace ? 1 : 0.45 }}>
                 <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>🔀  Add Transition Rule</Text>
               </Pressable>
             </View>
@@ -2798,7 +2798,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             <View key={i} style={{ flex: 1, minWidth: 140, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: `${kpi.color}30`, backgroundColor: `${kpi.color}0C` }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                 <Text style={{ fontSize: 20 }}>{kpi.icon}</Text>
-                <Text style={{ fontSize: 15, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340' }}>{kpi.label}</Text>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340' }}>{kpi.label}</Text>
               </View>
               <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.55)' : 'rgba(0,0,0,0.5)' }}>{kpi.sub}</Text>
             </View>
@@ -2812,7 +2812,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
         )}
 
         {/* ── Sub-tab Navigation ── */}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 16, borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(102,74,154,0.12)' }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 16, borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(102,74,154,0.12)' }}>
           {([
             { key: 'roles' as const, icon: '👤', label: 'Roles' },
             { key: 'permissions' as const, icon: '🔑', label: 'Permissions' },
@@ -2828,13 +2828,13 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                 style={{
                   flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
                   paddingVertical: 10, paddingHorizontal: 8, gap: 5, minWidth: 100,
-                  backgroundColor: isActive ? acRgba(0.18) : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                  backgroundColor: isActive ? acRgba(0.18) : mode === 'night' ? 'rgba(0,0,0,0.015)' : 'rgba(0,0,0,0.02)',
                   borderRightWidth: idx < 4 ? 1 : 0,
-                  borderRightColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(102,74,154,0.10)',
+                  borderRightColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(102,74,154,0.10)',
                 }}
               >
                 <Text style={{ fontSize: 13 }}>{icon}</Text>
-                <Text style={{ fontSize: 12, fontWeight: isActive ? '800' : '600', color: isActive ? ac : mode === 'night' ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)' }}>{label}</Text>
+                <Text style={{ fontSize: 12, fontWeight: isActive ? '800' : '600', color: isActive ? ac : mode === 'night' ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.45)' }}>{label}</Text>
               </Pressable>
             );
           })}
@@ -2851,14 +2851,14 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                   <Pressable key={role.id} onPress={() => setSelectedRoleId(role.id)} style={{
                     minWidth: 180, flex: 1, borderRadius: 12, padding: 14,
                     borderWidth: isSelected ? 2 : 1,
-                    borderColor: isSelected ? ac : mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-                    backgroundColor: isSelected ? acRgba(0.08) : mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                    borderColor: isSelected ? ac : mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)',
+                    backgroundColor: isSelected ? acRgba(0.08) : mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.02)',
                   }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                       <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: isSelected ? acRgba(0.2) : 'rgba(107,114,128,0.15)', alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ fontSize: 14 }}>👤</Text>
                       </View>
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: isSelected ? ac : mode === 'night' ? '#EEF1F8' : '#1A2340', flex: 1 }}>{role.name}</Text>
+                      <Text style={{ fontSize: 14, fontWeight: '700', color: isSelected ? ac : mode === 'night' ? '#1A2340' : '#1A2340', flex: 1 }}>{role.name}</Text>
                     </View>
                     <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)', marginBottom: 4 }}>{role.description || 'No description'}</Text>
                     <View style={{ flexDirection: 'row', gap: 12 }}>
@@ -2870,7 +2870,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             </View>
 
             {/* ── Create New Role ── */}
-            <View style={{ borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)', marginBottom: 12 }}>
+            <View style={{ borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.07)', backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.015)' : 'rgba(0,0,0,0.015)', marginBottom: 12 }}>
               <Text style={[styles.listTitle, { fontSize: 13, marginBottom: 8 }]}>Create New Role</Text>
               <LabeledInput label="Role Name" helperText="Permission profile name" value={newRoleName} onChangeText={setNewRoleName} placeholder="Example: Assembly Supervisor" />
               <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={createRole}>
@@ -2902,7 +2902,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             {/* ── Members Badge ── */}
             <View style={{ borderRadius: 10, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: acRgba(0.15), backgroundColor: acRgba(0.04) }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340' }}>Members in "{selectedRole.name}"</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340' }}>Members in "{selectedRole.name}"</Text>
                 {isEditingOwnRole && <View style={{ backgroundColor: acRgba(0.15), borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}><Text style={{ fontSize: 10, color: ac, fontWeight: '700' }}>YOUR ROLE</Text></View>}
               </View>
               {membersInRole.length === 0 ? (
@@ -2910,9 +2910,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               ) : (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                   {membersInRole.map((member) => (
-                    <View key={member.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}>
+                    <View key={member.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.03)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}>
                       <Text style={{ fontSize: 13 }}>{member.isSuperAdmin ? '👑' : '👤'}</Text>
-                      <Text style={{ fontSize: 12, fontWeight: '600', color: mode === 'night' ? '#EEF1F8' : '#1A2340' }}>{member.fullName}{member.id === currentUser?.id ? ' (you)' : ''}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: '600', color: mode === 'night' ? '#1A2340' : '#1A2340' }}>{member.fullName}{member.id === currentUser?.id ? ' (you)' : ''}</Text>
                     </View>
                   ))}
                 </View>
@@ -2920,7 +2920,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             </View>
 
             {/* ── Permission Cards ── */}
-            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340', marginBottom: 8 }}>Permission Map</Text>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340', marginBottom: 8 }}>Permission Map</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
               {permissionCatalog.map((permission) => {
                 const enabled = permissions.includes(permission.action);
@@ -2932,13 +2932,13 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     style={{
                       minWidth: 200, flex: 1, borderRadius: 10, padding: 12,
                       borderWidth: 1,
-                      borderColor: enabled ? `${ac}40` : mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
-                      backgroundColor: enabled ? acRgba(0.08) : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+                      borderColor: enabled ? `${ac}40` : mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.06)',
+                      backgroundColor: enabled ? acRgba(0.08) : mode === 'night' ? 'rgba(0,0,0,0.015)' : 'rgba(0,0,0,0.015)',
                       opacity: !canManageWorkspace ? 0.5 : 1,
                     }}
                   >
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <Text style={{ fontSize: 13, fontWeight: '700', color: enabled ? ac : mode === 'night' ? '#EEF1F8' : '#1A2340' }}>{permission.label}</Text>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: enabled ? ac : mode === 'night' ? '#1A2340' : '#1A2340' }}>{permission.label}</Text>
                       <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: enabled ? ac : 'rgba(107,114,128,0.25)', alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ fontSize: 11, color: '#fff', fontWeight: '700' }}>{enabled ? '✓' : ''}</Text>
                       </View>
@@ -2956,7 +2956,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             {/* ── Members Badge (same as permissions) ── */}
             <View style={{ borderRadius: 10, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: acRgba(0.15), backgroundColor: acRgba(0.04) }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340' }}>Members in "{selectedRole.name}"</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340' }}>Members in "{selectedRole.name}"</Text>
                 {isEditingOwnRole && <View style={{ backgroundColor: acRgba(0.15), borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}><Text style={{ fontSize: 10, color: ac, fontWeight: '700' }}>YOUR ROLE</Text></View>}
               </View>
               {membersInRole.length === 0 ? (
@@ -2964,9 +2964,9 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               ) : (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                   {membersInRole.map((member) => (
-                    <View key={member.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}>
+                    <View key={member.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.03)' : 'rgba(0,0,0,0.04)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}>
                       <Text style={{ fontSize: 13 }}>{member.isSuperAdmin ? '👑' : '👤'}</Text>
-                      <Text style={{ fontSize: 12, fontWeight: '600', color: mode === 'night' ? '#EEF1F8' : '#1A2340' }}>{member.fullName}{member.id === currentUser?.id ? ' (you)' : ''}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: '600', color: mode === 'night' ? '#1A2340' : '#1A2340' }}>{member.fullName}{member.id === currentUser?.id ? ' (you)' : ''}</Text>
                     </View>
                   ))}
                 </View>
@@ -2974,7 +2974,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             </View>
 
             {/* ── Scope Selector ── */}
-            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340', marginBottom: 8 }}>Workspace Access Scope</Text>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340', marginBottom: 8 }}>Workspace Access Scope</Text>
             <View style={{ flexDirection: 'row', gap: 10, marginBottom: 12 }}>
               {([
                 { key: 'all' as const, icon: '🌐', label: 'All Workspaces', sub: 'Unrestricted access to every workspace' },
@@ -2989,13 +2989,13 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     style={{
                       flex: 1, borderRadius: 12, padding: 14,
                       borderWidth: isActive ? 2 : 1,
-                      borderColor: isActive ? ac : mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-                      backgroundColor: isActive ? acRgba(0.08) : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+                      borderColor: isActive ? ac : mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)',
+                      backgroundColor: isActive ? acRgba(0.08) : mode === 'night' ? 'rgba(0,0,0,0.015)' : 'rgba(0,0,0,0.015)',
                       opacity: !canManageWorkspace ? 0.5 : 1,
                     }}
                   >
                     <Text style={{ fontSize: 20, marginBottom: 4 }}>{icon}</Text>
-                    <Text style={{ fontSize: 13, fontWeight: '700', color: isActive ? ac : mode === 'night' ? '#EEF1F8' : '#1A2340' }}>{label}</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: isActive ? ac : mode === 'night' ? '#1A2340' : '#1A2340' }}>{label}</Text>
                     <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)', marginTop: 2 }}>{sub}</Text>
                   </Pressable>
                 );
@@ -3014,12 +3014,12 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                       style={{
                         borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10,
                         borderWidth: 1,
-                        borderColor: selected ? `${ac}40` : mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-                        backgroundColor: selected ? acRgba(0.10) : mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+                        borderColor: selected ? `${ac}40` : mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)',
+                        backgroundColor: selected ? acRgba(0.10) : mode === 'night' ? 'rgba(0,0,0,0.015)' : 'rgba(0,0,0,0.015)',
                         opacity: !canManageWorkspace ? 0.5 : 1,
                       }}
                     >
-                      <Text style={{ fontSize: 13, fontWeight: selected ? '700' : '500', color: selected ? ac : mode === 'night' ? '#EEF1F8' : '#1A2340' }}>{selected ? '✓ ' : ''}{workspaceItem.name}</Text>
+                      <Text style={{ fontSize: 13, fontWeight: selected ? '700' : '500', color: selected ? ac : mode === 'night' ? '#1A2340' : '#1A2340' }}>{selected ? '✓ ' : ''}{workspaceItem.name}</Text>
                     </Pressable>
                   );
                 })}
@@ -3039,15 +3039,15 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
 
         {selectedRole && rolePane === 'templates' && (
           <>
-            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340', marginBottom: 8 }}>Policy Templates</Text>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340', marginBottom: 8 }}>Policy Templates</Text>
             <Text style={{ fontSize: 12, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)', marginBottom: 12 }}>Save permission snapshots as reusable templates. Clone, version, and diff them for audit and rollback.</Text>
 
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
               {templates.map((template) => (
-                <View key={template.id} style={{ minWidth: 260, flex: 1, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
+                <View key={template.id} style={{ minWidth: 260, flex: 1, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.02)' }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                     <Text style={{ fontSize: 14 }}>📋</Text>
-                    <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340', flex: 1 }}>{template.name}</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340', flex: 1 }}>{template.name}</Text>
                     <View style={{ backgroundColor: acRgba(0.12), borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
                       <Text style={{ fontSize: 10, color: ac, fontWeight: '700' }}>v{template.version}</Text>
                     </View>
@@ -3064,7 +3064,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                       { label: 'Set Base', onPress: () => setDiffFromTemplateId(template.id) },
                       { label: 'Set Compare', onPress: () => setDiffToTemplateId(template.id) },
                     ]).map((btn) => (
-                      <Pressable key={btn.label} disabled={!canManageWorkspace} onPress={btn.onPress} style={{ borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)', opacity: !canManageWorkspace ? 0.5 : 1 }}>
+                      <Pressable key={btn.label} disabled={!canManageWorkspace} onPress={btn.onPress} style={{ borderRadius: 6, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.05)', opacity: !canManageWorkspace ? 0.5 : 1 }}>
                         <Text style={{ fontSize: 11, fontWeight: '600', color: mode === 'night' ? 'rgba(241,232,255,0.7)' : 'rgba(0,0,0,0.6)' }}>{btn.label}</Text>
                       </Pressable>
                     ))}
@@ -3088,16 +3088,16 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             </View>
 
             {/* ── Lineage Viewer ── */}
-            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340', marginTop: 14, marginBottom: 8 }}>Template Lineage</Text>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340', marginTop: 14, marginBottom: 8 }}>Template Lineage</Text>
             {templateLineages.map((lineage) => (
-              <View key={lineage.lineageId} style={{ borderRadius: 12, padding: 14, marginBottom: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340' }}>{lineage.name}</Text>
+              <View key={lineage.lineageId} style={{ borderRadius: 12, padding: 14, marginBottom: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.02)' }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340' }}>{lineage.name}</Text>
                 <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.45)' : 'rgba(0,0,0,0.4)', marginBottom: 6 }}>{lineage.totalVersions} version{lineage.totalVersions !== 1 ? 's' : ''} · Latest: v{lineage.latestVersion}</Text>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                   {lineage.versions.map((versionItem) => {
                     const isLatest = versionItem.version === lineage.latestVersion;
                     return (
-                      <Pressable key={versionItem.id} disabled={!canManageWorkspace} onPress={() => applyTemplate(versionItem.id)} style={{ borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: isLatest ? acRgba(0.3) : mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', backgroundColor: isLatest ? acRgba(0.08) : 'transparent', opacity: !canManageWorkspace ? 0.5 : 1 }}>
+                      <Pressable key={versionItem.id} disabled={!canManageWorkspace} onPress={() => applyTemplate(versionItem.id)} style={{ borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: isLatest ? acRgba(0.3) : mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)', backgroundColor: isLatest ? acRgba(0.08) : 'transparent', opacity: !canManageWorkspace ? 0.5 : 1 }}>
                         <Text style={{ fontSize: 12, fontWeight: isLatest ? '700' : '500', color: isLatest ? ac : mode === 'night' ? 'rgba(241,232,255,0.6)' : 'rgba(0,0,0,0.5)' }}>v{versionItem.version}{isLatest ? ' · latest' : ''}</Text>
                       </Pressable>
                     );
@@ -3107,8 +3107,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             ))}
 
             {/* ── Save as Template ── */}
-            <View style={{ borderRadius: 12, padding: 14, marginTop: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)' }}>
-              <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340', marginBottom: 8 }}>Save Current as Template</Text>
+            <View style={{ borderRadius: 12, padding: 14, marginTop: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.07)', backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.015)' : 'rgba(0,0,0,0.015)' }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340', marginBottom: 8 }}>Save Current as Template</Text>
               <LabeledInput label="Template Name" helperText="Example: Receiving Team Basic Access" value={templateName} onChangeText={setTemplateName} placeholder="Template name" />
               <LabeledInput label="Template Description" helperText="Example: Use for new receiving team members" value={templateDescription} onChangeText={setTemplateDescription} placeholder="Describe usage" multiline />
               <Pressable disabled={!canManageWorkspace} style={[styles.secondaryButton, !canManageWorkspace && styles.buttonDisabled]} onPress={saveAsTemplate}>
@@ -3123,8 +3123,8 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
             <Text style={{ fontSize: 12, color: mode === 'night' ? 'rgba(241,232,255,0.5)' : 'rgba(0,0,0,0.45)', marginBottom: 10 }}>Base: {diffFromTemplateId || 'None'} · Compare: {diffToTemplateId || 'None'}</Text>
 
             {templateDiff && (
-              <View style={{ borderRadius: 12, padding: 16, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: mode === 'night' ? '#EEF1F8' : '#1A2340', marginBottom: 8 }}>Diff: {templateDiff.fromTemplateName} → {templateDiff.toTemplateName}</Text>
+              <View style={{ borderRadius: 12, padding: 16, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.02)' }}>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: mode === 'night' ? '#1A2340' : '#1A2340', marginBottom: 8 }}>Diff: {templateDiff.fromTemplateName} → {templateDiff.toTemplateName}</Text>
                 <Text style={{ fontSize: 11, color: mode === 'night' ? 'rgba(241,232,255,0.45)' : 'rgba(0,0,0,0.4)', marginBottom: 12 }}>Lineage: {templateDiff.lineageId} · v{templateDiff.fromVersion} → v{templateDiff.toVersion}</Text>
 
                 <Text style={{ fontSize: 12, fontWeight: '700', color: '#22C55E', marginBottom: 4 }}>+ Added</Text>
@@ -3245,13 +3245,13 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               borderRadius: 14,
               boxShadow: '0 8px 40px rgba(140, 91, 245, 0.18), 0 2px 12px rgba(0,0,0,0.4)',
               padding: '22px 24px 18px',
-              color: '#EEF1F8',
+              color: '#1A2340',
               fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
             }}>
               {/* Step badge */}
               <span style={{
                 display: 'inline-block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase' as const,
-                letterSpacing: 1.2, color: '#FFD332',
+                letterSpacing: 1.2, color: '#111111',
                 background: 'rgba(232, 120, 246, 0.12)', border: '1px solid rgba(232, 120, 246, 0.25)',
                 borderRadius: 6, padding: '3px 10px', marginBottom: 8,
               }}>
@@ -3268,7 +3268,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
               <p style={{ margin: '0 0 10px', fontSize: 13, lineHeight: 1.55, color: 'rgba(241, 232, 255, 0.82)' }}>
                 {step.goal}
               </p>
-              <p style={{ margin: '0 0 12px', fontSize: 12, lineHeight: 1.5, color: '#FFD332' }}>
+              <p style={{ margin: '0 0 12px', fontSize: 12, lineHeight: 1.5, color: '#111111' }}>
                 {step.pointer}
               </p>
 
@@ -3289,7 +3289,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     style={{
                       width: 8, height: 8, borderRadius: 4,
                       background: i === walkthroughIndex
-                        ? `linear-gradient(135deg, ${ac}, ${accentPalette?.secondary ?? '#FFD332'})`
+                        ? `linear-gradient(135deg, ${ac}, ${accentPalette?.secondary ?? '#111111'})`
                         : completedWalkthroughStepIds.includes(adminWalkthroughSteps[i].id)
                           ? acRgba(0.5)
                           : 'rgba(255, 255, 255, 0.12)',
@@ -3308,7 +3308,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                   style={{
                     border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 12, fontWeight: 600,
                     cursor: isFirst ? 'default' : 'pointer',
-                    background: 'rgba(255,255,255,0.08)', color: '#EEF1F8',
+                    background: 'rgba(0,0,0,0.06)', color: '#1A2340',
                     opacity: isFirst ? 0.35 : 1,
                   }}
                 >
@@ -3319,7 +3319,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     onClick={() => { toggleCurrentWalkthroughStep(); setWalkthroughOpen(false); }}
                     style={{
                       border: 'none', borderRadius: 8, padding: '8px 20px', fontSize: 12, fontWeight: 600,
-                      cursor: 'pointer', background: `linear-gradient(135deg, ${ac}, ${accentPalette?.secondary ?? '#FFD332'})`, color: acText,
+                      cursor: 'pointer', background: `linear-gradient(135deg, ${ac}, ${accentPalette?.secondary ?? '#111111'})`, color: acText,
                     }}
                   >
                     Finish
@@ -3329,7 +3329,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
                     onClick={() => goToWalkthroughStep(walkthroughIndex + 1)}
                     style={{
                       border: 'none', borderRadius: 8, padding: '8px 20px', fontSize: 12, fontWeight: 600,
-                      cursor: 'pointer', background: `linear-gradient(135deg, ${ac}, ${accentPalette?.secondary ?? '#FFD332'})`, color: acText,
+                      cursor: 'pointer', background: `linear-gradient(135deg, ${ac}, ${accentPalette?.secondary ?? '#111111'})`, color: acText,
                     }}
                   >
                     Next ({walkthroughIndex + 1}/{adminWalkthroughSteps.length})
@@ -3356,7 +3356,7 @@ export function AdminPage({ guidedMode, registerActions, auditLog, addNotificati
           onClick={() => setWalkthroughOpen(true)}
           style={{
             position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
-            background: `linear-gradient(135deg, ${ac}, ${accentPalette?.secondary ?? '#FFD332'})`, color: acText,
+            background: `linear-gradient(135deg, ${ac}, ${accentPalette?.secondary ?? '#111111'})`, color: acText,
             borderRadius: 28, padding: '10px 20px', fontSize: 13, fontWeight: 600,
             cursor: 'pointer', boxShadow: `0 4px 20px ${acRgba(0.35)}`,
           }}

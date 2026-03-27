@@ -153,7 +153,7 @@ const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF'];
 const TIMEZONE_OPTIONS = ['UTC', 'US/Eastern', 'US/Central', 'US/Mountain', 'US/Pacific', 'Europe/London', 'Europe/Berlin', 'Asia/Tokyo', 'Asia/Shanghai', 'Australia/Sydney'];
 
 const PALETTE_PRESETS = [
-  { name: 'Halo Navy', colors: ['#1E2A5E', '#263374', '#FFD332', '#FFD332', '#22C55E', '#F59E0B', '#EF4444', '#263374'] as const },
+  { name: 'Halo Navy', colors: ['#F8F9FA', '#FFFFFF', '#111111', '#111111', '#22C55E', '#F59E0B', '#EF4444', '#FFFFFF'] as const },
   { name: 'Ocean Blue', colors: ['#0A1628', '#0F1D32', '#3B82F6', '#60A5FA', '#10B981', '#F59E0B', '#EF4444', '#152238'] as const },
   { name: 'Forest Green', colors: ['#0A1A0F', '#0F261A', '#22C55E', '#4ADE80', '#3B82F6', '#F59E0B', '#EF4444', '#0D1F14'] as const },
   { name: 'Sunset Coral', colors: ['#1A0E14', '#261420', '#F43F5E', '#FB7185', '#8B5CF6', '#F59E0B', '#EF4444', '#1F1018'] as const },
@@ -178,8 +178,8 @@ const TENANT_TABS: Array<{ id: TenantTabId; label: string; icon: string }> = [
 ];
 
 const DEFAULT_TENANT_EXTRAS = {
-  tagline: '', industryVertical: '', accentSecondary: '#FFD332', successColor: '#22C55E',
-  warningColor: '#F59E0B', dangerColor: '#EF4444', surfaceColor: '#263374', fontFamily: 'System Default',
+  tagline: '', industryVertical: '', accentSecondary: '#111111', successColor: '#22C55E',
+  warningColor: '#F59E0B', dangerColor: '#EF4444', surfacecolor: '#111111', fontFamily: 'System Default',
   headingWeight: '800', baseFontSize: 13, borderRadius: 'rounded', uiDensity: 'comfortable',
   sidebarStyle: 'glass', cardStyle: 'elevated', welcomeMessage: '', heroImageUri: '',
   dashboardLayout: 'grid', defaultThemeMode: 'night', animationsEnabled: true, departments: [] as string[],
@@ -190,11 +190,11 @@ function extractExtras(branding: any) {
   return {
     tagline: branding?.tagline ?? '',
     industryVertical: branding?.industryVertical ?? '',
-    accentSecondary: branding?.accentSecondary ?? '#FFD332',
+    accentSecondary: branding?.accentSecondary ?? '#111111',
     successColor: branding?.successColor ?? '#22C55E',
     warningColor: branding?.warningColor ?? '#F59E0B',
     dangerColor: branding?.dangerColor ?? '#EF4444',
-    surfaceColor: branding?.surfaceColor ?? '#263374',
+    surfaceColor: branding?.surfaceColor ?? '#FFFFFF',
     fontFamily: branding?.fontFamily ?? 'System Default',
     headingWeight: branding?.headingWeight ?? '800',
     baseFontSize: branding?.baseFontSize ?? 13,
@@ -253,9 +253,9 @@ export function HomeScreen() {
   const [tenantCustomRoleTitle, setTenantCustomRoleTitle] = useState('');
   const [tenantRolesExpanded, setTenantRolesExpanded] = useState(false);
   const [newTenantLogoUri, setNewTenantLogoUri] = useState('');
-  const [newTenantPrimaryColor, setNewTenantPrimaryColor] = useState('#1E2A5E');
-  const [newTenantSecondaryColor, setNewTenantSecondaryColor] = useState('#263374');
-  const [newTenantAccentColor, setNewTenantAccentColor] = useState('#FFD332');
+  const [newTenantPrimaryColor, setNewTenantPrimaryColor] = useState('#F8F9FA');
+  const [newTenantSecondaryColor, setNewTenantSecondaryColor] = useState('#FFFFFF');
+  const [newTenantAccentColor, setNewTenantAccentColor] = useState('#111111');
   const [tenantExportTarget, setTenantExportTarget] = useState<PortableDatabaseTarget>('cosmos');
   const [newTenantRoleTitles, setNewTenantRoleTitles] = useState<string[]>(['Operations Coordinator']);
   const [newTenantCustomRoleTitle, setNewTenantCustomRoleTitle] = useState('');
@@ -708,9 +708,9 @@ export function HomeScreen() {
       const createResult = createTenant(newTenantName, {
         logoUri: newTenantLogoUri.trim() || undefined,
         brandColors: [
-          normalizeHex(newTenantPrimaryColor, '#1E2A5E'),
-          normalizeHex(newTenantSecondaryColor, '#263374'),
-          normalizeHex(newTenantAccentColor, '#FFD332'),
+          normalizeHex(newTenantPrimaryColor, '#F8F9FA'),
+          normalizeHex(newTenantSecondaryColor, '#FFFFFF'),
+          normalizeHex(newTenantAccentColor, '#111111'),
         ],
         widgetTwoColumnBreakpoint: GLOBAL_WIDGET_TWO_COLUMN_BREAKPOINT,
         employeeTitles: newTenantRoleTitles,
@@ -747,9 +747,9 @@ export function HomeScreen() {
 
       setNewTenantName('');
       setNewTenantLogoUri('');
-      setNewTenantPrimaryColor('#1E2A5E');
-      setNewTenantSecondaryColor('#263374');
-      setNewTenantAccentColor('#FFD332');
+      setNewTenantPrimaryColor('#F8F9FA');
+      setNewTenantSecondaryColor('#FFFFFF');
+      setNewTenantAccentColor('#111111');
       setNewTenantRoleTitles(['Operations Coordinator']);
       setNewTenantCustomRoleTitle('');
       setNewTenantRolesExpanded(false);
@@ -791,7 +791,7 @@ export function HomeScreen() {
       <View style={styles.loadingWrap}>
         <NebulaBackground mode={mode} />
         <BrandLogo width={260} height={104} />
-        <ActivityIndicator color="#FFD332" />
+        <ActivityIndicator color="#111111" />
         <Text style={styles.loadingText}>Getting things ready...</Text>
       </View>
     );
@@ -864,7 +864,7 @@ export function HomeScreen() {
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   {activeTenantBranding.logoUri?.trim() ? (
-                    <Image source={{ uri: activeTenantBranding.logoUri }} style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(255,255,255,0.06)' } as any} resizeMode="contain" />
+                    <Image source={{ uri: activeTenantBranding.logoUri }} style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(0,0,0,0.06)' } as any} resizeMode="contain" />
                   ) : (
                     <View style={[styles.dashboardTenantAvatar, page === 'enduser' && { backgroundColor: `${tenantAccentResolved}30`, borderColor: `${tenantAccentResolved}50` }]}>
                       <Text style={{ fontSize: 11, fontWeight: '800', color: page === 'enduser' ? tenantAccentResolved : 'rgba(214,204,235,0.85)' }}>
@@ -880,7 +880,7 @@ export function HomeScreen() {
                       <Text style={{ fontSize: 9, color: 'rgba(214,204,235,0.45)', fontWeight: '600' }} numberOfLines={1}>{activeTenantBranding.industryVertical}</Text>
                     ) : null}
                   </View>
-                  <Text style={{ fontSize: 10, color: page === 'enduser' ? 'rgba(255,255,255,0.55)' : 'rgba(214,204,235,0.45)', fontWeight: '800' }}>
+                  <Text style={{ fontSize: 10, color: page === 'enduser' ? 'rgba(0,0,0,0.55)' : 'rgba(214,204,235,0.45)', fontWeight: '800' }}>
                     {endUserTenantMenuOpen ? '▾' : '▸'}
                   </Text>
                 </View>
@@ -888,7 +888,7 @@ export function HomeScreen() {
               {endUserTenantMenuOpen && (
                 <View style={styles.dashboardTenantNavList}>
                   {tenants.map((tenant) => {
-                    const tenantAccent = normalizeHex(tenant.branding.brandColors[2], '#FFD332');
+                    const tenantAccent = normalizeHex(tenant.branding.brandColors[2], '#111111');
                     const tenantAccentText = getContrastTextColor(tenantAccent);
                     const selectedTenant = activeTenantId === tenant.id && page === 'enduser';
                     const isCreatePlaceholder = tenant.name === 'Create a Tenant +';
@@ -920,7 +920,7 @@ export function HomeScreen() {
                           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                             <View style={{ borderLeftWidth: 3, borderLeftColor: selectedTenant ? tenantAccent : `${tenantAccent}55`, borderRadius: 2, paddingLeft: 8, flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
                               {logoUri ? (
-                                <Image source={{ uri: logoUri }} style={{ width: 22, height: 22, borderRadius: 5, backgroundColor: 'rgba(255,255,255,0.04)' } as any} resizeMode="contain" />
+                                <Image source={{ uri: logoUri }} style={{ width: 22, height: 22, borderRadius: 5, backgroundColor: 'rgba(0,0,0,0.02)' } as any} resizeMode="contain" />
                               ) : (
                                 <View style={[styles.dashboardTenantAvatarSmall, selectedTenant && { backgroundColor: `${tenantAccent}30`, borderColor: `${tenantAccent}50` }]}>
                                   <Text style={{ fontSize: 8, fontWeight: '800', color: selectedTenant ? tenantAccentText : 'rgba(214,204,235,0.70)' }}>{tenant.name.slice(0, 2).toUpperCase()}</Text>
@@ -955,7 +955,7 @@ export function HomeScreen() {
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 {activeTenantBranding.logoUri?.trim() ? (
-                  <Image source={{ uri: activeTenantBranding.logoUri }} style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(255,255,255,0.06)' } as any} resizeMode="contain" />
+                  <Image source={{ uri: activeTenantBranding.logoUri }} style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(0,0,0,0.04)' } as any} resizeMode="contain" />
                 ) : (
                   <View style={[styles.dashboardTenantAvatar, page === 'enduser' && { backgroundColor: `${tenantAccentResolved}30`, borderColor: `${tenantAccentResolved}50` }]}>
                     <Text style={{ fontSize: 11, fontWeight: '800', color: page === 'enduser' ? tenantAccentResolved : 'rgba(214,204,235,0.85)' }}>
@@ -1152,7 +1152,7 @@ export function HomeScreen() {
               onPress={() => setNotificationsOpen(true)}
               accessibilityRole="button"
               accessibilityLabel={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' }}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.04)' }}
             >
               {/* Bell — jingles on every new notification via rotation animation */}
               <Animated.View style={{
@@ -1185,22 +1185,22 @@ export function HomeScreen() {
                 paddingHorizontal: 16,
                 paddingVertical: 5,
                 borderBottomWidth: 1,
-                borderBottomColor: mode === 'night' ? 'rgba(38,51,116,0.14)' : 'rgba(38,51,116,0.10)',
-                backgroundColor: mode === 'night' ? 'rgba(38,51,116,0.05)' : 'rgba(38,51,116,0.03)',
+                borderBottomColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.03)',
+                backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.03)' : 'rgba(0,0,0,0.02)',
                 gap: 2,
                 flexWrap: 'wrap' as any,
-                ...(Platform.OS === 'web' ? { boxShadow: mode === 'night' ? 'inset 0 -1px 0 rgba(38,51,116,0.12)' : 'inset 0 -1px 0 rgba(38,51,116,0.08)' } : {}),
+                ...(Platform.OS === 'web' ? { boxShadow: mode === 'night' ? 'inset 0 -1px 0 rgba(0,0,0,0.03)' : 'inset 0 -1px 0 rgba(0,0,0,0.02)' } : {}),
               }}>
                 {/* Left accent pip */}
-                <View style={{ width: 3, height: 16, borderRadius: 2, backgroundColor: '#FFD332', marginRight: 10, opacity: 0.7 }} />
+                <View style={{ width: 3, height: 16, borderRadius: 2, backgroundColor: '#111111', marginRight: 10, opacity: 0.7 }} />
                 {DEMO_STEPS.map((step, idx) => {
                   const isCurrent = page === step.id;
-                  const accent = '#FFD332';
+                  const accent = '#111111';
                   const stepNum = idx + 1;
                   return (
                     <React.Fragment key={step.id}>
                       {idx > 0 && (
-                        <Text style={{ fontSize: 9, color: mode === 'night' ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.18)', marginHorizontal: 2, letterSpacing: 1 }}>›</Text>
+                        <Text style={{ fontSize: 9, color: mode === 'night' ? 'rgba(0,0,0,0.18)' : 'rgba(0,0,0,0.18)', marginHorizontal: 2, letterSpacing: 1 }}>›</Text>
                       )}
                       <Pressable
                         onPress={() => { setTenantAccessOpen(false); setPage(step.id); }}
@@ -1226,14 +1226,14 @@ export function HomeScreen() {
                         {isCurrent ? (
                           <Text style={{ fontSize: 12 }}>{step.icon}</Text>
                         ) : (
-                          <View style={{ width: 16, height: 16, borderRadius: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.18)', alignItems: 'center', justifyContent: 'center' }}>
-                            <Text style={{ fontSize: 8, fontWeight: '700', color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)', lineHeight: 10 }}>{stepNum}</Text>
+                          <View style={{ width: 16, height: 16, borderRadius: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.18)' : 'rgba(0,0,0,0.18)', alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={{ fontSize: 8, fontWeight: '700', color: mode === 'night' ? 'rgba(0,0,0,0.40)' : 'rgba(0,0,0,0.35)', lineHeight: 10 }}>{stepNum}</Text>
                           </View>
                         )}
                         <Text style={{
                           fontSize: isCurrent ? 12 : 11,
                           fontWeight: isCurrent ? '700' : '500',
-                          color: isCurrent ? accent : (mode === 'night' ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.48)'),
+                          color: isCurrent ? accent : (mode === 'night' ? 'rgba(0,0,0,0.48)' : 'rgba(0,0,0,0.48)'),
                           letterSpacing: isCurrent ? 0.1 : 0,
                         }}>{step.label}</Text>
                         {isCurrent && (
@@ -1317,27 +1317,27 @@ export function HomeScreen() {
                       <View style={[styles.card, styles.tenantWidgetCard]}>
                         <Text style={styles.cardTitle}>Color Palette</Text>
                         <View style={styles.cardBody}>
-                          <LabeledInput label="Sidebar (Primary)" value={tenantPrimaryColor} onChangeText={setTenantPrimaryColor} placeholder="#1E2A5E" />
-                          <LabeledInput label="Background (Secondary)" value={tenantSecondaryColor} onChangeText={setTenantSecondaryColor} placeholder="#263374" />
-                          <LabeledInput label="Accent" value={tenantAccentColor} onChangeText={setTenantAccentColor} placeholder="#FFD332" />
-                          <LabeledInput label="Accent Secondary" value={tenantExtras.accentSecondary} onChangeText={(v: string) => updateExtra('accentSecondary', v)} placeholder="#FFD332" />
+                          <LabeledInput label="Sidebar (Primary)" value={tenantPrimaryColor} onChangeText={setTenantPrimaryColor} placeholder="#F8F9FA" />
+                          <LabeledInput label="Background (Secondary)" value={tenantSecondaryColor} onChangeText={setTenantSecondaryColor} placeholder="#FFFFFF" />
+                          <LabeledInput label="Accent" value={tenantAccentColor} onChangeText={setTenantAccentColor} placeholder="#111111" />
+                          <LabeledInput label="Accent Secondary" value={tenantExtras.accentSecondary} onChangeText={(v: string) => updateExtra('accentSecondary', v)} placeholder="#111111" />
                           <LabeledInput label="Success" value={tenantExtras.successColor} onChangeText={(v: string) => updateExtra('successColor', v)} placeholder="#22C55E" />
                           <LabeledInput label="Warning" value={tenantExtras.warningColor} onChangeText={(v: string) => updateExtra('warningColor', v)} placeholder="#F59E0B" />
                           <LabeledInput label="Danger" value={tenantExtras.dangerColor} onChangeText={(v: string) => updateExtra('dangerColor', v)} placeholder="#EF4444" />
-                          <LabeledInput label="Surface" value={tenantExtras.surfaceColor} onChangeText={(v: string) => updateExtra('surfaceColor', v)} placeholder="#263374" />
+                          <LabeledInput label="Surface" value={tenantExtras.surfaceColor} onChangeText={(v: string) => updateExtra('surfaceColor', v)} placeholder="#FFFFFF" />
                           <View style={[styles.inlineRow, { marginTop: 8 }]}>
                             {[
                               { label: 'Pri', hex: tenantPrimaryResolved },
                               { label: 'Sec', hex: tenantSecondaryResolved },
                               { label: 'Acc', hex: tenantAccentResolved },
-                              { label: 'Acc2', hex: normalizeHex(tenantExtras.accentSecondary, '#FFD332') },
+                              { label: 'Acc2', hex: normalizeHex(tenantExtras.accentSecondary, '#111111') },
                               { label: 'Ok', hex: normalizeHex(tenantExtras.successColor, '#22C55E') },
                               { label: 'Wrn', hex: normalizeHex(tenantExtras.warningColor, '#F59E0B') },
                               { label: 'Err', hex: normalizeHex(tenantExtras.dangerColor, '#EF4444') },
-                              { label: 'Srf', hex: normalizeHex(tenantExtras.surfaceColor, '#263374') },
+                              { label: 'Srf', hex: normalizeHex(tenantExtras.surfaceColor, '#FFFFFF') },
                             ].map((swatch) => (
                               <View key={swatch.label} style={{ alignItems: 'center', gap: 3 }}>
-                                <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: swatch.hex, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' }} />
+                                <View style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: swatch.hex, borderWidth: 1, borderColor: 'rgba(0,0,0,0.10)' }} />
                                 <Text style={[styles.metaText, { fontSize: 9 }]}>{swatch.label}</Text>
                               </View>
                             ))}
@@ -1371,7 +1371,7 @@ export function HomeScreen() {
                             >
                               <View style={{ flexDirection: 'row', gap: 3 }}>
                                 {preset.colors.map((c, i) => (
-                                  <View key={i} style={{ width: 18, height: 18, borderRadius: 4, backgroundColor: c, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)' }} />
+                                  <View key={i} style={{ width: 18, height: 18, borderRadius: 4, backgroundColor: c, borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }} />
                                 ))}
                               </View>
                               <Text style={styles.listTitle}>{preset.name}</Text>
@@ -1426,7 +1426,7 @@ export function HomeScreen() {
                           <View style={[styles.listCard, { marginTop: 8 }]}>
                             <Text style={[styles.metaText, { fontSize: 10 }]}>Preview</Text>
                             <Text style={{ fontWeight: tenantExtras.headingWeight as any, fontSize: tenantExtras.baseFontSize + 6, color: mode === 'night' ? '#FFFFFF' : '#1A1A2E' }}>Heading Sample</Text>
-                            <Text style={{ fontSize: tenantExtras.baseFontSize, color: mode === 'night' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)', marginTop: 4 }}>Body text preview with {tenantExtras.baseFontSize}px base font size and {tenantExtras.fontFamily} font family.</Text>
+                            <Text style={{ fontSize: tenantExtras.baseFontSize, color: mode === 'night' ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.7)', marginTop: 4 }}>Body text preview with {tenantExtras.baseFontSize}px base font size and {tenantExtras.fontFamily} font family.</Text>
                           </View>
                         </View>
                       </View>
@@ -1710,14 +1710,14 @@ export function HomeScreen() {
                       <View style={[styles.card, styles.tenantWidgetCard]}>
                         <Text style={styles.cardTitle}>New Tenant Colors</Text>
                         <View style={styles.cardBody}>
-                          <LabeledInput label="Primary" value={newTenantPrimaryColor} onChangeText={setNewTenantPrimaryColor} placeholder="#1E2A5E" />
-                          <LabeledInput label="Secondary" value={newTenantSecondaryColor} onChangeText={setNewTenantSecondaryColor} placeholder="#263374" />
-                          <LabeledInput label="Accent" value={newTenantAccentColor} onChangeText={setNewTenantAccentColor} placeholder="#FFD332" />
-                          <LabeledInput label="Accent Secondary" value={newTenantExtras.accentSecondary} onChangeText={(v: string) => updateNewExtra('accentSecondary', v)} placeholder="#FFD332" />
+                          <LabeledInput label="Primary" value={newTenantPrimaryColor} onChangeText={setNewTenantPrimaryColor} placeholder="#F8F9FA" />
+                          <LabeledInput label="Secondary" value={newTenantSecondaryColor} onChangeText={setNewTenantSecondaryColor} placeholder="#FFFFFF" />
+                          <LabeledInput label="Accent" value={newTenantAccentColor} onChangeText={setNewTenantAccentColor} placeholder="#111111" />
+                          <LabeledInput label="Accent Secondary" value={newTenantExtras.accentSecondary} onChangeText={(v: string) => updateNewExtra('accentSecondary', v)} placeholder="#111111" />
                           <LabeledInput label="Success" value={newTenantExtras.successColor} onChangeText={(v: string) => updateNewExtra('successColor', v)} placeholder="#22C55E" />
                           <LabeledInput label="Warning" value={newTenantExtras.warningColor} onChangeText={(v: string) => updateNewExtra('warningColor', v)} placeholder="#F59E0B" />
                           <LabeledInput label="Danger" value={newTenantExtras.dangerColor} onChangeText={(v: string) => updateNewExtra('dangerColor', v)} placeholder="#EF4444" />
-                          <LabeledInput label="Surface" value={newTenantExtras.surfaceColor} onChangeText={(v: string) => updateNewExtra('surfaceColor', v)} placeholder="#263374" />
+                          <LabeledInput label="Surface" value={newTenantExtras.surfaceColor} onChangeText={(v: string) => updateNewExtra('surfaceColor', v)} placeholder="#FFFFFF" />
                           <Text style={styles.metaText}>Apply Preset</Text>
                           <View style={styles.inlineRow}>
                             {PALETTE_PRESETS.map((preset) => (

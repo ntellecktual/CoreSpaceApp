@@ -4,10 +4,10 @@ export type ThemeMode = 'day' | 'night';
 
 const colors = {
   white: '#FFFFFF',
-  gold100: '#FFE680',
-  gold300: '#FFD332',
-  navy500: '#263374',
-  midnight900: '#1a2455',
+  gold100: '#F3F4F6',
+  gold300: '#000000',
+  navy500: '#FFFFFF',
+  midnight900: '#FAFAFA',
 };
 
 const nightStyleObject = {
@@ -16,8 +16,8 @@ const nightStyleObject = {
   // Removed duplicate landingTopMenuText
   root: {
     flex: 1,
-    backgroundColor: '#263374',
-    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(38,51,116,.22), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.14), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.12), transparent 60%), linear-gradient(180deg, #263374, #1E2A5E)',
+    backgroundColor: '#FFFFFF',
+    backgroundImage: 'none',
   },
   dashboardShell: {
     flex: 1,
@@ -42,12 +42,12 @@ const nightStyleObject = {
   dashboardSidebar: {
     width: 288,
     borderRadius: 12,
-    backgroundColor: 'rgba(10,14,24,0.55)',
+    backgroundColor: 'rgba(0,0,0,0.02)',
     backdropFilter: 'blur(18px) saturate(1.4)',
     WebkitBackdropFilter: 'blur(18px) saturate(1.4)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.28), inset 0 0.5px 0 rgba(255,255,255,0.08)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)',
     paddingHorizontal: 14,
     paddingTop: 12,
     paddingBottom: 10,
@@ -62,7 +62,7 @@ const nightStyleObject = {
     width: '100%',
     borderRadius: 0,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,211,50,0.24)',
+    borderBottomColor: 'rgba(0,0,0,0.06)',
     paddingTop: 12,
   },
   dashboardSidebarCollapsed: {
@@ -85,24 +85,24 @@ const nightStyleObject = {
     backgroundColor: 'transparent',
   },
   dashboardCollapsedNavItemActive: {
-    backgroundColor: 'rgba(38,51,116,0.38)',
+    backgroundColor: 'rgba(0,0,0,0.04)',
   },
   dashboardTenantHeader: {
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255,211,50,0.18)',
-    backgroundColor: 'rgba(18,26,60,0.55)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.02)',
     paddingHorizontal: 10,
     paddingVertical: 8,
     marginHorizontal: 2,
     marginTop: 4,
   },
   dashboardTenantHeaderActive: {
-    borderColor: 'rgba(38,51,116,0.45)',
-    backgroundColor: 'rgba(38,51,116,0.18)',
+    borderColor: 'rgba(0,0,0,0.10)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
   },
   dashboardTenantHeaderName: {
-    color: '#C5D4EE',
+    color: '#374151',
     fontSize: 13,
     fontWeight: '600',
     flex: 1,
@@ -112,8 +112,8 @@ const nightStyleObject = {
     height: 28,
     borderRadius: 7,
     borderWidth: 1,
-    borderColor: 'rgba(214,204,235,0.18)',
-    backgroundColor: 'rgba(38,51,116,0.14)',
+    borderColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -122,27 +122,27 @@ const nightStyleObject = {
     height: 20,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: 'rgba(214,204,235,0.18)',
-    backgroundColor: 'rgba(38,51,116,0.14)',
+    borderColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   dashboardTenantPill: {
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,211,50,0.3)',
-    backgroundColor: 'rgba(18,26,60,0.65)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     paddingHorizontal: 10,
     paddingVertical: 5,
     marginHorizontal: 2,
     marginTop: 4,
   },
   dashboardTenantPillActive: {
-    borderColor: 'rgba(255,211,50,0.85)',
-    backgroundColor: 'rgba(38,51,116,0.34)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.04)',
   },
   dashboardTenantPillText: {
-    color: '#C5D4EE',
+    color: '#374151',
     fontSize: 12,
     fontWeight: '600',
     flex: 1,
@@ -163,14 +163,14 @@ const nightStyleObject = {
     height: 32,
     borderRadius: 7,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.20)',
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: 'rgba(0,0,0,0.02)',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
   dashboardHamburgerButtonText: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 18,
     fontWeight: '800',
     lineHeight: 20,
@@ -187,7 +187,7 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   dashboardSubBrand: {
-    color: '#C9D4F0',
+    color: '#6B7280',
     fontSize: 11,
   },
   dashboardCreateButton: {
@@ -199,7 +199,7 @@ const nightStyleObject = {
     justifyContent: 'center',
   },
   dashboardCreateButtonText: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 14,
     fontWeight: '700',
   },
@@ -210,15 +210,15 @@ const nightStyleObject = {
     fontSize: 17,
     width: 26,
     textAlign: 'center',
-    color: 'rgba(214,204,235,0.70)',
+    color: 'rgba(0,0,0,0.5)',
   },
   dashboardNavDivider: {
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(0,0,0,0.02)',
     marginVertical: 4,
   },
   dashboardSectionLabel: {
-    color: '#6B7DAA',
+    color: '#9CA3AF',
     fontSize: 11,
     fontWeight: '700',
     marginTop: 2,
@@ -243,13 +243,13 @@ const nightStyleObject = {
     resizeMode: 'contain',
   },
   dashboardNavItemActive: {
-    backgroundColor: 'rgba(38,51,116,0.38)',
+    backgroundColor: 'rgba(0,0,0,0.04)',
   },
   dashboardTenantNavGroup: {
     gap: 6,
   },
   dashboardTenantChevron: {
-    color: '#E8EFF8',
+    color: '#1F2937',
     fontSize: 13,
     fontWeight: '800',
     marginLeft: 'auto',
@@ -261,8 +261,8 @@ const nightStyleObject = {
   dashboardTenantNavItem: {
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,211,50,0.12)',
-    backgroundColor: 'rgba(18,26,60,0.40)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     paddingHorizontal: 8,
     minHeight: 34,
     paddingVertical: 5,
@@ -270,12 +270,12 @@ const nightStyleObject = {
   },
   dashboardTenantNavItemCreate: {
     borderStyle: 'dashed' as any,
-    borderColor: 'rgba(214,204,235,0.18)',
+    borderColor: 'rgba(0,0,0,0.06)',
     backgroundColor: 'transparent',
   },
   dashboardTenantNavItemActive: {
-    borderColor: 'rgba(255,211,50,0.85)',
-    backgroundColor: 'rgba(38,51,116,0.34)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.04)',
   },
   dashboardTenantNavItemRow: {
     flexDirection: 'row',
@@ -283,30 +283,30 @@ const nightStyleObject = {
     gap: 8,
   },
   dashboardTenantNavItemText: {
-    color: '#C5D4EE',
+    color: '#374151',
     fontSize: 11,
     fontWeight: '600',
   },
   dashboardNavItemText: {
-    color: '#C5D4EE',
+    color: '#374151',
     fontSize: 14,
     fontWeight: '600',
   },
   dashboardNavItemDesc: {
-    color: 'rgba(214,204,235,0.55)',
+    color: 'rgba(0,0,0,0.45)',
     fontSize: 10,
     fontWeight: '600',
     letterSpacing: 0.3,
     textTransform: 'uppercase',
   },
   dashboardNavItemTextActive: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontWeight: '700',
   },
   dashboardRoleItem: {
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(255,211,50,0.22)',
+    borderColor: 'rgba(0,0,0,0.12)',
     paddingHorizontal: 8,
     minHeight: 26,
     paddingVertical: 3,
@@ -314,16 +314,16 @@ const nightStyleObject = {
     justifyContent: 'center',
   },
   dashboardRoleItemActive: {
-    borderColor: 'rgba(255,211,50,0.7)',
-    backgroundColor: 'rgba(38,51,116,0.3)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
   },
   dashboardRoleItemText: {
-    color: '#C5D4EE',
+    color: '#374151',
     fontSize: 11,
     fontWeight: '600',
   },
   dashboardRoleItemTextActive: {
-    color: '#FFFFFF',
+    color: '#111111',
   },
   dashboardSidebarFooter: {
     marginTop: 'auto',
@@ -336,7 +336,7 @@ const nightStyleObject = {
   dashboardSidebarAction: {
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,211,50,0.24)',
+    borderColor: 'rgba(0,0,0,0.12)',
     backgroundColor: 'rgba(16,24,56,0.88)',
     paddingHorizontal: 8,
     minHeight: 30,
@@ -344,19 +344,19 @@ const nightStyleObject = {
     justifyContent: 'center',
   },
   dashboardSidebarActionActive: {
-    borderColor: 'rgba(255,211,50,0.75)',
-    backgroundColor: 'rgba(38,51,116,0.3)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
   },
   dashboardSidebarActionText: {
-    color: '#D4DEEF',
+    color: '#4B5563',
     fontSize: 12,
     fontWeight: '600',
   },
   dashboardSidebarActionTextActive: {
-    color: '#FFFFFF',
+    color: '#111111',
   },
   dashboardUserText: {
-    color: '#8A9BC2',
+    color: '#6B7280',
     fontSize: 11,
     lineHeight: 16,
     paddingHorizontal: 2,
@@ -364,17 +364,17 @@ const nightStyleObject = {
   dashboardMainPane: {
     flex: 1,
     borderRadius: 12,
-    backgroundColor: 'rgba(11,14,22,0.48)',
+    backgroundColor: '#FFFFFF',
     backdropFilter: 'blur(20px) saturate(1.5)',
     WebkitBackdropFilter: 'blur(20px) saturate(1.5)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: 'rgba(0,0,0,0.08)',
     boxShadow: '0 8px 32px rgba(0,0,0,0.32), inset 0 0.5px 0 rgba(255,255,255,0.06)',
     overflow: 'hidden',
   },
   dashboardMainHeader: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.08)',
+    borderBottomColor: 'rgba(0,0,0,0.06)',
     backgroundColor: 'transparent',
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -387,12 +387,12 @@ const nightStyleObject = {
     gap: 10,
   },
   dashboardMainTitle: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 30,
     fontWeight: '800',
   },
   dashboardMainSubtitle: {
-    color: '#C9D4F0',
+    color: '#6B7280',
     fontSize: 13,
     marginTop: 2,
   },
@@ -408,28 +408,28 @@ const nightStyleObject = {
   dashboardHeaderButton: {
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255,211,50,0.4)',
-    backgroundColor: 'rgba(38,51,116,0.2)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.02)',
     paddingHorizontal: 10,
     minHeight: 34,
     paddingVertical: 6,
     justifyContent: 'center',
   },
   dashboardHeaderButtonText: {
-    color: '#F0F4FA',
+    color: '#111111',
     fontSize: 12,
     fontWeight: '700',
   },
   dashboardHeaderPrimaryButton: {
     borderRadius: 10,
-    backgroundColor: '#263374',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 10,
     minHeight: 34,
     paddingVertical: 6,
     justifyContent: 'center',
   },
   dashboardHeaderPrimaryButtonText: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -438,8 +438,8 @@ const nightStyleObject = {
   },
   dashboardBottomActionBar: {
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.10)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderTopColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 18,
     paddingVertical: 12,
     position: 'relative' as any,
@@ -462,7 +462,7 @@ const nightStyleObject = {
     alignItems: 'stretch',
   },
   dashboardBottomStatusText: {
-    color: '#C9D4F0',
+    color: '#6B7280',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -473,13 +473,13 @@ const nightStyleObject = {
   },
   dashboardDraftBanner: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,211,50,0.2)',
+    borderBottomColor: 'rgba(0,0,0,0.06)',
     paddingHorizontal: 18,
     paddingVertical: 8,
-    backgroundColor: 'rgba(38,51,116,0.08)',
+    backgroundColor: 'rgba(0,0,0,0.02)',
   },
   dashboardDraftText: {
-    color: '#C9D4F0',
+    color: '#6B7280',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -532,14 +532,14 @@ const nightStyleObject = {
     paddingBottom: 14,
   },
   sectionEyebrow: {
-    color: 'rgba(232,236,255,0.62)',
+    color: 'rgba(0,0,0,0.55)',
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
   sectionLeadText: {
-    color: 'rgba(232,236,255,0.8)',
+    color: 'rgba(0,0,0,0.7)',
     fontSize: 13,
     lineHeight: 19,
     fontWeight: '600',
@@ -560,7 +560,7 @@ const nightStyleObject = {
   tenantWidgetCard: {
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     backgroundColor: 'transparent',
     overflow: 'hidden',
   },
@@ -571,13 +571,13 @@ const nightStyleObject = {
   moduleWidgetCard: {
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     backgroundColor: 'transparent',
     overflow: 'hidden',
   },
   card: {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 14,
     padding: 14,
     backgroundColor: 'transparent',
@@ -598,37 +598,37 @@ const nightStyleObject = {
     gap: 8,
   },
   bodyText: {
-    color: 'rgba(232,236,255,0.84)',
+    color: 'rgba(0,0,0,0.75)',
     fontSize: 13,
     lineHeight: 20,
   },
   bullet: {
-    color: '#F0F4FA',
+    color: '#111111',
     fontSize: 14,
     lineHeight: 21,
   },
   diagram: {
-    color: '#F0F4FA',
+    color: '#111111',
     fontFamily: 'monospace',
     fontSize: 12,
     lineHeight: 18,
   },
   pill: {
     borderWidth: 1,
-    borderColor: 'rgba(38,51,116,0.18)',
+    borderColor: 'rgba(0,0,0,0.06)',
     borderRadius: 999,
     paddingHorizontal: 10,
     minHeight: 30,
     paddingVertical: 5,
-    backgroundColor: 'rgba(38,51,116,0.08)',
+    backgroundColor: 'rgba(0,0,0,0.02)',
     justifyContent: 'center',
   },
   pillActive: {
-    borderColor: 'rgba(38,51,116,0.45)',
-    backgroundColor: 'rgba(38,51,116,0.18)',
+    borderColor: 'rgba(0,0,0,0.10)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
   },
   pillText: {
-    color: '#8A9BC2',
+    color: '#6B7280',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -654,15 +654,15 @@ const nightStyleObject = {
   },
   builderCreateModeBanner: {
     borderWidth: 1,
-    borderColor: 'rgba(250,225,120,0.7)',
+    borderColor: 'rgba(0,0,0,0.12)',
     borderRadius: 10,
-    backgroundColor: 'rgba(250,225,120,0.15)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     paddingHorizontal: 10,
     paddingVertical: 8,
     marginBottom: 8,
   },
   builderCreateModeBannerText: {
-    color: '#FFF5C7',
+    color: '#111111',
     fontSize: 12,
     fontWeight: '800',
   },
@@ -674,14 +674,14 @@ const nightStyleObject = {
   },
   builderCreateModeBannerClose: {
     borderWidth: 1,
-    borderColor: 'rgba(250,225,120,0.78)',
+    borderColor: 'rgba(0,0,0,0.15)',
     borderRadius: 999,
-    backgroundColor: 'rgba(18,26,60,0.22)',
+    backgroundColor: 'rgba(0,0,0,0.02)',
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   builderCreateModeBannerCloseText: {
-    color: '#FFF5C7',
+    color: '#111111',
     fontSize: 11,
     fontWeight: '700',
   },
@@ -693,9 +693,9 @@ const nightStyleObject = {
   },
   builderStepItem: {
     borderWidth: 1,
-    borderColor: 'rgba(255,211,50,0.38)',
+    borderColor: 'rgba(0,0,0,0.12)',
     borderRadius: 999,
-    backgroundColor: 'rgba(38,51,116,0.14)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     paddingHorizontal: 10,
     minHeight: 30,
     paddingVertical: 6,
@@ -705,9 +705,9 @@ const nightStyleObject = {
     justifyContent: 'center',
   },
   builderStepItemCurrent: {
-    borderColor: 'rgba(250,225,120,0.9)',
-    backgroundColor: 'rgba(38,51,116,0.92)',
-    boxShadow: '0 0 10px rgba(253,224,120,0.5)',
+    borderColor: '#000000',
+    backgroundColor: '#000000',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
     elevation: 6,
   },
   builderStepItemComplete: {
@@ -720,26 +720,26 @@ const nightStyleObject = {
     borderRadius: 99,
   },
   builderStepBulletPending: {
-    backgroundColor: '#8A8699',
+    backgroundColor: '#D1D5DB',
   },
   builderStepBulletCurrent: {
-    backgroundColor: '#FDE078',
-    boxShadow: '0 0 8px rgba(253,224,120,0.7)',
+    backgroundColor: '#111111',
+    boxShadow: '0 0 6px rgba(0,0,0,0.2)',
     elevation: 8,
   },
   builderStepBulletComplete: {
     backgroundColor: '#37C778',
   },
   builderStepText: {
-    color: '#E8EFF8',
+    color: '#1F2937',
     fontSize: 12,
     fontWeight: '700',
   },
   builderStepTextCurrent: {
-    color: '#FFFFFF',
+    color: '#111111',
   },
   builderStepTextComplete: {
-    color: '#DFFBEA',
+    color: '#16A34A',
   },
   builderLayout: {
     flexDirection: 'row',
@@ -749,9 +749,9 @@ const nightStyleObject = {
   },
   builderSectionCard: {
     borderWidth: 1,
-    borderColor: 'rgba(38,51,116,0.14)',
+    borderColor: 'rgba(0,0,0,0.06)',
     borderRadius: 14,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(18px)',
     boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
@@ -761,21 +761,21 @@ const nightStyleObject = {
     gap: 8,
   },
   builderSectionTitle: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 14,
     fontWeight: '800',
     letterSpacing: -0.2,
   },
   builderSectionHint: {
-    color: '#8A9BC2',
+    color: '#6B7280',
     fontSize: 11,
     lineHeight: 16,
   },
   builderStudioTextPrimary: {
-    color: '#F0F4FA',
+    color: '#111111',
   },
   builderStudioTextSecondary: {
-    color: '#8A9BC2',
+    color: '#6B7280',
   },
   builderActionRow: {
     flexDirection: 'row',
@@ -788,9 +788,9 @@ const nightStyleObject = {
     alignItems: 'flex-start',
     gap: 10,
     borderWidth: 1,
-    borderColor: 'rgba(38,51,116,0.14)',
+    borderColor: 'rgba(0,0,0,0.06)',
     borderRadius: 14,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(18px)',
     boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
@@ -819,13 +819,13 @@ const nightStyleObject = {
     paddingBottom: 8,
   },
   builderFormSectionTitle: {
-    color: '#F0F4FA',
+    color: '#111111',
     fontSize: 13,
     fontWeight: '800',
     letterSpacing: -0.2,
   },
   builderFormSectionText: {
-    color: '#8A9BC2',
+    color: '#6B7280',
     fontSize: 11,
     lineHeight: 16,
   },
@@ -838,11 +838,11 @@ const nightStyleObject = {
     flex: 1,
     minWidth: 300,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 16,
     padding: 14,
     gap: 12,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
@@ -854,11 +854,11 @@ const nightStyleObject = {
   },
   builderPreviewCard: {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 16,
     padding: 14,
     gap: 12,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
@@ -866,10 +866,10 @@ const nightStyleObject = {
   },
   builderPreviewHeroCard: {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 12,
     padding: 12,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
@@ -877,12 +877,12 @@ const nightStyleObject = {
     gap: 4,
   },
   builderPreviewHeroTitle: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 20,
     fontWeight: '800',
   },
   builderPreviewHeroSubtitle: {
-    color: '#D4DEEF',
+    color: '#4B5563',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -895,11 +895,11 @@ const nightStyleObject = {
     flex: 1,
     minWidth: 130,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 12,
     paddingHorizontal: 10,
     paddingVertical: 10,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
@@ -907,20 +907,20 @@ const nightStyleObject = {
     gap: 2,
   },
   builderPreviewStatValue: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 24,
     fontWeight: '800',
   },
   builderPreviewStatLabel: {
-    color: '#C9D4F0',
+    color: '#6B7280',
     fontSize: 11,
     fontWeight: '600',
   },
   builderPreviewFieldRow: {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 12,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
@@ -933,18 +933,18 @@ const nightStyleObject = {
   },
   builderDropZone: {
     borderWidth: 2,
-    borderColor: 'rgba(255,211,50,0.62)',
+    borderColor: 'rgba(0,0,0,0.12)',
     borderStyle: 'dashed',
     borderRadius: 14,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    backgroundColor: 'rgba(38,51,116,0.16)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
   },
   builderDetailsFormPanel: {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 14,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
@@ -962,21 +962,21 @@ const nightStyleObject = {
     width: '100%',
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,211,50,0.18)',
+    borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   builderDetailsFormRowHalf: {
     width: '48%',
   },
   builderDetailsFormLabel: {
-    color: '#F0F4FA',
+    color: '#111111',
     fontSize: 13,
     fontWeight: '700',
   },
   builderDetailsFormInput: {
     borderWidth: 1,
-    borderColor: 'rgba(255,211,50,0.4)',
+    borderColor: 'rgba(0,0,0,0.12)',
     borderRadius: 10,
-    backgroundColor: 'rgba(38,51,116,0.14)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     minHeight: 38,
     paddingHorizontal: 10,
     paddingVertical: 8,
@@ -988,24 +988,24 @@ const nightStyleObject = {
     justifyContent: 'flex-start',
   },
   builderDetailsFormInputText: {
-    color: '#C5D4EE',
+    color: '#374151',
     fontSize: 12,
   },
   builderDetailsFormType: {
-    color: '#8A9BC2',
+    color: '#6B7280',
     fontSize: 11,
   },
   endUserWorkspaceShell: {
     flexDirection: 'row',
     alignItems: 'stretch',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundImage: 'none',
+    backgroundColor: '#FFFFFF',
     backdropFilter: 'blur(14px)',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)',
   },
   endUserWorkspaceShellCompact: {
     flexDirection: 'column',
@@ -1014,8 +1014,8 @@ const nightStyleObject = {
     width: 300,
     borderRightWidth: 1,
     borderRightColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundImage: 'none',
+    backgroundColor: '#FFFFFF',
     backdropFilter: 'blur(14px)',
     paddingHorizontal: 10,
     paddingVertical: 9,
@@ -1025,10 +1025,10 @@ const nightStyleObject = {
     width: '100%',
     borderRightWidth: 0,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,211,50,0.24)',
+    borderBottomColor: 'rgba(0,0,0,0.06)',
   },
   endUserWorkspaceRailLabel: {
-    color: '#8A9BC2',
+    color: '#6B7280',
     fontSize: 11,
     fontWeight: '700',
     paddingHorizontal: 4,
@@ -1036,8 +1036,8 @@ const nightStyleObject = {
   endUserWorkspaceTab: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
@@ -1050,25 +1050,25 @@ const nightStyleObject = {
   },
   endUserWorkspaceTabActive: {
     borderWidth: 2,
-    borderColor: 'rgba(255,211,50,0.82)',
-    backgroundColor: 'rgba(38,51,116,0.34)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.04)',
   },
   endUserWorkspaceTabStep: {
-    color: '#D4DEEF',
+    color: '#4B5563',
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.3,
   },
   endUserWorkspaceTabStepActive: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontWeight: '800',
   },
   endUserWorkspaceTabName: {
-    color: '#8A9BC2',
+    color: '#6B7280',
     fontSize: 11,
   },
   endUserWorkspaceTabNameActive: {
-    color: '#F0F4FA',
+    color: '#111111',
     fontWeight: '700',
   },
   endUserWorkspaceContent: {
@@ -1086,9 +1086,9 @@ const nightStyleObject = {
     flexGrow: 1,
     minWidth: 170,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 12,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
@@ -1097,7 +1097,7 @@ const nightStyleObject = {
     paddingVertical: 8,
   },
   endUserHierarchyCardText: {
-    color: '#F0F4FA',
+    color: '#111111',
     fontSize: 12,
     fontWeight: '800',
   },
@@ -1111,11 +1111,11 @@ const nightStyleObject = {
     gap: 8,
   },
   inputLabel: {
-    color: 'rgba(232,236,255,0.88)',
+    color: 'rgba(0,0,0,0.88)',
     fontSize: 13,
   },
   inputHelperText: {
-    color: 'rgba(232,236,255,0.58)',
+    color: 'rgba(0,0,0,0.5)',
     fontSize: 11,
     flexShrink: 1,
     textAlign: 'right',
@@ -1124,7 +1124,7 @@ const nightStyleObject = {
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
     borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: '#FFFFFF',
     color: colors.white,
     minHeight: 42,
     paddingHorizontal: 12,
@@ -1143,10 +1143,10 @@ const nightStyleObject = {
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(38,51,116,0.40)',
-    backgroundImage: 'linear-gradient(135deg, rgba(38,51,116,0.85), rgba(59,130,246,0.65))',
-    backgroundColor: '#263374',
-    boxShadow: '0 8px 16px rgba(38,51,116,0.24), 0 18px 40px rgba(38,51,116,0.18)',
+    borderColor: 'rgba(0,0,0,0.10)',
+    backgroundImage: 'none',
+    backgroundColor: '#FFFFFF',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04)',
   },
   primaryButtonText: {
     color: '#fff',
@@ -1159,27 +1159,27 @@ const nightStyleObject = {
   secondaryButton: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: 'rgba(0,0,0,0.08)',
     minHeight: 36,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
   },
   secondaryButtonText: {
-    color: 'rgba(232,236,255,0.9)',
+    color: 'rgba(0,0,0,0.85)',
     fontSize: 12,
     fontWeight: '700',
   },
   /* ── Shared / Orbital shared keys ─────────────────────── */
   sectionTitle: {
-    color: '#F1F5F9',
+    color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '800',
     marginBottom: 4,
   },
   sectionDetail: {
-    color: 'rgba(232,236,255,0.72)',
+    color: 'rgba(0,0,0,0.6)',
     fontSize: 13,
     lineHeight: 19,
   },
@@ -1187,45 +1187,45 @@ const nightStyleObject = {
     flex: 1,
   },
   adminSidebar: {
-    backgroundColor: 'rgba(18,26,60,0.65)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     paddingTop: 8,
   },
   textInput: {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    color: '#F1F5F9',
+    color: '#FFFFFF',
     fontSize: 14,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: '#FFFFFF',
   },
   pillButton: {
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: 'rgba(0,0,0,0.08)',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: '#FFFFFF',
   },
   pillButtonActive: {
-    borderColor: '#263374',
-    backgroundColor: 'rgba(38,51,116,0.22)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
   },
   pillButtonText: {
-    color: 'rgba(232,236,255,0.78)',
+    color: 'rgba(0,0,0,0.7)',
     fontSize: 12,
     fontWeight: '600',
   },
   pillButtonTextActive: {
-    color: '#B0C4E8',
+    color: '#6B7280',
     fontWeight: '700',
   },
   listCard: {
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
@@ -1234,7 +1234,7 @@ const nightStyleObject = {
     gap: 4,
   },
   listTitle: {
-    color: 'rgba(232,236,255,0.96)',
+    color: 'rgba(0,0,0,0.9)',
     fontSize: 14,
     fontWeight: '800',
   },
@@ -1249,20 +1249,20 @@ const nightStyleObject = {
     fontWeight: '800',
     letterSpacing: 0.5,
   },
-  stageReceived: { backgroundColor: 'rgba(59,130,246,0.22)' },
-  stageReceivedText: { color: '#93C5FD' },
-  stageTriage: { backgroundColor: 'rgba(249,115,22,0.22)' },
-  stageTriageText: { color: '#FDBA74' },
-  stageRepair: { backgroundColor: 'rgba(168,85,247,0.22)' },
-  stageRepairText: { color: '#8A9BC2' },
-  stageQC: { backgroundColor: 'rgba(234,179,8,0.22)' },
-  stageQCText: { color: '#FDE68A' },
-  stageShipped: { backgroundColor: 'rgba(34,197,94,0.22)' },
-  stageShippedText: { color: '#86EFAC' },
-  stageRisk: { backgroundColor: 'rgba(239,68,68,0.22)' },
-  stageRiskText: { color: '#FCA5A5' },
-  stageActive: { backgroundColor: 'rgba(34,197,94,0.18)' },
-  stageActiveText: { color: '#86EFAC' },
+  stageReceived: { backgroundColor: 'rgba(59,130,246,0.10)' },
+  stageReceivedText: { color: '#2563EB' },
+  stageTriage: { backgroundColor: 'rgba(249,115,22,0.10)' },
+  stageTriageText: { color: '#D97706' },
+  stageRepair: { backgroundColor: 'rgba(168,85,247,0.10)' },
+  stageRepairText: { color: '#7C3AED' },
+  stageQC: { backgroundColor: 'rgba(234,179,8,0.10)' },
+  stageQCText: { color: '#B45309' },
+  stageShipped: { backgroundColor: 'rgba(34,197,94,0.10)' },
+  stageShippedText: { color: '#16A34A' },
+  stageRisk: { backgroundColor: 'rgba(239,68,68,0.10)' },
+  stageRiskText: { color: '#DC2626' },
+  stageActive: { backgroundColor: 'rgba(34,197,94,0.10)' },
+  stageActiveText: { color: '#16A34A' },
   kpiRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -1273,8 +1273,8 @@ const nightStyleObject = {
     minWidth: 120,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
@@ -1284,18 +1284,18 @@ const nightStyleObject = {
     alignItems: 'center',
   },
   kpiValue: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 22,
     fontWeight: '800',
   },
   kpiLabel: {
-    color: 'rgba(232,236,255,0.6)',
+    color: 'rgba(0,0,0,0.55)',
     fontSize: 10,
     fontWeight: '600',
     textAlign: 'center',
   },
   kpiSub: {
-    color: 'rgba(232,236,255,0.4)',
+    color: 'rgba(0,0,0,0.35)',
     fontSize: 9,
     textAlign: 'center',
   },
@@ -1312,7 +1312,7 @@ const nightStyleObject = {
     minWidth: 60,
   },
   dataHeaderText: {
-    color: 'rgba(232,236,255,0.5)',
+    color: 'rgba(0,0,0,0.45)',
     fontSize: 9,
     fontWeight: '800',
     letterSpacing: 0.5,
@@ -1330,11 +1330,11 @@ const nightStyleObject = {
     minWidth: 60,
   },
   dataCellText: {
-    color: 'rgba(232,236,255,0.82)',
+    color: 'rgba(0,0,0,0.75)',
     fontSize: 11,
   },
   dataCellBold: {
-    color: 'rgba(232,236,255,0.96)',
+    color: 'rgba(0,0,0,0.9)',
     fontSize: 11,
     fontWeight: '700',
   },
@@ -1355,16 +1355,16 @@ const nightStyleObject = {
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 10,
-    color: 'rgba(232,236,255,0.9)',
+    color: 'rgba(0,0,0,0.85)',
     fontSize: 12,
   },
   detailPanel: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
@@ -1382,30 +1382,30 @@ const nightStyleObject = {
     gap: 1,
   },
   detailFieldLabel: {
-    color: 'rgba(232,236,255,0.44)',
+    color: 'rgba(0,0,0,0.4)',
     fontSize: 9,
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.4,
   },
   detailFieldValue: {
-    color: 'rgba(232,236,255,0.92)',
+    color: 'rgba(0,0,0,0.85)',
     fontSize: 12,
   },
   tagBadge: {
     paddingHorizontal: 6,
     paddingVertical: 1,
     borderRadius: 4,
-    backgroundColor: 'rgba(38,51,116,0.22)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     alignSelf: 'flex-start',
   },
   tagBadgeText: {
-    color: '#8A9BC2',
+    color: '#6B7280',
     fontSize: 9,
     fontWeight: '700',
   },
   metaText: {
-    color: 'rgba(232,236,255,0.66)',
+    color: 'rgba(0,0,0,0.6)',
     fontSize: 10,
     lineHeight: 14,
   },
@@ -1415,7 +1415,7 @@ const nightStyleObject = {
     marginVertical: 4,
   },
   notice: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -1427,7 +1427,7 @@ const nightStyleObject = {
     gap: 10,
   },
   loadingText: {
-    color: '#E8EFF8',
+    color: '#1F2937',
     fontSize: 13,
   },
   emptyWrap: {
@@ -1436,12 +1436,12 @@ const nightStyleObject = {
     justifyContent: 'center',
   },
   emptyText: {
-    color: '#D4DEEF',
+    color: '#4B5563',
   },
   processCard: {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
@@ -1469,25 +1469,25 @@ const nightStyleObject = {
     height: 26,
     borderRadius: 99,
     borderWidth: 1,
-    borderColor: 'rgba(255,211,50,0.55)',
+    borderColor: 'rgba(0,0,0,0.12)',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(38,51,116,0.2)',
+    backgroundColor: 'rgba(0,0,0,0.02)',
   },
   stepDotActive: {
-    borderColor: 'rgba(255,211,50,0.95)',
-    backgroundColor: 'rgba(255,211,50,0.35)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.04)',
   },
   stepDotText: {
-    color: '#F0F4FA',
+    color: '#111111',
     fontSize: 12,
     fontWeight: '700',
   },
   stepDotTextActive: {
-    color: '#ffffff',
+    color: '#111111',
   },
   stepLabel: {
-    color: '#D4DEEF',
+    color: '#4B5563',
     fontSize: 11,
     fontWeight: '600',
     textAlign: 'center',
@@ -1502,9 +1502,9 @@ const nightStyleObject = {
     width: 240,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
-    backgroundColor: 'rgba(38,51,116,0.18)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundImage: 'none',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
     overflow: 'hidden',
@@ -1517,7 +1517,7 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   hintBubbleText: {
-    color: '#E8EFF8',
+    color: '#1F2937',
     fontSize: 11,
     lineHeight: 16,
   },
@@ -1525,7 +1525,7 @@ const nightStyleObject = {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(18,26,60,0.7)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     padding: 20,
   },
   modalCard: {
@@ -1533,11 +1533,11 @@ const nightStyleObject = {
     maxWidth: 420,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))',
-    backgroundColor: 'rgba(20,15,35,0.95)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundImage: 'none',
+    backgroundColor: 'rgba(255,255,255,0.98)',
     backdropFilter: 'blur(14px)',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)',
     overflow: 'hidden',
     padding: 16,
     gap: 10,
@@ -1548,14 +1548,14 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   modalText: {
-    color: '#E8EFF8',
+    color: '#1F2937',
     fontSize: 14,
     lineHeight: 21,
   },
   authWrap: {
     flex: 1,
-    backgroundColor: '#263374',
-    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(38,51,116,.22), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.14), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.12), transparent 60%), linear-gradient(180deg, #263374, #1E2A5E)',
+    backgroundColor: '#FFFFFF',
+    backgroundImage: 'none',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 18,
@@ -1565,11 +1565,11 @@ const nightStyleObject = {
     maxWidth: 440,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))',
-    backgroundColor: 'rgba(20,15,35,0.92)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundImage: 'none',
+    backgroundColor: 'rgba(255,255,255,0.97)',
     backdropFilter: 'blur(14px)',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)',
     overflow: 'hidden',
     padding: 24,
     gap: 14,
@@ -1580,7 +1580,7 @@ const nightStyleObject = {
     fontWeight: '800',
   },
   authSubTitle: {
-    color: 'rgba(232,236,255,0.72)',
+    color: 'rgba(0,0,0,0.6)',
     fontSize: 14,
     lineHeight: 20,
   },
@@ -1595,7 +1595,7 @@ const nightStyleObject = {
     backgroundColor: 'rgba(255,255,255,0.10)',
   },
   authDividerText: {
-    color: 'rgba(232,236,255,0.55)',
+    color: 'rgba(0,0,0,0.45)',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.25,
@@ -1603,17 +1603,17 @@ const nightStyleObject = {
   socialButton: {
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     paddingHorizontal: 14,
     minHeight: 44,
     paddingVertical: 10,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: '#FFFFFF',
     backdropFilter: 'blur(14px)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   socialButtonText: {
-    color: 'rgba(232,236,255,0.86)',
+    color: 'rgba(0,0,0,0.8)',
     fontWeight: '700',
     fontSize: 14,
     textAlign: 'center',
@@ -1640,19 +1640,19 @@ const nightStyleObject = {
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 999,
     paddingHorizontal: 18,
     paddingVertical: 10,
     marginTop: 12,
     marginBottom: 20,
     backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))',
-    backgroundColor: 'rgba(10,14,24,0.65)',
+    backgroundColor: 'rgba(0,0,0,0.02)',
     backdropFilter: 'blur(18px)',
     boxShadow: '0 12px 40px rgba(0,0,0,0.35)',
   },
   landingTopBrand: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 15,
     fontWeight: '800',
   },
@@ -1662,8 +1662,8 @@ const nightStyleObject = {
   },
   landingTopMenuButton: {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: '#FFFFFF',
     borderRadius: 999,
     paddingHorizontal: 12,
     minHeight: 34,
@@ -1671,16 +1671,16 @@ const nightStyleObject = {
     justifyContent: 'center',
   },
   landingTopMenuButtonActive: {
-    borderColor: 'rgba(38,51,116,0.55)',
-    backgroundColor: 'rgba(38,51,116,0.18)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
   },
   landingTopMenuText: {
-    color: '#F0F4FA',
+    color: '#111111',
     fontSize: 13,
     fontWeight: '700',
   },
   landingTopMenuTextActive: {
-    color: '#FFFFFF',
+    color: '#111111',
   },
   landingHeroSection: {
     minHeight: 640,
@@ -1695,20 +1695,20 @@ const nightStyleObject = {
     height: 56,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))',
-    backgroundColor: 'rgba(38,51,116,0.18)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     backdropFilter: 'blur(14px)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   landingHeroIcon: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 22,
     fontWeight: '700',
   },
   landingHeroTitle: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 62,
     lineHeight: 66,
     fontWeight: '800',
@@ -1716,7 +1716,7 @@ const nightStyleObject = {
     maxWidth: 980,
   },
   landingHeroSubtitle: {
-    color: '#D4DEEF',
+    color: '#4B5563',
     fontSize: 21,
     lineHeight: 31,
     textAlign: 'center',
@@ -1730,25 +1730,25 @@ const nightStyleObject = {
   landingPrimaryCta: {
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(38,51,116,0.40)',
-    backgroundImage: 'linear-gradient(135deg, rgba(38,51,116,0.85), rgba(59,130,246,0.65))',
-    backgroundColor: '#263374',
-    boxShadow: '0 18px 40px rgba(38,51,116,0.18)',
+    borderColor: 'rgba(0,0,0,0.10)',
+    backgroundImage: 'none',
+    backgroundColor: '#FFFFFF',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
     minHeight: 44,
     paddingHorizontal: 18,
     paddingVertical: 11,
     justifyContent: 'center',
   },
   landingPrimaryCtaText: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 14,
     fontWeight: '700',
   },
   landingSecondaryCta: {
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: '#FFFFFF',
     backdropFilter: 'blur(14px)',
     minHeight: 44,
     paddingHorizontal: 18,
@@ -1756,13 +1756,13 @@ const nightStyleObject = {
     justifyContent: 'center',
   },
   landingSecondaryCtaText: {
-    color: '#F0F4FA',
+    color: '#111111',
     fontSize: 14,
     fontWeight: '700',
   },
   landingTrustText: {
     marginTop: 20,
-    color: '#C9D4F0',
+    color: '#6B7280',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -1775,7 +1775,7 @@ const nightStyleObject = {
     marginTop: 2,
   },
   landingLogoItem: {
-    color: '#C5D4EE',
+    color: '#374151',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1783,29 +1783,29 @@ const nightStyleObject = {
     width: '100%',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))',
-    backgroundColor: 'rgba(10,14,24,0.82)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundImage: 'none',
+    backgroundColor: '#FAFAFA',
     backdropFilter: 'blur(14px)',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)',
     paddingHorizontal: 20,
     paddingVertical: 22,
     gap: 14,
   },
   landingSectionTitle: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 34,
     lineHeight: 40,
     fontWeight: '800',
   },
   landingSectionEyebrow: {
-    color: '#FFD332',
+    color: '#111111',
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1,
   },
   landingSectionText: {
-    color: '#D4DEEF',
+    color: '#4B5563',
     fontSize: 17,
     lineHeight: 26,
   },
@@ -1819,23 +1819,23 @@ const nightStyleObject = {
     flex: 1,
     minWidth: 210,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundImage: 'none',
+    backgroundColor: '#FFFFFF',
     backdropFilter: 'blur(14px)',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)',
     overflow: 'hidden',
     borderRadius: 12,
     padding: 14,
     gap: 6,
   },
   landingFeatureTitle: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 15,
     fontWeight: '700',
   },
   landingFeatureText: {
-    color: '#D4DEEF',
+    color: '#4B5563',
     fontSize: 12,
     lineHeight: 18,
   },
@@ -1843,22 +1843,22 @@ const nightStyleObject = {
     marginTop: 8,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundImage: 'none',
+    backgroundColor: '#FFFFFF',
     backdropFilter: 'blur(14px)',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)',
     overflow: 'hidden',
   },
   landingShowcaseHeader: {
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.08)',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderBottomColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: '#FAFAFA',
   },
   landingShowcaseHeaderText: {
-    color: '#E8EFF8',
+    color: '#1F2937',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1872,9 +1872,9 @@ const nightStyleObject = {
     flex: 1,
     minWidth: 220,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 12,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+    backgroundImage: 'none',
     backgroundColor: 'transparent',
     backdropFilter: 'blur(14px)',
     boxShadow: 'none',
@@ -1883,12 +1883,12 @@ const nightStyleObject = {
     gap: 6,
   },
   landingShowcaseColumnTitle: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 13,
     fontWeight: '800',
   },
   landingShowcaseItem: {
-    color: '#D4DEEF',
+    color: '#4B5563',
     fontSize: 12,
     lineHeight: 17,
   },
@@ -1908,12 +1908,12 @@ const nightStyleObject = {
     width: 264,
     minWidth: 264,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 16,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundImage: 'none',
+    backgroundColor: '#FFFFFF',
     backdropFilter: 'blur(20px)',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.22)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)',
     overflow: 'hidden',
     paddingVertical: 12,
     paddingHorizontal: 8,
@@ -1945,24 +1945,24 @@ const nightStyleObject = {
     gap: 8,
   },
   adminNavSectionHeaderActive: {
-    backgroundColor: 'rgba(38,51,116,0.14)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     borderWidth: 1,
-    borderColor: 'rgba(38,51,116,0.28)',
+    borderColor: 'rgba(0,0,0,0.08)',
   },
   adminNavSectionHeaderLabel: {
-    color: '#F0F4FA',
+    color: '#111111',
     fontSize: 13,
     fontWeight: '800',
     letterSpacing: -0.2,
     flex: 1,
   },
   adminNavSectionChevron: {
-    color: '#FFD332',
+    color: '#111111',
     fontSize: 11,
     fontWeight: '700',
   },
   adminNavSectionDescription: {
-    color: 'rgba(232,236,255,0.55)',
+    color: 'rgba(0,0,0,0.45)',
     fontSize: 10,
     lineHeight: 14,
     paddingHorizontal: 14,
@@ -1977,21 +1977,21 @@ const nightStyleObject = {
     backgroundColor: 'transparent',
   },
   adminNavItemActive: {
-    backgroundColor: 'rgba(38,51,116,0.18)',
+    backgroundColor: 'rgba(0,0,0,0.03)',
     borderWidth: 1,
-    borderColor: 'rgba(38,51,116,0.22)',
+    borderColor: 'rgba(0,0,0,0.08)',
   },
   adminNavItemLabel: {
-    color: '#8A9BC2',
+    color: '#6B7280',
     fontSize: 12,
     fontWeight: '600',
   },
   adminNavItemLabelActive: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontWeight: '700',
   },
   adminNavItemDetail: {
-    color: 'rgba(232,236,255,0.45)',
+    color: 'rgba(0,0,0,0.4)',
     fontSize: 10,
     lineHeight: 13,
     paddingTop: 2,
@@ -2000,12 +2000,12 @@ const nightStyleObject = {
     flex: 1,
     minWidth: 320,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     borderRadius: 16,
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundImage: 'none',
+    backgroundColor: '#FFFFFF',
     backdropFilter: 'blur(20px)',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.22)',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)',
     overflow: 'hidden',
     paddingLeft: 16,
     paddingRight: 16,
@@ -2020,709 +2020,31 @@ const nightStyleObject = {
     marginTop: 8,
   },
   adminContentHeader: {
-    backgroundImage: 'linear-gradient(135deg, rgba(38,51,116,0.18) 0%, rgba(59,130,246,0.10) 100%)',
+    backgroundImage: 'none',
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: 'rgba(0,0,0,0.08)',
     backdropFilter: 'blur(18px)',
     padding: 20,
     gap: 8,
   },
   adminContentTitle: {
-    color: '#FFFFFF',
+    color: '#111111',
     fontSize: 20,
     fontWeight: '800',
     letterSpacing: -0.3,
   },
   adminContentDescription: {
-    color: 'rgba(232,236,255,0.72)',
+    color: 'rgba(0,0,0,0.6)',
     fontSize: 13,
     lineHeight: 20,
   },
 };
 
-function parseColor(value: string) {
-  const hexMatch = value.match(/^#([0-9a-fA-F]{6})$/);
-  if (hexMatch) {
-    const hex = hexMatch[1];
-    return {
-      type: 'hex' as const,
-      r: parseInt(hex.slice(0, 2), 16),
-      g: parseInt(hex.slice(2, 4), 16),
-      b: parseInt(hex.slice(4, 6), 16),
-      a: 1,
-    };
-  }
+// Both day and night modes now share the same white/black modern theme.
 
-  const rgbaMatch = value.match(/^rgba\((\d+),\s*(\d+),\s*(\d+),\s*([0-9.]+)\)$/);
-  if (rgbaMatch) {
-    return {
-      type: 'rgba' as const,
-      r: Number(rgbaMatch[1]),
-      g: Number(rgbaMatch[2]),
-      b: Number(rgbaMatch[3]),
-      a: Number(rgbaMatch[4]),
-    };
-  }
+const styles = StyleSheet.create(nightStyleObject as any);
 
-  return null;
-}
-
-function toRgbaString(r: number, g: number, b: number, a: number) {
-  return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${a})`;
-}
-
-function luminance(r: number, g: number, b: number) {
-  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-}
-
-function transformColorForDay(value: string, property: string) {
-  const color = parseColor(value);
-  if (!color) {
-    return value;
-  }
-
-  const isText = property === 'color';
-  const isBackground = property.toLowerCase().includes('backgroundcolor');
-  const isBorder = property.toLowerCase().includes('bordercolor');
-  const isDark = luminance(color.r, color.g, color.b) < 0.45;
-
-  if (isText) {
-    if (!isDark) {
-      return toRgbaString(34, 24, 52, color.a);
-    }
-    return toRgbaString(
-      Math.min(color.r + 10, 82),
-      Math.min(color.g + 8, 74),
-      Math.min(color.b + 14, 92),
-      color.a,
-    );
-  }
-
-  if (isBackground) {
-    if (isDark) {
-      return toRgbaString(
-        Math.min(246, color.r + 182),
-        Math.min(245, color.g + 182),
-        Math.min(250, color.b + 182),
-        color.a,
-      );
-    }
-    return toRgbaString(
-      Math.min(250, color.r + 8),
-      Math.min(248, color.g + 8),
-      Math.min(252, color.b + 8),
-      color.a,
-    );
-  }
-
-  if (isBorder) {
-    if (isDark) {
-      return toRgbaString(124, 98, 178, Math.max(0.38, color.a));
-    }
-    return toRgbaString(120, 94, 170, Math.max(0.34, color.a));
-  }
-
-  return value;
-}
-
-const dayStyleObject = Object.fromEntries(
-  Object.entries(nightStyleObject).map(([styleKey, styleValue]) => {
-    if (!styleValue || typeof styleValue !== 'object') {
-      return [styleKey, styleValue];
-    }
-
-    const transformed = Object.fromEntries(
-      Object.entries(styleValue).map(([property, value]) => {
-        if (typeof value === 'string') {
-          return [property, transformColorForDay(value, property)];
-        }
-        return [property, value];
-      }),
-    );
-
-    return [styleKey, transformed];
-  }),
-);
-
-const dayOverrides = {
-  root: {
-    backgroundColor: '#F5F1FF',
-    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(38,51,116,.10), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.06), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.06), transparent 60%), linear-gradient(180deg, #F5F1FF, #EDE6FC)',
-  },
-  dashboardSidebar: {
-    backgroundImage: 'linear-gradient(180deg, rgba(239,232,252,0.72), rgba(245,241,255,0.58))',
-    backgroundColor: 'rgba(239,232,252,0.52)',
-    backdropFilter: 'blur(18px) saturate(1.3)',
-    WebkitBackdropFilter: 'blur(18px) saturate(1.3)',
-    borderColor: 'rgba(102,74,154,0.22)',
-    boxShadow: '0 8px 32px rgba(102,74,154,0.12), inset 0 0.5px 0 rgba(255,255,255,0.45)',
-  },
-  dashboardHamburgerButton: {
-    borderColor: 'rgba(100,80,150,0.30)',
-    backgroundColor: 'rgba(100,80,150,0.10)',
-  },
-  dashboardHamburgerButtonText: {
-    color: '#2E2148',
-  },
-  dashboardMainPane: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.68), rgba(245,241,255,0.52))',
-    backgroundColor: 'rgba(251,248,255,0.45)',
-    backdropFilter: 'blur(20px) saturate(1.4)',
-    WebkitBackdropFilter: 'blur(20px) saturate(1.4)',
-    borderColor: 'rgba(102,74,154,0.22)',
-    boxShadow: '0 8px 32px rgba(102,74,154,0.14), inset 0 0.5px 0 rgba(255,255,255,0.50)',
-  },
-  dashboardMainHeader: {
-    backgroundColor: 'transparent',
-    borderBottomColor: 'rgba(102,74,154,0.22)',
-  },
-  dashboardDraftBanner: {
-    backgroundColor: 'rgba(38,51,116,0.12)',
-    borderBottomColor: 'rgba(102,74,154,0.24)',
-  },
-  dashboardDraftText: {
-    color: '#4A3A69',
-  },
-  dashboardBottomStatusText: {
-    color: '#4A3A69',
-  },
-  dashboardSectionLabel: {
-    color: '#5C477F',
-  },
-  dashboardNavIcon: {
-    color: 'rgba(74,58,105,0.60)',
-  },
-  dashboardNavDivider: {
-    backgroundColor: 'rgba(102,74,154,0.14)',
-  },
-  dashboardNavItemText: {
-    color: '#2E2148',
-  },
-  dashboardNavItemDesc: {
-    color: 'rgba(46,33,72,0.45)',
-  },
-  dashboardNavItemActive: {
-    backgroundColor: '#263374',
-  },
-  dashboardTenantChevron: {
-    color: '#2E2148',
-  },
-  dashboardTenantNavItem: {
-    borderColor: 'rgba(112,85,163,0.25)',
-    backgroundColor: 'rgba(112,85,163,0.08)',
-  },
-  dashboardTenantNavItemActive: {
-    borderColor: 'rgba(38,51,116,0.88)',
-    backgroundColor: 'rgba(38,51,116,0.78)',
-  },
-  dashboardTenantNavItemText: {
-    color: '#2F2249',
-  },
-  dashboardTenantHeader: {
-    borderColor: 'rgba(112,85,163,0.30)',
-    backgroundColor: 'rgba(112,85,163,0.08)',
-  },
-  dashboardTenantHeaderActive: {
-    borderColor: 'rgba(38,51,116,0.50)',
-    backgroundColor: 'rgba(38,51,116,0.14)',
-  },
-  dashboardTenantHeaderName: {
-    color: '#2F2249',
-  },
-  dashboardTenantAvatar: {
-    borderColor: 'rgba(112,85,163,0.25)',
-    backgroundColor: 'rgba(112,85,163,0.12)',
-  },
-  dashboardTenantAvatarSmall: {
-    borderColor: 'rgba(112,85,163,0.25)',
-    backgroundColor: 'rgba(112,85,163,0.12)',
-  },
-  dashboardTenantPill: {
-    borderColor: 'rgba(112,85,163,0.5)',
-    backgroundColor: 'rgba(112,85,163,0.12)',
-  },
-  dashboardTenantPillActive: {
-    borderColor: 'rgba(38,51,116,0.88)',
-    backgroundColor: 'rgba(38,51,116,0.78)',
-  },
-  dashboardTenantPillText: {
-    color: '#2F2249',
-  },
-  dashboardCollapsedNavItem: {
-    backgroundColor: 'transparent',
-  },
-  dashboardCollapsedNavItemActive: {
-    backgroundColor: '#263374',
-  },
-  dashboardNavItemTextActive: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-  },
-  dashboardRoleItemText: {
-    color: '#2F2249',
-  },
-  dashboardRoleItem: {
-    borderColor: 'rgba(112,85,163,0.46)',
-    backgroundColor: 'rgba(112,85,163,0.12)',
-  },
-  dashboardRoleItemActive: {
-    borderColor: 'rgba(38,51,116,0.88)',
-    backgroundColor: 'rgba(38,51,116,0.78)',
-  },
-  dashboardRoleItemTextActive: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-  },
-  dashboardSidebarActionText: {
-    color: '#2F2248',
-  },
-  dashboardSidebarAction: {
-    borderColor: 'rgba(112,85,163,0.52)',
-    backgroundColor: 'rgba(112,85,163,0.12)',
-  },
-  dashboardSidebarActionActive: {
-    borderColor: 'rgba(38,51,116,0.9)',
-    backgroundColor: 'rgba(38,51,116,0.8)',
-  },
-  dashboardSidebarActionTextActive: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-  },
-  dashboardUserText: {
-    color: '#4E3D6E',
-  },
-  card: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderColor: 'rgba(112,85,163,0.28)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  tenantWidgetCard: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderColor: 'rgba(102,74,154,0.18)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  moduleWidgetCard: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderColor: 'rgba(102,74,154,0.18)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  bodyText: {
-    color: '#111111',
-    fontSize: 13,
-    lineHeight: 20,
-  },
-  sectionTitle: {
-    color: '#1E293B',
-  },
-  sectionDetail: {
-    color: '#475569',
-  },
-  adminSidebar: {
-    backgroundColor: 'rgba(245,241,255,0.75)',
-  },
-  textInput: {
-    borderColor: 'rgba(115,88,165,0.52)',
-    backgroundColor: 'rgba(255,255,255,0.96)',
-    color: '#2D2142',
-  },
-  pillButton: {
-    borderColor: 'rgba(112,85,163,0.36)',
-    backgroundColor: 'rgba(112,85,163,0.08)',
-  },
-  pillButtonActive: {
-    borderColor: '#263374',
-    backgroundColor: 'rgba(38,51,116,0.16)',
-  },
-  pillButtonText: {
-    color: '#4A3A69',
-  },
-  pillButtonTextActive: {
-    color: '#1a2455',
-  },
-  metaText: {
-    color: '#111111',
-    fontSize: 11,
-    lineHeight: 16,
-  },
-  notice: {
-    color: '#111111',
-  },
-  input: {
-    backgroundColor: 'rgba(255,255,255,0.96)',
-    borderColor: 'rgba(115,88,165,0.62)',
-    color: '#2D2142',
-  },
-  secondaryButton: {
-    borderColor: 'rgba(112,85,163,0.64)',
-    backgroundColor: 'rgba(112,85,163,0.2)',
-  },
-  secondaryButtonText: {
-    color: '#111111',
-  },
-  dashboardHeaderButton: {
-    borderColor: 'rgba(38,51,116,0.5)',
-    backgroundColor: 'rgba(38,51,116,0.14)',
-  },
-  dashboardHeaderButtonText: {
-    color: '#111111',
-  },
-  dashboardHeaderPrimaryButton: {
-    backgroundColor: '#7A52E8',
-  },
-  dashboardHeaderPrimaryButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-  },
-  pill: {
-    borderColor: 'rgba(38,51,116,0.22)',
-    backgroundColor: 'rgba(38,51,116,0.06)',
-  },
-  pillActive: {
-    borderColor: 'rgba(38,51,116,0.72)',
-    backgroundColor: 'rgba(38,51,116,0.14)',
-  },
-  pillText: {
-    color: '#4A3A69',
-  },
-  pillTextActive: {
-    color: '#263374',
-    fontWeight: '800',
-  },
-  buttonDisabled: {
-    opacity: 0.38,
-  },
-  primaryButton: {
-    backgroundColor: '#7A52E8',
-  },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-  },
-  loadingWrap: {
-    backgroundColor: '#F4F0FB',
-  },
-  loadingText: {
-    color: '#352552',
-  },
-  authWrap: {
-    backgroundColor: '#F5F1FF',
-    backgroundImage: 'radial-gradient(1200px 700px at 18% 8%, rgba(38,51,116,.10), transparent 55%), radial-gradient(900px 650px at 82% 18%, rgba(34,197,94,.06), transparent 60%), radial-gradient(900px 650px at 45% 100%, rgba(59,130,246,.06), transparent 60%), linear-gradient(180deg, #F5F1FF, #EDE6FC)',
-  },
-  authSubTitle: {
-    color: '#3D2D5F',
-  },
-  landingWrap: {
-    backgroundColor: 'transparent',
-  },
-  landingTopBar: {
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.72))',
-    backgroundColor: 'rgba(255,255,255,0.80)',
-    borderColor: 'rgba(102,74,154,0.22)',
-    boxShadow: '0 12px 40px rgba(102,74,154,0.12)',
-  },
-  sectionEyebrow: {
-    color: '#5A467E',
-  },
-  sectionLeadText: {
-    color: '#2F224A',
-  },
-  landingShowcaseSection: {
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.72))',
-    backgroundColor: 'rgba(255,255,255,0.80)',
-    borderColor: 'rgba(102,74,154,0.22)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  landingShowcasePanel: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: 'rgba(251,248,255,0.85)',
-    borderColor: 'rgba(102,74,154,0.18)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  adminNavPane: {
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.75))',
-    backgroundColor: 'rgba(255,255,255,0.82)',
-    borderColor: 'rgba(102,74,154,0.18)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.08)',
-  },
-  adminNavSectionHeaderActive: {
-    backgroundColor: 'rgba(38,51,116,0.08)',
-    borderColor: 'rgba(38,51,116,0.20)',
-  },
-  adminNavSectionHeaderLabel: {
-    color: '#1A2340',
-  },
-  adminNavSectionChevron: {
-    color: '#263374',
-  },
-  adminNavSectionDescription: {
-    color: '#5C477F',
-  },
-  adminNavItemActive: {
-    backgroundColor: 'rgba(38,51,116,0.10)',
-    borderColor: 'rgba(38,51,116,0.18)',
-  },
-  adminNavItemLabel: {
-    color: '#4A3A69',
-  },
-  adminNavItemLabelActive: {
-    color: '#263374',
-  },
-  adminNavItemDetail: {
-    color: '#7A6A9A',
-  },
-  adminContentPane: {
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.75))',
-    backgroundColor: 'rgba(255,255,255,0.82)',
-    borderColor: 'rgba(102,74,154,0.18)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.08)',
-  },
-  adminContentHeader: {
-    backgroundImage: 'linear-gradient(135deg, rgba(38,51,116,0.06) 0%, rgba(59,130,246,0.04) 100%)',
-    borderColor: 'rgba(102,74,154,0.16)',
-  },
-  adminContentTitle: {
-    color: '#1A2340',
-  },
-  adminContentDescription: {
-    color: '#4A3A69',
-  },
-  authCard: {
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.72))',
-    backgroundColor: 'rgba(255,255,255,0.80)',
-    borderColor: 'rgba(102,74,154,0.22)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  builderPreviewHeroCard: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: 'rgba(255,255,255,0.90)',
-    borderColor: 'rgba(38,51,116,0.28)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  builderPreviewHeroTitle: {
-    color: '#111111',
-  },
-  builderPreviewHeroSubtitle: {
-    color: '#111111',
-  },
-  builderPreviewStatCard: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: '#FFFFFF',
-    borderColor: 'rgba(38,51,116,0.3)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  builderPreviewStatValue: {
-    color: '#111111',
-  },
-  builderPreviewStatLabel: {
-    color: '#111111',
-  },
-  builderPreviewFieldRow: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: '#FFFFFF',
-    borderColor: 'rgba(112,85,163,0.36)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  builderSectionCard: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: 'rgba(255,255,255,0.94)',
-    borderColor: 'rgba(38,51,116,0.28)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  builderFormSection: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: 'rgba(255,255,255,0.94)',
-    borderColor: 'rgba(38,51,116,0.28)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  builderFormSectionHeaderRail: {
-    borderRightColor: 'rgba(112,85,163,0.22)',
-  },
-  builderFormSectionTitle: {
-    color: '#2D2142',
-  },
-  builderFormSectionText: {
-    color: '#4F3D71',
-  },
-  builderSectionTitle: {
-    color: '#2D2142',
-  },
-  builderSectionHint: {
-    color: '#4F3D71',
-  },
-  builderStudioTextPrimary: {
-    color: '#1F2937',
-  },
-  builderStudioTextSecondary: {
-    color: '#64748B',
-  },
-  builderConfigPane: {
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.72))',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderColor: 'rgba(38,51,116,0.34)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  builderPreviewCard: {
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.72))',
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderColor: 'rgba(38,51,116,0.34)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  builderDropZone: {
-    borderColor: 'rgba(38,51,116,0.58)',
-    backgroundColor: 'rgba(38,51,116,0.12)',
-  },
-  builderCreateModeBanner: {
-    borderColor: 'rgba(176,130,38,0.55)',
-    backgroundColor: 'rgba(250,225,120,0.28)',
-  },
-  builderCreateModeBannerText: {
-    color: '#5E4719',
-  },
-  builderCreateModeBannerClose: {
-    borderColor: 'rgba(176,130,38,0.62)',
-    backgroundColor: 'rgba(255,255,255,0.58)',
-  },
-  builderCreateModeBannerCloseText: {
-    color: '#5E4719',
-  },
-  builderDetailsFormPanel: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: '#FFFFFF',
-    borderColor: 'rgba(112,85,163,0.36)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  builderDetailsFormRow: {
-    borderBottomColor: 'rgba(112,85,163,0.22)',
-  },
-  builderDetailsFormLabel: {
-    color: '#2D2142',
-  },
-  builderDetailsFormInput: {
-    backgroundColor: 'rgba(112,85,163,0.12)',
-    borderColor: 'rgba(112,85,163,0.38)',
-  },
-  builderDetailsFormInputText: {
-    color: '#4A3B68',
-  },
-  builderDetailsFormType: {
-    color: '#5E4A84',
-  },
-  endUserWorkspaceRail: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: '#FFFFFF',
-    borderColor: 'rgba(112,85,163,0.32)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  endUserWorkspaceShell: {
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.72))',
-    backgroundColor: '#FFFFFF',
-    borderColor: 'rgba(112,85,163,0.32)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  endUserWorkspaceRailLabel: {
-    color: '#5D4B83',
-  },
-  endUserWorkspaceTab: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    borderColor: 'rgba(112,85,163,0.42)',
-    backgroundColor: 'rgba(255,255,255,0.90)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  endUserWorkspaceTabActive: {
-    borderColor: 'rgba(38,51,116,0.92)',
-    backgroundColor: 'rgba(38,51,116,0.78)',
-  },
-  endUserWorkspaceTabStep: {
-    color: '#2E2148',
-  },
-  endUserWorkspaceTabStepActive: {
-    color: '#FFFFFF',
-  },
-  endUserWorkspaceTabName: {
-    color: '#4A3B68',
-  },
-  endUserWorkspaceTabNameActive: {
-    color: '#FFFFFF',
-  },
-  endUserHierarchyCard: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    borderColor: 'rgba(112,85,163,0.32)',
-    backgroundColor: 'rgba(255,255,255,0.88)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  endUserHierarchyCardText: {
-    color: '#2E2148',
-  },
-  listCard: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderColor: 'rgba(112,85,163,0.28)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  kpiCard: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderColor: 'rgba(112,85,163,0.28)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  detailPanel: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderColor: 'rgba(112,85,163,0.28)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  processCard: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderColor: 'rgba(112,85,163,0.28)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  modalCard: {
-    backgroundImage: 'linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.72))',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderColor: 'rgba(102,74,154,0.22)',
-    boxShadow: '0 4px 24px rgba(102,74,154,0.10)',
-  },
-  dashboardBottomActionBar: {
-    backgroundImage: 'linear-gradient(180deg, rgba(251,248,255,0.9), rgba(245,241,255,0.82))',
-    backgroundColor: 'rgba(255,255,255,0.88)',
-    borderTopColor: 'rgba(102,74,154,0.18)',
-  },
-};
-
-for (const [styleKey, overrideValues] of Object.entries(dayOverrides)) {
-  const existing = (dayStyleObject as any)[styleKey] ?? {};
-  (dayStyleObject as any)[styleKey] = {
-    ...existing,
-    ...overrideValues,
-  };
-}
-
-const nightStyles = StyleSheet.create(nightStyleObject as any);
-// Ensure landing styles exist in day mode too
-dayStyleObject.landingWrap = {
-  flex: 1,
-  backgroundColor: 'transparent',
-};
-dayStyleObject.landingContent = {
-  flexGrow: 1,
-  paddingBottom: 36,
-};
-dayStyleObject.landingTopMenu = {
-  flexDirection: 'row',
-  gap: 8,
-};
-dayStyleObject.landingTopMenuText = {
-  color: '#4A3B68',
-  fontSize: 13,
-  fontWeight: '700',
-};
-const dayStyles = StyleSheet.create(dayStyleObject as any);
-
-export function getStyles(mode: ThemeMode) {
-  return mode === 'day' ? dayStyles : nightStyles;
+export function getStyles(_mode: ThemeMode) {
+  return styles;
 }

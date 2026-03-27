@@ -35,18 +35,18 @@ function ensureCSS() {
     .cs-nebula-night {
       position: absolute; inset: 0;
       background:
-        radial-gradient(ellipse 120% 80% at 20% 30%, rgba(45,60,140,0.40), transparent 60%),
-        radial-gradient(ellipse 100% 90% at 80% 70%, rgba(55,85,180,0.25), transparent 55%),
-        radial-gradient(ellipse 90% 100% at 50% 90%, rgba(40,55,130,0.30), transparent 50%);
+        radial-gradient(ellipse 120% 80% at 20% 30%, rgba(0,0,0,0.02), transparent 60%),
+        radial-gradient(ellipse 100% 90% at 80% 70%, rgba(0,0,0,0.015), transparent 55%),
+        radial-gradient(ellipse 90% 100% at 50% 90%, rgba(0,0,0,0.02), transparent 50%);
       background-size: 200% 200%, 200% 200%, 200% 200%;
       animation: cs-nebula-drift 30s ease-in-out infinite;
     }
     .cs-nebula-day {
       position: absolute; inset: 0;
       background:
-        radial-gradient(ellipse 120% 80% at 20% 30%, rgba(38,51,116,0.14), transparent 60%),
-        radial-gradient(ellipse 100% 90% at 80% 70%, rgba(96,165,250,0.10), transparent 55%),
-        radial-gradient(ellipse 90% 100% at 50% 90%, rgba(38,51,116,0.10), transparent 50%);
+        radial-gradient(ellipse 120% 80% at 20% 30%, rgba(0,0,0,0.02), transparent 60%),
+        radial-gradient(ellipse 100% 90% at 80% 70%, rgba(96,165,250,0.03), transparent 55%),
+        radial-gradient(ellipse 90% 100% at 50% 90%, rgba(0,0,0,0.03), transparent 50%);
       background-size: 200% 200%, 200% 200%, 200% 200%;
       animation: cs-nebula-drift 30s ease-in-out infinite;
     }
@@ -58,11 +58,11 @@ function ensureCSS() {
     }
     .cs-vignette-night {
       position: absolute; inset: 0; pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 40%, rgba(28,36,80,0.50) 100%);
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.02) 100%);
     }
     .cs-vignette-day {
       position: absolute; inset: 0; pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 40%, rgba(245,241,255,0.50) 100%);
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(245,241,255,0.25) 100%);
     }
   `;
   document.head.appendChild(s);

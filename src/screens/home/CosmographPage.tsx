@@ -330,20 +330,20 @@ export function CosmographPage({ registerActions, addNotification, auditLog }: G
 
   /* ── Palette ──────────────────────────────────────────────────── */
   const p = isDark ? {
-    bg: 'rgba(13,13,22,0.82)', border: 'rgba(255,255,255,0.09)', cardBg: 'rgba(255,255,255,0.04)',
+    bg: 'rgba(255,255,255,0.95)', border: 'rgba(0,0,0,0.07)', cardBg: 'rgba(0,0,0,0.02)',
     title: '#FFFFFF', sub: 'rgba(232,236,255,0.75)', body: 'rgba(232,236,255,0.60)',
-    accent: '#FFD332', accentBg: 'rgba(38,51,116,0.12)', accentBorder: 'rgba(38,51,116,0.28)',
-    inputBg: 'rgba(255,255,255,0.05)', inputBorder: 'rgba(255,255,255,0.12)',
+    accent: '#111111', accentBg: 'rgba(0,0,0,0.03)', accentBorder: 'rgba(0,0,0,0.08)',
+    inputBg: 'rgba(0,0,0,0.03)', inputBorder: 'rgba(0,0,0,0.08)',
     rowHover: 'rgba(139,92,246,0.10)', activeRow: 'rgba(139,92,246,0.18)',
-    pillBg: 'rgba(255,255,255,0.07)', pillText: '#FFD332',
+    pillBg: 'rgba(0,0,0,0.04)', pillText: '#111111',
     green: '#22C55E', red: '#EF4444', amber: '#F59E0B', blue: '#3B82F6',
   } : {
     bg: 'rgba(248,246,255,0.95)', border: 'rgba(0,0,0,0.09)', cardBg: 'rgba(255,255,255,0.82)',
     title: '#1A2340', sub: '#4A3A69', body: '#5C477F',
-    accent: '#263374', accentBg: 'rgba(38,51,116,0.08)', accentBorder: 'rgba(38,51,116,0.22)',
-    inputBg: '#FFFFFF', inputBorder: 'rgba(38,51,116,0.22)',
-    rowHover: 'rgba(38,51,116,0.06)', activeRow: 'rgba(38,51,116,0.14)',
-    pillBg: 'rgba(38,51,116,0.10)', pillText: '#263374',
+    accent: '#111111', accentBg: 'rgba(0,0,0,0.02)', accentBorder: 'rgba(0,0,0,0.06)',
+    inputBg: '#FFFFFF', inputBorder: 'rgba(0,0,0,0.06)',
+    rowHover: 'rgba(0,0,0,0.03)', activeRow: 'rgba(0,0,0,0.06)',
+    pillBg: 'rgba(0,0,0,0.03)', pillText: '#111111',
     green: '#16A34A', red: '#DC2626', amber: '#D97706', blue: '#2563EB',
   };
 
@@ -657,7 +657,7 @@ export function CosmographPage({ registerActions, addNotification, auditLog }: G
                     onChange={(e) => setColumnMapping(col.key, e.target.value)}
                     style={{
                       width: '100%', fontSize: 12, padding: '6px 8px', borderRadius: 8,
-                      background: isDark ? 'rgba(255,255,255,0.07)' : '#FFFFFF',
+                      background: isDark ? 'rgba(0,0,0,0.04)' : '#FFFFFF',
                       color: isDark ? '#E0E4ED' : '#1A2340',
                       border: `1px solid ${col.mappedFieldId ? p.accent : p.inputBorder}`,
                       outline: 'none',

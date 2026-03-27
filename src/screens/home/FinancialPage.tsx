@@ -19,19 +19,19 @@ import {
 import { Card } from './components';
 import { GuidedPageProps } from './types';
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+// ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Constants ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 type FinTab = 'mission' | 'ledger' | 'payables' | 'receivables' | 'waterfalls' | 'reports' | 'vendors';
 type LedgerSubTab = 'accounts' | 'entries' | 'periods';
 type ReportType = 'trial_balance' | 'income_statement' | 'balance_sheet';
 
 const FIN_TABS: { id: FinTab; label: string; icon: string }[] = [
-  { id: 'mission', label: 'Mission Control', icon: '🎯' },
-  { id: 'ledger', label: 'Ledger', icon: '📒' },
-  { id: 'payables', label: 'Payables', icon: '📤' },
-  { id: 'receivables', label: 'Receivables', icon: '📥' },
-  { id: 'waterfalls', label: 'Waterfalls', icon: '🌊' },
-  { id: 'reports', label: 'Reports', icon: '📊' },
-  { id: 'vendors', label: 'Vendors & AP', icon: '🏢' },
+  { id: 'mission', label: 'Mission Control', icon: 'ÃƒÂ°Ã…Â¸Ã…Â½Ã‚Â¯' },
+  { id: 'ledger', label: 'Ledger', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬â„¢' },
+  { id: 'payables', label: 'Payables', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â¤' },
+  { id: 'receivables', label: 'Receivables', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â¥' },
+  { id: 'waterfalls', label: 'Waterfalls', icon: 'ÃƒÂ°Ã…Â¸Ã…â€™Ã…Â ' },
+  { id: 'reports', label: 'Reports', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â ' },
+  { id: 'vendors', label: 'Vendors & AP', icon: 'ÃƒÂ°Ã…Â¸Ã‚ÂÃ‚Â¢' },
 ];
 
 const ACCENT = '#F59E0B';
@@ -47,7 +47,7 @@ function fmtDate(iso: string) {
   return iso.slice(0, 10);
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+// ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Sub-components ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 function StatusBadge({ label, color }: { label: string; color: string }) {
   return (
     <View style={{
@@ -106,7 +106,7 @@ function WaterfallStatusColor(s: string): string {
   return '#8878AE';
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Main Component ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 export function FinancialPage({}: GuidedPageProps) {
   const { data, currentUser,
     postJournalEntry, submitJournalEntryForApproval,
@@ -126,7 +126,7 @@ export function FinancialPage({}: GuidedPageProps) {
   const [reportType, setReportType] = useState<ReportType>('trial_balance');
   const [lastErrors, setLastErrors] = useState<FinancialValidationError[]>([]);
 
-  // ── Journal Entry Create State ──────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Journal Entry Create State ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   const [jeDesc, setJeDesc] = useState('');
   const [jeDate, setJeDate] = useState(new Date().toISOString().slice(0, 10));
   const [jePeriodId, setJePeriodId] = useState('');
@@ -135,13 +135,13 @@ export function FinancialPage({}: GuidedPageProps) {
     { id: '', accountId: '', debitStr: '', creditStr: '', memo: '' },
   ]);
 
-  // ── Payable Create State ────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Payable Create State ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   const [apTo, setApTo] = useState('');
   const [apAmount, setApAmount] = useState('');
   const [apDue, setApDue] = useState('');
   const [apNotes, setApNotes] = useState('');
 
-  // ── Receivable Create State ─────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Receivable Create State ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   const [arFrom, setArFrom] = useState('');
   const [arAmount, setArAmount] = useState('');
   const [arNotes, setArNotes] = useState('');
@@ -156,14 +156,14 @@ export function FinancialPage({}: GuidedPageProps) {
 
   const openPeriod = periods.find((p) => p.status === 'open');
 
-  // ── Pending Counts ──────────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Pending Counts ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   const pendingJEs = journalEntries.filter((e) => e.postingStatus === 'pending_approval');
   const pendingPayables = payables.filter((p) => p.approvalStatus === 'pending_approval');
   const pendingWaterfalls = waterfalls.filter((w) => w.executionStatus === 'pending_approval');
   const pendingIngestionRecords: IngestionRecord[] = (data.ingestionRecords ?? []).filter((r) => r.reviewStatus === 'pending_review');
   const pendingTotal = pendingJEs.length + pendingPayables.length + pendingWaterfalls.length + pendingIngestionRecords.length;
 
-  // ── Trial Balance Computation ───────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Trial Balance Computation ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   const trialBalance = useMemo(() => {
     const postedLines = journalEntries
       .filter((e) => e.postingStatus === 'posted')
@@ -181,7 +181,7 @@ export function FinancialPage({}: GuidedPageProps) {
   const totalDebits = trialBalance.reduce((s, r) => s + r.totalDebit, 0);
   const totalCredits = trialBalance.reduce((s, r) => s + r.totalCredit, 0);
 
-  // ── Income Statement ────────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Income Statement ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   const incomeStatement = useMemo(() => {
     const postedLines = journalEntries
       .filter((e) => e.postingStatus === 'posted')
@@ -203,7 +203,7 @@ export function FinancialPage({}: GuidedPageProps) {
     return { revenues, expenses, totalRevenue, totalExpenses, netIncome: totalRevenue - totalExpenses };
   }, [glAccounts, journalEntries]);
 
-  // ── Balance Sheet ───────────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Balance Sheet ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   const balanceSheet = useMemo(() => {
     const postedLines = journalEntries
       .filter((e) => e.postingStatus === 'posted')
@@ -225,7 +225,7 @@ export function FinancialPage({}: GuidedPageProps) {
     return { assets, liabilities, equity, totalAssets, totalLiabilities, totalEquity, balanced: Math.abs(totalAssets - (totalLiabilities + totalEquity)) < 0.01 };
   }, [glAccounts, journalEntries, incomeStatement.netIncome]);
 
-  // ── Handlers ────────────────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Handlers ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   function handlePostJE(entryId: string) {
     const userId = currentUser?.id ?? 'user-admin';
     const result = postJournalEntry(entryId, userId);
@@ -306,7 +306,7 @@ export function FinancialPage({}: GuidedPageProps) {
     setArFrom(''); setArAmount(''); setArNotes('');
   }
 
-  // ── Render helpers ────────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Render helpers ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   function renderTabBar() {
     return (
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexShrink: 0 }} contentContainerStyle={{ gap: 6, padding: 2, paddingBottom: 4 }}>
@@ -317,8 +317,8 @@ export function FinancialPage({}: GuidedPageProps) {
             <Pressable key={t.id} onPress={() => setTab(t.id)} style={{
               flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8,
               borderRadius: 10, borderWidth: 1,
-              borderColor: active ? `${ACCENT}88` : 'rgba(255,255,255,0.1)',
-              backgroundColor: active ? `${ACCENT}18` : 'rgba(255,255,255,0.04)',
+              borderColor: active ? `${ACCENT}88` : 'rgba(0,0,0,0.08)',
+              backgroundColor: active ? `${ACCENT}18` : 'rgba(0,0,0,0.02)',
             }}>
               <Text style={{ fontSize: 14 }}>{t.icon}</Text>
               <Text style={{ color: active ? ACCENT : 'rgba(243,234,255,0.6)', fontSize: 13, fontWeight: active ? '700' : '500' }}>{t.label}</Text>
@@ -334,7 +334,7 @@ export function FinancialPage({}: GuidedPageProps) {
     );
   }
 
-  // ── Vendor & AP state ──────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Vendor & AP state ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   const [vndName, setVndName] = useState('');
   const [vndCode, setVndCode] = useState('');
   const [vndPayment, setVndPayment] = useState<'ach' | 'wire' | 'check'>('ach');
@@ -414,19 +414,19 @@ export function FinancialPage({}: GuidedPageProps) {
 
   function renderVendors() {
     const inputStyle = {
-      backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(245,158,11,0.3)',
-      borderRadius: 8, padding: 10, color: '#fff' as const, fontSize: 14, marginBottom: 8,
+      backgroundColor: 'rgba(0,0,0,0.04)', borderWidth: 1, borderColor: 'rgba(245,158,11,0.3)',
+      borderRadius: 8, padding: 10, color: '#111111' as const, fontSize: 14, marginBottom: 8,
     };
     return (
       <View style={{ gap: 16 }}>
         {/* Vendor list */}
-        <Card title={`🏢 Vendor Registry (${vendors.length})`}>
-          {vendors.length === 0 && <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>No vendors yet.</Text>}
+        <Card title={`ÃƒÂ°Ã…Â¸Ã‚ÂÃ‚Â¢ Vendor Registry (${vendors.length})`}>
+          {vendors.length === 0 && <Text style={{ color: 'rgba(0,0,0,0.35)', fontSize: 13 }}>No vendors yet.</Text>}
           {vendors.map((v) => (
-            <View key={v.id} style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <View key={v.id} style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.04)', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <View>
-                <Text style={{ color: '#fff', fontWeight: '600' }}>{v.vendorName} <Text style={{ color: INFO, fontSize: 11 }}>[{v.vendorCode}]</Text></Text>
-                <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>{v.paymentMethod.toUpperCase()}{v.contactName ? ` · ${v.contactName}` : ''}</Text>
+                <Text style={{ color: '#111111', fontWeight: '600' }}>{v.vendorName} <Text style={{ color: INFO, fontSize: 11 }}>[{v.vendorCode}]</Text></Text>
+                <Text style={{ color: 'rgba(0,0,0,0.45)', fontSize: 12 }}>{v.paymentMethod.toUpperCase()}{v.contactName ? ` Ãƒâ€šÃ‚Â· ${v.contactName}` : ''}</Text>
               </View>
               <Pressable onPress={() => updateVendor(v.id, { isActive: !v.isActive })} style={{
                 paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6,
@@ -440,22 +440,22 @@ export function FinancialPage({}: GuidedPageProps) {
         </Card>
 
         {/* Add vendor form */}
-        <Card title="➕ Add Vendor">
+        <Card title="ÃƒÂ¢Ã…Â¾Ã¢â‚¬Â¢ Add Vendor">
           {vndErrors && <Text style={{ color: DANGER, fontSize: 12, marginBottom: 8 }}>{vndErrors}</Text>}
-          <TextInput placeholder="Vendor name *" placeholderTextColor="rgba(255,255,255,0.35)" value={vndName} onChangeText={setVndName} style={inputStyle} />
-          <TextInput placeholder="Vendor code * (e.g. GSC)" placeholderTextColor="rgba(255,255,255,0.35)" value={vndCode} onChangeText={setVndCode} style={inputStyle} />
-          <TextInput placeholder="Contact name" placeholderTextColor="rgba(255,255,255,0.35)" value={vndContact} onChangeText={setVndContact} style={inputStyle} />
-          <TextInput placeholder="Default expense account ID" placeholderTextColor="rgba(255,255,255,0.35)" value={vndExpenseAcct} onChangeText={setVndExpenseAcct} style={inputStyle} />
-          <TextInput placeholder="Default AP liability account ID" placeholderTextColor="rgba(255,255,255,0.35)" value={vndLiabAcct} onChangeText={setVndLiabAcct} style={inputStyle} />
-          <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 6 }}>Payment method:</Text>
+          <TextInput placeholder="Vendor name *" placeholderTextColor="rgba(0,0,0,0.3)" value={vndName} onChangeText={setVndName} style={inputStyle} />
+          <TextInput placeholder="Vendor code * (e.g. GSC)" placeholderTextColor="rgba(0,0,0,0.3)" value={vndCode} onChangeText={setVndCode} style={inputStyle} />
+          <TextInput placeholder="Contact name" placeholderTextColor="rgba(0,0,0,0.3)" value={vndContact} onChangeText={setVndContact} style={inputStyle} />
+          <TextInput placeholder="Default expense account ID" placeholderTextColor="rgba(0,0,0,0.3)" value={vndExpenseAcct} onChangeText={setVndExpenseAcct} style={inputStyle} />
+          <TextInput placeholder="Default AP liability account ID" placeholderTextColor="rgba(0,0,0,0.3)" value={vndLiabAcct} onChangeText={setVndLiabAcct} style={inputStyle} />
+          <Text style={{ color: 'rgba(0,0,0,0.45)', fontSize: 12, marginBottom: 6 }}>Payment method:</Text>
           <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
             {(['ach', 'wire', 'check'] as const).map((m) => (
               <Pressable key={m} onPress={() => setVndPayment(m)} style={{
                 paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6,
-                backgroundColor: vndPayment === m ? `${ACCENT}33` : 'rgba(255,255,255,0.05)',
-                borderWidth: 1, borderColor: vndPayment === m ? ACCENT : 'rgba(255,255,255,0.1)',
+                backgroundColor: vndPayment === m ? `${ACCENT}33` : 'rgba(0,0,0,0.03)',
+                borderWidth: 1, borderColor: vndPayment === m ? ACCENT : 'rgba(0,0,0,0.08)',
               }}>
-                <Text style={{ color: vndPayment === m ? ACCENT : 'rgba(255,255,255,0.5)', fontSize: 13 }}>{m.toUpperCase()}</Text>
+                <Text style={{ color: vndPayment === m ? ACCENT : 'rgba(0,0,0,0.45)', fontSize: 13 }}>{m.toUpperCase()}</Text>
               </Pressable>
             ))}
           </View>
@@ -465,22 +465,22 @@ export function FinancialPage({}: GuidedPageProps) {
         </Card>
 
         {/* AP Invoice list */}
-        <Card title={`📋 AP Invoices (${apInvoices.length})`}>
+        <Card title={`ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Â¹ AP Invoices (${apInvoices.length})`}>
           {apLastErrors.length > 0 && <ValidationErrors errors={apLastErrors} />}
-          {apInvoices.length === 0 && <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>No AP invoices yet.</Text>}
+          {apInvoices.length === 0 && <Text style={{ color: 'rgba(0,0,0,0.35)', fontSize: 13 }}>No AP invoices yet.</Text>}
           {apInvoices.map((inv) => {
             const vendor = vendors.find((v) => v.id === inv.vendorId);
             const statusColor = apInvoiceStatusColor(inv.invoiceStatus);
             return (
-              <View key={inv.id} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)', paddingVertical: 10 }}>
+              <View key={inv.id} style={{ borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.04)', paddingVertical: 10 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ color: '#fff', fontWeight: '600' }}>{inv.invoiceRef}</Text>
-                    <Text style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12 }}>{vendor?.vendorName ?? inv.vendorId} · #{inv.invoiceNumber}</Text>
-                    <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>Due {fmtDate(inv.dueDate)}</Text>
+                    <Text style={{ color: '#111111', fontWeight: '600' }}>{inv.invoiceRef}</Text>
+                    <Text style={{ color: 'rgba(0,0,0,0.5)', fontSize: 12 }}>{vendor?.vendorName ?? inv.vendorId} Ãƒâ€šÃ‚Â· #{inv.invoiceNumber}</Text>
+                    <Text style={{ color: 'rgba(0,0,0,0.4)', fontSize: 11 }}>Due {fmtDate(inv.dueDate)}</Text>
                   </View>
                   <View style={{ alignItems: 'flex-end', gap: 4 }}>
-                    <Text style={{ color: '#fff', fontWeight: '700' }}>{fmtCurrency(inv.amountDue)}</Text>
+                    <Text style={{ color: '#111111', fontWeight: '700' }}>{fmtCurrency(inv.amountDue)}</Text>
                     <View style={{ borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2, backgroundColor: `${statusColor}22`, borderWidth: 1, borderColor: `${statusColor}55` }}>
                       <Text style={{ color: statusColor, fontSize: 10, fontWeight: '700', textTransform: 'uppercase' }}>{inv.invoiceStatus.replace(/_/g, ' ')}</Text>
                     </View>
@@ -508,8 +508,8 @@ export function FinancialPage({}: GuidedPageProps) {
                     </Pressable>
                   )}
                   {inv.glEntryId && (
-                    <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.05)' }}>
-                      <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>GL: {inv.glEntryId.slice(0, 18)}…</Text>
+                    <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.03)' }}>
+                      <Text style={{ color: 'rgba(0,0,0,0.35)', fontSize: 11 }}>GL: {inv.glEntryId.slice(0, 18)}ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦</Text>
                     </View>
                   )}
                 </View>
@@ -521,25 +521,25 @@ export function FinancialPage({}: GuidedPageProps) {
         {/* Add AP Invoice form */}
         <Card title="Record AP Invoice">
           {apiErrors && <Text style={{ color: DANGER, fontSize: 12, marginBottom: 8 }}>{apiErrors}</Text>}
-          <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 4 }}>Vendor *</Text>
+          <Text style={{ color: 'rgba(0,0,0,0.45)', fontSize: 12, marginBottom: 4 }}>Vendor *</Text>
           <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
             {vendors.filter((v) => v.isActive).map((v) => (
               <Pressable key={v.id} onPress={() => setApiVendorId(v.id)} style={{
                 paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6,
-                backgroundColor: apiVendorId === v.id ? `${ACCENT}33` : 'rgba(255,255,255,0.05)',
-                borderWidth: 1, borderColor: apiVendorId === v.id ? ACCENT : 'rgba(255,255,255,0.1)',
+                backgroundColor: apiVendorId === v.id ? `${ACCENT}33` : 'rgba(0,0,0,0.03)',
+                borderWidth: 1, borderColor: apiVendorId === v.id ? ACCENT : 'rgba(0,0,0,0.08)',
               }}>
-                <Text style={{ color: apiVendorId === v.id ? ACCENT : 'rgba(255,255,255,0.6)', fontSize: 12 }}>{v.vendorName}</Text>
+                <Text style={{ color: apiVendorId === v.id ? ACCENT : 'rgba(0,0,0,0.55)', fontSize: 12 }}>{v.vendorName}</Text>
               </Pressable>
             ))}
           </View>
-          <TextInput placeholder="Invoice number *" placeholderTextColor="rgba(255,255,255,0.35)" value={apiInvoiceNum} onChangeText={setApiInvoiceNum} style={inputStyle} />
-          <TextInput placeholder="Invoice date (YYYY-MM-DD) *" placeholderTextColor="rgba(255,255,255,0.35)" value={apiInvoiceDate} onChangeText={setApiInvoiceDate} style={inputStyle} />
-          <TextInput placeholder="Due date (YYYY-MM-DD) *" placeholderTextColor="rgba(255,255,255,0.35)" value={apiDueDate} onChangeText={setApiDueDate} style={inputStyle} />
-          <TextInput placeholder="Amount due *" placeholderTextColor="rgba(255,255,255,0.35)" value={apiAmount} onChangeText={setApiAmount} keyboardType="numeric" style={inputStyle} />
-          <TextInput placeholder="Expense account ID (overrides vendor default)" placeholderTextColor="rgba(255,255,255,0.35)" value={apiExpense} onChangeText={setApiExpense} style={inputStyle} />
-          <TextInput placeholder="AP account ID (overrides vendor default)" placeholderTextColor="rgba(255,255,255,0.35)" value={apiApAcct} onChangeText={setApiApAcct} style={inputStyle} />
-          <TextInput placeholder="Notes" placeholderTextColor="rgba(255,255,255,0.35)" value={apiNotes} onChangeText={setApiNotes} style={inputStyle} multiline numberOfLines={2} />
+          <TextInput placeholder="Invoice number *" placeholderTextColor="rgba(0,0,0,0.3)" value={apiInvoiceNum} onChangeText={setApiInvoiceNum} style={inputStyle} />
+          <TextInput placeholder="Invoice date (YYYY-MM-DD) *" placeholderTextColor="rgba(0,0,0,0.3)" value={apiInvoiceDate} onChangeText={setApiInvoiceDate} style={inputStyle} />
+          <TextInput placeholder="Due date (YYYY-MM-DD) *" placeholderTextColor="rgba(0,0,0,0.3)" value={apiDueDate} onChangeText={setApiDueDate} style={inputStyle} />
+          <TextInput placeholder="Amount due *" placeholderTextColor="rgba(0,0,0,0.3)" value={apiAmount} onChangeText={setApiAmount} keyboardType="numeric" style={inputStyle} />
+          <TextInput placeholder="Expense account ID (overrides vendor default)" placeholderTextColor="rgba(0,0,0,0.3)" value={apiExpense} onChangeText={setApiExpense} style={inputStyle} />
+          <TextInput placeholder="AP account ID (overrides vendor default)" placeholderTextColor="rgba(0,0,0,0.3)" value={apiApAcct} onChangeText={setApiApAcct} style={inputStyle} />
+          <TextInput placeholder="Notes" placeholderTextColor="rgba(0,0,0,0.3)" value={apiNotes} onChangeText={setApiNotes} style={inputStyle} multiline numberOfLines={2} />
           <Pressable onPress={handleAddApInvoice} style={{ backgroundColor: `${ACCENT}22`, borderWidth: 1, borderColor: ACCENT, borderRadius: 8, padding: 10, alignItems: 'center' }}>
             <Text style={{ color: ACCENT, fontWeight: '700' }}>+ Record Invoice</Text>
           </Pressable>
@@ -548,7 +548,7 @@ export function FinancialPage({}: GuidedPageProps) {
     );
   }
 
-  // ── Mission Control ──────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Mission Control ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   function renderMissionControl() {
     const hasItems = pendingJEs.length + pendingPayables.length + pendingWaterfalls.length + pendingIngestionRecords.length > 0;
     return (
@@ -556,12 +556,12 @@ export function FinancialPage({}: GuidedPageProps) {
         <View>
           <Text style={{ color: ACCENT, fontSize: 13, fontWeight: '700', marginBottom: 2 }}>HUMAN OVERSIGHT LAYER</Text>
           <Text style={{ color: 'rgba(243,234,255,0.55)', fontSize: 12 }}>
-            Every financial action that requires approval surfaces here. Review, validate, and act — nothing posts without deliberate authorization.
+            Every financial action that requires approval surfaces here. Review, validate, and act ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â nothing posts without deliberate authorization.
           </Text>
         </View>
         {!hasItems && (
           <View style={{ borderRadius: 12, padding: 16, backgroundColor: `${SUCCESS}12`, borderWidth: 1, borderColor: `${SUCCESS}30`, alignItems: 'center' }}>
-            <Text style={{ fontSize: 22 }}>✅</Text>
+            <Text style={{ fontSize: 22 }}>ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦</Text>
             <Text style={{ color: SUCCESS, fontSize: 14, fontWeight: '700', marginTop: 6 }}>Decision Queue Empty</Text>
             <Text style={{ color: 'rgba(16,185,129,0.7)', fontSize: 12, marginTop: 2 }}>All items have been processed.</Text>
           </View>
@@ -570,9 +570,9 @@ export function FinancialPage({}: GuidedPageProps) {
 
         {/* Pending Journal Entries */}
         {pendingJEs.length > 0 && (
-          <Card title={`📒 Pending Journal Entries (${pendingJEs.length})`}>
+          <Card title={`ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬â„¢ Pending Journal Entries (${pendingJEs.length})`}>
             {pendingJEs.map((entry) => (
-              <View key={entry.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)', gap: 8 }}>
+              <View key={entry.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(0,0,0,0.02)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', gap: 8 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '700' }}>{entry.entryRef}</Text>
                   <StatusBadge label={entry.postingStatus} color={JeStatusColor(entry.postingStatus)} />
@@ -580,9 +580,9 @@ export function FinancialPage({}: GuidedPageProps) {
                 <Text style={{ color: 'rgba(243,234,255,0.65)', fontSize: 12 }}>{entry.description}</Text>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
                   <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11 }}>DR {fmtCurrency(entry.debitTotal)}</Text>
-                  <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11 }}>•</Text>
+                  <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11 }}>ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢</Text>
                   <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11 }}>CR {fmtCurrency(entry.creditTotal)}</Text>
-                  <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11 }}>•</Text>
+                  <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11 }}>ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢</Text>
                   <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11 }}>{fmtDate(entry.transactionDate)}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -600,14 +600,14 @@ export function FinancialPage({}: GuidedPageProps) {
 
         {/* Pending Payables */}
         {pendingPayables.length > 0 && (
-          <Card title={`📤 Payables Awaiting Approval (${pendingPayables.length})`}>
+          <Card title={`ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â¤ Payables Awaiting Approval (${pendingPayables.length})`}>
             {pendingPayables.map((p) => (
-              <View key={p.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)', gap: 8 }}>
+              <View key={p.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(0,0,0,0.02)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', gap: 8 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '700' }}>{p.payableRef}</Text>
                   <StatusBadge label={p.approvalStatus} color={PayableStatusColor(p.approvalStatus)} />
                 </View>
-                <Text style={{ color: 'rgba(243,234,255,0.65)', fontSize: 12 }}>{p.payableTo} — {p.externalRef ?? 'No ref'}</Text>
+                <Text style={{ color: 'rgba(243,234,255,0.65)', fontSize: 12 }}>{p.payableTo} ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â {p.externalRef ?? 'No ref'}</Text>
                 <Text style={{ color: ACCENT, fontSize: 14, fontWeight: '700' }}>{fmtCurrency(p.amountDue)} <Text style={{ color: 'rgba(243,234,255,0.4)', fontSize: 11, fontWeight: '400' }}>due {fmtDate(p.dueDate)}</Text></Text>
                 {p.notes && <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11, fontStyle: 'italic' }}>{p.notes}</Text>}
                 <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -623,19 +623,19 @@ export function FinancialPage({}: GuidedPageProps) {
           </Card>
         )}
 
-        {/* Ingestion Review Queue — WS-048-ADD */}
+        {/* Ingestion Review Queue ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â WS-048-ADD */}
         {pendingIngestionRecords.length > 0 && (
-          <Card title={`📥 Ingestion Review Queue (${pendingIngestionRecords.length})`}>
+          <Card title={`ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â¥ Ingestion Review Queue (${pendingIngestionRecords.length})`}>
             <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 12, marginBottom: 10, lineHeight: 18 }}>
               These documents arrived via OCR but one or more extracted fields scored below the confidence threshold.
               Review the extracted values, then confirm to continue downstream processing or reject the document.
             </Text>
             {pendingIngestionRecords.map((rec) => (
-              <View key={rec.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.3)', gap: 8, marginBottom: 8 }}>
+              <View key={rec.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(0,0,0,0.02)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.3)', gap: 8, marginBottom: 8 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                   <View>
                     <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '700' }}>{rec.id}</Text>
-                    <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 11 }}>{rec.sourceRef} · {rec.receivedAt.slice(0, 16).replace('T', ' ')}</Text>
+                    <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 11 }}>{rec.sourceRef} Ãƒâ€šÃ‚Â· {rec.receivedAt.slice(0, 16).replace('T', ' ')}</Text>
                   </View>
                   <View style={{ borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3, backgroundColor: '#EF444422', borderWidth: 1, borderColor: '#EF444444' }}>
                     <Text style={{ color: DANGER, fontSize: 10, fontWeight: '700' }}>PENDING REVIEW</Text>
@@ -658,7 +658,7 @@ export function FinancialPage({}: GuidedPageProps) {
                 )}
                 <Text style={{ color: 'rgba(243,234,255,0.4)', fontSize: 11 }}>
                   Overall confidence: <Text style={{ color: DANGER, fontWeight: '700' }}>{(rec.overallConfidence * 100).toFixed(0)}%</Text>
-                  {rec.eventFired ? `  ·  ${rec.eventFired}` : ''}
+                  {rec.eventFired ? `  Ãƒâ€šÃ‚Â·  ${rec.eventFired}` : ''}
                 </Text>
                 <View style={{ flexDirection: 'row', gap: 8 }}>
                   <Pressable
@@ -679,9 +679,9 @@ export function FinancialPage({}: GuidedPageProps) {
 
         {/* Pending Waterfalls */}
         {pendingWaterfalls.length > 0 && (
-          <Card title={`🌊 Waterfalls Awaiting Approval (${pendingWaterfalls.length})`}>
+          <Card title={`ÃƒÂ°Ã…Â¸Ã…â€™Ã…Â  Waterfalls Awaiting Approval (${pendingWaterfalls.length})`}>
             {pendingWaterfalls.map((wf) => (
-              <View key={wf.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.09)', gap: 8 }}>
+              <View key={wf.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(0,0,0,0.02)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', gap: 8 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '700' }}>{wf.waterfallRef}</Text>
                   <StatusBadge label={wf.executionStatus} color={WaterfallStatusColor(wf.executionStatus)} />
@@ -712,7 +712,7 @@ export function FinancialPage({}: GuidedPageProps) {
     );
   }
 
-  // ── Ledger Tab ────────────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Ledger Tab ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   function renderLedger() {
     const acctGroups: { type: string; label: string; accounts: GlAccount[] }[] = [
       { type: 'asset', label: 'Assets', accounts: glAccounts.filter((a) => a.accountType === 'asset') },
@@ -727,10 +727,10 @@ export function FinancialPage({}: GuidedPageProps) {
         {/* Sub-tab bar */}
         <View style={{ flexDirection: 'row', gap: 6 }}>
           {(['accounts', 'entries', 'periods'] as LedgerSubTab[]).map((id) => {
-            const labels: Record<LedgerSubTab, string> = { accounts: '📋 Accounts', entries: '📝 Entries', periods: '📅 Periods' };
+            const labels: Record<LedgerSubTab, string> = { accounts: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Â¹ Accounts', entries: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â Entries', periods: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Â¦ Periods' };
             const active = ledgerSubTab === id;
             return (
-              <Pressable key={id} onPress={() => setLedgerSubTab(id)} style={{ paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: active ? `${INFO}66` : 'rgba(255,255,255,0.1)', backgroundColor: active ? `${INFO}18` : 'transparent' }}>
+              <Pressable key={id} onPress={() => setLedgerSubTab(id)} style={{ paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: active ? `${INFO}66` : 'rgba(0,0,0,0.08)', backgroundColor: active ? `${INFO}18` : 'transparent' }}>
                 <Text style={{ color: active ? '#818CF8' : 'rgba(243,234,255,0.5)', fontSize: 12, fontWeight: active ? '700' : '500' }}>{labels[id]}</Text>
               </Pressable>
             );
@@ -743,10 +743,10 @@ export function FinancialPage({}: GuidedPageProps) {
             {acctGroups.map((group) => (
               <Card key={group.type} title={group.label}>
                 {group.accounts.map((acct) => (
-                  <View key={acct.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' }}>
+                  <View key={acct.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.03)' }}>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ color: '#F3EAFF', fontSize: 13 }}>{acct.accountNumber} — {acct.accountName}</Text>
-                      <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 11 }}>{acct.normalBalance} normal • {acct.isActive ? 'active' : 'inactive'}</Text>
+                      <Text style={{ color: '#F3EAFF', fontSize: 13 }}>{acct.accountNumber} ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â {acct.accountName}</Text>
+                      <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 11 }}>{acct.normalBalance} normal ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {acct.isActive ? 'active' : 'inactive'}</Text>
                     </View>
                     <StatusBadge label={group.type} color={group.type === 'asset' ? INFO : group.type === 'liability' ? DANGER : group.type === 'equity' ? SUCCESS : group.type === 'revenue' ? ACCENT : '#8878AE'} />
                   </View>
@@ -776,7 +776,7 @@ export function FinancialPage({}: GuidedPageProps) {
                   style={[styles.inputField, { flex: 1 }]}
                 />
               </View>
-              <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 11, marginBottom: 8 }}>Journal Lines (Account # · Debit · Credit · Memo)</Text>
+              <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 11, marginBottom: 8 }}>Journal Lines (Account # Ãƒâ€šÃ‚Â· Debit Ãƒâ€šÃ‚Â· Credit Ãƒâ€šÃ‚Â· Memo)</Text>
               {jeLines.map((line, idx) => (
                 <View key={idx} style={{ flexDirection: 'row', gap: 6, marginBottom: 6, alignItems: 'center' }}>
                   <TextInput
@@ -802,7 +802,7 @@ export function FinancialPage({}: GuidedPageProps) {
                 </View>
               ))}
               <View style={{ flexDirection: 'row', gap: 8, marginTop: 4 }}>
-                <Pressable onPress={() => setJeLines((ls) => [...ls, { id: '', accountId: '', debitStr: '', creditStr: '', memo: '' }])} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', alignItems: 'center' }}>
+                <Pressable onPress={() => setJeLines((ls) => [...ls, { id: '', accountId: '', debitStr: '', creditStr: '', memo: '' }])} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(0,0,0,0.10)', alignItems: 'center' }}>
                   <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 12 }}>+ Add Line</Text>
                 </Pressable>
                 <Pressable onPress={handleCreateJE} style={{ flex: 1, paddingVertical: 8, borderRadius: 8, backgroundColor: `${ACCENT}22`, borderWidth: 1, borderColor: `${ACCENT}55`, alignItems: 'center' }}>
@@ -814,7 +814,7 @@ export function FinancialPage({}: GuidedPageProps) {
             <Card title={`Journal Entries (${journalEntries.length})`}>
               {journalEntries.length === 0 && <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 13 }}>No entries yet.</Text>}
               {journalEntries.map((entry) => (
-                <View key={entry.id} style={{ borderRadius: 10, padding: 10, backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)', gap: 6, marginBottom: 8 }}>
+                <View key={entry.id} style={{ borderRadius: 10, padding: 10, backgroundColor: 'rgba(0,0,0,0.015)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.04)', gap: 6, marginBottom: 8 }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <Text style={{ color: '#F3EAFF', fontSize: 12, fontWeight: '700', flex: 1 }}>{entry.entryRef}</Text>
                     <StatusBadge label={entry.postingStatus} color={JeStatusColor(entry.postingStatus)} />
@@ -827,12 +827,12 @@ export function FinancialPage({}: GuidedPageProps) {
                   </View>
                   {entry.postingStatus === 'draft' && (
                     <Pressable onPress={() => handleSubmitJEForApproval(entry.id)} style={{ paddingVertical: 6, borderRadius: 8, backgroundColor: `${ACCENT}18`, borderWidth: 1, borderColor: `${ACCENT}44`, alignItems: 'center' }}>
-                      <Text style={{ color: ACCENT, fontSize: 11, fontWeight: '700' }}>Submit for Approval →</Text>
+                      <Text style={{ color: ACCENT, fontSize: 11, fontWeight: '700' }}>Submit for Approval ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢</Text>
                     </Pressable>
                   )}
                   {entry.postingStatus === 'pending_approval' && (
                     <Pressable onPress={() => handlePostJE(entry.id)} style={{ paddingVertical: 6, borderRadius: 8, backgroundColor: `${SUCCESS}18`, borderWidth: 1, borderColor: `${SUCCESS}44`, alignItems: 'center' }}>
-                      <Text style={{ color: SUCCESS, fontSize: 11, fontWeight: '700' }}>Post Entry ✓</Text>
+                      <Text style={{ color: SUCCESS, fontSize: 11, fontWeight: '700' }}>Post Entry ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“</Text>
                     </Pressable>
                   )}
                 </View>
@@ -843,9 +843,9 @@ export function FinancialPage({}: GuidedPageProps) {
 
         {/* Periods */}
         {ledgerSubTab === 'periods' && (
-          <Card title="Accounting Periods — FY 2026">
+          <Card title="Accounting Periods ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â FY 2026">
             {periods.map((period) => (
-              <View key={period.id} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' }}>
+              <View key={period.id} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.03)' }}>
                 <View style={{ flex: 1 }}>
                   <Text style={{ color: '#F3EAFF', fontSize: 13 }}>{period.periodName}</Text>
                   {period.closedAt && <Text style={{ color: 'rgba(243,234,255,0.4)', fontSize: 11 }}>Closed {fmtDate(period.closedAt)}</Text>}
@@ -864,7 +864,7 @@ export function FinancialPage({}: GuidedPageProps) {
     );
   }
 
-  // ── Payables Tab ────────────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Payables Tab ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   function renderPayables() {
     return (
       <View style={{ gap: 16 }}>
@@ -883,12 +883,12 @@ export function FinancialPage({}: GuidedPageProps) {
         <Card title={`Accounts Payable (${payables.length})`}>
           {payables.length === 0 && <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 13 }}>No payables.</Text>}
           {payables.map((p) => (
-            <View key={p.id} style={{ borderRadius: 10, padding: 10, backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)', gap: 6, marginBottom: 8 }}>
+            <View key={p.id} style={{ borderRadius: 10, padding: 10, backgroundColor: 'rgba(0,0,0,0.015)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.04)', gap: 6, marginBottom: 8 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '700', flex: 1 }}>{p.payableTo}</Text>
                 <StatusBadge label={p.approvalStatus} color={PayableStatusColor(p.approvalStatus)} />
               </View>
-              <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11 }}>{p.payableRef} {p.externalRef ? `• ${p.externalRef}` : ''}</Text>
+              <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11 }}>{p.payableRef} {p.externalRef ? `ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ ${p.externalRef}` : ''}</Text>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Text style={{ color: ACCENT, fontSize: 14, fontWeight: '700' }}>{fmtCurrency(p.amountDue)}</Text>
                 <Text style={{ color: 'rgba(243,234,255,0.4)', fontSize: 11 }}>Due {fmtDate(p.dueDate)}</Text>
@@ -914,7 +914,7 @@ export function FinancialPage({}: GuidedPageProps) {
     );
   }
 
-  // ── Receivables Tab ─────────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Receivables Tab ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   function renderReceivables() {
     const arTotal = receivables.filter((r) => r.receiptStatus === 'pending' || r.receiptStatus === 'partial').reduce((s, r) => s + (r.invoicedAmount - r.receivedAmount), 0);
     return (
@@ -937,7 +937,7 @@ export function FinancialPage({}: GuidedPageProps) {
         <Card title={`Accounts Receivable (${receivables.length})`}>
           {receivables.length === 0 && <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 13 }}>No receivables.</Text>}
           {receivables.map((r) => (
-            <View key={r.id} style={{ borderRadius: 10, padding: 10, backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)', gap: 6, marginBottom: 8 }}>
+            <View key={r.id} style={{ borderRadius: 10, padding: 10, backgroundColor: 'rgba(0,0,0,0.015)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.04)', gap: 6, marginBottom: 8 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '700', flex: 1 }}>{r.receivableFrom}</Text>
                 <StatusBadge label={r.receiptStatus} color={ReceiptStatusColor(r.receiptStatus)} />
@@ -960,14 +960,14 @@ export function FinancialPage({}: GuidedPageProps) {
     );
   }
 
-  // ── Waterfalls Tab ─────────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Waterfalls Tab ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   function renderWaterfalls() {
     return (
       <View style={{ gap: 16 }}>
         <Card title={`Distribution Waterfalls (${waterfalls.length})`}>
           {waterfalls.length === 0 && <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 13 }}>No waterfalls configured.</Text>}
           {waterfalls.map((wf) => (
-            <View key={wf.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)', gap: 8, marginBottom: 10 }}>
+            <View key={wf.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(0,0,0,0.015)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.04)', gap: 8, marginBottom: 10 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <View style={{ flex: 1 }}>
                   <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '700' }}>{wf.waterfallRef}</Text>
@@ -976,12 +976,12 @@ export function FinancialPage({}: GuidedPageProps) {
                 <StatusBadge label={wf.executionStatus} color={WaterfallStatusColor(wf.executionStatus)} />
               </View>
               <Text style={{ color: ACCENT, fontSize: 15, fontWeight: '800' }}>{fmtCurrency(wf.totalAmount)}</Text>
-              <View style={{ gap: 4, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)', paddingTop: 8 }}>
+              <View style={{ gap: 4, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.04)', paddingTop: 8 }}>
                 {wf.parties.map((party) => (
                   <View key={party.id} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <View style={{ flex: 1 }}>
                       <Text style={{ color: 'rgba(243,234,255,0.75)', fontSize: 12 }}>{party.partyName}</Text>
-                      <Text style={{ color: 'rgba(243,234,255,0.4)', fontSize: 11 }}>{party.partyRole} • {party.paymentMethod ?? 'unset'}</Text>
+                      <Text style={{ color: 'rgba(243,234,255,0.4)', fontSize: 11 }}>{party.partyRole} ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ {party.paymentMethod ?? 'unset'}</Text>
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
                       <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '700' }}>{fmtCurrency(party.paymentAmount)}</Text>
@@ -992,7 +992,7 @@ export function FinancialPage({}: GuidedPageProps) {
               </View>
               {wf.executionStatus === 'draft' && (
                 <Pressable onPress={() => approveWaterfall(wf.id, currentUser?.id ?? 'user-admin')} style={{ paddingVertical: 8, borderRadius: 8, backgroundColor: `${SUCCESS}18`, borderWidth: 1, borderColor: `${SUCCESS}44`, alignItems: 'center' }}>
-                  <Text style={{ color: SUCCESS, fontSize: 12, fontWeight: '700' }}>Submit for Approval →</Text>
+                  <Text style={{ color: SUCCESS, fontSize: 12, fontWeight: '700' }}>Submit for Approval ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢</Text>
                 </Pressable>
               )}
             </View>
@@ -1002,7 +1002,7 @@ export function FinancialPage({}: GuidedPageProps) {
     );
   }
 
-  // ── Reports Tab ─────────────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Reports Tab ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   function renderReports() {
     return (
       <View style={{ gap: 16 }}>
@@ -1015,7 +1015,7 @@ export function FinancialPage({}: GuidedPageProps) {
           ] as { id: ReportType; label: string }[]).map((r) => {
             const active = reportType === r.id;
             return (
-              <Pressable key={r.id} onPress={() => setReportType(r.id)} style={{ flex: 1, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: active ? `${ACCENT}66` : 'rgba(255,255,255,0.1)', backgroundColor: active ? `${ACCENT}18` : 'transparent', alignItems: 'center' }}>
+              <Pressable key={r.id} onPress={() => setReportType(r.id)} style={{ flex: 1, paddingVertical: 8, borderRadius: 8, borderWidth: 1, borderColor: active ? `${ACCENT}66` : 'rgba(0,0,0,0.08)', backgroundColor: active ? `${ACCENT}18` : 'transparent', alignItems: 'center' }}>
                 <Text style={{ color: active ? ACCENT : 'rgba(243,234,255,0.5)', fontSize: 12, fontWeight: active ? '700' : '500' }}>{r.label}</Text>
               </Pressable>
             );
@@ -1027,14 +1027,14 @@ export function FinancialPage({}: GuidedPageProps) {
         {reportType === 'trial_balance' && (
           <Card title="Trial Balance">
             {trialBalance.length === 0 && <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 13 }}>No posted entries yet.</Text>}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.08)' }}>
               <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11, fontWeight: '700', flex: 3 }}>Account</Text>
               <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11, fontWeight: '700', flex: 2, textAlign: 'right' }}>Debit</Text>
               <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11, fontWeight: '700', flex: 2, textAlign: 'right' }}>Credit</Text>
               <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 11, fontWeight: '700', flex: 2, textAlign: 'right' }}>Net</Text>
             </View>
             {trialBalance.map((row) => (
-              <View key={row.acct.id} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)' }}>
+              <View key={row.acct.id} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.02)' }}>
                 <Text style={{ color: '#F3EAFF', fontSize: 11, flex: 3 }}>{row.acct.accountNumber} {row.acct.accountName}</Text>
                 <Text style={{ color: 'rgba(243,234,255,0.7)', fontSize: 11, flex: 2, textAlign: 'right' }}>{fmtCurrency(row.totalDebit)}</Text>
                 <Text style={{ color: 'rgba(243,234,255,0.7)', fontSize: 11, flex: 2, textAlign: 'right' }}>{fmtCurrency(row.totalCredit)}</Text>
@@ -1047,7 +1047,7 @@ export function FinancialPage({}: GuidedPageProps) {
                 <Text style={{ color: ACCENT, fontSize: 12, fontWeight: '700', flex: 2, textAlign: 'right' }}>{fmtCurrency(totalDebits)}</Text>
                 <Text style={{ color: ACCENT, fontSize: 12, fontWeight: '700', flex: 2, textAlign: 'right' }}>{fmtCurrency(totalCredits)}</Text>
                 <Text style={{ color: Math.abs(totalDebits - totalCredits) < 0.01 ? SUCCESS : DANGER, fontSize: 12, fontWeight: '700', flex: 2, textAlign: 'right' }}>
-                  {Math.abs(totalDebits - totalCredits) < 0.01 ? '✓ Balanced' : '⚠ Imbalanced'}
+                  {Math.abs(totalDebits - totalCredits) < 0.01 ? 'ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Balanced' : 'ÃƒÂ¢Ã…Â¡Ã‚Â  Imbalanced'}
                 </Text>
               </View>
             )}
@@ -1064,7 +1064,7 @@ export function FinancialPage({}: GuidedPageProps) {
                 <Text style={{ color: SUCCESS, fontSize: 12, fontWeight: '600', flex: 2, textAlign: 'right' }}>{fmtCurrency(r.amount)}</Text>
               </View>
             ))}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', marginTop: 4 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.08)', marginTop: 4 }}>
               <Text style={{ color: SUCCESS, fontSize: 13, fontWeight: '800' }}>Total Revenue</Text>
               <Text style={{ color: SUCCESS, fontSize: 13, fontWeight: '800' }}>{fmtCurrency(incomeStatement.totalRevenue)}</Text>
             </View>
@@ -1075,7 +1075,7 @@ export function FinancialPage({}: GuidedPageProps) {
                 <Text style={{ color: DANGER, fontSize: 12, fontWeight: '600', flex: 2, textAlign: 'right' }}>({fmtCurrency(e.amount)})</Text>
               </View>
             ))}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', marginTop: 4 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.08)', marginTop: 4 }}>
               <Text style={{ color: DANGER, fontSize: 13, fontWeight: '800' }}>Total Expenses</Text>
               <Text style={{ color: DANGER, fontSize: 13, fontWeight: '800' }}>({fmtCurrency(incomeStatement.totalExpenses)})</Text>
             </View>
@@ -1096,7 +1096,7 @@ export function FinancialPage({}: GuidedPageProps) {
                   <Text style={{ color: INFO, fontSize: 12, fontWeight: '600', textAlign: 'right' }}>{fmtCurrency(r.amount)}</Text>
                 </View>
               ))}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', marginTop: 4 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 6, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.08)', marginTop: 4 }}>
                 <Text style={{ color: '#F3EAFF', fontWeight: '800', fontSize: 13 }}>Total Assets</Text>
                 <Text style={{ color: INFO, fontWeight: '800', fontSize: 13 }}>{fmtCurrency(balanceSheet.totalAssets)}</Text>
               </View>
@@ -1108,7 +1108,7 @@ export function FinancialPage({}: GuidedPageProps) {
                   <Text style={{ color: DANGER, fontSize: 12, fontWeight: '600', textAlign: 'right' }}>{fmtCurrency(r.amount)}</Text>
                 </View>
               ))}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', marginTop: 4 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 6, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.08)', marginTop: 4 }}>
                 <Text style={{ color: '#F3EAFF', fontWeight: '800', fontSize: 13 }}>Total Liabilities</Text>
                 <Text style={{ color: DANGER, fontWeight: '800', fontSize: 13 }}>{fmtCurrency(balanceSheet.totalLiabilities)}</Text>
               </View>
@@ -1124,14 +1124,14 @@ export function FinancialPage({}: GuidedPageProps) {
                 <Text style={{ color: 'rgba(243,234,255,0.6)', fontSize: 12, flex: 3 }}>Net Income (P&L)</Text>
                 <Text style={{ color: incomeStatement.netIncome >= 0 ? SUCCESS : DANGER, fontSize: 12, fontWeight: '600', textAlign: 'right' }}>{fmtCurrency(incomeStatement.netIncome)}</Text>
               </View>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)', marginTop: 4 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 6, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.08)', marginTop: 4 }}>
                 <Text style={{ color: '#F3EAFF', fontWeight: '800', fontSize: 13 }}>Total Equity</Text>
                 <Text style={{ color: SUCCESS, fontWeight: '800', fontSize: 13 }}>{fmtCurrency(balanceSheet.totalEquity)}</Text>
               </View>
             </Card>
             <View style={{ borderRadius: 10, padding: 12, backgroundColor: balanceSheet.balanced ? `${SUCCESS}18` : `${DANGER}18`, borderWidth: 1, borderColor: balanceSheet.balanced ? `${SUCCESS}44` : `${DANGER}44`, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '800' }}>
-                {balanceSheet.balanced ? '✓ Balance Sheet Balanced' : '⚠ Balance Sheet Imbalanced'}
+                {balanceSheet.balanced ? 'ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Balance Sheet Balanced' : 'ÃƒÂ¢Ã…Â¡Ã‚Â  Balance Sheet Imbalanced'}
               </Text>
               <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 12 }}>A = L + E</Text>
             </View>
@@ -1141,7 +1141,7 @@ export function FinancialPage({}: GuidedPageProps) {
     );
   }
 
-  // ── Root Render ────────────────────────────────────────────────────────────
+  // ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Root Render ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 60 }}>
       {/* Page Header */}
@@ -1149,7 +1149,7 @@ export function FinancialPage({}: GuidedPageProps) {
         <View>
           <Text style={{ color: ACCENT, fontSize: 20, fontWeight: '800', letterSpacing: -0.4 }}>Financial Ops</Text>
           <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 12, marginTop: 2 }}>
-            GL · AP · AR · Distributions · Reporting
+            GL Ãƒâ€šÃ‚Â· AP Ãƒâ€šÃ‚Â· AR Ãƒâ€šÃ‚Â· Distributions Ãƒâ€šÃ‚Â· Reporting
           </Text>
         </View>
         {pendingTotal > 0 && (

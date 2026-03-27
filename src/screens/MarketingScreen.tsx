@@ -53,14 +53,14 @@ function ensureMarketingCSS() {
     }
     .cs-glass-card:hover {
       transform: translateY(-4px) scale(1.012);
-      box-shadow: 0 12px 40px rgba(38,51,116,0.16), 0 4px 12px rgba(0,0,0,0.22) !important;
-      border-color: rgba(38,51,116,0.28) !important;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.22) !important;
+      border-color: rgba(0,0,0,0.08) !important;
     }
 
     /* ── CTA glow pulse ────────────────────────────────────── */
     @keyframes cs-cta-glow {
-      0%, 100% { box-shadow: 0 0 20px rgba(38,51,116,0.25), 0 8px 32px rgba(38,51,116,0.12); }
-      50%      { box-shadow: 0 0 32px rgba(38,51,116,0.40), 0 12px 48px rgba(38,51,116,0.22); }
+      0%, 100% { box-shadow: 0 0 20px rgba(0,0,0,0.10), 0 8px 32px rgba(0,0,0,0.03); }
+      50%      { box-shadow: 0 0 32px rgba(0,0,0,0.12), 0 12px 48px rgba(0,0,0,0.06); }
     }
     .cs-cta-primary {
       animation: cs-cta-glow 3s ease-in-out infinite;
@@ -75,14 +75,14 @@ function ensureMarketingCSS() {
     }
     .cs-cta-secondary:hover {
       transform: scale(1.03);
-      background-color: rgba(255,255,255,0.08) !important;
-      border-color: rgba(38,51,116,0.32) !important;
+      background-color: rgba(0,0,0,0.03) !important;
+      border-color: rgba(0,0,0,0.10) !important;
     }
 
     /* ── Section divider gradient ──────────────────────────── */
     .cs-section-divider {
       width: 100%; height: 1px; margin: 0 auto;
-      background: linear-gradient(90deg, transparent 5%, rgba(38,51,116,0.28) 30%, rgba(59,130,246,0.22) 70%, transparent 95%);
+      background: linear-gradient(90deg, transparent 5%, rgba(0,0,0,0.08) 30%, rgba(59,130,246,0.22) 70%, transparent 95%);
     }
 
     /* ── Stat value shimmer ────────────────────────────────── */
@@ -108,8 +108,8 @@ function ensureMarketingCSS() {
 
     /* ── Pricing highlight ring ────────────────────────────── */
     @keyframes cs-ring-pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(38,51,116,0.20); }
-      50%      { box-shadow: 0 0 0 6px rgba(38,51,116,0.08); }
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0.08); }
+      50%      { box-shadow: 0 0 0 6px rgba(0,0,0,0.02); }
     }
     .cs-pricing-highlight {
       animation: cs-ring-pulse 3s ease-in-out infinite;
@@ -344,7 +344,7 @@ const INVESTORS = [
     thesis: '"The next wave is legal operations intelligence. Halo Internal is the infrastructure play I\'ve been looking for since 2019."',
     portfolio: ['MedLane (acquired)', 'Fieldstack', 'VerifyNow'],
     emoji: '💎',
-    accent: '#263374',
+    accent: '#111111',
   },
   {
     name: 'Priya Nairn',
@@ -380,7 +380,7 @@ const ABOUT_MODULES = [
     name: 'Halo Internal Platform',
     icon: '🌌',
     tagline: 'The Legal Operations Platform for Every Firm',
-    color: '#263374',
+    color: '#111111',
     description: 'Halo Internal is a no-code legal operations platform that lets any law firm build, automate, and scale its case workflows without writing a single line of code. Enterprise-grade infrastructure accessible to firms of any size.',
     details: [
       { label: '🌍 Multi-Tenant Architecture', text: 'Full tenant isolation — dedicated branding, data, and configuration per client.' },
@@ -542,9 +542,9 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
   /* ── Shared inline styles ─────────────────────────────────────── */
   const glassCard: Record<string, unknown> = {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    background: 'linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    background: 'none',
+    backgroundColor: '#FAFAFA',
     backdropFilter: 'blur(14px)',
     boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
     borderRadius: 14,
@@ -555,8 +555,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
     paddingHorizontal: navMenuButtonPaddingX,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(0,0,0,0.08)',
+    backgroundColor: '#F9FAFB',
     backdropFilter: 'blur(10px)',
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
@@ -566,9 +566,9 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
     shadowOffset: { width: 0, height: 2 },
   } as const;
   const navButtonActiveStyle = {
-    borderColor: 'rgba(38,51,116,0.40)',
-    backgroundColor: 'rgba(38,51,116,0.16)',
-    shadowColor: '#263374',
+    borderColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'rgba(0,0,0,0.16)',
+    shadowcolor: '#111111',
     shadowOpacity: 0.22,
   } as const;
   const navLoginButtonStyle = {
@@ -576,13 +576,13 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
     paddingHorizontal: navMenuButtonPaddingX + 2,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(38,51,116,0.40)',
-    background: 'linear-gradient(135deg, rgba(38,51,116,0.85), rgba(59,130,246,0.65))',
-    backgroundColor: '#263374',
-    boxShadow: '0 18px 40px rgba(38,51,116,0.18)',
+    borderColor: 'rgba(0,0,0,0.12)',
+    background: 'linear-gradient(135deg, rgba(0,0,0,0.85), rgba(59,130,246,0.65))',
+    backgroundcolor: '#111111',
+    boxShadow: '0 18px 40px rgba(0,0,0,0.06)',
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
-    shadowColor: '#263374',
+    shadowcolor: '#111111',
     shadowOpacity: 0.28,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 2 },
@@ -617,7 +617,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
   );
 
   return (
-    <View style={[styles.landingWrap, { backgroundColor: '#263374' } as any]}>
+    <View style={[styles.landingWrap, { backgroundcolor: '#111111' } as any]}>
 
     {/* ─── Sticky nav (show on scroll-up) ────────────────────── */}
     <View style={{
@@ -634,7 +634,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
             backgroundColor: 'rgba(20,28,65,0.92)',
             backdropFilter: 'blur(18px)',
             WebkitBackdropFilter: 'blur(18px)',
-            borderBottom: '1px solid rgba(38,51,116,0.18)',
+            borderBottom: '1px solid rgba(0,0,0,0.06)',
             boxShadow: '0 4px 30px rgba(0,0,0,0.30)',
           } : {
             backgroundColor: 'transparent',
@@ -647,11 +647,11 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
           /* ── Mobile hamburger button ── */
           <Pressable
             onPress={() => setMobileMenuOpen((prev) => !prev)}
-            style={{ padding: 8, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.08)' }}
+            style={{ padding: 8, borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.04)' }}
             accessibilityRole="button"
             accessibilityLabel={mobileMenuOpen ? 'Close menu' : 'Open menu'}
           >
-            <Text style={{ fontSize: 22, color: '#FFFFFF', fontWeight: '800', lineHeight: 24 }}>
+            <Text style={{ fontSize: 22, color: '#111111', fontWeight: '800', lineHeight: 24 }}>
               {mobileMenuOpen ? '✕' : '☰'}
             </Text>
           </Pressable>
@@ -674,18 +674,18 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                 } as any}>{item.label}</Text>
                 <View style={{
                   position: 'absolute', bottom: 0, left: '22%', right: '22%', height: 2, borderRadius: 1,
-                  background: isActive ? 'linear-gradient(90deg, #263374, #3B82F6)' : 'transparent',
-                  backgroundColor: isActive ? '#263374' : 'transparent',
-                  boxShadow: isActive ? '0 0 10px rgba(38,51,116,0.50), 0 0 4px rgba(59,130,246,0.30)' : 'none',
+                  background: isActive ? 'linear-gradient(90deg, #111111, #374151)' : 'transparent',
+                  backgroundColor: isActive ? '#111111' : 'transparent',
+                  boxShadow: isActive ? '0 0 10px rgba(0,0,0,0.14), 0 0 4px rgba(59,130,246,0.30)' : 'none',
                   transform: isActive ? 'scaleX(1)' : 'scaleX(0)',
                   transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1), background 0.3s ease, box-shadow 0.3s ease',
                 } as any} />
               </Pressable>
             );
           })}
-          <View style={{ width: 1, height: 18, backgroundColor: 'rgba(255,255,255,0.12)', marginHorizontal: 6 }} />
+          <View style={{ width: 1, height: 18, backgroundColor: 'rgba(0,0,0,0.06)', marginHorizontal: 6 }} />
           <Pressable style={navLoginButtonStyle} onPress={onContinue}>
-            <Text style={[styles.landingTopMenuText, { fontSize: navMenuFontSize, color: '#FFFFFF', fontWeight: '800' }]}>Login</Text>
+            <Text style={[styles.landingTopMenuText, { fontSize: navMenuFontSize, color: '#111111', fontWeight: '800' }]}>Login</Text>
           </Pressable>
         </View>
         )}
@@ -699,14 +699,14 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
           paddingHorizontal: 20,
           paddingVertical: 12,
           gap: 4,
-          borderBottom: '1px solid rgba(38,51,116,0.18)',
+          borderBottom: '1px solid rgba(0,0,0,0.06)',
         } as any}>
           {NAV_ITEMS.map((item) => {
             const isActive = activeTab === item.key;
             return (
               <Pressable
                 key={item.key}
-                style={{ paddingVertical: 10, paddingHorizontal: 8, borderRadius: 8, backgroundColor: isActive ? 'rgba(38,51,116,0.18)' : 'transparent' } as any}
+                style={{ paddingVertical: 10, paddingHorizontal: 8, borderRadius: 8, backgroundColor: isActive ? 'rgba(0,0,0,0.06)' : 'transparent' } as any}
                 onPress={() => { goToSection(item.key); setMobileMenuOpen(false); }}
               >
                 <Text style={{
@@ -717,12 +717,12 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
               </Pressable>
             );
           })}
-          <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 6 }} />
+          <View style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.04)', marginVertical: 6 }} />
           <Pressable
-            style={{ paddingVertical: 10, paddingHorizontal: 8, borderRadius: 10, backgroundColor: '#263374', alignItems: 'center' } as any}
+            style={{ paddingVertical: 10, paddingHorizontal: 8, borderRadius: 10, backgroundcolor: '#111111', alignItems: 'center' } as any}
             onPress={() => { setMobileMenuOpen(false); onContinue(); }}
           >
-            <Text style={{ fontSize: 15, color: '#FFFFFF', fontWeight: '700' }}>Login</Text>
+            <Text style={{ fontSize: 15, color: '#111111', fontWeight: '700' }}>Login</Text>
           </Pressable>
         </View>
       )}
@@ -754,7 +754,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
         <BrandLogo width={480} height={175} />
 
         <div className="cs-reveal cs-visible cs-hero-badge">
-          <Text style={{ color: '#C5D4EE', fontSize: 11, fontWeight: '700', letterSpacing: 0.6 }}>THE LEGAL OPERATIONS PLATFORM</Text>
+          <Text style={{ color: '#374151', fontSize: 11, fontWeight: '700', letterSpacing: 0.6 }}>THE LEGAL OPERATIONS PLATFORM</Text>
         </div>
 
         <div className="cs-reveal cs-visible cs-hero-title" style={{ '--cs-hero-title-size': `${heroTitleSize}px`, '--cs-hero-title-line': `${heroTitleLineHeight}px` } as React.CSSProperties}>
@@ -787,7 +787,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
             {STATS.map((s, i) => (
               <div key={`stat-${i}`} style={{ alignItems: 'center', minWidth: 100 }}>
                 <div className="cs-stat-value" style={{ fontSize: 28, fontWeight: 800 }}>{s.value}</div>
-                <span style={{ color: '#C9D4F0', fontSize: 11, fontWeight: 600, textAlign: 'center', marginTop: 2 }}>{s.label}</span>
+                <span style={{ color: '#6B7280', fontSize: 11, fontWeight: 600, textAlign: 'center', marginTop: 2 }}>{s.label}</span>
               </div>
             ))}
           </div>
@@ -835,22 +835,22 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                 <View key={`conf-${i}`} style={{ ...(glassCard as any), flexDirection: 'row', gap: 18, alignItems: 'flex-start', padding: compactCtas ? 14 : 18 }}>
                   <View style={{ alignItems: 'center', minWidth: compactCtas ? 52 : 72, gap: 4 }}>
                     <Text style={{ fontSize: compactCtas ? 22 : 28 }}>{step.icon}</Text>
-                    <Text style={{ color: '#263374', fontSize: 10, fontWeight: '800', letterSpacing: 0.5, textAlign: 'center' }}>{step.time}</Text>
+                    <Text style={{ color: '#111111', fontSize: 10, fontWeight: '800', letterSpacing: 0.5, textAlign: 'center' }}>{step.time}</Text>
                   </View>
                   <View style={{ flex: 1, gap: 3 }}>
-                    <Text style={{ color: '#FFFFFF', fontSize: compactCtas ? 13 : 15, fontWeight: '800', lineHeight: 20 }}>{step.title}</Text>
-                    <Text style={{ color: '#C9D4F0', fontSize: compactCtas ? 12 : 13, lineHeight: 19 }}>{step.detail}</Text>
+                    <Text style={{ color: '#111111', fontSize: compactCtas ? 13 : 15, fontWeight: '800', lineHeight: 20 }}>{step.title}</Text>
+                    <Text style={{ color: '#6B7280', fontSize: compactCtas ? 12 : 13, lineHeight: 19 }}>{step.detail}</Text>
                   </View>
                 </View>
               ))}
             </View>
 
             {/* Bottom CTA strip */}
-            <View style={{ ...(glassCard as any), padding: compactCtas ? 16 : 22, gap: 8, marginTop: 6, borderColor: 'rgba(38,51,116,0.30)', background: 'linear-gradient(135deg, rgba(38,51,116,0.12), rgba(59,130,246,0.08))' } as any}>
-              <Text style={{ color: '#FFFFFF', fontSize: compactCtas ? 16 : 20, fontWeight: '900', textAlign: 'center' }}>
+            <View style={{ ...(glassCard as any), padding: compactCtas ? 16 : 22, gap: 8, marginTop: 6, borderColor: 'rgba(0,0,0,0.10)', background: 'linear-gradient(135deg, rgba(0,0,0,0.03), rgba(59,130,246,0.08))' } as any}>
+              <Text style={{ color: '#111111', fontSize: compactCtas ? 16 : 20, fontWeight: '900', textAlign: 'center' }}>
                 "This is the first tool I've seen that actually replaces custom software for the price of a SaaS subscription."
               </Text>
-              <Text style={{ color: '#263374', fontSize: 12, fontWeight: '700', textAlign: 'center', letterSpacing: 0.4 }}>
+              <Text style={{ color: '#111111', fontSize: 12, fontWeight: '700', textAlign: 'center', letterSpacing: 0.4 }}>
                 — What we hear every time we demo.
               </Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'center', marginTop: 6 }}>
@@ -860,7 +860,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   '✅ Live in under an hour',
                   '✅ Your data, your database',
                 ].map((badge, i) => (
-                  <View key={`badge-${i}`} style={{ paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(38,51,116,0.35)', backgroundColor: 'rgba(38,51,116,0.10)' }}>
+                  <View key={`badge-${i}`} style={{ paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(0,0,0,0.10)', backgroundColor: 'rgba(0,0,0,0.03)' }}>
                     <Text style={{ color: '#B0C4E8', fontSize: 12, fontWeight: '700' }}>{badge}</Text>
                   </View>
                 ))}
@@ -915,7 +915,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   <Text style={{ fontSize: compactCtas ? 24 : 32, minWidth: 40 }}>{item.icon}</Text>
                   <View style={{ flex: 1, gap: 6 }}>
                     <Text style={{ color: '#FF8A8A', fontSize: compactCtas ? 13 : 15, fontWeight: '800', lineHeight: 20 }}>{item.pain}</Text>
-                    <Text style={{ color: '#D4DEEF', fontSize: compactCtas ? 12 : 13, lineHeight: 20 }}>{item.reality}</Text>
+                    <Text style={{ color: '#4B5563', fontSize: compactCtas ? 12 : 13, lineHeight: 20 }}>{item.reality}</Text>
                     <View style={{ flexDirection: 'row', gap: 6, alignItems: 'flex-start', marginTop: 2 }}>
                       <Text style={{ color: '#F59E0B', fontSize: 13, fontWeight: '800' }}>→</Text>
                       <Text style={{ color: '#F59E0B', fontSize: compactCtas ? 11 : 12, lineHeight: 18, flex: 1, fontWeight: '700' }}>{item.cost}</Text>
@@ -924,9 +924,9 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                 </View>
               ))}
             </View>
-            <View style={{ ...(glassCard as any), padding: compactCtas ? 14 : 20, gap: 6, borderColor: 'rgba(38,51,116,0.28)', background: 'linear-gradient(135deg, rgba(38,51,116,0.10), rgba(59,130,246,0.06))', flexDirection: 'row', alignItems: 'center' } as any}>
+            <View style={{ ...(glassCard as any), padding: compactCtas ? 14 : 20, gap: 6, borderColor: 'rgba(0,0,0,0.08)', background: 'linear-gradient(135deg, rgba(0,0,0,0.03), rgba(59,130,246,0.06))', flexDirection: 'row', alignItems: 'center' } as any}>
               <Image source={haloIcon} style={{ width: compactCtas ? 52 : 72, height: compactCtas ? 52 : 72, marginRight: compactCtas ? 12 : 18, opacity: 0.92 }} resizeMode="contain" />
-              <Text style={{ color: '#FFFFFF', fontSize: compactCtas ? 15 : 18, fontWeight: '900', flex: 1, lineHeight: compactCtas ? 22 : 26 }}>
+              <Text style={{ color: '#111111', fontSize: compactCtas ? 15 : 18, fontWeight: '900', flex: 1, lineHeight: compactCtas ? 22 : 26 }}>
                 Halo Internal is the fix — built specifically for law firms that need enterprise structure without the enterprise price tag.
               </Text>
             </View>
@@ -950,7 +950,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
             <View style={{ gap: 10, marginTop: 4 }}>
               {[
                 {
-                  step: '01', icon: '💬', color: '#263374',
+                  step: '01', icon: '💬', color: '#111111',
                   title: 'Describe your practice to Bebo',
                   detail: 'Tell the AI what your practice handles — your practice area, what you track, who\'s on your team. Plain English. No forms, no templates to fill out.',
                   outcome: 'Bebo maps your description to a complete case management configuration.',
@@ -982,8 +982,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                     <Text style={{ color: s.color, fontSize: 11, fontWeight: '900', letterSpacing: 1 }}>STEP {s.step}</Text>
                   </View>
                   <View style={{ flex: 1, gap: 6 }}>
-                    <Text style={{ color: '#FFFFFF', fontSize: compactCtas ? 14 : 16, fontWeight: '800', lineHeight: 22 }}>{s.title}</Text>
-                    <Text style={{ color: '#C9D4F0', fontSize: compactCtas ? 12 : 13, lineHeight: 20 }}>{s.detail}</Text>
+                    <Text style={{ color: '#111111', fontSize: compactCtas ? 14 : 16, fontWeight: '800', lineHeight: 22 }}>{s.title}</Text>
+                    <Text style={{ color: '#6B7280', fontSize: compactCtas ? 12 : 13, lineHeight: 20 }}>{s.detail}</Text>
                     <View style={{ flexDirection: 'row', gap: 6, alignItems: 'flex-start', marginTop: 2 }}>
                       <Text style={{ color: s.color, fontSize: 13, fontWeight: '800' }}>→</Text>
                       <Text style={{ color: s.color, fontSize: compactCtas ? 11 : 12, lineHeight: 18, flex: 1, fontWeight: '700' }}>{s.outcome}</Text>
@@ -1013,8 +1013,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
               {INDUSTRIES.map((ind, i) => (
                 <div key={`ind-${i}`} className="cs-glass-card" style={{ ...(glassCard as any), flex: 1, minWidth: compactCtas ? '47%' : 170, maxWidth: compactCtas ? '48%' : '24%', padding: 16, gap: 4 }}>
-                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>{ind.name}</Text>
-                  <Text style={{ color: '#C9D4F0', fontSize: 12, lineHeight: 17 }}>{ind.desc}</Text>
+                  <Text style={{ color: '#111111', fontSize: 14, fontWeight: '700' }}>{ind.name}</Text>
+                  <Text style={{ color: '#6B7280', fontSize: 12, lineHeight: 17 }}>{ind.desc}</Text>
                 </div>
               ))}
             </View>
@@ -1036,15 +1036,15 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
             <Text style={[styles.landingSectionText, { fontSize: sectionBodySize, lineHeight: sectionBodyLineHeight, maxWidth: 760 }]}>
               There are over 450,000 law firms in the US. Most run on spreadsheets and outdated case management tools. Enterprise legal ops software is too expensive, too rigid, and requires a dev team to maintain. Halo Internal is the first platform that makes enterprise-grade legal operational structure accessible to any law firm — no code, no developer, no six-figure contract.
             </Text>
-            <View style={{ ...(glassCard as any), padding: compactCtas ? 14 : 20, gap: 10, borderColor: 'rgba(38,51,116,0.28)' }}>
-              <Text style={{ color: '#FFD332', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>🎯 THE THESIS IN ONE SENTENCE</Text>
-              <Text style={{ color: '#FFFFFF', fontSize: compactCtas ? 15 : 19, fontWeight: '900', lineHeight: compactCtas ? 22 : 28 }}>
+            <View style={{ ...(glassCard as any), padding: compactCtas ? 14 : 20, gap: 10, borderColor: 'rgba(0,0,0,0.08)' }}>
+              <Text style={{ color: '#111111', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>🎯 THE THESIS IN ONE SENTENCE</Text>
+              <Text style={{ color: '#111111', fontSize: compactCtas ? 15 : 19, fontWeight: '900', lineHeight: compactCtas ? 22 : 28 }}>
                 "Every law firm needs what Am Law 100 firms have — structured data, enforced workflow, and team-level permissions. Halo Internal delivers it without the $200K price tag or the 18-month build."
               </Text>
             </View>
 
             <View style={{ ...(glassCard as any), padding: 20, gap: 12, marginTop: 4 }}>
-              <Text style={{ color: '#FFD332', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>📊 MARKET OPPORTUNITY</Text>
+              <Text style={{ color: '#111111', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>📊 MARKET OPPORTUNITY</Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
                 { [
                   { metric: '$120B+', insight: 'Business ops software market is massive.' },
@@ -1053,16 +1053,16 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   { metric: '34%', insight: 'No-code platforms grow at record pace.' },
                 ].map((item, i) => (
                   <View key={`mkt-${i}`} style={{ ...(glassCard as any), flex: 1, minWidth: compactCtas ? '100%' : 200, flexDirection: 'row', gap: 16, alignItems: 'center', padding: 14 }}>
-                    <Text style={{ color: '#263374', fontSize: 38, fontWeight: '900', minWidth: 90, textAlign: 'right' }}>{item.metric}</Text>
-                    <Text style={{ color: '#D4DEEF', fontSize: 18, fontWeight: '800', lineHeight: 24, flex: 1 }}>{item.insight}</Text>
+                    <Text style={{ color: '#111111', fontSize: 38, fontWeight: '900', minWidth: 90, textAlign: 'right' }}>{item.metric}</Text>
+                    <Text style={{ color: '#4B5563', fontSize: 18, fontWeight: '800', lineHeight: 24, flex: 1 }}>{item.insight}</Text>
                   </View>
                 ))}
               </View>
             </View>
 
             <View style={{ ...(glassCard as any), padding: 20, gap: 12 }}>
-              <Text style={{ color: '#FFD332', fontSize: 18, fontWeight: '900', letterSpacing: 1 }}>💰 WHERE THE MONEY GOES</Text>
-              <Text style={{ color: '#D4DEEF', fontSize: 14, lineHeight: 22 }}>
+              <Text style={{ color: '#111111', fontSize: 18, fontWeight: '900', letterSpacing: 1 }}>💰 WHERE THE MONEY GOES</Text>
+              <Text style={{ color: '#4B5563', fontSize: 14, lineHeight: 22 }}>
                 Seed funding split across four areas:
               </Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
@@ -1073,17 +1073,17 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   { pct: '15%', pillar: '🏦 Operations & Reserve', detail: 'Covers security, cloud, and cash buffer.' },
                 ].map((item, i) => (
                   <View key={`fund-${i}`} style={{ ...(glassCard as any), flex: 1, minWidth: compactCtas ? '100%' : 220, padding: 16, gap: 6 }}>
-                    <Text style={{ color: '#263374', fontSize: 34, fontWeight: '900' }}>{item.pct}</Text>
-                    <Text style={{ color: '#FFFFFF', fontSize: 18, fontWeight: '900' }}>{item.pillar}</Text>
-                    <Text style={{ color: '#C9D4F0', fontSize: 15, lineHeight: 22 }}>{item.detail}</Text>
+                    <Text style={{ color: '#111111', fontSize: 34, fontWeight: '900' }}>{item.pct}</Text>
+                    <Text style={{ color: '#111111', fontSize: 18, fontWeight: '900' }}>{item.pillar}</Text>
+                    <Text style={{ color: '#6B7280', fontSize: 15, lineHeight: 22 }}>{item.detail}</Text>
                   </View>
                 ))}
               </View>
             </View>
 
             <View style={{ ...(glassCard as any), padding: 20, gap: 12 }}>
-              <Text style={{ color: '#FFD332', fontSize: 18, fontWeight: '900', letterSpacing: 1 }}>📈 RETURN ON INVESTMENT</Text>
-              <Text style={{ color: '#D4DEEF', fontSize: 14, lineHeight: 22 }}>
+              <Text style={{ color: '#111111', fontSize: 18, fontWeight: '900', letterSpacing: 1 }}>📈 RETURN ON INVESTMENT</Text>
+              <Text style={{ color: '#4B5563', fontSize: 14, lineHeight: 22 }}>
                 Recurring revenue, near-zero cost per extra workspace.
               </Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4 }}>
@@ -1096,17 +1096,17 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   { label: '✅ Cash-Flow Positive', value: '18 mo', note: 'Breakeven before Series A.' },
                 ].map((item, i) => (
                   <View key={`roi-${i}`} style={{ ...(glassCard as any), flex: 1, minWidth: compactCtas ? '100%' : 180, maxWidth: compactCtas ? undefined : '31%', padding: 16, gap: 4 }}>
-                    <Text style={{ color: '#263374', fontSize: 32, fontWeight: '900' }}>{item.value}</Text>
-                    <Text style={{ color: '#FFFFFF', fontSize: 17, fontWeight: '900' }}>{item.label}</Text>
-                    <Text style={{ color: '#C9D4F0', fontSize: 13, lineHeight: 18 }}>{item.note}</Text>
+                    <Text style={{ color: '#111111', fontSize: 32, fontWeight: '900' }}>{item.value}</Text>
+                    <Text style={{ color: '#111111', fontSize: 17, fontWeight: '900' }}>{item.label}</Text>
+                    <Text style={{ color: '#6B7280', fontSize: 13, lineHeight: 18 }}>{item.note}</Text>
                   </View>
                 ))}
               </View>
             </View>
 
             <View style={{ ...(glassCard as any), padding: 20, gap: 12 }}>
-              <Text style={{ color: '#FFD332', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>⚔️ COMPETITIVE LANDSCAPE</Text>
-              <Text style={{ color: '#D4DEEF', fontSize: 14, lineHeight: 22 }}>
+              <Text style={{ color: '#111111', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>⚔️ COMPETITIVE LANDSCAPE</Text>
+              <Text style={{ color: '#4B5563', fontSize: 14, lineHeight: 22 }}>
                 Nobody else has built this. Here's why:
               </Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
@@ -1133,8 +1133,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   },
                 ].map((item, i) => (
                   <View key={`comp-${i}`} style={{ ...(glassCard as any), flex: 1, minWidth: compactCtas ? '100%' : 280, padding: 16, gap: 8 }}>
-                    <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '800' }}>{item.competitor}</Text>
-                    <Text style={{ color: '#C9D4F0', fontSize: 12, lineHeight: 18 }}>{item.gap}</Text>
+                    <Text style={{ color: '#111111', fontSize: 14, fontWeight: '800' }}>{item.competitor}</Text>
+                    <Text style={{ color: '#6B7280', fontSize: 12, lineHeight: 18 }}>{item.gap}</Text>
                     <View style={{ flexDirection: 'row', gap: 6, alignItems: 'flex-start' }}>
                       <Text style={{ color: '#22C55E', fontSize: 14, fontWeight: '800', marginTop: 1 }}>→</Text>
                       <Text style={{ color: '#22C55E', fontSize: 12, lineHeight: 18, flex: 1, fontWeight: '600' }}>{item.edge}</Text>
@@ -1145,8 +1145,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
             </View>
 
             <View style={{ ...(glassCard as any), padding: 20, gap: 12 }}>
-              <Text style={{ color: '#FFD332', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>✨ THE SEAMLESS ADVANTAGE</Text>
-              <Text style={{ color: '#D4DEEF', fontSize: 14, lineHeight: 22 }}>
+              <Text style={{ color: '#111111', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>✨ THE SEAMLESS ADVANTAGE</Text>
+              <Text style={{ color: '#4B5563', fontSize: 14, lineHeight: 22 }}>
                 No one has ever built this before. Here's why it works:
               </Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
@@ -1160,15 +1160,15 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                 ].map((item, i) => (
                   <View key={`adv-${i}`} style={{ ...(glassCard as any), flex: 1, minWidth: compactCtas ? '100%' : 200, maxWidth: compactCtas ? undefined : '31%', padding: 16, gap: 6 }}>
                     <Text style={{ fontSize: 22 }}>{item.icon}</Text>
-                    <Text style={{ color: '#FFFFFF', fontSize: 13, fontWeight: '700' }}>{item.title}</Text>
-                    <Text style={{ color: '#C9D4F0', fontSize: 12, lineHeight: 18 }}>{item.text}</Text>
+                    <Text style={{ color: '#111111', fontSize: 13, fontWeight: '700' }}>{item.title}</Text>
+                    <Text style={{ color: '#6B7280', fontSize: 12, lineHeight: 18 }}>{item.text}</Text>
                   </View>
                 ))}
               </View>
             </View>
 
             <View style={{ gap: 10 }}>
-              <Text style={{ color: '#FFD332', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>🏆 TRACTION & MILESTONES</Text>
+              <Text style={{ color: '#111111', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>🏆 TRACTION & MILESTONES</Text>
               {/* Kanban columns */}
               <View style={{ flexDirection: compactCtas ? 'column' : 'row', gap: 10, alignItems: 'stretch' }}>
 
@@ -1191,9 +1191,9 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                     <View key={`ms-done-${i}`} style={{ ...(glassCard as any), padding: 10, gap: 3, borderRadius: 10 }}>
                       <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
                         <Text style={{ color: '#22C55E', fontSize: 12, fontWeight: '900' }}>✓</Text>
-                        <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700', flex: 1 }}>{item.label}</Text>
+                        <Text style={{ color: '#111111', fontSize: 12, fontWeight: '700', flex: 1 }}>{item.label}</Text>
                       </View>
-                      <Text style={{ color: '#8A9BC2', fontSize: 11, lineHeight: 16, paddingLeft: 18 }}>{item.detail}</Text>
+                      <Text style={{ color: '#9CA3AF', fontSize: 11, lineHeight: 16, paddingLeft: 18 }}>{item.detail}</Text>
                     </View>
                   ))}
                 </View>
@@ -1210,19 +1210,19 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   <View style={{ ...(glassCard as any), padding: 10, gap: 3, borderRadius: 10 }}>
                     <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
                       <Text style={{ color: '#F59E0B', fontSize: 12, fontWeight: '900' }}>⚙</Text>
-                      <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700', flex: 1 }}>Cosmograph importer</Text>
+                      <Text style={{ color: '#111111', fontSize: 12, fontWeight: '700', flex: 1 }}>Cosmograph importer</Text>
                     </View>
-                    <Text style={{ color: '#8A9BC2', fontSize: 11, lineHeight: 16, paddingLeft: 18 }}>Auto-maps CSV/Excel to workspace fields with PII detection. Final testing.</Text>
+                    <Text style={{ color: '#9CA3AF', fontSize: 11, lineHeight: 16, paddingLeft: 18 }}>Auto-maps CSV/Excel to workspace fields with PII detection. Final testing.</Text>
                   </View>
                 </View>
 
                 {/* ── Next Quarter ── */}
-                <View style={{ flex: 1, ...(glassCard as any), padding: 14, gap: 10, borderColor: 'rgba(38,51,116,0.25)', borderTopWidth: 3, borderTopColor: '#263374' }}>
+                <View style={{ flex: 1, ...(glassCard as any), padding: 14, gap: 10, borderColor: 'rgba(0,0,0,0.10)', borderTopWidth: 3, borderTopcolor: '#111111' }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#263374' }} />
-                    <Text style={{ color: '#263374', fontSize: 10, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' }}>Next Quarter</Text>
-                    <View style={{ marginLeft: 'auto' as any, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 999, backgroundColor: 'rgba(38,51,116,0.15)' }}>
-                      <Text style={{ color: '#263374', fontSize: 10, fontWeight: '800' }}>2</Text>
+                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundcolor: '#111111' }} />
+                    <Text style={{ color: '#111111', fontSize: 10, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' }}>Next Quarter</Text>
+                    <View style={{ marginLeft: 'auto' as any, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 999, backgroundColor: 'rgba(0,0,0,0.15)' }}>
+                      <Text style={{ color: '#111111', fontSize: 10, fontWeight: '800' }}>2</Text>
                     </View>
                   </View>
                   {[
@@ -1231,10 +1231,10 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   ].map((item, i) => (
                     <View key={`ms-next-${i}`} style={{ ...(glassCard as any), padding: 10, gap: 3, borderRadius: 10 }}>
                       <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
-                        <Text style={{ color: '#263374', fontSize: 12, fontWeight: '900' }}>→</Text>
-                        <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700', flex: 1 }}>{item.label}</Text>
+                        <Text style={{ color: '#111111', fontSize: 12, fontWeight: '900' }}>→</Text>
+                        <Text style={{ color: '#111111', fontSize: 12, fontWeight: '700', flex: 1 }}>{item.label}</Text>
                       </View>
-                      <Text style={{ color: '#8A9BC2', fontSize: 11, lineHeight: 16, paddingLeft: 18 }}>{item.detail}</Text>
+                      <Text style={{ color: '#9CA3AF', fontSize: 11, lineHeight: 16, paddingLeft: 18 }}>{item.detail}</Text>
                     </View>
                   ))}
                 </View>
@@ -1244,8 +1244,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
 
             {/* ── Our Investors ─────────────────────────────────────── */}
             <View style={{ gap: 16 }}>
-              <Text style={{ color: '#FFD332', fontSize: 16, fontWeight: '900', letterSpacing: 1, textAlign: 'center' }}>🤝 OUR INVESTORS</Text>
-              <Text style={{ color: '#D4DEEF', fontSize: 13, lineHeight: 21, textAlign: 'center', maxWidth: 580, alignSelf: 'center' as const }}>Halo Internal is backed by experienced operators who have seen what real enterprise automation looks like — and know exactly the gap we fill.</Text>
+              <Text style={{ color: '#111111', fontSize: 16, fontWeight: '900', letterSpacing: 1, textAlign: 'center' }}>🤝 OUR INVESTORS</Text>
+              <Text style={{ color: '#4B5563', fontSize: 13, lineHeight: 21, textAlign: 'center', maxWidth: 580, alignSelf: 'center' as const }}>Halo Internal is backed by experienced operators who have seen what real enterprise automation looks like — and know exactly the gap we fill.</Text>
               <div className="cs-investor-grid">
                 {INVESTORS.map((inv, i) => (
                   <div key={`inv-${i}`} className="cs-investor-card" style={{ borderColor: `${inv.accent}33` } as any}>
@@ -1254,23 +1254,23 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                         <Text style={{ fontSize: 24 }}>{inv.emoji}</Text>
                       </View>
                       <View style={{ flex: 1 }}>
-                        <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '800' }}>{inv.name}</Text>
+                        <Text style={{ color: '#111111', fontSize: 15, fontWeight: '800' }}>{inv.name}</Text>
                         <Text style={{ color: inv.accent, fontSize: 11, fontWeight: '700' }}>{inv.title} — {inv.fund}</Text>
-                        <Text style={{ color: '#8A9BC2', fontSize: 10, marginTop: 1 }}>{inv.focus}</Text>
+                        <Text style={{ color: '#9CA3AF', fontSize: 10, marginTop: 1 }}>{inv.focus}</Text>
                       </View>
                       <View style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, backgroundColor: `${inv.accent}18`, borderWidth: 1, borderColor: `${inv.accent}30` }}>
                         <Text style={{ color: inv.accent, fontSize: 12, fontWeight: '900' }}>{inv.amount}</Text>
                       </View>
                     </View>
-                    <Text style={{ color: '#C9D4F0', fontSize: 12, lineHeight: 19 }}>{inv.bio}</Text>
+                    <Text style={{ color: '#6B7280', fontSize: 12, lineHeight: 19 }}>{inv.bio}</Text>
                     <View style={{ padding: 12, borderRadius: 10, backgroundColor: `${inv.accent}0D`, borderWidth: 1, borderColor: `${inv.accent}22` }}>
-                      <Text style={{ color: '#D4DEEF', fontSize: 12, lineHeight: 19, fontStyle: 'italic' }}>{inv.thesis}</Text>
+                      <Text style={{ color: '#4B5563', fontSize: 12, lineHeight: 19, fontStyle: 'italic' }}>{inv.thesis}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-                      <Text style={{ color: '#8A9BC2', fontSize: 10, fontWeight: '700', letterSpacing: 0.4 }}>PORTFOLIO:</Text>
+                      <Text style={{ color: '#9CA3AF', fontSize: 10, fontWeight: '700', letterSpacing: 0.4 }}>PORTFOLIO:</Text>
                       {inv.portfolio.map((p, pi) => (
-                        <View key={pi} style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)' }}>
-                          <Text style={{ color: '#C9D4F0', fontSize: 10, fontWeight: '600' }}>{p}</Text>
+                        <View key={pi} style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, backgroundColor: 'rgba(0,0,0,0.05)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
+                          <Text style={{ color: '#6B7280', fontSize: 10, fontWeight: '600' }}>{p}</Text>
                         </View>
                       ))}
                     </View>
@@ -1280,8 +1280,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
             </View>
 
             <View style={{ ...(glassCard as any), padding: 20, gap: 12 }}>
-              <Text style={{ color: '#FFD332', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>Interested in the Halo Internal opportunity?</Text>
-              <Text style={{ color: '#C9D4F0', fontSize: 13, lineHeight: 20, textAlign: 'center', maxWidth: 500 }}>
+              <Text style={{ color: '#111111', fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>Interested in the Halo Internal opportunity?</Text>
+              <Text style={{ color: '#6B7280', fontSize: 13, lineHeight: 20, textAlign: 'center', maxWidth: 500 }}>
                 We're building the legal operations backbone for every law firm. If that resonates, let's talk.
               </Text>
               <Pressable style={styles.landingPrimaryCta} onPress={onContinue}>
@@ -1322,27 +1322,27 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                     display: 'flex',
                     flexDirection: 'column',
                     ...(tier.highlight
-                      ? { borderColor: 'rgba(38,51,116,0.55)', borderWidth: 1.5 }
-                      : { borderColor: 'rgba(255,255,255,0.08)' }),
+                      ? { borderColor: 'rgba(0,0,0,0.15)', borderWidth: 1.5 }
+                      : { borderColor: 'rgba(0,0,0,0.06)' }),
                   }}
                 >
                   {/* Badge */}
                   {tier.highlight && (
-                    <View style={{ backgroundColor: '#263374', paddingVertical: 6, alignItems: 'center' as const }}>
-                      <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '800', letterSpacing: 0.8 }}>MOST POPULAR</Text>
+                    <View style={{ backgroundcolor: '#111111', paddingVertical: 6, alignItems: 'center' as const }}>
+                      <Text style={{ color: '#111111', fontSize: 11, fontWeight: '800', letterSpacing: 0.8 }}>MOST POPULAR</Text>
                     </View>
                   )}
 
                   {/* Header zone */}
-                  <View style={{ padding: 22, gap: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' }}>
-                    <Text style={{ color: '#FFFFFF', fontSize: 20, fontWeight: '800' }}>{tier.name}</Text>
-                    <Text style={{ color: '#C9D4F0', fontSize: 12, fontWeight: '600' }}>{tier.audience}</Text>
-                    <Text style={{ color: '#D4DEEF', fontSize: 12, lineHeight: 18, marginTop: 2 }}>{tier.description}</Text>
+                  <View style={{ padding: 22, gap: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)' }}>
+                    <Text style={{ color: '#111111', fontSize: 20, fontWeight: '800' }}>{tier.name}</Text>
+                    <Text style={{ color: '#6B7280', fontSize: 12, fontWeight: '600' }}>{tier.audience}</Text>
+                    <Text style={{ color: '#4B5563', fontSize: 12, lineHeight: 18, marginTop: 2 }}>{tier.description}</Text>
 
                     {/* Price */}
                     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 3, marginTop: 10 }}>
-                      <Text style={{ color: '#FFFFFF', fontSize: 36, fontWeight: '800' }}>{tier.price}</Text>
-                      {!!tier.period && <Text style={{ color: '#C9D4F0', fontSize: 13 }}>{tier.period}</Text>}
+                      <Text style={{ color: '#111111', fontSize: 36, fontWeight: '800' }}>{tier.price}</Text>
+                      {!!tier.period && <Text style={{ color: '#6B7280', fontSize: 13 }}>{tier.period}</Text>}
                     </View>
                     {!!tier.savings && (
                       <Text style={{ color: '#22C55E', fontSize: 12, fontWeight: '700', marginTop: 2 }}>{'💚 ' + tier.savings}</Text>
@@ -1363,11 +1363,11 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   <View style={{ padding: 22, gap: 16, flex: 1 }}>
                     {tier.featureGroups.map((group, gi) => (
                       <View key={`fg-${gi}`} style={{ gap: 7 }}>
-                        <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '800' }}>{group.heading}</Text>
+                        <Text style={{ color: '#111111', fontSize: 12, fontWeight: '800' }}>{group.heading}</Text>
                         {group.items.map((item, fi) => (
                           <View key={`fi-${fi}`} style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
-                            <Text style={{ color: '#263374', fontSize: 13, marginTop: 1 }}>✓</Text>
-                            <Text style={{ color: '#D4DEEF', fontSize: 13, lineHeight: 19, flex: 1 }}>{item}</Text>
+                            <Text style={{ color: '#111111', fontSize: 13, marginTop: 1 }}>✓</Text>
+                            <Text style={{ color: '#4B5563', fontSize: 13, lineHeight: 19, flex: 1 }}>{item}</Text>
                           </View>
                         ))}
                       </View>
@@ -1375,9 +1375,9 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   </View>
 
                   {/* Transparent reasoning */}
-                  <View style={{ padding: 18, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(38,51,116,0.04)' }}>
-                    <Text style={{ color: '#8A9BC2', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginBottom: 4 }}>WHY THIS PRICE</Text>
-                    <Text style={{ color: '#C9D4F0', fontSize: 11, lineHeight: 17 }}>{tier.reasoning}</Text>
+                  <View style={{ padding: 18, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.06)', backgroundColor: 'rgba(0,0,0,0.04)' }}>
+                    <Text style={{ color: '#9CA3AF', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginBottom: 4 }}>WHY THIS PRICE</Text>
+                    <Text style={{ color: '#6B7280', fontSize: 11, lineHeight: 17 }}>{tier.reasoning}</Text>
                   </View>
                 </div>
               ))}
@@ -1391,8 +1391,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
               ].map((item, i) => (
                 <View key={`trust-${i}`} style={{ flex: 1, alignItems: 'center' as const, gap: 4, paddingHorizontal: 12 }}>
                   <Text style={{ fontSize: 18 }}>{item.icon}</Text>
-                  <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>{item.title}</Text>
-                  <Text style={{ color: '#C9D4F0', fontSize: 11, textAlign: 'center' }}>{item.desc}</Text>
+                  <Text style={{ color: '#111111', fontSize: 12, fontWeight: '700' }}>{item.title}</Text>
+                  <Text style={{ color: '#6B7280', fontSize: 11, textAlign: 'center' }}>{item.desc}</Text>
                 </View>
               ))}
             </View>
@@ -1414,7 +1414,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
 
             {/* Products */}
             <View style={{ gap: 12, marginTop: spaceSm }}>
-              <Text style={{ color: '#FFD332', fontSize: 15, fontWeight: '900', textAlign: 'center', letterSpacing: 0.6 }}>🧩 OUR PRODUCTS</Text>
+              <Text style={{ color: '#111111', fontSize: 15, fontWeight: '900', textAlign: 'center', letterSpacing: 0.6 }}>🧩 OUR PRODUCTS</Text>
               <div className="cs-about-grid">
                 {ABOUT_MODULES.map((mod, i) => (
                   <div key={`mod-${i}`} className="cs-about-card" style={{ borderColor: `${mod.color}28` } as any}>
@@ -1423,16 +1423,16 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                         <Text style={{ fontSize: 20 }}>{mod.icon}</Text>
                       </View>
                       <View style={{ flex: 1 }}>
-                        <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '800' }}>{mod.name}</Text>
+                        <Text style={{ color: '#111111', fontSize: 14, fontWeight: '800' }}>{mod.name}</Text>
                         <Text style={{ color: mod.color, fontSize: 11, fontWeight: '700', marginTop: 1 }}>{mod.tagline}</Text>
                       </View>
                     </View>
-                    <Text style={{ color: '#C9D4F0', fontSize: 12, lineHeight: 19 }}>{mod.description}</Text>
+                    <Text style={{ color: '#6B7280', fontSize: 12, lineHeight: 19 }}>{mod.description}</Text>
                     <div className="cs-about-detail-row">
                       {mod.details.map((d, di) => (
                         <div key={di} className="cs-about-detail-item">
-                          <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>{d.label}</Text>
-                          <Text style={{ color: '#8A9BC2', fontSize: 11, lineHeight: 17 }}>{d.text}</Text>
+                          <Text style={{ color: '#111111', fontSize: 12, fontWeight: '700' }}>{d.label}</Text>
+                          <Text style={{ color: '#9CA3AF', fontSize: 11, lineHeight: 17 }}>{d.text}</Text>
                         </div>
                       ))}
                     </div>
@@ -1444,13 +1444,13 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
             {/* Mission */}
             <View style={{ ...(glassCard as any), padding: 26, gap: 12, alignItems: 'center', marginTop: spaceSm }}>
               <Text style={{ fontSize: 30 }}>🌌</Text>
-              <Text style={{ color: '#FFFFFF', fontSize: 17, fontWeight: '800', textAlign: 'center' }}>Our Mission</Text>
-              <Text style={{ color: '#D4DEEF', fontSize: 13, lineHeight: 22, textAlign: 'center', maxWidth: 580 }}>
+              <Text style={{ color: '#111111', fontSize: 17, fontWeight: '800', textAlign: 'center' }}>Our Mission</Text>
+              <Text style={{ color: '#4B5563', fontSize: 13, lineHeight: 22, textAlign: 'center', maxWidth: 580 }}>
                 Every solo practitioner, mid-size firm, and legal department deserves the same operational power that Am Law 100 firms have — without a $2M software budget. That is what Halo Internal is building.
               </Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 4 }}>
                 {['🇺🇸 U.S. Company', '📍 Remote-First', '🔒 Privacy-First', '♾️ No Vendor Lock-In', '🤝 Community-Backed'].map((v, i) => (
-                  <View key={i} style={{ paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, backgroundColor: 'rgba(38,51,116,0.12)', borderWidth: 1, borderColor: 'rgba(38,51,116,0.26)' }}>
+                  <View key={i} style={{ paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, backgroundColor: 'rgba(0,0,0,0.03)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
                     <Text style={{ color: '#B0C4E8', fontSize: 11, fontWeight: '700' }}>{v}</Text>
                   </View>
                 ))}
@@ -1470,7 +1470,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
             <Text style={[styles.landingSectionEyebrow, { fontSize: sectionTitleSize * 1.25, fontWeight: '900', textAlign: 'center', width: '100%' }]}>📰 BLOG &amp; NEWS</Text>
             <Text style={[styles.landingSectionTitle, { fontSize: sectionTitleSize, lineHeight: sectionTitleLineHeight, textAlign: 'center', width: '100%' }]}>Latest from Halo Internal &amp; the legal tech world</Text>
             {blogLoading && (
-              <Text style={{ color: '#8A9BC2', fontSize: 12, textAlign: 'center' }}>Loading latest articles…</Text>
+              <Text style={{ color: '#9CA3AF', fontSize: 12, textAlign: 'center' }}>Loading latest articles…</Text>
             )}
             <div className="cs-blog-grid">
               {blogPosts.map((post) => (
@@ -1484,18 +1484,18 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                 >
                   <Text style={{ fontSize: 26 }}>{post.emoji}</Text>
                   <span className="cs-blog-tag">{post.tag}</span>
-                  <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700', lineHeight: 21 }}>{post.title}</Text>
-                  <Text style={{ color: '#C9D4F0', fontSize: 12, lineHeight: 19, flex: 1 }}>{post.summary}</Text>
+                  <Text style={{ color: '#111111', fontSize: 14, fontWeight: '700', lineHeight: 21 }}>{post.title}</Text>
+                  <Text style={{ color: '#6B7280', fontSize: 12, lineHeight: 19, flex: 1 }}>{post.summary}</Text>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
-                    <Text style={{ color: '#8A9BC2', fontSize: 11 }}>{post.author}</Text>
-                    <Text style={{ color: '#8A9BC2', fontSize: 11 }}>{post.date} · {post.readTime} min</Text>
+                    <Text style={{ color: '#9CA3AF', fontSize: 11 }}>{post.author}</Text>
+                    <Text style={{ color: '#9CA3AF', fontSize: 11 }}>{post.date} · {post.readTime} min</Text>
                   </View>
                 </a>
               ))}
             </div>
             <View style={{ ...(glassCard as any), padding: 22, gap: 10, alignItems: 'center', marginTop: spaceSm }}>
-              <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '800', textAlign: 'center' }}>📬 Stay in the loop</Text>
-              <Text style={{ color: '#C9D4F0', fontSize: 12, lineHeight: 19, textAlign: 'center', maxWidth: 480 }}>Product updates and SaaS insights — no spam, ever.</Text>
+              <Text style={{ color: '#111111', fontSize: 15, fontWeight: '800', textAlign: 'center' }}>📬 Stay in the loop</Text>
+              <Text style={{ color: '#6B7280', fontSize: 12, lineHeight: 19, textAlign: 'center', maxWidth: 480 }}>Product updates and SaaS insights — no spam, ever.</Text>
               <Pressable
                 style={[styles.landingPrimaryCta, { alignSelf: 'center', marginTop: 4 }]}
                 onPress={() => {
@@ -1525,7 +1525,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
             </Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
               {['🌍 Remote-First', '🔥 Seed Stage', '⚡ Move Fast', '🛡️ Privacy-First', '📈 Equity for Early Hires'].map((v, i) => (
-                <View key={i} style={{ paddingHorizontal: 13, paddingVertical: 5, borderRadius: 999, backgroundColor: 'rgba(38,51,116,0.10)', borderWidth: 1, borderColor: 'rgba(38,51,116,0.24)' }}>
+                <View key={i} style={{ paddingHorizontal: 13, paddingVertical: 5, borderRadius: 999, backgroundColor: 'rgba(0,0,0,0.03)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
                   <Text style={{ color: '#B0C4E8', fontSize: 11, fontWeight: '700' }}>{v}</Text>
                 </View>
               ))}
@@ -1533,7 +1533,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
 
             {/* Open roles */}
             <View style={{ gap: 10 }}>
-              <Text style={{ color: '#FFD332', fontSize: 14, fontWeight: '800', letterSpacing: 0.4 }}>Open Positions</Text>
+              <Text style={{ color: '#111111', fontSize: 14, fontWeight: '800', letterSpacing: 0.4 }}>Open Positions</Text>
               <div className="cs-jobs-list">
                 {JOBS.map((job, i) => (
                   <div
@@ -1544,31 +1544,31 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   >
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', gap: 12, flexWrap: 'wrap' as any }}>
                       <View style={{ flex: 1, gap: 3 }}>
-                        <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '800' }}>{job.title}</Text>
+                        <Text style={{ color: '#111111', fontSize: 14, fontWeight: '800' }}>{job.title}</Text>
                         <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' as any }}>
-                          <Text style={{ color: '#263374', fontSize: 11, fontWeight: '700' }}>{job.team}</Text>
-                          <Text style={{ color: '#8A9BC2', fontSize: 11 }}>·</Text>
-                          <Text style={{ color: '#8A9BC2', fontSize: 11 }}>{job.type}</Text>
-                          <Text style={{ color: '#8A9BC2', fontSize: 11 }}>·</Text>
+                          <Text style={{ color: '#111111', fontSize: 11, fontWeight: '700' }}>{job.team}</Text>
+                          <Text style={{ color: '#9CA3AF', fontSize: 11 }}>·</Text>
+                          <Text style={{ color: '#9CA3AF', fontSize: 11 }}>{job.type}</Text>
+                          <Text style={{ color: '#9CA3AF', fontSize: 11 }}>·</Text>
                           <Text style={{ color: '#22C55E', fontSize: 11, fontWeight: '600' }}>{job.level}</Text>
                         </View>
                       </View>
-                      <View style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: 'rgba(38,51,116,0.12)', borderWidth: 1, borderColor: 'rgba(38,51,116,0.26)' }}>
+                      <View style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.03)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
                         <Text style={{ color: '#B0C4E8', fontSize: 10, fontWeight: '700' }}>{expandedJob === job.title ? 'Close ▲' : 'View ▼'}</Text>
                       </View>
                     </View>
                     {expandedJob === job.title && (
                       <View style={{ gap: 8, paddingTop: 6, width: '100%' }}>
-                        <Text style={{ color: '#D4DEEF', fontSize: 12, lineHeight: 19 }}>{job.description}</Text>
+                        <Text style={{ color: '#4B5563', fontSize: 12, lineHeight: 19 }}>{job.description}</Text>
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                           {job.skills.map((sk, si) => (
-                            <View key={si} style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)' }}>
-                              <Text style={{ color: '#C9D4F0', fontSize: 11, fontWeight: '600' }}>{sk}</Text>
+                            <View key={si} style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.05)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
+                              <Text style={{ color: '#6B7280', fontSize: 11, fontWeight: '600' }}>{sk}</Text>
                             </View>
                           ))}
                         </View>
                         <Pressable
-                          style={{ alignSelf: 'flex-start', marginTop: 4, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, backgroundColor: '#263374' }}
+                          style={{ alignSelf: 'flex-start', marginTop: 4, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, backgroundcolor: '#111111' }}
                           onPress={() => {
                             if (typeof window !== 'undefined') {
                               const sub = encodeURIComponent(`Application: ${job.title}`);
@@ -1577,7 +1577,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                             }
                           }}
                         >
-                          <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>Apply for this role →</Text>
+                          <Text style={{ color: '#111111', fontSize: 12, fontWeight: '700' }}>Apply for this role →</Text>
                         </Pressable>
                       </View>
                     )}
@@ -1588,18 +1588,18 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
 
             {/* General application form */}
             <View style={{ gap: 14, marginTop: spaceSm }}>
-              <Text style={{ color: '#FFD332', fontSize: 14, fontWeight: '800', letterSpacing: 0.4 }}>📨 Send a General Application</Text>
-              <Text style={{ color: '#C9D4F0', fontSize: 12, lineHeight: 19 }}>Don't see your role? We're always looking for exceptional people — send a note and we'll keep you in mind.</Text>
+              <Text style={{ color: '#111111', fontSize: 14, fontWeight: '800', letterSpacing: 0.4 }}>📨 Send a General Application</Text>
+              <Text style={{ color: '#6B7280', fontSize: 12, lineHeight: 19 }}>Don't see your role? We're always looking for exceptional people — send a note and we'll keep you in mind.</Text>
               {careerSubmitted ? (
                 <View style={{ padding: 22, borderRadius: 14, backgroundColor: 'rgba(34,197,94,0.10)', borderWidth: 1, borderColor: 'rgba(34,197,94,0.28)', alignItems: 'center', gap: 8 }}>
                   <Text style={{ fontSize: 26 }}>🎉</Text>
                   <Text style={{ color: '#22C55E', fontSize: 14, fontWeight: '800', textAlign: 'center' }}>Application sent!</Text>
-                  <Text style={{ color: '#D4DEEF', fontSize: 12, lineHeight: 19, textAlign: 'center' }}>Thanks for reaching out. We'll be in touch within 5 business days.</Text>
+                  <Text style={{ color: '#4B5563', fontSize: 12, lineHeight: 19, textAlign: 'center' }}>Thanks for reaching out. We'll be in touch within 5 business days.</Text>
                   <Pressable
-                    style={{ marginTop: 6, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.06)' }}
+                    style={{ marginTop: 6, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8, backgroundColor: '#F9FAFB' }}
                     onPress={() => { setCareerSubmitted(false); setCareerName(''); setCareerEmail(''); setCareerRole(''); setCareerMessage(''); }}
                   >
-                    <Text style={{ color: '#C9D4F0', fontSize: 11, fontWeight: '600' }}>Submit another</Text>
+                    <Text style={{ color: '#6B7280', fontSize: 11, fontWeight: '600' }}>Submit another</Text>
                   </Pressable>
                 </View>
               ) : (
@@ -1649,7 +1649,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   >
                     <Text style={styles.landingPrimaryCtaText}>Send Application →</Text>
                   </Pressable>
-                  <Text style={{ color: '#8A9BC2', fontSize: 10, marginTop: -4 }}>Sends to dwaineeck@outlook.com</Text>
+                  <Text style={{ color: '#9CA3AF', fontSize: 10, marginTop: -4 }}>Sends to dwaineeck@outlook.com</Text>
                 </div>
               )}
             </View>
@@ -1679,8 +1679,8 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
 
           {/* Footer */}
           <View style={{ marginTop: 40, alignItems: 'center', gap: 6, opacity: 0.6 }}>
-            <Text style={{ color: '#C9D4F0', fontSize: 11 }}>© 2026 Halo Internal. All rights reserved.</Text>
-            <Text style={{ color: '#8A9BC2', fontSize: 10 }}>Built with React Native + Expo  •  Portable persistence  •  Powered by Bebo Ai</Text>
+            <Text style={{ color: '#6B7280', fontSize: 11 }}>© 2026 Halo Internal. All rights reserved.</Text>
+            <Text style={{ color: '#9CA3AF', fontSize: 10 }}>Built with React Native + Expo  •  Portable persistence  •  Powered by Bebo Ai</Text>
           </View>
         </View>
       </div>

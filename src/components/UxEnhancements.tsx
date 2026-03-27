@@ -47,18 +47,18 @@ export function ToastContainer() {
             }}
           >
             <span style={{ fontSize: 16, fontWeight: 700 }}>{cfg.icon}</span>
-            <span style={{ flex: 1, fontSize: 13, color: '#EEF1F8', lineHeight: 1.4 }}>{t.message}</span>
+            <span style={{ flex: 1, fontSize: 13, color: '#374151', lineHeight: 1.4 }}>{t.message}</span>
             {t.undoAction && (
               <button
                 onClick={() => { t.undoAction?.(); setToasts((prev) => prev.filter((x) => x.id !== t.id)); }}
-                style={{ border: 'none', background: 'rgba(255,255,255,0.12)', color: '#FFD332', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+                style={{ border: 'none', background: 'rgba(0,0,0,0.08)', color: '#111111', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
               >
                 Undo
               </button>
             )}
             <button
               onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
-              style={{ border: 'none', background: 'transparent', color: 'rgba(255,255,255,0.35)', fontSize: 14, cursor: 'pointer', padding: 2 }}
+              style={{ border: 'none', background: 'transparent', color: 'rgba(0,0,0,0.30)', fontSize: 14, cursor: 'pointer', padding: 2 }}
             >
               ✕
             </button>
@@ -72,16 +72,16 @@ export function ToastContainer() {
 // ─── Skeleton Loader ──────────────────────────────────────────────
 export function Skeleton({ width = '100%', height = 16, borderRadius = 8 }: { width?: number | string; height?: number; borderRadius?: number }) {
   if (Platform.OS !== 'web') {
-    return <View style={{ width: width as any, height, borderRadius, backgroundColor: 'rgba(255,255,255,0.06)' }} />;
+    return <View style={{ width: width as any, height, borderRadius, backgroundColor: 'rgba(0,0,0,0.04)' }} />;
   }
   return (
-    <div style={{ width: typeof width === 'number' ? width : width, height, borderRadius, background: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%)', backgroundSize: '200% 100%', animation: 'cs-skeleton 1.5s ease infinite' }} />
+    <div style={{ width: typeof width === 'number' ? width : width, height, borderRadius, background: 'linear-gradient(90deg, rgba(0,0,0,0.02) 25%, rgba(0,0,0,0.06) 50%, rgba(0,0,0,0.02) 75%)', backgroundSize: '200% 100%', animation: 'cs-skeleton 1.5s ease infinite' }} />
   );
 }
 
 export function SkeletonCard() {
   return (
-    <View style={{ borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(10,14,24,0.72)', padding: 14, gap: 10 }}>
+    <View style={{ borderRadius: 14, borderWidth: 1, borderColor: 'rgba(0,0,0,0.04)', backgroundColor: 'rgba(255,255,255,0.95)', padding: 14, gap: 10 }}>
       <Skeleton width="60%" height={14} />
       <Skeleton width="40%" height={10} />
       <View style={{ flexDirection: 'row', gap: 6 }}>
@@ -96,7 +96,7 @@ export function SkeletonList({ count = 4 }: { count?: number }) {
   return (
     <View style={{ gap: 8, padding: 12 }}>
       {Array.from({ length: count }).map((_, i) => (
-        <View key={i} style={{ borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', backgroundColor: 'rgba(255,255,255,0.02)', padding: 12, gap: 8 }}>
+        <View key={i} style={{ borderRadius: 12, borderWidth: 1, borderColor: 'rgba(0,0,0,0.03)', backgroundColor: 'rgba(0,0,0,0.02)', padding: 12, gap: 8 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <Skeleton width={70} height={20} borderRadius={10} />
             <Skeleton width="50%" height={14} />
@@ -112,7 +112,7 @@ export function SkeletonList({ count = 4 }: { count?: number }) {
 }
 
 // ─── Mini Sparkline ───────────────────────────────────────────────
-export function Sparkline({ data, width = 80, height = 24, color = '#FFD332' }: { data: number[]; width?: number; height?: number; color?: string }) {
+export function Sparkline({ data, width = 80, height = 24, color = '#111111' }: { data: number[]; width?: number; height?: number; color?: string }) {
   if (Platform.OS !== 'web' || data.length < 2) return null;
   const max = Math.max(...data);
   const min = Math.min(...data);
@@ -138,13 +138,13 @@ export function Breadcrumb({ items, onNavigate }: { items: { label: string; key:
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", padding: '6px 0' }}>
       {items.map((item, i) => (
         <React.Fragment key={item.key}>
-          {i > 0 && <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 10 }}>›</span>}
+          {i > 0 && <span style={{ color: 'rgba(0,0,0,0.20)', fontSize: 10 }}>›</span>}
           {i < items.length - 1 ? (
             <span
               onClick={() => onNavigate?.(item.key)}
-              style={{ color: 'rgba(255,255,255,0.5)', cursor: 'pointer', transition: 'color 0.15s' }}
-              onMouseEnter={(e) => { (e.target as HTMLElement).style.color = '#FFD332'; }}
-              onMouseLeave={(e) => { (e.target as HTMLElement).style.color = 'rgba(255,255,255,0.5)'; }}
+              style={{ color: 'rgba(0,0,0,0.45)', cursor: 'pointer', transition: 'color 0.15s' }}
+              onMouseEnter={(e) => { (e.target as HTMLElement).style.color = '#111111'; }}
+              onMouseLeave={(e) => { (e.target as HTMLElement).style.color = 'rgba(0,0,0,0.45)'; }}
             >
               {item.label}
             </span>
@@ -162,13 +162,13 @@ export function SavingIndicator({ saving }: { saving: boolean }) {
   if (Platform.OS !== 'web') return null;
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: saving ? '#FFD332' : '#86EFAC',
+      display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: saving ? '#111111' : '#86EFAC',
       transition: 'opacity 0.3s', opacity: saving ? 1 : 0.7,
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     }}>
       {saving ? (
         <>
-          <div style={{ width: 12, height: 12, border: '2px solid rgba(255,211,50,0.3)', borderTopColor: '#FFD332', borderRadius: '50%', animation: 'cs-spin 0.8s linear infinite' }} />
+          <div style={{ width: 12, height: 12, border: '2px solid rgba(255,211,50,0.3)', borderTopColor: '#111111', borderRadius: '50%', animation: 'cs-spin 0.8s linear infinite' }} />
           <span>Saving...</span>
         </>
       ) : (
@@ -196,7 +196,7 @@ export function injectUxAnimations() {
     @keyframes cs-slide-in { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes cs-scale-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
     @keyframes cs-count-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes cs-pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(38,51,116,0); } 50% { box-shadow: 0 0 0 4px rgba(38,51,116,0.22); } }
+    @keyframes cs-pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } 50% { box-shadow: 0 0 0 4px rgba(0,0,0,0.06); } }
     @keyframes cs-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
     [data-animate-in] { animation: cs-fade-in 0.35s ease both; }
@@ -220,7 +220,7 @@ export function injectUxAnimations() {
     @keyframes cs-kpi-pop { 0% { opacity: 0; transform: scale(0.6) translateY(10px); } 60% { opacity: 1; transform: scale(1.08) translateY(-2px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
     [data-scale-in] { animation: cs-scale-in 0.3s ease both; }
     [data-slide-in] { animation: cs-slide-in 0.3s ease both; }
-    [data-status-border] { border-left: 3.5px solid var(--status-color, rgba(38,51,116,0.5)); }
+    [data-status-border] { border-left: 3.5px solid var(--status-color, rgba(0,0,0,0.12)); }
     [data-empty-state] { animation: cs-empty-bounce 0.6s ease both; }
     @keyframes cs-empty-bounce { 0% { opacity: 0; transform: scale(0.85) translateY(16px); } 60% { opacity: 1; transform: scale(1.04) translateY(-4px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
     [data-filter-chip] { animation: cs-scale-in 0.2s ease both; transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease; }
@@ -239,17 +239,17 @@ export function injectUxAnimations() {
 
     /* DnD styles */
     [data-dnd-dragging] { opacity: 0.5; transform: scale(0.95); transition: opacity 0.15s, transform 0.15s; }
-    [data-dnd-over] { border-color: rgba(38,51,116,0.6) !important; background-color: rgba(38,51,116,0.08) !important; transition: border-color 0.15s, background-color 0.15s; }
+    [data-dnd-over] { border-color: rgba(0,0,0,0.15) !important; background-color: rgba(0,0,0,0.02) !important; transition: border-color 0.15s, background-color 0.15s; }
     [data-dnd-card] { cursor: grab; transition: box-shadow 0.15s, transform 0.15s; }
-    [data-dnd-card]:active { cursor: grabbing; box-shadow: 0 4px 16px rgba(38,51,116,0.3); }
+    [data-dnd-card]:active { cursor: grabbing; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
 
     /* Sort header hover */
     [data-sortable] { cursor: pointer; user-select: none; transition: color 0.15s; }
-    [data-sortable]:hover { color: #FFD332 !important; }
+    [data-sortable]:hover { color: #111111 !important; }
 
     /* Light mode improvements */
-    [data-theme="day"] { --surface: #FAFBFC; --surface-raised: #FFFFFF; --border: rgba(0,0,0,0.08); --text: #1A2340; --text-dim: rgba(0,0,0,0.5); --accent-soft: rgba(38,51,116,0.08); }
-    [data-theme="night"] { --surface: #0F1628; --surface-raised: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08); --text: #E0E4ED; --text-dim: rgba(255,255,255,0.45); --accent-soft: rgba(38,51,116,0.18); }
+    [data-theme="day"] { --surface: #FAFBFC; --surface-raised: #FFFFFF; --border: rgba(0,0,0,0.08); --text: #1A2340; --text-dim: rgba(0,0,0,0.5); --accent-soft: rgba(0,0,0,0.02); }
+    [data-theme="night"] { --surface: #FFFFFF; --surface-raised: rgba(0,0,0,0.02); --border: rgba(0,0,0,0.06); --text: #E0E4ED; --text-dim: rgba(0,0,0,0.40); --accent-soft: rgba(0,0,0,0.04); }
 
     /* ── Modern interaction utilities ── */
 
@@ -259,7 +259,7 @@ export function injectUxAnimations() {
     }
     .cs-btn-primary:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(38,51,116,0.35);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
       filter: brightness(1.08);
     }
     .cs-btn-primary:active { transform: translateY(0); box-shadow: none; }
@@ -268,8 +268,8 @@ export function injectUxAnimations() {
       transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
     }
     .cs-btn-secondary:hover {
-      border-color: rgba(38,51,116,0.55) !important;
-      background: rgba(38,51,116,0.08) !important;
+      border-color: rgba(0,0,0,0.12) !important;
+      background: rgba(0,0,0,0.02) !important;
       transform: translateY(-1px);
     }
     .cs-btn-secondary:active { transform: translateY(0); }
@@ -286,20 +286,20 @@ export function injectUxAnimations() {
     /* Record card with status border */
     .cs-record-card {
       transition: box-shadow 0.2s ease, transform 0.16s ease, border-color 0.16s ease;
-      border-left: 3.5px solid var(--status-color, rgba(38,51,116,0.4));
+      border-left: 3.5px solid var(--status-color, rgba(0,0,0,0.10));
     }
     .cs-record-card:hover {
       transform: translateY(-1px);
       box-shadow: 0 6px 24px rgba(0,0,0,0.16);
-      border-left-color: var(--status-color, rgba(38,51,116,0.7));
+      border-left-color: var(--status-color, rgba(0,0,0,0.18));
     }
 
     /* CSV table styling */
     .cs-csv-header { font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .cs-csv-row:nth-child(even) { background: rgba(255,255,255,0.03); }
-    .cs-csv-row:nth-child(odd) { background: rgba(255,255,255,0.06); }
+    .cs-csv-row:nth-child(even) { background: rgba(0,0,0,0.015); }
+    .cs-csv-row:nth-child(odd) { background: rgba(0,0,0,0.03); }
     .cs-csv-row { transition: background 0.12s ease; }
-    .cs-csv-row:hover { background: rgba(38,51,116,0.08) !important; }
+    .cs-csv-row:hover { background: rgba(0,0,0,0.02) !important; }
 
     /* Recently viewed card enhancement */
     .cs-recent-card {
@@ -308,7 +308,7 @@ export function injectUxAnimations() {
     .cs-recent-card:hover {
       transform: translateY(-2px) scale(1.02);
       box-shadow: 0 6px 20px rgba(0,0,0,0.22);
-      border-color: rgba(38,51,116,0.4) !important;
+      border-color: rgba(0,0,0,0.10) !important;
     }
 
     /* Stage distribution bar segment */
@@ -322,8 +322,8 @@ export function injectUxAnimations() {
     }
     .cs-input:focus {
       outline: none;
-      border-color: rgba(38,51,116,0.65) !important;
-      box-shadow: 0 0 0 3px rgba(38,51,116,0.18);
+      border-color: rgba(0,0,0,0.15) !important;
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
     }
 
     /* Nav item smooth highlight */
@@ -331,7 +331,7 @@ export function injectUxAnimations() {
       transition: background 0.15s ease, color 0.15s ease, border-left-color 0.15s ease;
     }
     .cs-nav-item:hover {
-      background: rgba(38,51,116,0.08) !important;
+      background: rgba(0,0,0,0.02) !important;
     }
 
     /* Pill toggle */
@@ -339,7 +339,7 @@ export function injectUxAnimations() {
       transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     }
     .cs-pill:hover {
-      border-color: rgba(38,51,116,0.55) !important;
+      border-color: rgba(0,0,0,0.12) !important;
     }
 
     /* Status dot pulse for active states */
@@ -349,7 +349,7 @@ export function injectUxAnimations() {
 
     /* Gradient text utility */
     .cs-gradient-text {
-      background: linear-gradient(135deg, #FFD332 0%, #FFD332 60%, #60A5FA 100%);
+      background: linear-gradient(135deg, #111111 0%, #111111 60%, #60A5FA 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -364,15 +364,15 @@ export function injectUxAnimations() {
     /* Scrollbar modernisation */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(38,51,116,0.25); border-radius: 6px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(38,51,116,0.45); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 6px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.15); }
 
     /* Selection highlight */
-    ::selection { background: rgba(38,51,116,0.28); color: inherit; }
+    ::selection { background: rgba(0,0,0,0.08); color: inherit; }
 
     /* Smooth focus-visible ring for accessibility */
     :focus-visible {
-      outline: 2px solid rgba(38,51,116,0.70);
+      outline: 2px solid rgba(0,0,0,0.18);
       outline-offset: 2px;
     }
   `;

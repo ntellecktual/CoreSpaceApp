@@ -82,7 +82,7 @@ export const LabeledInput = React.memo(function LabeledInput({
 }) {
   const { mode, styles } = useUiTheme();
   const inputLabel = label.replace('*', '').trim();
-  const inputSurfaceColor = mode === 'day' ? '#FFFFFF' : '#263374';
+  const inputSurfaceColor = '#FFFFFF';
   const thresholdTextColor = getContrastTextColor(inputSurfaceColor);
   const thresholdPlaceholderColor = withAlpha(thresholdTextColor, mode === 'day' ? '8A' : 'B8');
 

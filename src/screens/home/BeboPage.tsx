@@ -1,5 +1,5 @@
 /**
- * BeboPage — Seamless AI Chat Experience
+ * BeboPage â€” Seamless AI Chat Experience
  * Friendly, intuitive interface with industry verticals, inline AI chat,
  * rich card rendering, and one-click workspace/data apply.
  */
@@ -34,7 +34,7 @@ import {
 } from '../../ai/beboEngine';
 import { GuidedPageProps } from './types';
 
-// ─── Types ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface ChatMsg {
   id: string;
@@ -45,7 +45,7 @@ interface ChatMsg {
   timestamp: Date;
 }
 
-// ─── Scenario Config ──────────────────────────────────────────────────
+// â”€â”€â”€ Scenario Config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const VERTICALS: DemoVertical[] = ['pharma', 'sales', 'healthcare', 'logistics', 'legal', 'insurance', 'lifecycle', 'fulfillment', 'kitting'];
 
@@ -67,7 +67,7 @@ const DEMO_QUICK_PROMPTS: Record<DemoVertical, string[]> = {
   kitting:     ['Build Pick-Pack-Ship workspace', 'Generate fulfillment data', 'Show automation flows', 'Show Orbital'],
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function uid() {
   return `msg-${Date.now()}-${Math.floor(Math.random() * 99999)}`;
@@ -102,7 +102,7 @@ function MarkdownText({ text, bodyColor, subtleColor }: { text: string; bodyColo
             parts.push(<Text key={k++} style={{ color: bodyColor, fontWeight: '700' }}>{m[1]}</Text>);
             rem = rem.slice(m.index + m[0].length);
           } else {
-            parts.push(<Text key={k++} style={{ color: rem.startsWith('•') || rem.startsWith('*') ? subtleColor : bodyColor }}>{rem}</Text>);
+            parts.push(<Text key={k++} style={{ color: rem.startsWith('â€¢') || rem.startsWith('*') ? subtleColor : bodyColor }}>{rem}</Text>);
             break;
           }
         }
@@ -112,7 +112,7 @@ function MarkdownText({ text, bodyColor, subtleColor }: { text: string; bodyColo
   );
 }
 
-// ─── Card Components ──────────────────────────────────────────────────
+// â”€â”€â”€ Card Components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function WorkspaceProposalCard({
   card, onApply, applied, accent,
@@ -124,24 +124,24 @@ function WorkspaceProposalCard({
 }) {
   const totalSS = card.workspaces.reduce((a, w) => a + w.subSpaces.length, 0);
   return (
-    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 14 } as any}>
+    <View style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 14 } as any}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: `${accent}22`, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontSize: 18 }}>🗂️</Text>
+          <Text style={{ fontSize: 18 }}>ðŸ—‚ï¸</Text>
         </View>
-        <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 15, flex: 1 }}>{card.industry} — Workspace Blueprint</Text>
+        <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 15, flex: 1 }}>{card.industry} â€” Workspace Blueprint</Text>
       </View>
 
       {/* Workspaces */}
       <View style={{ gap: 8 }}>
         {card.workspaces.map((ws, wi) => (
-          <View key={wi} style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 12, gap: 6 }}>
+          <View key={wi} style={{ backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: 12, padding: 12, gap: 6 }}>
             <Text style={{ color: '#E0E4ED', fontWeight: '700', fontSize: 14 }}>{ws.icon} {ws.name}</Text>
             <Text style={{ color: 'rgba(232,228,255,0.50)', fontSize: 12 }}>Root Entity: {ws.rootEntity}</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 2 }}>
               {ws.subSpaces.map((ss, si) => (
                 <View key={si} style={{ backgroundColor: `${accent}18`, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
-                  <Text style={{ color: accent, fontSize: 11, fontWeight: '600' }}>{ss.name} · {ss.fieldCount} fields · {ss.displayType}</Text>
+                  <Text style={{ color: accent, fontSize: 11, fontWeight: '600' }}>{ss.name} Â· {ss.fieldCount} fields Â· {ss.displayType}</Text>
                 </View>
               ))}
             </View>
@@ -175,7 +175,7 @@ function WorkspaceProposalCard({
         } as any}
       >
         <Text style={{ color: applied ? '#22C55E' : '#FFFFFF', fontWeight: '700', fontSize: 15 }}>
-          {applied ? '✅  Applied to Halo Internal' : 'Apply Full Scenario  →'}
+          {applied ? 'âœ…  Applied to Halo Internal' : 'Apply Full Scenario  â†’'}
         </Text>
       </Pressable>
     </View>
@@ -186,16 +186,16 @@ function DataPreviewCard({ card, accent, vertical }: { card: BeboCardDataPreview
   const [fmt, setFmt] = useState<'csv' | 'json'>('csv');
   const slug = VERTICAL_META[vertical].shortLabel.toLowerCase();
   return (
-    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 12 } as any}>
+    <View style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 12 } as any}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14, flex: 1 }}>{card.title}</Text>
-        <View style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 }}>
+        <View style={{ backgroundColor: 'rgba(0,0,0,0.06)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 }}>
           <Text style={{ color: 'rgba(232,228,255,0.5)', fontSize: 12, fontWeight: '600' }}>{card.totalRows} records</Text>
         </View>
       </View>
 
       {/* Format toggle */}
-      <View style={{ flexDirection: 'row', gap: 6, backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: 3, alignSelf: 'flex-start' }}>
+      <View style={{ flexDirection: 'row', gap: 6, backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: 10, padding: 3, alignSelf: 'flex-start' }}>
         {(['csv', 'json'] as const).map(f => (
           <Pressable key={f} onPress={() => setFmt(f)}
             style={{ backgroundColor: fmt === f ? accent : 'transparent', borderRadius: 8, paddingHorizontal: 14, paddingVertical: 6 }}>
@@ -214,14 +214,14 @@ function DataPreviewCard({ card, accent, vertical }: { card: BeboCardDataPreview
               ))}
             </View>
             {card.rows.slice(0, 4).map((row, ri) => (
-              <View key={ri} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)', paddingVertical: 6 }}>
+              <View key={ri} style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.02)', paddingVertical: 6 }}>
                 {row.slice(0, 5).map((cell, ci) => (
                   <Text key={ci} numberOfLines={1} style={{ color: 'rgba(232,228,255,0.65)', fontSize: 11, width: 125, paddingHorizontal: 8 }}>{cell}</Text>
                 ))}
               </View>
             ))}
             <Text style={{ color: 'rgba(232,228,255,0.35)', fontSize: 11, paddingTop: 6, paddingHorizontal: 8 }}>
-              Showing 4 of {card.totalRows} rows · {card.headers.length} columns
+              Showing 4 of {card.totalRows} rows Â· {card.headers.length} columns
             </Text>
           </View>
         </ScrollView>
@@ -231,7 +231,7 @@ function DataPreviewCard({ card, accent, vertical }: { card: BeboCardDataPreview
       {fmt === 'json' && (
         <ScrollView style={{ maxHeight: 120, backgroundColor: 'rgba(0,0,0,0.20)', borderRadius: 10, padding: 10 }} showsVerticalScrollIndicator={false}>
           <Text style={{ color: 'rgba(232,228,255,0.65)', fontSize: 11, fontFamily: 'monospace' }}>
-            {card.jsonContent.slice(0, 500)}{card.jsonContent.length > 500 ? '\n…' : ''}
+            {card.jsonContent.slice(0, 500)}{card.jsonContent.length > 500 ? '\nâ€¦' : ''}
           </Text>
         </ScrollView>
       )}
@@ -239,16 +239,16 @@ function DataPreviewCard({ card, accent, vertical }: { card: BeboCardDataPreview
       {/* Actions */}
       <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
         <Pressable onPress={() => downloadFile(card.csvContent, `halointernal-${slug}.csv`, 'text/csv')}
-          style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 }}>
-          <Text style={{ color: 'rgba(232,228,255,0.70)', fontSize: 12, fontWeight: '600' }}>⬇ CSV</Text>
+          style={{ backgroundColor: 'rgba(0,0,0,0.04)', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 }}>
+          <Text style={{ color: 'rgba(232,228,255,0.70)', fontSize: 12, fontWeight: '600' }}>â¬‡ CSV</Text>
         </Pressable>
         <Pressable onPress={() => downloadFile(card.jsonContent, `halointernal-${slug}.json`, 'application/json')}
-          style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 }}>
-          <Text style={{ color: 'rgba(232,228,255,0.70)', fontSize: 12, fontWeight: '600' }}>⬇ JSON</Text>
+          style={{ backgroundColor: 'rgba(0,0,0,0.04)', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 }}>
+          <Text style={{ color: 'rgba(232,228,255,0.70)', fontSize: 12, fontWeight: '600' }}>â¬‡ JSON</Text>
         </Pressable>
         <Pressable onPress={() => downloadFile(card.csvContent, `halointernal-${slug}.csv`, 'text/csv')}
           style={{ backgroundColor: `${accent}22`, borderWidth: 1, borderColor: `${accent}55`, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 } as any}>
-          <Text style={{ color: accent, fontSize: 12, fontWeight: '600' }}>🌐 Import to Cosmograph</Text>
+          <Text style={{ color: accent, fontSize: 12, fontWeight: '600' }}>ðŸŒ Import to Cosmograph</Text>
         </Pressable>
       </View>
     </View>
@@ -257,21 +257,21 @@ function DataPreviewCard({ card, accent, vertical }: { card: BeboCardDataPreview
 
 function IntegrationStatusCard({ card, accent }: { card: BeboCardIntegrationStatus; accent: string }) {
   return (
-    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 12 } as any}>
-      <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>🔗 Orbital Integrations</Text>
+    <View style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 12 } as any}>
+      <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>ðŸ”— Orbital Integrations</Text>
       <View style={{ gap: 8 }}>
         {card.integrations.map((intg, i) => (
-          <View key={i} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 12, gap: 10 }}>
+          <View key={i} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: 12, padding: 12, gap: 10 }}>
             <Text style={{ fontSize: 20 }}>{intg.icon}</Text>
             <View style={{ flex: 1 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Text style={{ color: '#E0E4ED', fontWeight: '700', fontSize: 13 }}>{intg.name}</Text>
-                <View style={{ backgroundColor: intg.status === 'active' ? 'rgba(34,197,94,0.18)' : 'rgba(255,255,255,0.08)', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 }}>
+                <View style={{ backgroundColor: intg.status === 'active' ? 'rgba(34,197,94,0.18)' : 'rgba(0,0,0,0.06)', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 }}>
                   <Text style={{ color: intg.status === 'active' ? '#22C55E' : 'rgba(232,228,255,0.45)', fontSize: 10, fontWeight: '700', textTransform: 'uppercase' as any }}>{intg.status}</Text>
                 </View>
               </View>
               <Text style={{ color: 'rgba(232,228,255,0.45)', fontSize: 11, marginTop: 2 }}>
-                {intg.status === 'active' ? `${intg.lastSync} · ${intg.eventsToday} events today` : `${intg.category} · Ready to activate`}
+                {intg.status === 'active' ? `${intg.lastSync} Â· ${intg.eventsToday} events today` : `${intg.category} Â· Ready to activate`}
               </Text>
             </View>
             {intg.status === 'active' && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#22C55E' }} />}
@@ -291,11 +291,11 @@ function SignalFlowsCard({
   accent: string;
 }) {
   return (
-    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 12 } as any}>
-      <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>⚡ Automation Flows</Text>
+    <View style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 12 } as any}>
+      <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>âš¡ Automation Flows</Text>
       <View style={{ gap: 10 }}>
         {card.flows.map((fl, i) => (
-          <View key={i} style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 12, gap: 6 }}>
+          <View key={i} style={{ backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: 12, padding: 12, gap: 6 }}>
             <Text style={{ color: '#E0E4ED', fontWeight: '700', fontSize: 13 }}>{fl.name}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
               <View style={{ backgroundColor: 'rgba(59,130,246,0.18)', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 }}>
@@ -318,7 +318,7 @@ function SignalFlowsCard({
         style={{ backgroundColor: applied ? 'rgba(34,197,94,0.16)' : `${accent}dd`, borderWidth: 1, borderColor: applied ? '#22C55E' : 'transparent', borderRadius: 12, paddingVertical: 12, alignItems: 'center' } as any}
       >
         <Text style={{ color: applied ? '#22C55E' : '#FFFFFF', fontWeight: '700', fontSize: 13 }}>
-          {applied ? '✅  Flows Published' : '⚡  Publish All Flows'}
+          {applied ? 'âœ…  Flows Published' : 'âš¡  Publish All Flows'}
         </Text>
       </Pressable>
     </View>
@@ -327,15 +327,15 @@ function SignalFlowsCard({
 
 function StatsCard({ card, accent }: { card: BeboCardStats; accent: string }) {
   return (
-    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 12 } as any}>
-      <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>📊 Platform Analytics</Text>
+    <View style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderWidth: 1, borderColor: `${accent}44`, borderRadius: 16, padding: 18, marginTop: 10, gap: 12 } as any}>
+      <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>ðŸ“Š Platform Analytics</Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
         {card.stats.map((s, i) => (
-          <View key={i} style={{ backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: 14, minWidth: 130, flex: 1, gap: 4 }}>
+          <View key={i} style={{ backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: 14, padding: 14, minWidth: 130, flex: 1, gap: 4 }}>
             <Text style={{ fontSize: 20 }}>{s.icon}</Text>
             <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: 22, letterSpacing: -0.5 }}>{s.value}</Text>
             <Text style={{ color: 'rgba(232,228,255,0.55)', fontSize: 12 }}>{s.label}</Text>
-            {s.delta && <Text style={{ color: s.positive ? '#22C55E' : '#F87171', fontSize: 11, fontWeight: '600' }}>{s.positive ? '↑' : '↓'} {s.delta}</Text>}
+            {s.delta && <Text style={{ color: s.positive ? '#22C55E' : '#F87171', fontSize: 11, fontWeight: '600' }}>{s.positive ? 'â†‘' : 'â†“'} {s.delta}</Text>}
           </View>
         ))}
       </View>
@@ -352,9 +352,9 @@ function ArchitectureCard({
   accent: string;
 }) {
   return (
-    <View style={{ backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 16, padding: 18, gap: 14, borderWidth: 1, borderColor: `${accent}30` }}>
+    <View style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: 16, padding: 18, gap: 14, borderWidth: 1, borderColor: `${accent}30` }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <Text style={{ fontSize: 22 }}>🏗️</Text>
+        <Text style={{ fontSize: 22 }}>ðŸ—ï¸</Text>
         <View style={{ flex: 1 }}>
           <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 16 }}>Business Architecture</Text>
           <Text style={{ color: '#9CA3AF', fontSize: 12 }}>{card.industry}</Text>
@@ -402,7 +402,7 @@ function ArchitectureCard({
         style={{ backgroundColor: applied ? '#22C55E' : accent, borderRadius: 12, paddingVertical: 14, alignItems: 'center' }}
       >
         <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 15 }}>
-          {applied ? '✅  Architecture Applied' : 'Apply Architecture  →'}
+          {applied ? 'âœ…  Architecture Applied' : 'Apply Architecture  â†’'}
         </Text>
       </Pressable>
     </View>
@@ -426,7 +426,7 @@ function CardRenderer({
   }
 }
 
-// ─── Main BeboPage ────────────────────────────────────────────────────
+// â”€â”€â”€ Main BeboPage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPageProps) {
   const { mode } = useUiTheme();
@@ -449,25 +449,25 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     ? {
         bg: '#0F0B1B',
         headerBg: 'rgba(15,11,27,0.96)',
-        headerBorder: 'rgba(255,255,255,0.08)',
-        msgBg: 'rgba(255,255,255,0.04)',
-        msgBorder: 'rgba(255,255,255,0.08)',
-        inputBg: 'rgba(255,255,255,0.05)',
-        inputBorder: 'rgba(255,255,255,0.10)',
+        headerBorder: 'rgba(0,0,0,0.06)',
+        msgBg: 'rgba(0,0,0,0.02)',
+        msgBorder: 'rgba(0,0,0,0.06)',
+        inputBg: 'rgba(0,0,0,0.03)',
+        inputBorder: 'rgba(0,0,0,0.08)',
         inputText: '#FFFFFF',
-        placeholder: 'rgba(255,255,255,0.28)',
+        placeholder: 'rgba(0,0,0,0.25)',
         bodyText: 'rgba(232,228,255,0.84)',
         subtleText: 'rgba(232,228,255,0.48)',
-        chipBg: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
-        chipBorder: 'rgba(255,255,255,0.10)',
+        chipBg: isDark ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.05)',
+        chipBorder: 'rgba(0,0,0,0.08)',
       }
     : {
         bg: '#F4F2FF',
         headerBg: 'rgba(255,255,255,0.97)',
         headerBorder: 'rgba(102,74,154,0.12)',
-        msgBg: 'rgba(255,255,255,0.88)',
+        msgBg: 'rgba(255,255,255,0.92)',
         msgBorder: 'rgba(102,74,154,0.12)',
-        inputBg: 'rgba(255,255,255,0.92)',
+        inputBg: 'rgba(255,255,255,0.96)',
         inputBorder: 'rgba(102,74,154,0.20)',
         inputText: '#1A2340',
         placeholder: 'rgba(30,21,53,0.35)',
@@ -488,14 +488,14 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
   }, [messages, isThinking]);
 
-  // ── Scenario switch ─────────────────────────────────────────────────
+  // â”€â”€ Scenario switch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const switchVertical = useCallback((v: DemoVertical) => {
     setVertical(v);
     const resp = getScenarioIntroResponse(v);
     setMessages(prev => [...prev, { id: uid(), role: 'assistant', text: resp.text, cards: resp.cards, quickReplies: resp.quickReplies, timestamp: new Date() }]);
   }, []);
 
-  // ── Send message ────────────────────────────────────────────────────
+  // â”€â”€ Send message â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const sendMessage = useCallback((text: string) => {
     if (!text.trim() || isThinking) return;
     setMessages(prev => [...prev, { id: uid(), role: 'user', text: text.trim(), cards: [], quickReplies: [], timestamp: new Date() }]);
@@ -509,8 +509,8 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     }, delay);
   }, [isThinking, vertical]);
 
-  // ── Universal Tenant Org Layer ─────────────────────────────────────
-  // Universal is NOT a template — it is the standard org scaffold that comes
+  // â”€â”€ Universal Tenant Org Layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Universal is NOT a template â€” it is the standard org scaffold that comes
   // with every tenant. Operations holds the active vertical's workspaces.
   // All other departments are empty containers ready to accept workspaces.
   const handleUniversalSuite = useCallback(() => {
@@ -521,10 +521,10 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     const wsCard: BeboCardWorkspaceProposal = {
       type: 'workspace_proposal',
       id: `card-universal-${Date.now()}`,
-      industry: 'Tenant Org Layer — Universal',
+      industry: 'Tenant Org Layer â€” Universal',
       workspaces: scaffold.workspaces.map(ws => ({
         name: ws.name,
-        icon: ws.icon ?? '🗂️',
+        icon: ws.icon ?? 'ðŸ—‚ï¸',
         rootEntity: ws.rootEntity,
         subSpaces: (ws.subSpaces ?? []).map(ss => ({
           name: ss.name,
@@ -542,7 +542,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     setMessages(prev => [...prev, {
       id: uid(),
       role: 'assistant',
-      text: `🌐 **Universal is your tenant's org layer** — it ships with every Halo Internal tenant automatically. It is not a template.\n\n**How it works:**\n• **⚙️ Operations** contains your active vertical's workspaces (currently ${icon} **${label}**)\n• **💰 Finance · 👥 HR · 📣 Marketing · 📈 Sales · ⚖️ Legal · 💻 IT · 🌱 Sustainability** — all empty department containers, each ready to accept workspaces as your org grows\n\nAny workspace — whether from a vertical template or manually created — is placed into the department it belongs to. Operations is where your vertical's core workspaces live.\n\n**6 cross-department signal flows are pre-wired** and activate as departments are built out:\n• Deal Won → Finance invoice + CS onboarding\n• New Hire → IT provisioning + HR onboarding checklist\n• Contract Expiry → Legal renewal task\n• Overdue Invoice → Finance Director escalation\n• P1 Incident → IT war room + status page update\n• ESG Deadline → Sustainability team alert`,
+      text: `ðŸŒ **Universal is your tenant's org layer** â€” it ships with every Halo Internal tenant automatically. It is not a template.\n\n**How it works:**\nâ€¢ **âš™ï¸ Operations** contains your active vertical's workspaces (currently ${icon} **${label}**)\nâ€¢ **ðŸ’° Finance Â· ðŸ‘¥ HR Â· ðŸ“£ Marketing Â· ðŸ“ˆ Sales Â· âš–ï¸ Legal Â· ðŸ’» IT Â· ðŸŒ± Sustainability** â€” all empty department containers, each ready to accept workspaces as your org grows\n\nAny workspace â€” whether from a vertical template or manually created â€” is placed into the department it belongs to. Operations is where your vertical's core workspaces live.\n\n**6 cross-department signal flows are pre-wired** and activate as departments are built out:\nâ€¢ Deal Won â†’ Finance invoice + CS onboarding\nâ€¢ New Hire â†’ IT provisioning + HR onboarding checklist\nâ€¢ Contract Expiry â†’ Legal renewal task\nâ€¢ Overdue Invoice â†’ Finance Director escalation\nâ€¢ P1 Incident â†’ IT war room + status page update\nâ€¢ ESG Deadline â†’ Sustainability team alert`,
       cards: [wsCard],
       quickReplies: [
         `View ${label} workspaces in Operations`,
@@ -555,7 +555,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
   }, [vertical]);
 
-  // ── Apply payload ───────────────────────────────────────────────────
+  // â”€â”€ Apply payload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleApply = useCallback((payload: ScenarioApplyPayload, cardId: string) => {
     if (payload.shellConfig && appState.data.shellConfig) {
       appState.upsertShellConfig({ ...appState.data.shellConfig, ...payload.shellConfig });
@@ -574,35 +574,35 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
     setMessages(prev => [...prev, {
       id: uid(),
       role: 'assistant',
-      text: `✅ **Applied!** Your **${icon} ${label}** scenario is now live across Halo Internal.\n\n• **${payload.workspaces.length}** workspace${payload.workspaces.length !== 1 ? 's' : ''} created in Admin\n• **${payload.records.length}** records added to End User\n• **${(payload.clients?.length ?? 0)}** collection${(payload.clients?.length ?? 0) !== 1 ? 's' : ''} created\n• **${payload.flows.length}** Signal flows published\n• **${payload.integrations.length}** Orbital integrations activated${(payload.businessFunctions?.length ?? 0) > 0 ? `\n• **${payload.businessFunctions!.length}** department${payload.businessFunctions!.length !== 1 ? 's' : ''} loaded in Architecture` : ''}\n• Shell labels updated to ${label} terminology\n\nNavigate to **Admin** → Workspace Design to inspect the structure, or go to **End User** to interact with live ${label.toLowerCase()} data.`,
+      text: `âœ… **Applied!** Your **${icon} ${label}** scenario is now live across Halo Internal.\n\nâ€¢ **${payload.workspaces.length}** workspace${payload.workspaces.length !== 1 ? 's' : ''} created in Admin\nâ€¢ **${payload.records.length}** records added to End User\nâ€¢ **${(payload.clients?.length ?? 0)}** collection${(payload.clients?.length ?? 0) !== 1 ? 's' : ''} created\nâ€¢ **${payload.flows.length}** Signal flows published\nâ€¢ **${payload.integrations.length}** Orbital integrations activated${(payload.businessFunctions?.length ?? 0) > 0 ? `\nâ€¢ **${payload.businessFunctions!.length}** department${payload.businessFunctions!.length !== 1 ? 's' : ''} loaded in Architecture` : ''}\nâ€¢ Shell labels updated to ${label} terminology\n\nNavigate to **Admin** â†’ Workspace Design to inspect the structure, or go to **End User** to interact with live ${label.toLowerCase()} data.`,
       cards: [],
       quickReplies: ['Generate more sample data', 'Show platform analytics', 'Customize workspace fields', 'Try another scenario'],
       timestamp: new Date(),
     }]);
 
     if (addNotification) {
-      addNotification({ type: 'system', severity: 'success', title: `${icon} ${label} applied!`, body: `${payload.workspaces.length} workspaces · ${payload.records.length} records · ${payload.flows.length} flows are now live.` });
+      addNotification({ type: 'system', severity: 'success', title: `${icon} ${label} applied!`, body: `${payload.workspaces.length} workspaces Â· ${payload.records.length} records Â· ${payload.flows.length} flows are now live.` });
     }
   }, [appState, vertical, addNotification]);
 
-  // ─── Render ──────────────────────────────────────────────────────────
+  // â”€â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <View style={{ flex: 1, backgroundColor: pal.bg }}>
 
-      {/* ── Sticky Header ── */}
+      {/* â”€â”€ Sticky Header â”€â”€ */}
       <View style={{ backgroundColor: pal.headerBg, borderBottomWidth: 1, borderBottomColor: pal.headerBorder, paddingTop: 14, paddingBottom: 10, paddingHorizontal: compact ? 12 : 22, gap: 10, backdropFilter: 'blur(20px)', zIndex: 10 } as any}>
 
         {/* Title row */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <View style={{ width: 42, height: 42, borderRadius: 21, backgroundColor: `${accent}22`, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: `${accent}55` } as any}>
-            <Text style={{ fontSize: 22 }}>✦</Text>
+            <Text style={{ fontSize: 22 }}>âœ¦</Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={{ color: isDark ? '#FFFFFF' : '#1A2340', fontWeight: '800', fontSize: 18, letterSpacing: -0.3 }}>Bebo AI</Text>
-            <Text style={{ color: pal.subtleText, fontSize: 12, lineHeight: 16 }}>Your AI assistant — ask anything or pick an industry below</Text>
+            <Text style={{ color: pal.subtleText, fontSize: 12, lineHeight: 16 }}>Your AI assistant â€” ask anything or pick an industry below</Text>
           </View>
           {!!VERTICAL_META[vertical].tenantLogo && (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)' } as any}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: isDark ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.04)', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5, borderWidth: 1, borderColor: isDark ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.08)' } as any}>
               <Image source={{ uri: VERTICAL_META[vertical].tenantLogo }} style={{ width: 52, height: 18, resizeMode: 'contain' } as any} />
             </View>
           )}
@@ -613,7 +613,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
           )}
         </View>
 
-        {/* Scenario tabs — friendly labels, bigger pills */}
+        {/* Scenario tabs â€” friendly labels, bigger pills */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -4 }}>
           <View style={{ flexDirection: 'row', gap: 6, paddingHorizontal: 4 }}>
             {VERTICALS.map(v => {
@@ -637,24 +637,24 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
                 </Pressable>
               );
             })}
-            {/* Org layer button — inline with vertical tabs for discoverability */}
+            {/* Org layer button â€” inline with vertical tabs for discoverability */}
             <Pressable
               onPress={handleUniversalSuite}
               style={{
                 flexDirection: 'row', alignItems: 'center', gap: 6,
-                backgroundColor: isDark ? 'rgba(38,51,116,0.14)' : 'rgba(38,51,116,0.08)',
-                borderWidth: 1, borderColor: 'rgba(38,51,116,0.30)',
+                backgroundColor: isDark ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.02)',
+                borderWidth: 1, borderColor: 'rgba(0,0,0,0.10)',
                 borderRadius: 10, paddingHorizontal: 12, paddingVertical: 7,
               } as any}
             >
-              <Text style={{ fontSize: 14 }}>🌐</Text>
-              <Text style={{ color: isDark ? '#FFD332' : '#263374', fontSize: 13, fontWeight: '600' }}>Org Layer</Text>
+              <Text style={{ fontSize: 14 }}>ðŸŒ</Text>
+              <Text style={{ color: isDark ? '#111111' : '#111111', fontSize: 13, fontWeight: '600' }}>Org Layer</Text>
             </Pressable>
           </View>
         </ScrollView>
       </View>
 
-      {/* ── Messages ── */}
+      {/* â”€â”€ Messages â”€â”€ */}
       <ScrollView
         ref={scrollRef}
         style={{ flex: 1 }}
@@ -672,7 +672,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
                 {/* Bot label row */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 6 }}>
                   <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: `${accent}22`, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ fontSize: 11 }}>✦</Text>
+                    <Text style={{ fontSize: 11 }}>âœ¦</Text>
                   </View>
                   <Text style={{ color: accent, fontSize: 12, fontWeight: '700' }}>Bebo</Text>
                   <Text style={{ color: pal.subtleText, fontSize: 10 }}>{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
@@ -693,7 +693,7 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
                   ))}
                 </View>
 
-                {/* Quick replies — larger, more obvious */}
+                {/* Quick replies â€” larger, more obvious */}
                 {msg.quickReplies.length > 0 && (
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
                     <View style={{ flexDirection: 'row', gap: 7, paddingRight: 8 }}>
@@ -714,12 +714,12 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
           </View>
         ))}
 
-        {/* Thinking indicator — animated bouncing dots */}
+        {/* Thinking indicator â€” animated bouncing dots */}
         {isThinking && (
           <View style={{ alignItems: 'flex-start', gap: 6 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7, marginBottom: 5 }}>
               <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: `${accent}22`, alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontSize: 11 }}>✦</Text>
+                <Text style={{ fontSize: 11 }}>âœ¦</Text>
               </View>
               <Text style={{ color: accent, fontSize: 12, fontWeight: '700' }}>Bebo</Text>
             </View>
@@ -739,9 +739,9 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
         )}
       </ScrollView>
 
-      {/* ── Input Bar — prominent, ChatGPT-like ── */}
+      {/* â”€â”€ Input Bar â€” prominent, ChatGPT-like â”€â”€ */}
       <View style={{ backgroundColor: pal.headerBg, borderTopWidth: 1, borderTopColor: pal.headerBorder, padding: compact ? 12 : 16, gap: 10, backdropFilter: 'blur(20px)' } as any}>
-        {/* Quick prompt chips — bigger and more inviting */}
+        {/* Quick prompt chips â€” bigger and more inviting */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={{ flexDirection: 'row', gap: 7 }}>
             {DEMO_QUICK_PROMPTS[vertical].map((qa, i) => (
@@ -786,12 +786,12 @@ export function BeboPage({ guidedMode, onGuide, addNotification }: GuidedPagePro
               width: 48,
               height: 48,
               borderRadius: 14,
-              backgroundColor: input.trim() && !isThinking ? accent : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+              backgroundColor: input.trim() && !isThinking ? accent : isDark ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.08)',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Text style={{ fontSize: 20, color: input.trim() && !isThinking ? '#FFFFFF' : pal.subtleText }}>↑</Text>
+            <Text style={{ fontSize: 20, color: input.trim() && !isThinking ? '#FFFFFF' : pal.subtleText }}>â†‘</Text>
           </Pressable>
         </View>
       </View>

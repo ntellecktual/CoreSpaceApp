@@ -69,7 +69,7 @@ export const BoardView = React.memo(function BoardView({
 }) {
   const { mode } = useUiTheme();
   const isDark = mode === 'night';
-  const accent = accentColor ?? (isDark ? '#FFD332' : '#FFD332');
+  const accent = accentColor ?? (isDark ? '#111111' : '#111111');
 
   const columns = useMemo(() => deriveColumns(records, subSpace), [records, subSpace]);
 
@@ -79,8 +79,8 @@ export const BoardView = React.memo(function BoardView({
   const colBorder = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
   const textColor = isDark ? '#E0E4ED' : '#1A2340';
   const dimText = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
-  const countBg = isDark ? 'rgba(38,51,116,0.2)' : 'rgba(38,51,116,0.12)';
-  const countText = isDark ? '#FFD332' : '#FFD332';
+  const countBg = isDark ? 'rgba(38,51,116,0.2)' : 'rgba(0,0,0,0.03)';
+  const countText = isDark ? '#111111' : '#111111';
 
   /* ── DnD state ── */
   const [dragOverCol, setDragOverCol] = useState<string | null>(null);

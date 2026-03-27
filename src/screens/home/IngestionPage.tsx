@@ -1,5 +1,5 @@
 /**
- * IngestionPage — WS-048: Event Listener & Document Ingestion
+ * IngestionPage Ã¢â‚¬â€ WS-048: Event Listener & Document Ingestion
  *
  * The universal ingestion layer. Accepts OCR, CSV, EDI, and webhook-format
  * data, normalises it to a common field map, and fires events that start the
@@ -11,7 +11,7 @@
  *   - Confidence scores drive automatic processing vs. Mission Control routing.
  *   - Structured sources (CSV, EDI, webhook) always have confidence = 1.0.
  *
- * Ingestion → Mission Control routing (WS-048-ADD):
+ * Ingestion Ã¢â€ â€™ Mission Control routing (WS-048-ADD):
  *   - Records below confidence threshold appear in the Mission Control review
  *     queue in FinancialPage. The reviewer confirms or corrects each field.
  *   - On confirmation, the downstream chain fires as if auto-processed.
@@ -37,45 +37,45 @@ import {
 import { Card } from './components';
 import { GuidedPageProps } from './types';
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Constants Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 type IngTab = 'pipeline' | 'sources' | 'mappings' | 'presence';
 type SourceSubTab = 'ocr' | 'csv' | 'edi' | 'webhook';
 
 const ING_TABS: { id: IngTab; label: string; icon: string; description: string }[] = [
-  { id: 'pipeline',  label: 'Pipeline',       icon: '🔄', description: 'All ingestion records, confidence scores, and review status' },
-  { id: 'sources',   label: 'Sources',         icon: '📡', description: 'Configure ingestion source endpoints by format' },
-  { id: 'mappings',  label: 'Field Mappings',  icon: '🗺️', description: 'Map extracted keys to Halo Internal field slugs per document type' },
-  { id: 'presence',  label: 'Presence',        icon: '👥', description: 'Active users and routing availability (WS-048 v2.1)' },
+  { id: 'pipeline',  label: 'Pipeline',       icon: 'Ã°Å¸â€â€ž', description: 'All ingestion records, confidence scores, and review status' },
+  { id: 'sources',   label: 'Sources',         icon: 'Ã°Å¸â€œÂ¡', description: 'Configure ingestion source endpoints by format' },
+  { id: 'mappings',  label: 'Field Mappings',  icon: 'Ã°Å¸â€”ÂºÃ¯Â¸Â', description: 'Map extracted keys to Halo Internal field slugs per document type' },
+  { id: 'presence',  label: 'Presence',        icon: 'Ã°Å¸â€˜Â¥', description: 'Active users and routing availability (WS-048 v2.1)' },
 ];
 
 const FORMAT_INFO: Record<IngestionFormat, { label: string; icon: string; description: string; confidenceNote: string }> = {
   ocr: {
     label: 'OCR',
-    icon: '📄',
-    description: 'PDF invoices, settlement statements, court documents, EOBs — any image or non-machine-readable document.',
+    icon: 'Ã°Å¸â€œâ€ž',
+    description: 'PDF invoices, settlement statements, court documents, EOBs Ã¢â‚¬â€ any image or non-machine-readable document.',
     confidenceNote: 'Confidence computed per field. Fields below threshold are flagged for Mission Control review.',
   },
   csv: {
     label: 'CSV',
-    icon: '📊',
+    icon: 'Ã°Å¸â€œÅ ',
     description: 'Bank statement exports, payment processor exports, bulk invoice uploads, inventory feeds.',
-    confidenceNote: 'Structured flat file — all fields confirmed at 1.0. Column headers mapped in source configuration.',
+    confidenceNote: 'Structured flat file Ã¢â‚¬â€ all fields confirmed at 1.0. Column headers mapped in source configuration.',
   },
   edi: {
     label: 'EDI',
-    icon: '🔗',
+    icon: 'Ã°Å¸â€â€”',
     description: 'Healthcare claims (837/835), supply chain (810/850/856), financial transactions. Trading partner formats.',
-    confidenceNote: 'Standardised structure — all fields confirmed at 1.0. Transaction types defined per trading partner.',
+    confidenceNote: 'Standardised structure Ã¢â‚¬â€ all fields confirmed at 1.0. Transaction types defined per trading partner.',
   },
   webhook: {
     label: 'Webhook',
-    icon: '⚡',
+    icon: 'Ã¢Å¡Â¡',
     description: 'Payment processor callbacks (Stripe, ACH), e-signature completions, CRM events, any system posting JSON to a URL.',
-    confidenceNote: 'Structured event payload — all fields confirmed at 1.0. JSON path mappings defined per source.',
+    confidenceNote: 'Structured event payload Ã¢â‚¬â€ all fields confirmed at 1.0. JSON path mappings defined per source.',
   },
 };
 
-const ACCENT = '#06B6D4';   // Cyan — distinct from Financial amber (#F59E0B) and platform purple (#FFD332)
+const ACCENT = '#06B6D4';   // Cyan Ã¢â‚¬â€ distinct from Financial amber (#F59E0B) and platform purple (#FFD332)
 const SUCCESS = '#10B981';
 const DANGER = '#EF4444';
 const WARN = '#F59E0B';
@@ -118,7 +118,7 @@ function PresenceDot({ status }: { status: UserPresence['activityStatus'] }) {
   return <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors[status] ?? '#8878AE' }} />;
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Main Component Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 export function IngestionPage({}: GuidedPageProps) {
   const { data, addIngestionRecord, confirmIngestionRecord, rejectIngestionRecord, updateIngestionSourceConfig } = useAppState();
   const { styles } = useUiTheme();
@@ -126,12 +126,12 @@ export function IngestionPage({}: GuidedPageProps) {
   const [tab, setTab] = useState<IngTab>('pipeline');
   const [sourceSubTab, setSourceSubTab] = useState<SourceSubTab>('ocr');
 
-  // ── Simulate OCR upload form ──────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Simulate OCR upload form Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const [ocrDocType, setOcrDocType] = useState('');
   const [ocrSourceRef, setOcrSourceRef] = useState('ap-ocr-upload');
   const [ocrSimConfidence, setOcrSimConfidence] = useState('0.92');
 
-  // ── New source config form ────────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ New source config form Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   const [newSourceName, setNewSourceName] = useState('');
   const [newSourceRef, setNewSourceRef] = useState('');
   const [newSourceEvent, setNewSourceEvent] = useState('ingestion.payable_received');
@@ -146,7 +146,7 @@ export function IngestionPage({}: GuidedPageProps) {
   const autoProcessed = ingestionRecords.filter((r) => r.reviewStatus === 'auto_processed');
   const reviewed = ingestionRecords.filter((r) => r.reviewStatus === 'reviewed');
 
-  // ── Simulate an OCR ingestion record ─────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬ Simulate an OCR ingestion record Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   function handleSimulateOcr() {
     const conf = parseFloat(ocrSimConfidence);
     if (isNaN(conf) || conf < 0 || conf > 1) return;
@@ -179,7 +179,7 @@ export function IngestionPage({}: GuidedPageProps) {
     setOcrDocType('');
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   function renderTabBar() {
     return (
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexShrink: 0 }} contentContainerStyle={{ gap: 6, padding: 2, paddingBottom: 4 }}>
@@ -190,8 +190,8 @@ export function IngestionPage({}: GuidedPageProps) {
             <Pressable key={t.id} onPress={() => setTab(t.id)} style={{
               flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8,
               borderRadius: 10, borderWidth: 1,
-              borderColor: active ? `${ACCENT}88` : 'rgba(255,255,255,0.1)',
-              backgroundColor: active ? `${ACCENT}18` : 'rgba(255,255,255,0.04)',
+              borderColor: active ? `${ACCENT}88` : 'rgba(0,0,0,0.08)',
+              backgroundColor: active ? `${ACCENT}18` : 'rgba(0,0,0,0.02)',
             }}>
               <Text style={{ fontSize: 14 }}>{t.icon}</Text>
               <Text style={{ color: active ? ACCENT : 'rgba(243,234,255,0.6)', fontSize: 13, fontWeight: active ? '700' : '500' }}>{t.label}</Text>
@@ -207,16 +207,16 @@ export function IngestionPage({}: GuidedPageProps) {
     );
   }
 
-  // ─── Pipeline Tab ─────────────────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Pipeline Tab Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   function renderPipeline() {
     return (
       <View style={{ gap: 16 }}>
         {/* Architecture callout */}
         <View style={{ borderRadius: 12, padding: 14, backgroundColor: `${ACCENT}10`, borderWidth: 1, borderColor: `${ACCENT}30` }}>
-          <Text style={{ color: ACCENT, fontSize: 13, fontWeight: '700', marginBottom: 4 }}>INGESTION PIPELINE — WS-048</Text>
+          <Text style={{ color: ACCENT, fontSize: 13, fontWeight: '700', marginBottom: 4 }}>INGESTION PIPELINE Ã¢â‚¬â€ WS-048</Text>
           <Text style={{ color: 'rgba(243,234,255,0.6)', fontSize: 12, lineHeight: 18 }}>
             Every external data arrival is persisted as an ingestion record before any event fires.
-            OCR documents receive per-field confidence scores — fields below threshold route to{' '}
+            OCR documents receive per-field confidence scores Ã¢â‚¬â€ fields below threshold route to{' '}
             <Text style={{ color: WARN, fontWeight: '700' }}>Mission Control</Text> for human review.
             Structured sources (CSV, EDI, webhook) always confirm at 100%.
           </Text>
@@ -238,7 +238,7 @@ export function IngestionPage({}: GuidedPageProps) {
         </View>
 
         {/* Simulate incoming OCR record */}
-        <Card title="🧪 Simulate Incoming OCR Document">
+        <Card title="Ã°Å¸Â§Âª Simulate Incoming OCR Document">
           <Text style={{ color: 'rgba(243,234,255,0.5)', fontSize: 12, marginBottom: 10 }}>
             Simulates an OCR document arriving through the ingestion pipeline. Set confidence below 0.85 to trigger Mission Control routing.
           </Text>
@@ -257,7 +257,7 @@ export function IngestionPage({}: GuidedPageProps) {
             />
             <TextInput
               value={ocrSimConfidence} onChangeText={setOcrSimConfidence}
-              placeholder="Confidence (0.0–1.0)"
+              placeholder="Confidence (0.0Ã¢â‚¬â€œ1.0)"
               keyboardType="decimal-pad"
               placeholderTextColor="rgba(243,234,255,0.3)"
               style={[styles.inputField, { flex: 1 }]}
@@ -266,8 +266,8 @@ export function IngestionPage({}: GuidedPageProps) {
           {/* Threshold explanation */}
           <View style={{ flexDirection: 'row', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
             {[
-              { label: '≥ 0.85 → Auto-process', color: SUCCESS },
-              { label: '< 0.85 → Mission Control', color: DANGER },
+              { label: 'Ã¢â€°Â¥ 0.85 Ã¢â€ â€™ Auto-process', color: SUCCESS },
+              { label: '< 0.85 Ã¢â€ â€™ Mission Control', color: DANGER },
             ].map((h) => (
               <View key={h.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                 <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: h.color }} />
@@ -286,7 +286,7 @@ export function IngestionPage({}: GuidedPageProps) {
             <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 13 }}>No ingestion records yet.</Text>
           )}
           {ingestionRecords.slice(0, 20).map((rec) => (
-            <View key={rec.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)', gap: 8, marginBottom: 8 }}>
+            <View key={rec.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(0,0,0,0.015)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.04)', gap: 8, marginBottom: 8 }}>
               {/* Header */}
               <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
                 <View style={{ flex: 1 }}>
@@ -297,7 +297,7 @@ export function IngestionPage({}: GuidedPageProps) {
                       <Text style={{ color: ACCENT, fontSize: 10, fontWeight: '700' }}>{FORMAT_INFO[rec.sourceFormat].label}</Text>
                     </View>
                   </View>
-                  <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 11, marginTop: 2 }}>{rec.sourceRef} · {fmtDate(rec.receivedAt)}</Text>
+                  <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 11, marginTop: 2 }}>{rec.sourceRef} Ã‚Â· {fmtDate(rec.receivedAt)}</Text>
                 </View>
                 <View style={{ gap: 4, alignItems: 'flex-end' }}>
                   <ReviewStatusBadge status={rec.reviewStatus} />
@@ -308,7 +308,7 @@ export function IngestionPage({}: GuidedPageProps) {
               {/* Fields below threshold */}
               {rec.fieldsBelowThreshold && rec.fieldsBelowThreshold.length > 0 && (
                 <View style={{ borderRadius: 8, padding: 8, backgroundColor: `${DANGER}10`, borderWidth: 1, borderColor: `${DANGER}30`, gap: 4 }}>
-                  <Text style={{ color: DANGER, fontSize: 11, fontWeight: '700' }}>⚠ Fields Below Threshold — Human Review Required</Text>
+                  <Text style={{ color: DANGER, fontSize: 11, fontWeight: '700' }}>Ã¢Å¡Â  Fields Below Threshold Ã¢â‚¬â€ Human Review Required</Text>
                   {rec.fieldsBelowThreshold.map((f, i) => (
                     <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                       <Text style={{ color: 'rgba(243,234,255,0.6)', fontSize: 11 }}>{f.slug}</Text>
@@ -322,7 +322,7 @@ export function IngestionPage({}: GuidedPageProps) {
                 </View>
               )}
 
-              {/* Field map preview — show first 4 fields */}
+              {/* Field map preview Ã¢â‚¬â€ show first 4 fields */}
               <View style={{ gap: 3 }}>
                 {Object.entries(rec.fieldMap.fields).slice(0, 4).map(([slug, fv]) => (
                   <View key={slug} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -338,14 +338,14 @@ export function IngestionPage({}: GuidedPageProps) {
               {/* Downstream link */}
               {rec.downstreamRecordType && (
                 <Text style={{ color: `${SUCCESS}BB`, fontSize: 11 }}>
-                  → Created {rec.downstreamRecordType}: {rec.downstreamRecordId}
+                  Ã¢â€ â€™ Created {rec.downstreamRecordType}: {rec.downstreamRecordId}
                 </Text>
               )}
 
               {/* Event fired */}
               {rec.eventFired && (
                 <Text style={{ color: `${ACCENT}99`, fontSize: 11 }}>
-                  ⚡ {rec.eventFired}
+                  Ã¢Å¡Â¡ {rec.eventFired}
                 </Text>
               )}
             </View>
@@ -355,7 +355,7 @@ export function IngestionPage({}: GuidedPageProps) {
     );
   }
 
-  // ─── Sources Tab ──────────────────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Sources Tab Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   function renderSources() {
     const groupedSources: Record<SourceSubTab, IngestionSourceConfig[]> = {
       ocr:     ingestionSources.filter((s) => s.format === 'ocr'),
@@ -370,11 +370,11 @@ export function IngestionPage({}: GuidedPageProps) {
       <View style={{ gap: 16 }}>
         {/* Format architecture callout */}
         <View style={{ borderRadius: 12, padding: 14, backgroundColor: `${INFO}10`, borderWidth: 1, borderColor: `${INFO}30` }}>
-          <Text style={{ color: '#818CF8', fontSize: 13, fontWeight: '700', marginBottom: 4 }}>INGESTION FORMATS — WS-048 §2</Text>
+          <Text style={{ color: '#818CF8', fontSize: 13, fontWeight: '700', marginBottom: 4 }}>INGESTION FORMATS Ã¢â‚¬â€ WS-048 Ã‚Â§2</Text>
           <Text style={{ color: 'rgba(243,234,255,0.6)', fontSize: 12, lineHeight: 18 }}>
             All four formats produce the same NormalizedFieldMap output before firing events.
             A deployment configuration specifies which format each document source uses.
-            Adding a new source is configuration only — no code changes required.
+            Adding a new source is configuration only Ã¢â‚¬â€ no code changes required.
           </Text>
         </View>
 
@@ -384,7 +384,7 @@ export function IngestionPage({}: GuidedPageProps) {
             const active = sourceSubTab === id;
             const fi = FORMAT_INFO[id];
             return (
-              <Pressable key={id} onPress={() => setSourceSubTab(id)} style={{ flex: 1, paddingVertical: 8, borderRadius: 10, borderWidth: 1, borderColor: active ? `${ACCENT}66` : 'rgba(255,255,255,0.1)', backgroundColor: active ? `${ACCENT}18` : 'transparent', alignItems: 'center', gap: 3 }}>
+              <Pressable key={id} onPress={() => setSourceSubTab(id)} style={{ flex: 1, paddingVertical: 8, borderRadius: 10, borderWidth: 1, borderColor: active ? `${ACCENT}66` : 'rgba(0,0,0,0.08)', backgroundColor: active ? `${ACCENT}18` : 'transparent', alignItems: 'center', gap: 3 }}>
                 <Text style={{ fontSize: 16 }}>{fi.icon}</Text>
                 <Text style={{ color: active ? ACCENT : 'rgba(243,234,255,0.5)', fontSize: 11, fontWeight: '700' }}>{fi.label}</Text>
                 <Text style={{ color: active ? `${ACCENT}99` : 'rgba(243,234,255,0.3)', fontSize: 9 }}>{groupedSources[id].length} source{groupedSources[id].length !== 1 ? 's' : ''}</Text>
@@ -394,10 +394,10 @@ export function IngestionPage({}: GuidedPageProps) {
         </View>
 
         {/* Format info card */}
-        <View style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', gap: 6 }}>
-          <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '700' }}>{FORMAT_INFO[sourceSubTab].label} — {FORMAT_INFO[sourceSubTab].description}</Text>
+        <View style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(0,0,0,0.02)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)', gap: 6 }}>
+          <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '700' }}>{FORMAT_INFO[sourceSubTab].label} Ã¢â‚¬â€ {FORMAT_INFO[sourceSubTab].description}</Text>
           <Text style={{ color: `${WARN}CC`, fontSize: 12 }}>
-            ⚙ {FORMAT_INFO[sourceSubTab].confidenceNote}
+            Ã¢Å¡â„¢ {FORMAT_INFO[sourceSubTab].confidenceNote}
           </Text>
         </View>
 
@@ -407,7 +407,7 @@ export function IngestionPage({}: GuidedPageProps) {
             <Text style={{ color: 'rgba(243,234,255,0.4)', fontSize: 13 }}>No {FORMAT_INFO[sourceSubTab].label} sources configured. Add one in Admin {'>'} Financial Operations {'>'} Ingestion.</Text>
           )}
           {groupedSources[sourceSubTab].map((src) => (
-            <View key={src.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)', gap: 6, marginBottom: 8 }}>
+            <View key={src.id} style={{ borderRadius: 10, padding: 12, backgroundColor: 'rgba(0,0,0,0.015)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.04)', gap: 6, marginBottom: 8 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flex: 1 }}>
                   <Text style={{ color: '#F3EAFF', fontSize: 13, fontWeight: '700' }}>{src.name}</Text>
@@ -466,18 +466,18 @@ export function IngestionPage({}: GuidedPageProps) {
     );
   }
 
-  // ─── Field Mappings Tab ───────────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Field Mappings Tab Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   function renderMappings() {
     return (
       <View style={{ gap: 16 }}>
         {/* Architecture note */}
         <View style={{ borderRadius: 12, padding: 14, backgroundColor: `${SUCCESS}10`, borderWidth: 1, borderColor: `${SUCCESS}25` }}>
-          <Text style={{ color: '#34D399', fontSize: 13, fontWeight: '700', marginBottom: 4 }}>FIELD MAPPING ARCHITECTURE — WS-048 §2.1</Text>
+          <Text style={{ color: '#34D399', fontSize: 13, fontWeight: '700', marginBottom: 4 }}>FIELD MAPPING ARCHITECTURE Ã¢â‚¬â€ WS-048 Ã‚Â§2.1</Text>
           <Text style={{ color: 'rgba(243,234,255,0.6)', fontSize: 12, lineHeight: 18 }}>
             Field mapping templates declare how extracted keys (from OCR, CSV headers, EDI data elements, or JSON paths)
             map to Halo Internal field slugs. Each source configuration references one template.{'\n\n'}
             Confidence thresholds are resolved per-field at ingestion time using a 3-level lookup:{'\n'}
-            1. Field-level override → 2. Source-level override → 3. Global tenant default (80%)
+            1. Field-level override Ã¢â€ â€™ 2. Source-level override Ã¢â€ â€™ 3. Global tenant default (80%)
           </Text>
         </View>
 
@@ -488,7 +488,7 @@ export function IngestionPage({}: GuidedPageProps) {
                 <Text style={{ color: ACCENT, fontSize: 11 }}>{FORMAT_INFO[tpl.sourceFormat].label}</Text>
               </View>
               {tpl.documentTypeHint && (
-                <View style={{ borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)' }}>
+                <View style={{ borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, backgroundColor: 'rgba(0,0,0,0.04)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
                   <Text style={{ color: 'rgba(243,234,255,0.6)', fontSize: 11 }}>{tpl.documentTypeHint}</Text>
                 </View>
               )}
@@ -498,16 +498,16 @@ export function IngestionPage({}: GuidedPageProps) {
             </View>
 
             {/* Mapping table header */}
-            <View style={{ flexDirection: 'row', paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)', marginBottom: 4 }}>
+            <View style={{ flexDirection: 'row', paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)', marginBottom: 4 }}>
               <Text style={{ flex: 2, color: 'rgba(243,234,255,0.4)', fontSize: 11, fontWeight: '700' }}>EXTRACTED KEY</Text>
               <Text style={{ flex: 1, color: 'rgba(243,234,255,0.4)', fontSize: 11, fontWeight: '700', textAlign: 'center' }}>REQ</Text>
               <Text style={{ flex: 2, color: 'rgba(243,234,255,0.4)', fontSize: 11, fontWeight: '700' }}>FIELD SLUG</Text>
             </View>
             {tpl.mappings.map((m, i) => (
-              <View key={i} style={{ flexDirection: 'row', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)' }}>
+              <View key={i} style={{ flexDirection: 'row', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.02)' }}>
                 <Text style={{ flex: 2, color: 'rgba(243,234,255,0.7)', fontSize: 12 }}>{m.extractedKey}</Text>
                 <View style={{ flex: 1, alignItems: 'center' }}>
-                  <Text style={{ color: m.required ? DANGER : 'rgba(243,234,255,0.3)', fontSize: 12 }}>{m.required ? '●' : '○'}</Text>
+                  <Text style={{ color: m.required ? DANGER : 'rgba(243,234,255,0.3)', fontSize: 12 }}>{m.required ? 'Ã¢â€”Â' : 'Ã¢â€”â€¹'}</Text>
                 </View>
                 <Text style={{ flex: 2, color: ACCENT, fontSize: 12, fontFamily: 'monospace' }}>{m.fieldSlug}</Text>
               </View>
@@ -518,7 +518,7 @@ export function IngestionPage({}: GuidedPageProps) {
     );
   }
 
-  // ─── Presence Tab ─────────────────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Presence Tab Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   function renderPresence() {
     const statusOrder: UserPresence['activityStatus'][] = ['active', 'idle', 'away', 'offline'];
     const sorted = [...userPresence].sort((a, b) => statusOrder.indexOf(a.activityStatus) - statusOrder.indexOf(b.activityStatus));
@@ -527,7 +527,7 @@ export function IngestionPage({}: GuidedPageProps) {
       <View style={{ gap: 16 }}>
         {/* Architecture callout */}
         <View style={{ borderRadius: 12, padding: 14, backgroundColor: `${INFO}10`, borderWidth: 1, borderColor: `${INFO}30` }}>
-          <Text style={{ color: '#818CF8', fontSize: 13, fontWeight: '700', marginBottom: 4 }}>PRESENCE REGISTRY — WS-048 v2.1 §7.6</Text>
+          <Text style={{ color: '#818CF8', fontSize: 13, fontWeight: '700', marginBottom: 4 }}>PRESENCE REGISTRY Ã¢â‚¬â€ WS-048 v2.1 Ã‚Â§7.6</Text>
           <Text style={{ color: 'rgba(243,234,255,0.6)', fontSize: 12, lineHeight: 18 }}>
             Tracks which users are active, idle, away, or offline. Used by the routing algorithm to find the best
             available approver when a Mission Control review requires a role-based assignment.{'\n\n'}
@@ -539,10 +539,10 @@ export function IngestionPage({}: GuidedPageProps) {
         {/* Status key */}
         <View style={{ flexDirection: 'row', gap: 14, flexWrap: 'wrap' }}>
           {[
-            { status: 'active' as const, label: 'Active — receiving events, WebSocket connected',   color: SUCCESS },
-            { status: 'idle'   as const, label: 'Idle — connected, last seen > 2 min',              color: WARN },
-            { status: 'away'   as const, label: 'Away — connected, last seen > 30 min',             color: '#F97316' },
-            { status: 'offline' as const, label: 'Offline — no WebSocket connection',               color: '#8878AE' },
+            { status: 'active' as const, label: 'Active Ã¢â‚¬â€ receiving events, WebSocket connected',   color: SUCCESS },
+            { status: 'idle'   as const, label: 'Idle Ã¢â‚¬â€ connected, last seen > 2 min',              color: WARN },
+            { status: 'away'   as const, label: 'Away Ã¢â‚¬â€ connected, last seen > 30 min',             color: '#F97316' },
+            { status: 'offline' as const, label: 'Offline Ã¢â‚¬â€ no WebSocket connection',               color: '#8878AE' },
           ].map((k) => (
             <View key={k.status} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <PresenceDot status={k.status} />
@@ -554,7 +554,7 @@ export function IngestionPage({}: GuidedPageProps) {
         <Card title={`Active Presence Registry (${userPresence.length})`}>
           {sorted.length === 0 && <Text style={{ color: 'rgba(243,234,255,0.45)', fontSize: 13 }}>No presence records.</Text>}
           {sorted.map((p) => (
-            <View key={p.userId} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)' }}>
+            <View key={p.userId} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.04)' }}>
               {/* Avatar */}
               <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: `${INFO}30`, borderWidth: 2, borderColor: `${INFO}55`, alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ color: '#818CF8', fontSize: 14, fontWeight: '700' }}>{p.userId.slice(5, 7).toUpperCase()}</Text>
@@ -567,7 +567,7 @@ export function IngestionPage({}: GuidedPageProps) {
                   <Text style={{ color: 'rgba(243,234,255,0.55)', fontSize: 11, textTransform: 'capitalize' }}>{p.activityStatus}</Text>
                   {p.currentRoute && (
                     <>
-                      <Text style={{ color: 'rgba(243,234,255,0.25)', fontSize: 11 }}>·</Text>
+                      <Text style={{ color: 'rgba(243,234,255,0.25)', fontSize: 11 }}>Ã‚Â·</Text>
                       <Text style={{ color: 'rgba(243,234,255,0.4)', fontSize: 11 }}>{p.currentRoute}</Text>
                     </>
                   )}
@@ -584,15 +584,15 @@ export function IngestionPage({}: GuidedPageProps) {
         </Card>
 
         {/* Routing algorithm explainer */}
-        <Card title="Routing Algorithm (WS-048 v2.1 §7.7)">
+        <Card title="Routing Algorithm (WS-048 v2.1 Ã‚Â§7.7)">
           {[
             { step: '1', label: 'Find all users in the required role for this tenant' },
             { step: '2', label: 'Filter to Active or Idle status in the Presence Registry' },
             { step: '3', label: 'Select the user with the oldest last_seen_at (load distribution)' },
-            { step: '4', label: 'If no active users → activate the escalation chain' },
-            { step: '5', label: 'If escalation chain also fails → broadcast to ALL users in role' },
+            { step: '4', label: 'If no active users Ã¢â€ â€™ activate the escalation chain' },
+            { step: '5', label: 'If escalation chain also fails Ã¢â€ â€™ broadcast to ALL users in role' },
           ].map((item) => (
-            <View key={item.step} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' }}>
+            <View key={item.step} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.03)' }}>
               <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: `${ACCENT}25`, alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
                 <Text style={{ color: ACCENT, fontSize: 11, fontWeight: '700' }}>{item.step}</Text>
               </View>
@@ -604,15 +604,15 @@ export function IngestionPage({}: GuidedPageProps) {
     );
   }
 
-  // ─── Main render ──────────────────────────────────────────────────────────
+  // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Main render Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={{ gap: 4 }}>
-        <Text style={{ color: ACCENT, fontSize: 11, fontWeight: '700', letterSpacing: 1.5 }}>WS-048 · INGESTION LAYER</Text>
+        <Text style={{ color: ACCENT, fontSize: 11, fontWeight: '700', letterSpacing: 1.5 }}>WS-048 Ã‚Â· INGESTION LAYER</Text>
         <Text style={{ color: '#F3EAFF', fontSize: 22, fontWeight: '800' }}>Event Listener & Document Ingestion</Text>
         <Text style={{ color: 'rgba(243,234,255,0.55)', fontSize: 13 }}>
-          Universal ingestion pipeline — OCR, CSV, EDI, Webhook. All formats produce the same NormalizedFieldMap.
+          Universal ingestion pipeline Ã¢â‚¬â€ OCR, CSV, EDI, Webhook. All formats produce the same NormalizedFieldMap.
           Confidence scoring routes unconfirmed fields to Mission Control for human review before downstream primitives are created.
         </Text>
       </View>

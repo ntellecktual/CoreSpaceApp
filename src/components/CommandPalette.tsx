@@ -265,7 +265,7 @@ showsVerticalScrollIndicator = { false}
         backgroundColor: isSelected
             ? isDark
                 ? 'rgba(38,51,116,0.18)'
-                : 'rgba(38,51,116,0.10)'
+                : 'rgba(0,0,0,0.03)'
             : 'transparent',
     }}
                       >
@@ -279,8 +279,8 @@ showsVerticalScrollIndicator = { false}
         fontWeight: '600',
         color: isSelected
             ? isDark
-                ? '#FFD332'
-                : '#FFD332'
+                ? '#111111'
+                : '#111111'
             : isDark
                 ? '#FFFFFF'
                 : '#111111',

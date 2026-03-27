@@ -7,20 +7,20 @@ import { ChainStep, FinancialActionType, WorkflowChainDefinition } from '../../t
 import { Card } from './components';
 import { GuidedPageProps } from './types';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-const ACCENT = '#6366F1';  // indigo — distinct from Financial amber, Ingestion cyan
+// ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Constants ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+const ACCENT = '#6366F1';  // indigo ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â distinct from Financial amber, Ingestion cyan
 const SUCCESS = '#10B981';
 const DANGER = '#EF4444';
 const WARN = '#F59E0B';
-const MUTED = 'rgba(255,255,255,0.5)';
+const MUTED = 'rgba(0,0,0,0.45)';
 
 type ChainTab = 'chains' | 'builder' | 'actions' | 'metrics';
 
 const CHAIN_TABS: { id: ChainTab; label: string; icon: string }[] = [
-  { id: 'chains', label: 'Chain Library', icon: '🔗' },
-  { id: 'builder', label: 'Chain Builder', icon: '🔧' },
-  { id: 'actions', label: 'Action Library', icon: '⚡' },
-  { id: 'metrics', label: 'Automation Metrics', icon: '📊' },
+  { id: 'chains', label: 'Chain Library', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬â€' },
+  { id: 'builder', label: 'Chain Builder', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ‚Â§' },
+  { id: 'actions', label: 'Action Library', icon: 'ÃƒÂ¢Ã…Â¡Ã‚Â¡' },
+  { id: 'metrics', label: 'Automation Metrics', icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã…Â ' },
 ];
 
 const CHAIN_TYPE_LABELS: Record<WorkflowChainDefinition['chainType'], string> = {
@@ -36,76 +36,76 @@ const CHAIN_TYPE_COLORS: Record<WorkflowChainDefinition['chainType'], string> = 
   ar_inbound: '#10B981',
   period_close: '#6366F1',
   exception: '#EF4444',
-  custom: '#FFD332',
+  custom: '#111111',
 };
 
 const ACTION_DOCS: { type: FinancialActionType; icon: string; label: string; description: string; parameters: string[] }[] = [
   {
     type: 'financial.create_payable',
-    icon: '📤',
+    icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â¤',
     label: 'Create Payable',
     description: 'Creates a payable obligation from record fields. Maps field slugs to payable amount, due date, and counterparty.',
     parameters: ['payableToField', 'amountField', 'dueDateField', 'externalRefField', 'liabilityAccountId', 'expenseAccountId'],
   },
   {
     type: 'financial.create_receivable',
-    icon: '📥',
+    icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã‚Â¥',
     label: 'Create Receivable',
     description: 'Creates an AR receivable from inbound record data. Supports field mapping from ingestion events.',
     parameters: ['amountField', 'fieldMapSource'],
   },
   {
     type: 'financial.post_journal_entry',
-    icon: '📒',
+    icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬â„¢',
     label: 'Post Journal Entry',
     description: 'Auto-generates and posts a double-entry GL journal. Entry lines, account IDs, and amounts are all configurable.',
     parameters: ['entryLines', 'transactionDateSource', 'descriptionTemplate', 'sourceType', 'sourceRefField'],
   },
   {
     type: 'financial.create_waterfall',
-    icon: '🌊',
+    icon: 'ÃƒÂ°Ã…Â¸Ã…â€™Ã…Â ',
     label: 'Create Distribution Waterfall',
-    description: 'Builds a configurable party waterfall from party definitions. Each party role, amount formula, and payment method is stored in data — not code.',
+    description: 'Builds a configurable party waterfall from party definitions. Each party role, amount formula, and payment method is stored in data ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â not code.',
     parameters: ['totalAmountSource', 'sourceRecordIdSource', 'partyDefinitions'],
   },
   {
     type: 'financial.request_period_close',
-    icon: '🔒',
+    icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬â„¢',
     label: 'Request Period Close',
     description: 'Initiates an accounting period close. Validates reconciliation state before locking the period.',
     parameters: [],
   },
   {
     type: 'financial.run_reconciliation_match',
-    icon: '🔄',
+    icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬Å¾',
     label: 'Run Reconciliation Match',
     description: 'Executes automated reconciliation matching against GL entries, bank data, or external source records.',
     parameters: [],
   },
   {
     type: 'signal.push_alert',
-    icon: '🔔',
+    icon: 'ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬Â',
     label: 'Push Alert',
     description: 'Sends a notification to a role target. Message template supports {{field}} interpolation from the trigger event payload.',
     parameters: ['alertSeverity', 'alertRoleTarget', 'alertMessageTemplate'],
   },
   {
     type: 'signal.update_field',
-    icon: '✏️',
+    icon: 'ÃƒÂ¢Ã…â€œÃ‚ÂÃƒÂ¯Ã‚Â¸Ã‚Â',
     label: 'Update Field',
     description: 'Updates a field on the source record. Used to tag status, flag exceptions, or set routing fields.',
     parameters: ['fieldMapSource', 'onPassStatus'],
   },
   {
     type: 'signal.validate_and_route',
-    icon: '🚦',
+    icon: 'ÃƒÂ°Ã…Â¸Ã…Â¡Ã‚Â¦',
     label: 'Validate & Route',
     description: 'Validates required fields and routes the event based on pass/fail. Human judgment points use this action to pause the chain.',
     parameters: ['requiredFields', 'onPassStatus', 'onFailRoute'],
   },
 ];
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Helpers ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 function pct(value: number) {
   return `${Math.round(value)}%`;
 }
@@ -118,7 +118,7 @@ function autoStepCount(steps: ChainStep[]) {
   return steps.filter((s) => !s.isHumanJudgmentPoint).length;
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Sub-components ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 function TabBar({ active, onChange }: { active: ChainTab; onChange: (t: ChainTab) => void }) {
   return (
     <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap', marginBottom: 16 }}>
@@ -130,7 +130,7 @@ function TabBar({ active, onChange }: { active: ChainTab; onChange: (t: ChainTab
             backgroundColor: isActive ? ACCENT : 'rgba(99,102,241,0.1)',
             borderWidth: 1, borderColor: isActive ? ACCENT : 'rgba(99,102,241,0.3)',
           }}>
-            <Text style={{ color: isActive ? '#fff' : 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '600' }}>
+            <Text style={{ color: isActive ? '#fff' : 'rgba(0,0,0,0.6)', fontSize: 13, fontWeight: '600' }}>
               {t.icon} {t.label}
             </Text>
           </Pressable>
@@ -175,13 +175,13 @@ function StepTimeline({ steps }: { steps: ChainStep[] }) {
               <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: `${stepColor}22`, borderWidth: 2, borderColor: stepColor, alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ color: stepColor, fontSize: 11, fontWeight: '800' }}>{step.stepOrder}</Text>
               </View>
-              {i < steps.length - 1 && <View style={{ width: 2, height: 20, backgroundColor: 'rgba(255,255,255,0.1)', marginTop: 2 }} />}
+              {i < steps.length - 1 && <View style={{ width: 2, height: 20, backgroundColor: 'rgba(0,0,0,0.08)', marginTop: 2 }} />}
             </View>
             {/* Step content */}
             <View style={{ flex: 1, paddingBottom: 8 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600' }}>
-                  {actionMeta?.icon ?? '⚙️'} {actionMeta?.label ?? step.actionType}
+                <Text style={{ color: '#111111', fontSize: 13, fontWeight: '600' }}>
+                  {actionMeta?.icon ?? 'ÃƒÂ¢Ã…Â¡Ã¢â€žÂ¢ÃƒÂ¯Ã‚Â¸Ã‚Â'} {actionMeta?.label ?? step.actionType}
                 </Text>
                 {isHuman && <Badge label="Human Gate" color={WARN} />}
                 <Badge label={step.failureBehavior.replace(/_/g, ' ')} color={step.failureBehavior === 'halt_chain' ? DANGER : MUTED.replace('0.5', '1')} />
@@ -196,7 +196,7 @@ function StepTimeline({ steps }: { steps: ChainStep[] }) {
   );
 }
 
-// ─── Chains Library Tab ───────────────────────────────────────────────────────
+// ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Chains Library Tab ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 function ChainsTab({ chains, onToggle }: { chains: WorkflowChainDefinition[]; onToggle: (id: string, active: boolean) => void }) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -217,29 +217,29 @@ function ChainsTab({ chains, onToggle }: { chains: WorkflowChainDefinition[]; on
                 <AutomationGauge value={chain.automationPct} />
                 <View style={{ flex: 1 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <Text style={{ color: '#fff', fontSize: 15, fontWeight: '700' }}>{chain.name}</Text>
+                    <Text style={{ color: '#111111', fontSize: 15, fontWeight: '700' }}>{chain.name}</Text>
                     <Badge label={CHAIN_TYPE_LABELS[chain.chainType]} color={typeColor} />
-                    {chain.industry && <Badge label={chain.industry} color="rgba(255,255,255,0.4)" />}
+                    {chain.industry && <Badge label={chain.industry} color="rgba(0,0,0,0.35)" />}
                     {!chain.isActive && <Badge label="Inactive" color={DANGER} />}
                   </View>
                   <Text style={{ color: MUTED, fontSize: 12, marginTop: 4 }}>{chain.description}</Text>
                   <View style={{ flexDirection: 'row', gap: 16, marginTop: 6 }}>
-                    <Text style={{ color: ACCENT, fontSize: 12 }}>🔗 {chain.steps.length} steps</Text>
-                    <Text style={{ color: WARN, fontSize: 12 }}>👤 {humanStepCount(chain.steps)} human gates</Text>
-                    <Text style={{ color: SUCCESS, fontSize: 12 }}>⚡ {autoStepCount(chain.steps)} automated</Text>
+                    <Text style={{ color: ACCENT, fontSize: 12 }}>ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬â€ {chain.steps.length} steps</Text>
+                    <Text style={{ color: WARN, fontSize: 12 }}>ÃƒÂ°Ã…Â¸Ã¢â‚¬ËœÃ‚Â¤ {humanStepCount(chain.steps)} human gates</Text>
+                    <Text style={{ color: SUCCESS, fontSize: 12 }}>ÃƒÂ¢Ã…Â¡Ã‚Â¡ {autoStepCount(chain.steps)} automated</Text>
                   </View>
                 </View>
                 {/* Active toggle */}
                 <Pressable onPress={() => onToggle(chain.id, !chain.isActive)} style={{ alignSelf: 'center' }}>
-                  <View style={{ width: 44, height: 24, borderRadius: 12, backgroundColor: chain.isActive ? `${SUCCESS}55` : 'rgba(255,255,255,0.1)', borderWidth: 1, borderColor: chain.isActive ? SUCCESS : 'rgba(255,255,255,0.2)', justifyContent: 'center', paddingHorizontal: 2 }}>
-                    <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: chain.isActive ? SUCCESS : 'rgba(255,255,255,0.4)', alignSelf: chain.isActive ? 'flex-end' : 'flex-start' }} />
+                  <View style={{ width: 44, height: 24, borderRadius: 12, backgroundColor: chain.isActive ? `${SUCCESS}55` : 'rgba(0,0,0,0.08)', borderWidth: 1, borderColor: chain.isActive ? SUCCESS : 'rgba(0,0,0,0.15)', justifyContent: 'center', paddingHorizontal: 2 }}>
+                    <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: chain.isActive ? SUCCESS : 'rgba(0,0,0,0.35)', alignSelf: chain.isActive ? 'flex-end' : 'flex-start' }} />
                   </View>
                 </Pressable>
               </View>
             </Pressable>
             {isOpen && (
-              <View style={{ marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)' }}>
-                <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '600', marginBottom: 12 }}>Step Timeline</Text>
+              <View style={{ marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.06)' }}>
+                <Text style={{ color: 'rgba(0,0,0,0.6)', fontSize: 13, fontWeight: '600', marginBottom: 12 }}>Step Timeline</Text>
                 <StepTimeline steps={chain.steps} />
               </View>
             )}
@@ -250,7 +250,7 @@ function ChainsTab({ chains, onToggle }: { chains: WorkflowChainDefinition[]; on
   );
 }
 
-// ─── Chain Builder Tab ────────────────────────────────────────────────────────
+// ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Chain Builder Tab ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 function BuilderTab({ onAdd }: { onAdd: (chain: Omit<WorkflowChainDefinition, 'id'>) => void }) {
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
@@ -305,12 +305,12 @@ function BuilderTab({ onAdd }: { onAdd: (chain: Omit<WorkflowChainDefinition, 'i
   }
 
   const inputStyle = {
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(0,0,0,0.04)',
     borderWidth: 1,
     borderColor: 'rgba(99,102,241,0.3)',
     borderRadius: 8,
     padding: 10,
-    color: '#fff' as const,
+    color: '#111111' as const,
     fontSize: 14,
     marginBottom: 10,
   };
@@ -319,7 +319,7 @@ function BuilderTab({ onAdd }: { onAdd: (chain: Omit<WorkflowChainDefinition, 'i
     <View style={{ gap: 12 }}>
       {saved && (
         <Card>
-          <Text style={{ color: SUCCESS, textAlign: 'center', fontWeight: '700' }}>✓ Workflow chain saved to library</Text>
+          <Text style={{ color: SUCCESS, textAlign: 'center', fontWeight: '700' }}>ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Workflow chain saved to library</Text>
         </Card>
       )}
       <Card>
@@ -331,8 +331,8 @@ function BuilderTab({ onAdd }: { onAdd: (chain: Omit<WorkflowChainDefinition, 'i
           {chainTypes.map((ct) => (
             <Pressable key={ct} onPress={() => setChainType(ct)} style={{
               paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6,
-              backgroundColor: chainType === ct ? `${CHAIN_TYPE_COLORS[ct]}33` : 'rgba(255,255,255,0.05)',
-              borderWidth: 1, borderColor: chainType === ct ? CHAIN_TYPE_COLORS[ct] : 'rgba(255,255,255,0.1)',
+              backgroundColor: chainType === ct ? `${CHAIN_TYPE_COLORS[ct]}33` : 'rgba(0,0,0,0.03)',
+              borderWidth: 1, borderColor: chainType === ct ? CHAIN_TYPE_COLORS[ct] : 'rgba(0,0,0,0.08)',
             }}>
               <Text style={{ color: chainType === ct ? CHAIN_TYPE_COLORS[ct] : MUTED, fontSize: 12 }}>{CHAIN_TYPE_LABELS[ct]}</Text>
             </Pressable>
@@ -348,8 +348,8 @@ function BuilderTab({ onAdd }: { onAdd: (chain: Omit<WorkflowChainDefinition, 'i
           {ACTION_DOCS.map((a) => (
             <Pressable key={a.type} onPress={() => setStepAction(a.type)} style={{
               paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6,
-              backgroundColor: stepAction === a.type ? `${ACCENT}33` : 'rgba(255,255,255,0.04)',
-              borderWidth: 1, borderColor: stepAction === a.type ? ACCENT : 'rgba(255,255,255,0.08)',
+              backgroundColor: stepAction === a.type ? `${ACCENT}33` : 'rgba(0,0,0,0.02)',
+              borderWidth: 1, borderColor: stepAction === a.type ? ACCENT : 'rgba(0,0,0,0.06)',
             }}>
               <Text style={{ color: stepAction === a.type ? ACCENT : MUTED, fontSize: 11 }}>{a.icon} {a.label}</Text>
             </Pressable>
@@ -357,8 +357,8 @@ function BuilderTab({ onAdd }: { onAdd: (chain: Omit<WorkflowChainDefinition, 'i
         </View>
         <TextInput placeholder="Step description" placeholderTextColor={MUTED} value={stepDesc} onChangeText={setStepDesc} style={inputStyle} />
         <Pressable onPress={() => setStepHuman(!stepHuman)} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <View style={{ width: 18, height: 18, borderRadius: 4, borderWidth: 2, borderColor: stepHuman ? WARN : 'rgba(255,255,255,0.3)', backgroundColor: stepHuman ? `${WARN}33` : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-            {stepHuman && <Text style={{ color: WARN, fontSize: 12, lineHeight: 14 }}>✓</Text>}
+          <View style={{ width: 18, height: 18, borderRadius: 4, borderWidth: 2, borderColor: stepHuman ? WARN : 'rgba(0,0,0,0.25)', backgroundColor: stepHuman ? `${WARN}33` : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+            {stepHuman && <Text style={{ color: WARN, fontSize: 12, lineHeight: 14 }}>ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“</Text>}
           </View>
           <Text style={{ color: stepHuman ? WARN : MUTED, fontSize: 13 }}>Human judgment point (chain pauses for review)</Text>
         </Pressable>
@@ -369,7 +369,7 @@ function BuilderTab({ onAdd }: { onAdd: (chain: Omit<WorkflowChainDefinition, 'i
 
       {steps.length > 0 && (
         <Card>
-          <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '600', marginBottom: 12 }}>Draft Steps ({steps.length})</Text>
+          <Text style={{ color: 'rgba(0,0,0,0.6)', fontSize: 13, fontWeight: '600', marginBottom: 12 }}>Draft Steps ({steps.length})</Text>
           <StepTimeline steps={steps as ChainStep[]} />
           <Pressable onPress={saveChain} style={{ marginTop: 16, backgroundColor: ACCENT, borderRadius: 8, padding: 12, alignItems: 'center' }}>
             <Text style={{ color: '#fff', fontWeight: '800', fontSize: 14 }}>Save Chain to Library</Text>
@@ -380,13 +380,13 @@ function BuilderTab({ onAdd }: { onAdd: (chain: Omit<WorkflowChainDefinition, 'i
   );
 }
 
-// ─── Action Library Tab ───────────────────────────────────────────────────────
+// ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Action Library Tab ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 function ActionsTab() {
   return (
     <View style={{ gap: 10 }}>
       <Card>
         <Text style={{ color: MUTED, fontSize: 13, lineHeight: 20 }}>
-          Signal Studio action types are the atomic operations that workflow chain steps execute. Each action type receives parameters from the chain step configuration — no logic is hard-coded in the platform.
+          Signal Studio action types are the atomic operations that workflow chain steps execute. Each action type receives parameters from the chain step configuration ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no logic is hard-coded in the platform.
         </Text>
       </Card>
       {ACTION_DOCS.map((action) => (
@@ -394,7 +394,7 @@ function ActionsTab() {
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 6 }}>
             <Text style={{ fontSize: 20 }}>{action.icon}</Text>
             <View>
-              <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>{action.label}</Text>
+              <Text style={{ color: '#111111', fontSize: 14, fontWeight: '700' }}>{action.label}</Text>
               <Text style={{ color: `${ACCENT}bb`, fontSize: 11, fontFamily: 'monospace' }}>{action.type}</Text>
             </View>
           </View>
@@ -414,7 +414,7 @@ function ActionsTab() {
   );
 }
 
-// ─── Metrics Tab ──────────────────────────────────────────────────────────────
+// ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Metrics Tab ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 function MetricsTab({ chains }: { chains: WorkflowChainDefinition[] }) {
   const active = chains.filter((c) => c.isActive);
   const overallPct = active.length
@@ -461,36 +461,36 @@ function MetricsTab({ chains }: { chains: WorkflowChainDefinition[] }) {
         </View>
       </Card>
 
-      {/* 75% Automation Threshold (WS-049 §5) */}
+      {/* 75% Automation Threshold (WS-049 Ãƒâ€šÃ‚Â§5) */}
       <Card>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: '700' }}>75% Automation Threshold</Text>
+          <Text style={{ color: 'rgba(0,0,0,0.75)', fontSize: 13, fontWeight: '700' }}>75% Automation Threshold</Text>
           <Badge label={overallPct >= 75 ? 'ACHIEVED' : 'BELOW TARGET'} color={overallPct >= 75 ? SUCCESS : WARN} />
         </View>
-        <View style={{ height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+        <View style={{ height: 8, borderRadius: 4, backgroundColor: 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
           <View style={{ height: 8, borderRadius: 4, backgroundColor: overallPct >= 75 ? SUCCESS : WARN, width: `${Math.min(overallPct, 100)}%` as any }} />
         </View>
         <Text style={{ color: MUTED, fontSize: 12, marginTop: 6 }}>
-          WS-049 target: ≥75% of chain steps run without human intervention. Current: {pct(overallPct)}.
+          WS-049 target: ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¥75% of chain steps run without human intervention. Current: {pct(overallPct)}.
         </Text>
       </Card>
 
       {/* Breakdown by chain type */}
       {byType.length > 0 && (
         <Card>
-          <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: '700', marginBottom: 12 }}>By Chain Type</Text>
+          <Text style={{ color: 'rgba(0,0,0,0.75)', fontSize: 13, fontWeight: '700', marginBottom: 12 }}>By Chain Type</Text>
           <View style={{ gap: 10 }}>
             {byType.map((row) => (
               <View key={row.type} style={{ gap: 4 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Text style={{ color: '#fff', fontSize: 13 }}>{row.label}</Text>
+                  <Text style={{ color: '#111111', fontSize: 13 }}>{row.label}</Text>
                   <Text style={{ color: row.color, fontSize: 13, fontWeight: '700' }}>{pct(row.avg)}</Text>
                 </View>
-                <View style={{ height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                <View style={{ height: 6, borderRadius: 3, backgroundColor: 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
                   <View style={{ height: 6, borderRadius: 3, backgroundColor: row.color, width: `${Math.min(row.avg, 100)}%` as any }} />
                 </View>
                 <Text style={{ color: MUTED, fontSize: 11 }}>
-                  {row.count} chain{row.count !== 1 ? 's' : ''} · {row.totalSteps} steps · {row.humanGates} human gate{row.humanGates !== 1 ? 's' : ''}
+                  {row.count} chain{row.count !== 1 ? 's' : ''} Ãƒâ€šÃ‚Â· {row.totalSteps} steps Ãƒâ€šÃ‚Â· {row.humanGates} human gate{row.humanGates !== 1 ? 's' : ''}
                 </Text>
               </View>
             ))}
@@ -500,7 +500,7 @@ function MetricsTab({ chains }: { chains: WorkflowChainDefinition[] }) {
 
       {/* Individual chain breakdown */}
       <Card>
-        <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, fontWeight: '700', marginBottom: 12 }}>Chain Detail</Text>
+        <Text style={{ color: 'rgba(0,0,0,0.75)', fontSize: 13, fontWeight: '700', marginBottom: 12 }}>Chain Detail</Text>
         {chains.length === 0 ? (
           <Text style={{ color: MUTED, fontSize: 13 }}>No chains defined.</Text>
         ) : (
@@ -511,15 +511,15 @@ function MetricsTab({ chains }: { chains: WorkflowChainDefinition[] }) {
                 <View key={chain.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <AutomationGauge value={chain.automationPct} />
                   <View style={{ flex: 1 }}>
-                    <Text style={{ color: '#fff', fontSize: 13, fontWeight: '600' }}>{chain.name}</Text>
+                    <Text style={{ color: '#111111', fontSize: 13, fontWeight: '600' }}>{chain.name}</Text>
                     <View style={{ flexDirection: 'row', gap: 8, marginTop: 2 }}>
                       <Badge label={chain.isActive ? 'Active' : 'Inactive'} color={chain.isActive ? SUCCESS : DANGER} />
                       <Badge label={CHAIN_TYPE_LABELS[chain.chainType]} color={typeColor} />
                     </View>
                   </View>
                   <View style={{ alignItems: 'flex-end' }}>
-                    <Text style={{ color: WARN, fontSize: 12 }}>{humanStepCount(chain.steps)} 👤</Text>
-                    <Text style={{ color: SUCCESS, fontSize: 12 }}>{autoStepCount(chain.steps)} ⚡</Text>
+                    <Text style={{ color: WARN, fontSize: 12 }}>{humanStepCount(chain.steps)} ÃƒÂ°Ã…Â¸Ã¢â‚¬ËœÃ‚Â¤</Text>
+                    <Text style={{ color: SUCCESS, fontSize: 12 }}>{autoStepCount(chain.steps)} ÃƒÂ¢Ã…Â¡Ã‚Â¡</Text>
                   </View>
                 </View>
               );
@@ -531,7 +531,7 @@ function MetricsTab({ chains }: { chains: WorkflowChainDefinition[] }) {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Main Component ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 export function WorkflowChainsPage({}: GuidedPageProps) {
   const { data, addWorkflowChain, updateWorkflowChain } = useAppState();
   const { styles } = useUiTheme();
@@ -556,7 +556,7 @@ export function WorkflowChainsPage({}: GuidedPageProps) {
           Workflow Chains
         </Text>
         <Text style={{ color: MUTED, fontSize: 13, marginTop: 4 }}>
-          Configurable automation chains connecting financial events, GL actions, and alerts. All logic lives in data — no hardcoded rules.
+          Configurable automation chains connecting financial events, GL actions, and alerts. All logic lives in data ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no hardcoded rules.
         </Text>
       </View>
 

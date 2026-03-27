@@ -1522,7 +1522,7 @@ export const defaultData: AppData = {
       name: 'Operations',
       icon: '⚙️',
       description: 'Core business operations: supply chain, logistics, service delivery, and asset management.',
-      color: '#FFD332',
+      color: '#111111',
       order: 0,
       objects: [
         {
@@ -1635,7 +1635,7 @@ export const defaultData: AppData = {
       name: 'Legal & Compliance',
       icon: '⚖️',
       description: 'Contracts, compliance, regulatory filings, and risk management.',
-      color: '#FFD332',
+      color: '#111111',
       order: 5,
       objects: [
         {

@@ -10,7 +10,7 @@ type UiThemeContextValue = {
 const UiThemeContext = createContext<UiThemeContextValue | undefined>(undefined);
 
 export function UiThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState<ThemeMode>('night');
+  const [mode, setMode] = useState<ThemeMode>('day');
 
   const value = useMemo<UiThemeContextValue>(
     () => ({

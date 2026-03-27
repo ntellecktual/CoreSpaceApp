@@ -1170,7 +1170,7 @@ export function useAdminWorkspace() {
       id: 'bfn-supply-chain',
       name: 'Supply Chain & Regulatory',
       icon: '🔗',
-      color: '#FFD332',
+      color: '#111111',
       order: 0,
       description: 'End-to-end pharmaceutical serialization from manufacturer to patient dispensing (DSCSA)',
       objects: [

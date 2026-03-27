@@ -179,9 +179,9 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
 
         {/* Layer 1: Connection Config */}
         <View style={{
-          backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(0,0,0,0.02)',
+          backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(255,255,255,0.03)',
           borderRadius: 16, padding: 20, gap: 14,
-          borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.06)',
+          borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(38,51,116,0.15)',
           borderLeftWidth: 3, borderLeftColor: '#111111',
         } as any}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -207,7 +207,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
 
         {/* Layer 2: Semantic Mapping */}
         <View style={{
-          backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(0,0,0,0.02)',
+          backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(255,255,255,0.03)',
           borderRadius: 16, padding: 20, gap: 14,
           borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(59,130,246,0.15)',
           borderLeftWidth: 3, borderLeftColor: '#3B82F6',
@@ -236,7 +236,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
         {/* Actions & Triggers — side by side on wider screens */}
         <View style={{ flexDirection: compact ? 'column' : 'row', gap: 16 }}>
           <View style={{
-            flex: 1, backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(0,0,0,0.02)',
+            flex: 1, backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(255,255,255,0.03)',
             borderRadius: 16, padding: 20, gap: 12,
             borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(34,197,94,0.15)',
           } as any}>
@@ -248,7 +248,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
               </View>
             </View>
             {selectedTemplate.actions.map((a) => (
-              <View key={a.key} style={{ backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(0,0,0,0.02)', borderRadius: 10, padding: 12, gap: 3 }}>
+              <View key={a.key} style={{ backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.03)', borderRadius: 10, padding: 12, gap: 3 }}>
                 <Text style={{ fontWeight: '700', color: mode === 'day' ? '#1E293B' : '#F1F5F9', fontSize: 14 }}>{a.label}</Text>
                 <Text style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 17 }}>{a.description}</Text>
               </View>
@@ -256,7 +256,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
           </View>
 
           <View style={{
-            flex: 1, backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(0,0,0,0.02)',
+            flex: 1, backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(255,255,255,0.03)',
             borderRadius: 16, padding: 20, gap: 12,
             borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(59,130,246,0.15)',
           } as any}>
@@ -268,7 +268,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
               </View>
             </View>
             {selectedTemplate.triggers.map((t) => (
-              <View key={t.key} style={{ backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(0,0,0,0.02)', borderRadius: 10, padding: 12, gap: 3 }}>
+              <View key={t.key} style={{ backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.03)', borderRadius: 10, padding: 12, gap: 3 }}>
                 <Text style={{ fontWeight: '700', color: mode === 'day' ? '#1E293B' : '#F1F5F9', fontSize: 14 }}>{t.label}</Text>
                 <Text style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 17 }}>{t.description}</Text>
               </View>
@@ -278,9 +278,9 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
 
         {selectedTemplate.prewiredSignals && selectedTemplate.prewiredSignals.length > 0 && (
           <View style={{
-            backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(0,0,0,0.02)',
+            backgroundColor: mode === 'day' ? '#FFFFFF' : 'rgba(255,255,255,0.03)',
             borderRadius: 16, padding: 20, gap: 12,
-            borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.06)',
+            borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(38,51,116,0.15)',
           } as any}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <Text style={{ fontSize: 16 }}>⚡</Text>
@@ -360,7 +360,7 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
                   style={{
                     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
                     paddingHorizontal: 14, paddingVertical: 11, borderRadius: 10,
-                    backgroundColor: isActive ? (mode === 'day' ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.06)') : 'transparent',
+                    backgroundColor: isActive ? (mode === 'day' ? 'rgba(0,0,0,0.02)' : 'rgba(38,51,116,0.15)') : 'transparent',
                   }}
                 >
                   <Text style={{
@@ -398,8 +398,8 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
                 onPress={() => setView(v)}
                 style={{
                   flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 10,
-                  backgroundColor: view === v ? '#111111' : (mode === 'day' ? '#F1F5F9' : 'rgba(0,0,0,0.04)'),
-                  borderWidth: 1, borderColor: view === v ? '#111111' : (mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.08)'),
+                  backgroundColor: view === v ? '#111111' : (mode === 'day' ? '#F1F5F9' : 'rgba(255,255,255,0.06)'),
+                  borderWidth: 1, borderColor: view === v ? '#111111' : (mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.10)'),
                 } as any}
               >
                 <Text style={{
@@ -432,8 +432,8 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
                   onPress={() => setCategoryFilter(null)}
                   style={{
                     paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
-                    backgroundColor: !categoryFilter ? '#111111' : (mode === 'day' ? '#F1F5F9' : 'rgba(0,0,0,0.04)'),
-                    borderWidth: 1, borderColor: !categoryFilter ? '#111111' : (mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.08)'),
+                    backgroundColor: !categoryFilter ? '#111111' : (mode === 'day' ? '#F1F5F9' : 'rgba(255,255,255,0.06)'),
+                    borderWidth: 1, borderColor: !categoryFilter ? '#111111' : (mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.10)'),
                   } as any}
                 >
                   <Text style={{ fontSize: 13, fontWeight: !categoryFilter ? '700' : '500', color: !categoryFilter ? '#FFF' : (mode === 'day' ? '#475569' : '#9CA3AF') }}>All</Text>
@@ -446,8 +446,8 @@ export function OrbitalPage({ guidedMode, onGuide, registerActions, auditLog, ad
                       onPress={() => setCategoryFilter(active ? null : cat)}
                       style={{
                         paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
-                        backgroundColor: active ? '#111111' : (mode === 'day' ? '#F1F5F9' : 'rgba(0,0,0,0.04)'),
-                        borderWidth: 1, borderColor: active ? '#111111' : (mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.08)'),
+                        backgroundColor: active ? '#111111' : (mode === 'day' ? '#F1F5F9' : 'rgba(255,255,255,0.06)'),
+                        borderWidth: 1, borderColor: active ? '#111111' : (mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.10)'),
                       } as any}
                     >
                       <Text style={{ fontSize: 13, fontWeight: active ? '700' : '500', color: active ? '#FFF' : (mode === 'day' ? '#475569' : '#9CA3AF') }}>{cat}</Text>
@@ -613,8 +613,8 @@ function ConfigFieldInput({
               onPress={() => onChange(opt)}
               style={{
                 paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
-                backgroundColor: value === opt ? '#111111' : (mode === 'day' ? '#F1F5F9' : 'rgba(0,0,0,0.04)'),
-                borderWidth: 1, borderColor: value === opt ? '#111111' : (mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.08)'),
+                backgroundColor: value === opt ? '#111111' : (mode === 'day' ? '#F1F5F9' : 'rgba(255,255,255,0.06)'),
+                borderWidth: 1, borderColor: value === opt ? '#111111' : (mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.10)'),
               } as any}
             >
               <Text style={{ fontSize: 13, fontWeight: value === opt ? '700' : '500', color: value === opt ? '#FFF' : (mode === 'day' ? '#475569' : '#9CA3AF') }}>{opt}</Text>
@@ -791,7 +791,7 @@ function ActivationCard({
         borderRadius: 16,
         padding: 20,
         borderWidth: 1,
-        borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.06)',
+        borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.08)',
         gap: 14,
       }}
     >
@@ -832,7 +832,7 @@ function ActivationCard({
       {expanded && (
         <View style={{ gap: 10, marginTop: 2 }}>
           {template && (
-            <View style={{ gap: 6, backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(0,0,0,0.02)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.04)' }}>
+            <View style={{ gap: 6, backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.03)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.06)' }}>
               <Text style={{ fontWeight: '700', fontSize: 13, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>🔑 Connection Config</Text>
               {Object.entries(activation.connectionConfig).map(([k, v]) => {
                 const fieldDef = template.fields.find((f) => f.key === k);
@@ -848,7 +848,7 @@ function ActivationCard({
             </View>
           )}
           {Object.keys(activation.mappingConfig).length > 0 && template && (
-            <View style={{ gap: 6, backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(0,0,0,0.02)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.04)' }}>
+            <View style={{ gap: 6, backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.03)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.06)' }}>
               <Text style={{ fontWeight: '700', fontSize: 13, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>🔗 Semantic Mapping</Text>
               {Object.entries(activation.mappingConfig).map(([k, v]) => {
                 const fieldDef = template.fields.find((f) => f.key === k);
@@ -873,7 +873,7 @@ function ActivationCard({
       {/* Action Buttons */}
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 2, flexWrap: 'wrap' }}>
         {activation.status === 'active' && (
-          <Pressable onPress={onPause} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(0,0,0,0.02)' }}>
+          <Pressable onPress={onPause} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.12)', backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.04)' }}>
             <Text style={{ fontSize: 14, color: mode === 'day' ? '#475569' : '#CBD5E1', fontWeight: '600' }}>⏸ Pause</Text>
           </Pressable>
         )}
@@ -885,13 +885,13 @@ function ActivationCard({
         <Pressable
           onPress={onTest}
           disabled={testResult === 'testing'}
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: testColor ?? (mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.08)'), backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(0,0,0,0.02)' }}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: testColor ?? (mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.12)'), backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.04)' }}
         >
           <Text style={{ fontSize: 14, fontWeight: '600', color: testColor ?? (mode === 'day' ? '#475569' : '#CBD5E1') }}>
             {testIcon} {testLabel}
           </Text>
         </Pressable>
-        <Pressable onPress={handleToggleLog} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.08)', backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(0,0,0,0.02)' }}>
+        <Pressable onPress={handleToggleLog} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.12)', backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.04)' }}>
           <Text style={{ fontSize: 14, color: mode === 'day' ? '#475569' : '#CBD5E1', fontWeight: '600' }}>{showLog ? '▲ Hide Log' : '📋 Event Log'}</Text>
         </Pressable>
         <Pressable onPress={onRemove} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: '#EF444466', backgroundColor: '#EF444412' }}>
@@ -901,7 +901,7 @@ function ActivationCard({
 
       {/* Event Log */}
       {showLog && (
-        <View style={{ gap: 8, marginTop: 4, backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(0,0,0,0.02)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.04)' }}>
+        <View style={{ gap: 8, marginTop: 4, backgroundColor: mode === 'day' ? '#F8FAFC' : 'rgba(255,255,255,0.03)', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.06)' }}>
           <Text style={{ fontWeight: '700', fontSize: 14, color: mode === 'day' ? '#1E293B' : '#F1F5F9' }}>📋 Event Log</Text>
           {(integrationLog ?? []).map((evt, idx) => {
             const c = evt.status === 'ok' ? '#22C55E' : evt.status === 'warn' ? '#F59E0B' : '#EF4444';
@@ -909,7 +909,7 @@ function ActivationCard({
               <View key={evt.id} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, paddingVertical: 5 }}>
                 <View style={{ alignItems: 'center', gap: 2, width: 14, paddingTop: 4 }}>
                   <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: c }} />
-                  {idx < (integrationLog?.length ?? 0) - 1 && <View style={{ width: 2, height: 16, backgroundColor: mode === 'day' ? '#E2E8F0' : 'rgba(0,0,0,0.06)' }} />}
+                  {idx < (integrationLog?.length ?? 0) - 1 && <View style={{ width: 2, height: 16, backgroundColor: mode === 'day' ? '#E2E8F0' : 'rgba(255,255,255,0.08)' }} />}
                 </View>
                 <Text style={{ fontSize: 12, color: '#9CA3AF', width: 72, flexShrink: 0, fontWeight: '500' }}>{evt.ts}</Text>
                 <Text style={{ fontSize: 13, color: mode === 'day' ? '#475569' : '#CBD5E1', flex: 1, lineHeight: 18 }}>{evt.event}</Text>

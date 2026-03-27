@@ -1,5 +1,5 @@
-/**
- * IngestionPage Ã¢â‚¬â€ WS-048: Event Listener & Document Ingestion
+﻿/**
+ * IngestionPage -- WS-048: Event Listener & Document Ingestion
  *
  * The universal ingestion layer. Accepts OCR, CSV, EDI, and webhook-format
  * data, normalises it to a common field map, and fires events that start the
@@ -11,7 +11,7 @@
  *   - Confidence scores drive automatic processing vs. Mission Control routing.
  *   - Structured sources (CSV, EDI, webhook) always have confidence = 1.0.
  *
- * Ingestion Ã¢â€ â€™ Mission Control routing (WS-048-ADD):
+ * Ingestion -> Mission Control routing (WS-048-ADD):
  *   - Records below confidence threshold appear in the Mission Control review
  *     queue in FinancialPage. The reviewer confirms or corrects each field.
  *   - On confirmation, the downstream chain fires as if auto-processed.
@@ -37,15 +37,15 @@ import {
 import { Card } from './components';
 import { GuidedPageProps } from './types';
 
-// Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Constants Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+// --- Constants ---
 type IngTab = 'pipeline' | 'sources' | 'mappings' | 'presence';
 type SourceSubTab = 'ocr' | 'csv' | 'edi' | 'webhook';
 
 const ING_TABS: { id: IngTab; label: string; icon: string; description: string }[] = [
-  { id: 'pipeline',  label: 'Pipeline',       icon: 'Ã°Å¸â€â€ž', description: 'All ingestion records, confidence scores, and review status' },
-  { id: 'sources',   label: 'Sources',         icon: 'Ã°Å¸â€œÂ¡', description: 'Configure ingestion source endpoints by format' },
-  { id: 'mappings',  label: 'Field Mappings',  icon: 'Ã°Å¸â€”ÂºÃ¯Â¸Â', description: 'Map extracted keys to Halo Internal field slugs per document type' },
-  { id: 'presence',  label: 'Presence',        icon: 'Ã°Å¸â€˜Â¥', description: 'Active users and routing availability (WS-048 v2.1)' },
+  { id: 'pipeline',  label: 'Pipeline',       icon: '📋', description: 'All ingestion records, confidence scores, and review status' },
+  { id: 'sources',   label: 'Sources',         icon: '📡', description: 'Configure ingestion source endpoints by format' },
+  { id: 'mappings',  label: 'Field Mappings',  icon: '🗺', description: 'Map extracted keys to Halo Internal field slugs per document type' },
+  { id: 'presence',  label: 'Presence',        icon: '👥', description: 'Active users and routing availability (WS-048 v2.1)' },
 ];
 
 const FORMAT_INFO: Record<IngestionFormat, { label: string; icon: string; description: string; confidenceNote: string }> = {
@@ -75,7 +75,7 @@ const FORMAT_INFO: Record<IngestionFormat, { label: string; icon: string; descri
   },
 };
 
-const ACCENT = '#06B6D4';   // Cyan Ã¢â‚¬â€ distinct from Financial amber (#F59E0B) and platform purple (#FFD332)
+const ACCENT = '#06B6D4';   // Cyan -- distinct from Financial amber (#F59E0B) and platform accent
 const SUCCESS = '#10B981';
 const DANGER = '#EF4444';
 const WARN = '#F59E0B';

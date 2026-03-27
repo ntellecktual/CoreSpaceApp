@@ -35,9 +35,9 @@ class AppErrorBoundary extends React.Component<{ children: React.ReactNode }, Er
   render() {
     if (this.state.hasError) {
       return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: '#263374', padding: 16 }}>
-          <Text style={{ color: '#FFD332', fontSize: 13, fontWeight: '700' }}>Halo Internal encountered a runtime error.</Text>
-          <Text style={{ color: '#FFFFFF', fontSize: 13 }}>{this.state.message || 'Unknown error'}</Text>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: '#FFFFFF', padding: 16 }}>
+          <Text style={{ color: '#111111', fontSize: 13, fontWeight: '700' }}>Halo Internal encountered a runtime error.</Text>
+          <Text style={{ color: '#4B5563', fontSize: 13 }}>{this.state.message || 'Unknown error'}</Text>
         </View>
       );
     }

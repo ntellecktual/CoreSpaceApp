@@ -91,7 +91,7 @@ function ensureMarketingCSS() {
       100% { background-position: 200% center; }
     }
     .cs-stat-value {
-      background: linear-gradient(90deg, #FFFFFF 30%, #B0C4E8 50%, #FFFFFF 70%);
+      background: linear-gradient(90deg, #111111 30%, #3B82F6 50%, #111111 70%);
       background-size: 200% 100%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -568,7 +568,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
   const navButtonActiveStyle = {
     borderColor: 'rgba(0,0,0,0.12)',
     backgroundColor: 'rgba(0,0,0,0.16)',
-    shadowcolor: '#111111',
+    shadowColor: '#111111',
     shadowOpacity: 0.22,
   } as const;
   const navLoginButtonStyle = {
@@ -578,11 +578,11 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.12)',
     background: 'linear-gradient(135deg, rgba(0,0,0,0.85), rgba(59,130,246,0.65))',
-    backgroundcolor: '#111111',
+    backgroundColor: '#111111',
     boxShadow: '0 18px 40px rgba(0,0,0,0.06)',
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
-    shadowcolor: '#111111',
+    shadowColor: '#111111',
     shadowOpacity: 0.28,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 2 },
@@ -617,7 +617,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
   );
 
   return (
-    <View style={[styles.landingWrap, { backgroundcolor: '#111111' } as any]}>
+    <View style={[styles.landingWrap, { backgroundColor: '#FFFFFF' } as any]}>
 
     {/* ─── Sticky nav (show on scroll-up) ────────────────────── */}
     <View style={{
@@ -631,7 +631,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
           flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
           paddingHorizontal: navHorizontalPadding, paddingVertical: navVerticalPadding,
           ...(navScrolled ? {
-            backgroundColor: 'rgba(20,28,65,0.92)',
+            backgroundColor: 'rgba(255,255,255,0.95)',
             backdropFilter: 'blur(18px)',
             WebkitBackdropFilter: 'blur(18px)',
             borderBottom: '1px solid rgba(0,0,0,0.06)',
@@ -667,7 +667,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
               >
                 <Text style={{
                   fontSize: navMenuFontSize,
-                  color: isActive ? '#FFFFFF' : 'rgba(235,223,255,0.60)',
+                  color: isActive ? '#FFFFFF' : 'rgba(0,0,0,0.45)',
                   fontWeight: isActive ? '800' : '500',
                   letterSpacing: 0.4,
                   transition: 'color 0.3s ease',
@@ -694,7 +694,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
       {/* ── Mobile dropdown menu ── */}
       {isMobile && mobileMenuOpen && (
         <View style={{
-          backgroundColor: 'rgba(20,28,65,0.96)',
+          backgroundColor: 'rgba(255,255,255,0.98)',
           backdropFilter: 'blur(18px)',
           paddingHorizontal: 20,
           paddingVertical: 12,
@@ -711,7 +711,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
               >
                 <Text style={{
                   fontSize: 15,
-                  color: isActive ? '#FFFFFF' : 'rgba(235,223,255,0.70)',
+                  color: isActive ? '#FFFFFF' : 'rgba(0,0,0,0.55)',
                   fontWeight: isActive ? '700' : '500',
                 } as any}>{item.label}</Text>
               </Pressable>
@@ -719,7 +719,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
           })}
           <View style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.04)', marginVertical: 6 }} />
           <Pressable
-            style={{ paddingVertical: 10, paddingHorizontal: 8, borderRadius: 10, backgroundcolor: '#111111', alignItems: 'center' } as any}
+            style={{ paddingVertical: 10, paddingHorizontal: 8, borderRadius: 10, backgroundColor: '#111111', alignItems: 'center' } as any}
             onPress={() => { setMobileMenuOpen(false); onContinue(); }}
           >
             <Text style={{ fontSize: 15, color: '#111111', fontWeight: '700' }}>Login</Text>
@@ -861,7 +861,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                   '✅ Your data, your database',
                 ].map((badge, i) => (
                   <View key={`badge-${i}`} style={{ paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(0,0,0,0.10)', backgroundColor: 'rgba(0,0,0,0.03)' }}>
-                    <Text style={{ color: '#B0C4E8', fontSize: 12, fontWeight: '700' }}>{badge}</Text>
+                    <Text style={{ color: '#374151', fontSize: 12, fontWeight: '700' }}>{badge}</Text>
                   </View>
                 ))}
               </View>
@@ -1217,9 +1217,9 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                 </View>
 
                 {/* ── Next Quarter ── */}
-                <View style={{ flex: 1, ...(glassCard as any), padding: 14, gap: 10, borderColor: 'rgba(0,0,0,0.10)', borderTopWidth: 3, borderTopcolor: '#111111' }}>
+                <View style={{ flex: 1, ...(glassCard as any), padding: 14, gap: 10, borderColor: 'rgba(0,0,0,0.10)', borderTopWidth: 3, borderTopColor: '#111111' }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundcolor: '#111111' }} />
+                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#111111' }} />
                     <Text style={{ color: '#111111', fontSize: 10, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' }}>Next Quarter</Text>
                     <View style={{ marginLeft: 'auto' as any, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 999, backgroundColor: 'rgba(0,0,0,0.15)' }}>
                       <Text style={{ color: '#111111', fontSize: 10, fontWeight: '800' }}>2</Text>
@@ -1328,7 +1328,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                 >
                   {/* Badge */}
                   {tier.highlight && (
-                    <View style={{ backgroundcolor: '#111111', paddingVertical: 6, alignItems: 'center' as const }}>
+                    <View style={{ backgroundColor: '#111111', paddingVertical: 6, alignItems: 'center' as const }}>
                       <Text style={{ color: '#111111', fontSize: 11, fontWeight: '800', letterSpacing: 0.8 }}>MOST POPULAR</Text>
                     </View>
                   )}
@@ -1451,7 +1451,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 4 }}>
                 {['🇺🇸 U.S. Company', '📍 Remote-First', '🔒 Privacy-First', '♾️ No Vendor Lock-In', '🤝 Community-Backed'].map((v, i) => (
                   <View key={i} style={{ paddingHorizontal: 12, paddingVertical: 5, borderRadius: 999, backgroundColor: 'rgba(0,0,0,0.03)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
-                    <Text style={{ color: '#B0C4E8', fontSize: 11, fontWeight: '700' }}>{v}</Text>
+                    <Text style={{ color: '#374151', fontSize: 11, fontWeight: '700' }}>{v}</Text>
                   </View>
                 ))}
               </View>
@@ -1526,7 +1526,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
               {['🌍 Remote-First', '🔥 Seed Stage', '⚡ Move Fast', '🛡️ Privacy-First', '📈 Equity for Early Hires'].map((v, i) => (
                 <View key={i} style={{ paddingHorizontal: 13, paddingVertical: 5, borderRadius: 999, backgroundColor: 'rgba(0,0,0,0.03)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
-                  <Text style={{ color: '#B0C4E8', fontSize: 11, fontWeight: '700' }}>{v}</Text>
+                  <Text style={{ color: '#374151', fontSize: 11, fontWeight: '700' }}>{v}</Text>
                 </View>
               ))}
             </View>
@@ -1554,7 +1554,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                         </View>
                       </View>
                       <View style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.03)', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' }}>
-                        <Text style={{ color: '#B0C4E8', fontSize: 10, fontWeight: '700' }}>{expandedJob === job.title ? 'Close ▲' : 'View ▼'}</Text>
+                        <Text style={{ color: '#374151', fontSize: 10, fontWeight: '700' }}>{expandedJob === job.title ? 'Close ▲' : 'View ▼'}</Text>
                       </View>
                     </View>
                     {expandedJob === job.title && (
@@ -1568,7 +1568,7 @@ export function MarketingScreen({ onContinue }: MarketingScreenProps) {
                           ))}
                         </View>
                         <Pressable
-                          style={{ alignSelf: 'flex-start', marginTop: 4, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, backgroundcolor: '#111111' }}
+                          style={{ alignSelf: 'flex-start', marginTop: 4, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, backgroundColor: '#111111' }}
                           onPress={() => {
                             if (typeof window !== 'undefined') {
                               const sub = encodeURIComponent(`Application: ${job.title}`);

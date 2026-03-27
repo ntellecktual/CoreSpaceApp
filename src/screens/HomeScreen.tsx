@@ -864,7 +864,7 @@ export function HomeScreen() {
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   {activeTenantBranding.logoUri?.trim() ? (
-                    <Image source={{ uri: activeTenantBranding.logoUri }} style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(0,0,0,0.06)' } as any} resizeMode="contain" />
+                    <Image source={{ uri: activeTenantBranding.logoUri }} style={{ width: 28, height: 28, borderRadius: 7, backgroundColor: 'rgba(255,255,255,0.06)' } as any} resizeMode="contain" />
                   ) : (
                     <View style={[styles.dashboardTenantAvatar, page === 'enduser' && { backgroundColor: `${tenantAccentResolved}30`, borderColor: `${tenantAccentResolved}50` }]}>
                       <Text style={{ fontSize: 11, fontWeight: '800', color: page === 'enduser' ? tenantAccentResolved : 'rgba(214,204,235,0.85)' }}>
@@ -880,7 +880,7 @@ export function HomeScreen() {
                       <Text style={{ fontSize: 9, color: 'rgba(214,204,235,0.45)', fontWeight: '600' }} numberOfLines={1}>{activeTenantBranding.industryVertical}</Text>
                     ) : null}
                   </View>
-                  <Text style={{ fontSize: 10, color: page === 'enduser' ? 'rgba(0,0,0,0.55)' : 'rgba(214,204,235,0.45)', fontWeight: '800' }}>
+                  <Text style={{ fontSize: 10, color: page === 'enduser' ? 'rgba(255,255,255,0.55)' : 'rgba(214,204,235,0.45)', fontWeight: '800' }}>
                     {endUserTenantMenuOpen ? '▾' : '▸'}
                   </Text>
                 </View>
@@ -1152,7 +1152,7 @@ export function HomeScreen() {
               onPress={() => setNotificationsOpen(true)}
               accessibilityRole="button"
               accessibilityLabel={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: mode === 'night' ? 'rgba(0,0,0,0.06)' : 'rgba(0,0,0,0.04)' }}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: mode === 'night' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' }}
             >
               {/* Bell — jingles on every new notification via rotation animation */}
               <Animated.View style={{
@@ -1200,7 +1200,7 @@ export function HomeScreen() {
                   return (
                     <React.Fragment key={step.id}>
                       {idx > 0 && (
-                        <Text style={{ fontSize: 9, color: mode === 'night' ? 'rgba(0,0,0,0.18)' : 'rgba(0,0,0,0.18)', marginHorizontal: 2, letterSpacing: 1 }}>›</Text>
+                        <Text style={{ fontSize: 9, color: mode === 'night' ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.18)', marginHorizontal: 2, letterSpacing: 1 }}>›</Text>
                       )}
                       <Pressable
                         onPress={() => { setTenantAccessOpen(false); setPage(step.id); }}
@@ -1226,14 +1226,14 @@ export function HomeScreen() {
                         {isCurrent ? (
                           <Text style={{ fontSize: 12 }}>{step.icon}</Text>
                         ) : (
-                          <View style={{ width: 16, height: 16, borderRadius: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(0,0,0,0.18)' : 'rgba(0,0,0,0.18)', alignItems: 'center', justifyContent: 'center' }}>
-                            <Text style={{ fontSize: 8, fontWeight: '700', color: mode === 'night' ? 'rgba(0,0,0,0.40)' : 'rgba(0,0,0,0.35)', lineHeight: 10 }}>{stepNum}</Text>
+                          <View style={{ width: 16, height: 16, borderRadius: 8, borderWidth: 1, borderColor: mode === 'night' ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.18)', alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={{ fontSize: 8, fontWeight: '700', color: mode === 'night' ? 'rgba(255,255,255,0.40)' : 'rgba(0,0,0,0.35)', lineHeight: 10 }}>{stepNum}</Text>
                           </View>
                         )}
                         <Text style={{
                           fontSize: isCurrent ? 12 : 11,
                           fontWeight: isCurrent ? '700' : '500',
-                          color: isCurrent ? accent : (mode === 'night' ? 'rgba(0,0,0,0.48)' : 'rgba(0,0,0,0.48)'),
+                          color: isCurrent ? accent : (mode === 'night' ? 'rgba(255,255,255,0.48)' : 'rgba(0,0,0,0.48)'),
                           letterSpacing: isCurrent ? 0.1 : 0,
                         }}>{step.label}</Text>
                         {isCurrent && (
@@ -1426,7 +1426,7 @@ export function HomeScreen() {
                           <View style={[styles.listCard, { marginTop: 8 }]}>
                             <Text style={[styles.metaText, { fontSize: 10 }]}>Preview</Text>
                             <Text style={{ fontWeight: tenantExtras.headingWeight as any, fontSize: tenantExtras.baseFontSize + 6, color: mode === 'night' ? '#FFFFFF' : '#1A1A2E' }}>Heading Sample</Text>
-                            <Text style={{ fontSize: tenantExtras.baseFontSize, color: mode === 'night' ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.7)', marginTop: 4 }}>Body text preview with {tenantExtras.baseFontSize}px base font size and {tenantExtras.fontFamily} font family.</Text>
+                            <Text style={{ fontSize: tenantExtras.baseFontSize, color: mode === 'night' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)', marginTop: 4 }}>Body text preview with {tenantExtras.baseFontSize}px base font size and {tenantExtras.fontFamily} font family.</Text>
                           </View>
                         </View>
                       </View>
